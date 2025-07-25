@@ -11,7 +11,6 @@ import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as caiThunks from "../cai/caiThunks"
 import { Chat } from "../cai/Chat"
-import * as collaboration from "../app/collaboration"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
@@ -72,10 +71,7 @@ function saveActiveScriptWithRunStatus(status: number) {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
     const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
-    if (script?.collaborative) {
-        script && collaboration.saveScript(script.shareid)
-        isWaitingForServerResponse = false
-    } else if (script && !script.readonly && !script.isShared && !script.saved) {
+    if (script && !script.readonly && !script.isShared && !script.saved) {
         // save the script on a successful run
         store.dispatch(scriptsThunks.saveScript({
             name: script.name,
@@ -107,8 +103,6 @@ function saveScript() {
         store.dispatch(saveScriptIfModified(activeTabID)).unwrap().catch(() => {
             userNotification.show(i18n.t("messages:idecontroller.savefailed"), "failure1")
         })
-    } else if (script?.collaborative) {
-        collaboration.saveScript()
     }
 }
 

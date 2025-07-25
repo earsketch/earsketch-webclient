@@ -13,7 +13,6 @@ import * as bubble from "../bubble/bubbleState"
 import { ConfettiLauncher } from "./Confetti"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
-import * as collaboration from "./collaboration"
 import { Script, SoundEntity } from "common"
 import { CompetitionSubmission } from "./CompetitionSubmission"
 import * as curriculum from "../browser/curriculumState"
@@ -143,17 +142,9 @@ async function postLogin(username: string) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
 
-    // register callbacks to the collaboration service
-    collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
-    // TODO: potential race condition with server-side script renaming operation?
-    collaboration.callbacks.refreshSharedScriptBrowser = () => store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
-    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabThunks.closeTab(id))
-
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
     userNotification.callbacks.getSharedScripts = () => store.dispatch(scriptsThunks.getSharedScripts())
-
-    collaboration.setUserName(username)
 
     // used for managing websocket notifications locally
     userNotification.user.loginTime = Date.now()
@@ -230,7 +221,6 @@ async function refreshCodeBrowser() {
             script.saved = true
             script.tooltipText = ""
             scripts[script.shareid] = script
-            scriptsThunks.fixCollaborators(script)
         }
         store.dispatch(scriptsState.setRegularScripts(scripts))
     } else {
@@ -249,10 +239,6 @@ export async function renameScript(script: Script) {
         return
     }
     reporter.renameScript()
-    if (script.collaborative) {
-        collaboration.renameScript(script.shareid, name, user.selectUserName(store.getState())!)
-        reporter.renameSharedScript()
-    }
 }
 
 export function downloadScript(script: Script) {
@@ -260,9 +246,7 @@ export function downloadScript(script: Script) {
 }
 
 export async function openScriptHistory(script: Script, allowRevert: boolean) {
-    if (script.collaborative) {
-        collaboration.saveScript(script.id)
-    } else if (!script.isShared) {
+    if (!script.isShared) {
         // saveScript() saves regular scripts - if called for shared scripts, it will create a local copy (#2663).
         await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
     }
@@ -307,7 +291,6 @@ async function deleteScriptHelper(scriptid: string) {
             if (scripts[scriptid]) {
                 script.modified = Date.now()
                 store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
-                scriptsThunks.fixCollaborators(scripts[scriptid])
             } else {
                 // script doesn't exist
             }
@@ -325,9 +308,6 @@ async function deleteScriptHelper(scriptid: string) {
 
 async function deleteScript(script: Script) {
     if (await confirm({ textKey: "messages:confirm.deletescript", okKey: "script.delete", type: "danger" })) {
-        if (script.shareid === collaboration.scriptID && collaboration.active) {
-            collaboration.closeScript(script.shareid)
-        }
         await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
         await deleteScriptHelper(script.shareid)
         reporter.deleteScript()
@@ -338,30 +318,15 @@ async function deleteScript(script: Script) {
 }
 
 export async function deleteSharedScript(script: Script) {
-    if (script.collaborative) {
-        if (await confirm({ textKey: "messages:confirm.leaveCollaboration", textReplacements: { scriptName: script.name }, okKey: "leave", type: "danger" })) {
-            if (script.shareid === collaboration.scriptID && collaboration.active) {
-                collaboration.closeScript(script.shareid)
-            }
-            // Apply state change first
-            const { [script.shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
-            store.dispatch(scriptsState.setSharedScripts(sharedScripts))
-            store.dispatch(tabThunks.closeDeletedScript(script.shareid))
-            store.dispatch(tabs.removeModifiedScript(script.shareid))
-            // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
-            collaboration.leaveCollaboration(script.shareid, user.selectUserName(store.getState())!, false)
+    if (await confirm({ textKey: "messages:confirm.deleteSharedScript", textReplacements: { scriptName: script.name }, okKey: "script.delete", type: "danger" })) {
+        if (user.selectLoggedIn(store.getState())) {
+            await request.postAuth("/scripts/deleteshared", { scriptid: script.shareid })
+            esconsole("Deleted shared script: " + script.shareid, "debug")
         }
-    } else {
-        if (await confirm({ textKey: "messages:confirm.deleteSharedScript", textReplacements: { scriptName: script.name }, okKey: "script.delete", type: "danger" })) {
-            if (user.selectLoggedIn(store.getState())) {
-                await request.postAuth("/scripts/deleteshared", { scriptid: script.shareid })
-                esconsole("Deleted shared script: " + script.shareid, "debug")
-            }
-            const { [script.shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
-            store.dispatch(scriptsState.setSharedScripts(sharedScripts))
-            store.dispatch(tabThunks.closeDeletedScript(script.shareid))
-            store.dispatch(tabs.removeModifiedScript(script.shareid))
-        }
+        const { [script.shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
+        store.dispatch(scriptsState.setSharedScripts(sharedScripts))
+        store.dispatch(tabThunks.closeDeletedScript(script.shareid))
+        store.dispatch(tabs.removeModifiedScript(script.shareid))
     }
 }
 
@@ -422,16 +387,6 @@ export function openSharedScript(shareID: string) {
     openShare(shareID).then(() => {
         store.dispatch(tabThunks.setActiveTabAndEditor(shareID))
     })
-}
-
-export function openCollaborativeScript(shareID: string) {
-    const sharedScripts = scriptsState.selectSharedScripts(store.getState())
-    if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
-        openSharedScript(shareID)
-        store.dispatch(tabThunks.setActiveTabAndEditor(shareID))
-    } else {
-        userNotification.show("Error opening the collaborative script! You may no longer the access. Try refreshing the page and checking the shared scripts browser", "failure1")
-    }
 }
 
 function toggleColorTheme() {
@@ -604,7 +559,6 @@ const NotificationMenu = () => {
             <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-3/4">
                 {({ close }) => <NotificationList
                     openSharedScript={openSharedScript}
-                    openCollaborativeScript={openCollaborativeScript}
                     showHistory={setShowHistory}
                     close={close}
                 />}
@@ -852,8 +806,6 @@ export const App = () => {
             }
         }
 
-        leaveCollaborationSession()
-
         localStorage.clear()
         if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
             store.dispatch(caiState.resetState())
@@ -1042,24 +994,9 @@ export const ModalContainer = () => {
     </Transition>
 }
 
-function leaveCollaborationSession() {
-    const activeTabID = tabs.selectActiveTabID(store.getState())
-    if (activeTabID) {
-        const allScriptEntities = scriptsState.selectAllScripts(store.getState())
-        // Protect against scenario where the last tab opened was force-closed due to the current
-        // user being removed from that script's collaboration, causing
-        // allScriptEntities[activeTabID] to be undefined and error on ".collaborative".
-        if (allScriptEntities[activeTabID]?.collaborative) {
-            collaboration.leaveSession(activeTabID)
-        }
-    }
-}
-
 // websocket gets closed before onunload in FF
 window.onbeforeunload = () => {
     if (user.selectLoggedIn(store.getState())) {
-        leaveCollaborationSession()
-
         // Show page-close warning if saving.
         // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right way will be to call preventDefault.)
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.

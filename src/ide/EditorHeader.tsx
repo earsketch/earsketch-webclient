@@ -158,7 +158,7 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
             <div className={`${openTabs.length ? "flex" : "hidden"} items-center space-x-8`}>
                 <UndoRedoButtons />
                 <SettingsMenu />
-                {(loggedIn && scriptType !== "readonly" && !(scriptType === "shared" && script?.collaborative)) && (
+                {(loggedIn && scriptType !== "readonly") && (
                     <button
                         className={`
                                 rounded-full

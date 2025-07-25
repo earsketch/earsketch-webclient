@@ -5,7 +5,6 @@ import { Language } from "common"
 const ACTIONS = {
     user: ["login", "logout", "openHistory", "sidebarTogglesClicked", "toggleColorTheme"],
     script: ["createScript", "deleteScript", "openScript", "openSharedScript", "renameScript", "renameSharedScript", "revertScript", "saveScript", "saveSharedScript"],
-    collab: ["syncError", "syncErrorRejoin", "failedToSync", "collabServerFull", "inactiveSessionClosed"],
 }
 
 const module: { [key: string]: Function } = {}
@@ -131,14 +130,7 @@ function blocksMode(enterBlocksMode: boolean) {
     })
 }
 
-function collabSessionJoined(userCount: number) {
-    gtag("event", "collab_joined", {
-        event_category: "collab",
-        active_users: userCount,
-    })
-}
-
-export default { exception, readererror, compile, share, localeSelection, localeMiss, blocksMode, collabSessionJoined, ...module } as { [key: string]: Function }
+export default { exception, readererror, compile, share, localeSelection, localeMiss, blocksMode, ...module } as { [key: string]: Function }
 
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 

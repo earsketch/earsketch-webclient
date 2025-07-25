@@ -11,7 +11,6 @@ export interface Notification {
     time: number
     unread: boolean
     pinned: boolean
-    // Collaboration data.
     sender?: string
     // eslint-disable-next-line camelcase
     script_name?: string

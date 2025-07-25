@@ -2,21 +2,16 @@ import { Transition } from "@headlessui/react"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { usePopper } from "react-popper"
-import { useDispatch, useSelector } from "react-redux"
 
-import * as collaboration from "./collaboration"
 import { Script } from "common"
 import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
 import reporter from "./reporter"
-import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
-import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
 import { get } from "../request"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
-import type { AppDispatch } from "../reducers"
 import store from "../reducers"
 import * as websocket from "./websocket"
 
@@ -33,7 +28,7 @@ function shareWithPeople(shareid: string, users: string[]) {
     websocket.send(data)
 }
 
-// stuff for view-only and collaborative share
+// stuff for view-only share
 async function queryID(query: any) {
     query = query.toLowerCase().trim()
     if (query === "") {
@@ -245,55 +240,6 @@ export const LinkTab = ({ script, close }: TabParameters) => {
     </form>
 }
 
-const CollaborationTab = ({ script, close }: TabParameters) => {
-    const dispatch = useDispatch<AppDispatch>()
-    const activeTabID = useSelector(tabs.selectActiveTabID)
-    const [collaborators, setCollaborators] = useState(script.collaborators)
-    const finalize = useRef<undefined |(() => Promise<string[] | null>)>()
-    const { t } = useTranslation()
-
-    const submit = async () => {
-        const newCollaborators = await finalize.current?.()
-        if (!newCollaborators) return
-        const oldCollaborators = script.collaborators
-
-        // Update the remote script state.
-        const added = newCollaborators.filter(m => !oldCollaborators.includes(m))
-        const removed = oldCollaborators.filter(m => !newCollaborators.includes(m))
-        const username = user.selectUserName(store.getState())!
-        collaboration.addCollaborators(script.shareid, username, added)
-        collaboration.removeCollaborators(script.shareid, username, removed)
-
-        // Update the local script state.
-        dispatch(scripts.setScriptCollaborators({ id: script.shareid, collaborators: newCollaborators }))
-        script = scripts.selectRegularScripts(store.getState())[script.shareid]
-
-        // Update the state of tab, if open.
-        if (activeTabID === script.shareid) {
-            if (oldCollaborators.length === 0 && newCollaborators.length > 0) {
-                if (!script.saved) {
-                    await dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
-                }
-                collaboration.openScript(script, username)
-            } else if (oldCollaborators.length > 0 && newCollaborators.length === 0) {
-                collaboration.closeScript(script.shareid)
-            }
-        }
-        close()
-    }
-
-    return <form onSubmit={e => { e.preventDefault(); submit() }}>
-        <ModalBody>
-            <div className="modal-section-header">
-                <i className="icon icon-users mr-2" style={{ color: "#6dfed4" }}></i>
-                {t("scriptShare.tab.collab.addRemove")}
-            </div>
-            <UserListInput users={collaborators} setUsers={setCollaborators} setFinalize={f => { finalize.current = f }} />
-        </ModalBody>
-        <ModalFooter submit="save" close={close} />
-    </form>
-}
-
 const EmbedTab = ({ script, close }: TabParameters) => {
     const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
     const [showCode, setShowCode] = useState(true)
@@ -328,7 +274,6 @@ const EmbedTab = ({ script, close }: TabParameters) => {
 
 const Tabs = [
     { component: LinkTab, titleKey: "scriptShare.tab.viewonly.title", descriptionKey: "messages:shareScript.menuDescriptions.viewOnly" },
-    { component: CollaborationTab, titleKey: "scriptShare.tab.collab.title", descriptionKey: "messages:shareScript.menuDescriptions.collaboration" },
     { component: EmbedTab, titleKey: "scriptShare.tab.embed.title", descriptionKey: "messages:shareScript.menuDescriptions.embedded" },
 ]
 

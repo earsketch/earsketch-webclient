@@ -263,10 +263,6 @@ const SingletonSharedScriptInfo = () => {
                     body={script.username}
                 />
                 <SharedScriptInfoItem
-                    title={t("sharedScript.collaborators")}
-                    body={script.collaborative ? script.collaborators.join(", ") : ""}
-                />
-                <SharedScriptInfoItem
                     title={t("lastModified")}
                     body={script.modified as string}
                 />
@@ -310,7 +306,6 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
     // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
 
     const shared = script.creator || script.isShared
-    const collaborators = script.collaborators as string[]
     const ariaLabel = type === "deleted" ? "" : t("scriptBrowser.openInEditor", { name: script.name })
     return (
         <div
@@ -338,8 +333,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                             {script.name}
                         </div>
                         <div className="pr-4 space-x-2">
-                            {(shared && !script.collaborative) && (<i className="icon-copy3 align-middle" title={t("scriptBrowser.shared.sharedBy", { username: script.creator ?? script.username })} />)}
-                            {script.collaborative && (<i className="icon-users4 align-middle" title={t("scriptBrowser.collab.sharedWith", { collaborators: collaborators.join(", ") })} />)}
+                            {shared && (<i className="icon-copy3 align-middle" title={t("scriptBrowser.shared.sharedBy", { username: script.creator ?? script.username })} />)}
                         </div>
                     </div>
                     <div className={`${type === "regular" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
