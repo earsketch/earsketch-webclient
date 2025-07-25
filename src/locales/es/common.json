@@ -55,6 +55,7 @@
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "Restaurar",
     "scriptBrowser.options.close": "Close Script Options",
+    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "Mantener abiertas pestañas no guardadas",
@@ -127,6 +128,7 @@
     "script.delete": "Borrar",
     "sharedScript.noDescription": "Este script no tiene una descripción.",
     "sharedScript.originalAuthor": "Autor original",
+    "sharedScript.collaborators": "Colaboradores",
     "sharedScript.license": "Información de licencia",
     "sharedScript.viewOnlyLink": "Enlace de script de sólo lectura",
     "lastModified": "Última vez que se modificó",
@@ -184,6 +186,7 @@
     "scriptHistory.title": "Historial de versiones de {{scriptName}}",
     "scriptHistory.heading": "Historial de versiones",
     "scriptHistory.diff": "Diferencia con versión anterior",
+    "scriptHistory.activeCollab": "Colaboradores activos",
     "scriptHistory.onlyMyScripts": "Para revertir un script, hay que usar $t(scriptBrowser.myScripts)",
     "scriptHistory.fetching": "Consiguiendo historial del script...",
     "renameScript.title": "Renombrar script",
@@ -219,6 +222,8 @@
     "scriptShare.tab.viewonly.shareFuture": "Compartir futuros cambios",
     "scriptShare.tab.viewonly.otherUsers": "Enviar script no editable a otros usuarios",
     "scriptShare.tab.viewonly.usersPlaceholder": "Escribe las identificaciones de ususarios, separadas por un espacio.",
+    "scriptShare.tab.collab.title": "Permitir que otros editen",
+    "scriptShare.tab.collab.addRemove": "Agregar o remover colaboradores",
     "scriptShare.tab.embed.title": "Compartir un script incrustado",
     "scriptShare.tab.embed.linkTitle": "Código IFrame que se puede incrustar",
     "scriptShare.tab.embed.showCode": "Mostrar código:",
@@ -393,7 +398,8 @@
     "confirm": {
       "deletescript": "Scripts borrados desaparecen de la lista de los Scripts y se pueden restaurar desde \"Scripts borrados\".",
       "deleteSharedScript": "¿Estás seguro que quieres borrar el script compartido \"{{scriptName}}\"?",
-      "deleteSound": "Do you really want to delete sound {{soundName}}"
+      "deleteSound": "Do you really want to delete sound {{soundName}}",
+      "leaveCollaboration": "¿Quieres salir de la colaboración \"{{scriptName}}\"?"
     },
     "interpreter": {
       "runSuccess": "¡El script se ejecutó exitosamente! Haz clic en el botón de play para escuchar tu música.",
@@ -493,6 +499,7 @@
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "Quiero que alguien vea mi script. (No podrá editarlo.)",
+        "collaboration": "Quiero que alguien pueda editar mi script.",
         "embedded": "Quiero poder insertar mi canción en una página web."
       },
       "sharedViewOnly": "Compartiste una versión no editable de {{scriptName}} con"

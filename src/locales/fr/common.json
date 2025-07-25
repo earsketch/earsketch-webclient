@@ -55,6 +55,7 @@
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "Restaurer",
     "scriptBrowser.options.close": "Close Script Options",
+    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "Garder les onglets non sauvegardés ouverts",
@@ -127,6 +128,7 @@
     "script.delete": "Supprimer",
     "sharedScript.noDescription": "Ce script n'a aucune description.",
     "sharedScript.originalAuthor": "Auteur d'origine",
+    "sharedScript.collaborators": "Collaborateurs",
     "sharedScript.license": "Informations sur la licence",
     "sharedScript.viewOnlyLink": "Lien de script en lecture seule",
     "lastModified": "Dernière modification",
@@ -184,6 +186,7 @@
     "scriptHistory.title": "Historique des versions pour {{scriptName}}",
     "scriptHistory.heading": "Historique des versions",
     "scriptHistory.diff": "Différence avec la version précédente",
+    "scriptHistory.activeCollab": "Collaborateurs actifs",
     "scriptHistory.onlyMyScripts": "Vous ne pouvez annuler les scripts que sous $t(scriptBrowser.myScripts)",
     "scriptHistory.fetching": "Récupération de l'historique des scripts...",
     "renameScript.title": "Renommer le script",
@@ -219,6 +222,8 @@
     "scriptShare.tab.viewonly.shareFuture": "Partager les modifications futures",
     "scriptShare.tab.viewonly.otherUsers": "Envoyer un script en lecture seule aux autres utilisateurs",
     "scriptShare.tab.viewonly.usersPlaceholder": "Tapez les identifiants d'utilisateur, séparés par des espaces.",
+    "scriptShare.tab.collab.title": "Autoriser les autres à modifier",
+    "scriptShare.tab.collab.addRemove": "Ajouter ou supprimer des collaborateurs",
     "scriptShare.tab.embed.title": "Partager un script intégré",
     "scriptShare.tab.embed.linkTitle": "Code IFrame intégrable",
     "scriptShare.tab.embed.showCode": "Afficher le code :",
@@ -393,7 +398,8 @@
     "confirm": {
       "deletescript": "Les scripts supprimés disparaissent de la liste des scripts et peuvent être restaurés à partir de « Scripts supprimés ».",
       "deleteSharedScript": "Êtes-vous sûr de vouloir supprimer le script partagé \"{{scriptName}}\" ?",
-      "deleteSound": "Voulez-vous vraiment supprimer le son {{soundName}} ?"
+      "deleteSound": "Voulez-vous vraiment supprimer le son {{soundName}} ?",
+      "leaveCollaboration": "Voulez-vous vraiment quitter la collaboration sur \"{{scriptName}}\" ?"
     },
     "interpreter": {
       "runSuccess": "Script exécuté avec succès ! Cliquez sur le bouton de lecture pour écouter votre musique.",
@@ -493,6 +499,7 @@
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "Je veux qu'une personne puisse voir mon script. (Elle ne pourra pas effectuer de modification)",
+        "collaboration": "Je veux qu'une personne puisse modifier mon script.",
         "embedded": "Je veux pouvoir intégrer ma chanson sur un site Web."
       },
       "sharedViewOnly": "{{scriptName}} a été partagé en lecture seule avec "

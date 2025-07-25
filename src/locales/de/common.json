@@ -55,6 +55,7 @@
     "scriptBrowser.openInEditor": "{{name}} im Code Editor öffnen",
     "scriptBrowser.restore": "Wiederherstellen",
     "scriptBrowser.options.close": "Skript-Optionen schließen",
+    "scriptBrowser.collab.sharedWith": "Geteilt mit {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Geteilt von {{username}}",
     "script.options.copy": "Kopie von {{scriptname}} erstellen",
     "keepUnsavedTabs": "Ungespeicherte Tabs offen lassen",
@@ -127,6 +128,7 @@
     "script.delete": "Löschen",
     "sharedScript.noDescription": "Dieses Skript hat keine Beschreibung.",
     "sharedScript.originalAuthor": "Originaler Autor",
+    "sharedScript.collaborators": "Mitwirkende",
     "sharedScript.license": "Lizenzinformation",
     "sharedScript.viewOnlyLink": "\"Nur anzeigen\" Link",
     "lastModified": "Zuletzt geändert",
@@ -184,6 +186,7 @@
     "scriptHistory.title": "Versionsverlauf von {{scriptName}}",
     "scriptHistory.heading": "Versionsverlauf",
     "scriptHistory.diff": "Unterschiede zur vorherigen Version",
+    "scriptHistory.activeCollab": "Aktive Mitwirkende",
     "scriptHistory.onlyMyScripts": "Du kannst die Skripte nur unter $t(scriptBrowser.myScripts) zurücksetzen",
     "scriptHistory.fetching": "Skriptverlauf wird abgerufen.",
     "renameScript.title": "Skript umbenennen",
@@ -219,6 +222,8 @@
     "scriptShare.tab.viewonly.shareFuture": "Zukünftige Änderungen teilen",
     "scriptShare.tab.viewonly.otherUsers": "Nur-Ansichts-Skript an andere Benutzer senden",
     "scriptShare.tab.viewonly.usersPlaceholder": "Gib die Benutzer-IDs ein, getrennt durch Leerzeichen.",
+    "scriptShare.tab.collab.title": "Andere bearbeiten lassen",
+    "scriptShare.tab.collab.addRemove": "Mitwirkende hinzufügen oder entfernen",
     "scriptShare.tab.embed.title": "Ein eingebettetes Skript teilen",
     "scriptShare.tab.embed.linkTitle": "Einbettbarer IFrame-Code",
     "scriptShare.tab.embed.showCode": "Code anzeigen:",
@@ -393,7 +398,8 @@
     "confirm": {
       "deletescript": "Gelöschte Skripte verschwinden aus der Liste der Skripte und können unter „Gelöschte Skripte“ wiederhergestellt werden.",
       "deleteSharedScript": "Bist du sicher, dass du das freigegebene Skript „{{scriptName}}“ löschen möchtest?",
-      "deleteSound": "Möchtest du den Sound „{{soundName}}“ wirklich löschen?"
+      "deleteSound": "Möchtest du den Sound „{{soundName}}“ wirklich löschen?",
+      "leaveCollaboration": "Möchtest du die Zusammenarbeit in \"{{scriptName}} \" verlassen?"
     },
     "interpreter": {
       "runSuccess": "Skript erfolgreich ausgeführt! Klicke auf den Play-Button, um deine Musik zu hören.",
@@ -493,6 +499,7 @@
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "Ich möchte, dass jemand mein Skript sieht (ohne Bearbeitungserlaubnis).",
+        "collaboration": "Ich möchte, dass jemand mein Skript bearbeiten kann.",
         "embedded": "Ich möchte meinen Song auf einer Website einbetten können."
       },
       "sharedViewOnly": "{{scriptName}} wurde nur zur Ansicht freigegeben für "
