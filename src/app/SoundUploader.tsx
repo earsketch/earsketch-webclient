@@ -364,36 +364,10 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
     </form>
 }
 
-const TunepadTab = ({ close }: { close: () => void }) => {
-    // todo: after some time we can remove the tunepad sunset message
-    return <>
-        <ModalBody>
-            <div className="text-sm text-red-800 bg-orange-100 p-4 mb-4 rounded border border-red-200">
-                <p>Sorry, TunePad integration within EarSketch has been retired.</p>
-                <p className="pt-5">
-                    However, your creative workflow between TunePad and EarSketch can continue.
-                </p>
-                <p className="pt-5">
-                    <ol className="list-decimal list-inside">
-                        <li>Start by opening TunePad in a new browser tab.</li>
-                        <li>Export your desired music creation.</li>
-                        <li>Then, navigate back to EarSketch and select the &quot;UPLOAD SOUND&quot; option.</li>
-                    </ol>
-                </p>
-                <p className="pt-5">
-                    And voila! Continue bringing your unique soundscapes to life with EarSketch!
-                </p>
-            </div>
-        </ModalBody>
-        <ModalFooter close={close} />
-    </>
-}
-
 const Tabs = [
     { component: FileTab, titleKey: "soundUploader.title.upload", icon: "cloud-upload" },
     { component: RecordTab, titleKey: "soundUploader.title.record", icon: "microphone" },
     { component: FreesoundTab, titleKey: "FREESOUND", icon: "search" },
-    { component: TunepadTab, titleKey: "TUNEPAD", icon: "cloud-upload" },
 ]
 
 export const SoundUploader = ({ close }: { close: () => void }) => {
