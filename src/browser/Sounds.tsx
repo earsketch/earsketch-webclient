@@ -487,22 +487,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         listRef.current?.resetAfterIndex(0)
     }, [filterHeight])
 
-      useEffect(() => {
-        // Command/ Control + Up arrow to go to top 
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowUp') {
-                event.preventDefault()
-                // Scroll to top (same as clicking the back to top button)
-                listRef.current?.scrollToItem(0)
-            }
-        }
-
-        document.addEventListener('keydown', handleKeyDown)
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown)
-        }
-    }, [])
-
     const getItemSize = (index: number) => {
         const folderHeight = 25
         const clipHeight = 30
