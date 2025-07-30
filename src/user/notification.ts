@@ -24,6 +24,14 @@ export function show(text: string, type: string = "", duration: number | undefin
             unread: false,
             pinned: false,
         }))
+    } else if (type === "collaboration") {
+        store.dispatch(pushNotification({
+            message: { text },
+            notification_type: type,
+            time: Date.now(),
+            unread: true,
+            pinned: false,
+        }))
     } else {
         // showCallback.apply(this, arguments)
     }
@@ -49,6 +57,27 @@ function loadHistory(notifications: Notification[]) {
             // auto-add new view-only scripts that are shared to the shared-script browser
             if (v.unread && callbacks.addSharedScript(v.shareid!)) {
                 needRefresh = true
+            }
+        } else if (v.notification_type === "collaborate_script") {
+            // This notification may have been processed before.
+            if (v.message.json) {
+                const data = JSON.parse(v.message.json!)
+                // received only by the ones affected
+                switch (data.action) {
+                    case "userAddedToCollaboration":
+                        text = data.sender + " added you as a collaborator on " + data.scriptName
+                        break
+                    case "userRemovedFromCollaboration":
+                        text = data.sender + " removed you from collaboration on " + data.scriptName
+                        break
+                    case "userLeftCollaboration":
+                        text = data.sender + " left the collaboration on " + data.scriptName
+                        break
+                    case "scriptRenamed":
+                        text = `Collaborative script "${data.oldName}" was renamed to "${data.newName}"`
+                        break
+                }
+                v.message = { text, action: data.action }
             }
         }
 
