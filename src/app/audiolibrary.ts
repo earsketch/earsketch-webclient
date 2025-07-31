@@ -154,8 +154,7 @@ async function _getStandardSounds() {
 }
 
 export async function getUserSounds(username: string) {
-    const response = await getAuth("/audio/user?" + new URLSearchParams({ username }))
-    const sounds: SoundEntity[] = await response.json()
+    const sounds: SoundEntity[] = await getAuth("/audio/user", { username })
     // Populate cache with user sound metadata so that we don't fetch it again later via `getMetadata()`.
     for (const sound of sounds) {
         fixMetadata(sound, false)
