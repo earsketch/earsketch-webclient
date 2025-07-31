@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next"
 import { Menu } from "@headlessui/react"
 
 import * as appState from "../app/appState"
-import * as editor from "./ideState"
 import { DropdownContextMenuCaller } from "../browser/ScriptsMenus"
 import * as scripts from "../browser/scriptsState"
 import * as tabs from "./tabState"
@@ -40,14 +39,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
     const scriptType = (script.isShared && "shared") || (script.readonly && "readonly") || "regular"
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const active = activeTabID === scriptID
-    const collaborators = script.collaborators as string[]
     const { t } = useTranslation()
-
-    useEffect(() => {
-        if (active && script.collaborative) {
-            dispatch(editor.setBlocksMode(false))
-        }
-    }, [activeTabID])
 
     const tabDivClass = classNames("shrink-0 cursor-pointer border text-sm",
         {
@@ -94,10 +86,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
                 type={scriptType}
             >
                 <div className="flex items-center space-x-1.5 truncate">
-                    {(script.isShared && !script.collaborative) &&
-                        <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`}/>}
-                    {script.collaborative &&
-                        <i className="icon-users4 align-middle" title={`Shared with ${collaborators.join(", ")}`}/>}
+                    {script.isShared && <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`}/>}
                     <div className="truncate select-none align-middle">{scriptName}</div>
                 </div>
             </DropdownContextMenuCaller>
