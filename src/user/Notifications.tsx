@@ -98,9 +98,8 @@ export const NotificationPopup = () => {
     </div>
 }
 
-const Notification = ({ item, openCollaborativeScript, openSharedScript, close }: {
-    item: user.Notification, close: () => void,
-    openCollaborativeScript: (s: string) => void, openSharedScript: (s: string) => void,
+const Notification = ({ item, openSharedScript, close }: {
+    item: user.Notification, close: () => void, openSharedScript: (s: string) => void,
 }) => {
     const { t } = useTranslation()
 
@@ -134,11 +133,6 @@ const Notification = ({ item, openCollaborativeScript, openSharedScript, close }
                         <div>
                             <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>
                         </div>}
-                        {item.notification_type === "collaborate_script" &&
-                        <div>
-                            {item.message.action === "userAddedToCollaboration" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>}
-                            {item.message.action === "scriptRenamed" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>}
-                        </div>}
                     </div>
                 </div>
             </div>
@@ -147,9 +141,10 @@ const Notification = ({ item, openCollaborativeScript, openSharedScript, close }
     </div>
 }
 
-export const NotificationList = ({ openCollaborativeScript, openSharedScript, showHistory, close }: {
-    openCollaborativeScript: (s: string) => void, openSharedScript: (s: string) => void,
-    showHistory: (b: boolean) => void, close: () => void,
+export const NotificationList = ({ openSharedScript, showHistory, close }: {
+    openSharedScript: (s: string) => void,
+    showHistory: (b: boolean) => void,
+    close: () => void,
 }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
@@ -179,7 +174,6 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
                 {notifications.slice(0, 5).map((item, index) =>
                     <Notification
                         key={index} item={item}
-                        openCollaborativeScript={openCollaborativeScript}
                         openSharedScript={openSharedScript}
                         close={close}
                     />)}
