@@ -8,8 +8,6 @@ export interface Script {
     modified: number | string
     saved: boolean
     tooltipText: string
-    collaborative: boolean
-    collaborators: string[]
     isShared: boolean
     run_status: number
     readonly: boolean
@@ -18,10 +16,8 @@ export interface Script {
     id?: string
     original_id?: string
     soft_delete?: boolean
-    activeUsers?: string | string[]
 }
 
-// Note: How about collaborative?
 export type ScriptType = "regular" | "shared" | "readonly" | "deleted";
 
 export type Language = "python" | "javascript"

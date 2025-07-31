@@ -2,7 +2,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import i18n from "i18next"
 
 import type { Script } from "common"
-import * as collaboration from "../app/collaboration"
 import esconsole from "../esconsole"
 import { fromEntries } from "../esutils"
 import type { ThunkAPI } from "../reducers"
@@ -19,40 +18,13 @@ import { RenameScript } from "../app/Rename"
 import * as userNotification from "../user/notification"
 import store from "../reducers"
 
-// The script content from server may need adjustment in the collaborators parameter.
-// Is this still necessary?
-export function fixCollaborators(script: Script, username?: string) {
-    if (script.collaborators === undefined) {
-        script.collaborators = []
-    } else if (typeof script.collaborators === "string") {
-        script.collaborators = [script.collaborators]
-    }
-
-    if (username) {
-        // for shared-script browser: treat script as collaborative only when the user is listed among collaborators
-        // #1858: List of collaborators may be recorded in mixed case (inconsistently).
-        if (script.collaborators.length !== 0 &&
-            script.collaborators.map((user: string) => user.toLowerCase()).includes(username.toLowerCase())) {
-            script.collaborative = true
-            script.readonly = false
-        } else {
-            script.collaborative = false
-            script.readonly = true
-        }
-    } else {
-        // for regular script browser
-        script.collaborative = script.collaborators.length !== 0
-    }
-}
-
 export const getSharedScripts = createAsyncThunk<Script[], void, ThunkAPI>(
     "scripts/getSharedScripts",
-    async (_, { getState, dispatch }) => {
-        const username = user.selectUserName(getState())!
+    async (_, { dispatch }) => {
         const scripts: Script[] = await getAuth("/scripts/shared")
         for (const script of scripts) {
             script.isShared = true
-            fixCollaborators(script, username)
+            script.readonly = true
         }
         dispatch(setSharedScripts(fromEntries(scripts.map(script => [script.shareid, script]))))
         return scripts
@@ -82,7 +54,6 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
             script.modified = Date.now()
             script.saved = true
             script.tooltipText = ""
-            fixCollaborators(script)
             dispatch(setRegularScripts({ ...scripts, [script.shareid]: script }))
             return script
         } else {
@@ -106,7 +77,6 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
                 modified: Date.now(),
                 saved: true,
                 tooltipText: "",
-                collaborators: [],
                 ...(creator && { creator }),
             } as any as Script
             dispatch(setRegularScripts({ ...scripts, [script.shareid]: script }))
@@ -205,7 +175,6 @@ export async function importSharedScript(scriptid: string) {
             ...script,
             creator: script.username,
             original_id: script.shareid,
-            collaborative: false,
             readonly: false,
             shareid: selectNextLocalScriptID(state),
         }
@@ -216,18 +185,6 @@ export async function importSharedScript(scriptid: string) {
     store.dispatch(setRegularScripts({ ...scripts, [script.shareid]: script }))
     esconsole("Import script " + scriptid, ["debug", "user"])
     return script
-}
-
-export async function importCollaborativeScript(script: Script) {
-    const originalScriptName = script.name
-    if (lookForScriptByName(script.name)) {
-        await promptForRename(script)
-    }
-    const text = await collaboration.getScriptText(script.shareid)
-    // TODO: Translate (or remove) this message!
-    userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`)
-    collaboration.closeScript(script.shareid)
-    return store.dispatch(saveScript({ name: script.name, source: text })).unwrap()
 }
 
 export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string) {
