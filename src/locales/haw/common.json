@@ -456,7 +456,7 @@
       "alreadyused": " is already used as a constant",
       "invalidconstant": " is not valid constant...",
       "tempointeger": "Tempo must be a positive number...",
-      "bigsize": " Sorry, the audio file cannot be longer than 30 seconds.",
+      "toolong": " Sorry, the audio file cannot be longer than 30 seconds.",
       "timeout": "Timeout Communication Error Uploading Sound ...",
       "uploadsuccess": "Success uploading custom sound",
       "commerror": "Communication Error uploading sound ...",

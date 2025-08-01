@@ -456,7 +456,7 @@
       "alreadyused": " allaqachon konstanta sifatida ishlatilgan",
       "invalidconstant": " haqiqiy konstanta emas...",
       "tempointeger": "Temp ijobiy raqam bo'lishi shart...",
-      "bigsize": " Kechirasiz, audio fayl 30 soniyadan uzun bo'lmasligi kerak.",
+      "toolong": " Kechirasiz, audio fayl 30 soniyadan uzun bo'lmasligi kerak.",
       "timeout": "Tovushni Yuklashda Bog'lanish Vaqti Tugashi Bilan Bog‘liq Xato...",
       "uploadsuccess": "Maxsus tovush muvaffaqiyatli yuklandi",
       "commerror": "Tovushni yuklashda Aloqa Xatosi ...",

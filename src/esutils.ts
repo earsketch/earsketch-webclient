@@ -44,7 +44,7 @@ export const parseName = (filename: string) => {
     return match ? match[1] : filename
 }
 
-// Parse the extension from a filename. Returns empty string if there is no extension.
+// Parse the extension (including the leading '.') from a filename. Returns empty string if there is no extension.
 export const parseExt = (filename: string) => {
     const match = filename.match(/\.[^.]*$/)
     return match ? match[0] : ""
