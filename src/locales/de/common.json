@@ -883,7 +883,7 @@
       },
       "example": {
         "python": "# Slicen und neu ordnen durch Achtelnoten\nsound = HIPHOP_TRAPHOP_BEAT_002\neighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"01261264\"\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8)",
-        "javascript": "// Slice und neu ordnen durch Achtelnoten\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
+        "javascript": "// Slicen und neu ordnen durch Achtelnoten\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
       }
     },
     "print": {
@@ -1152,7 +1152,7 @@
       }
     },
     "shuffleList": {
-      "description": "Die Elemente in einer Listen/Array zufällig neu anordnen.",
+      "description": "Die Elemente in einer Liste/Array zufällig neu anordnen.",
       "parameters": {
         "list": {
           "description": "Liste/Array, die/das gemischt werden soll."
@@ -1195,7 +1195,7 @@
       "ImportError": "Die entsprechenden Pakete können nicht gefunden oder importiert werden",
       "IndentationError": "Es gibt einen Einrückungsfehler im Code (fehlende oder zusätzliche Leerzeichen)",
       "IndexError": "Es gibt einen Fehler bei der Verwendung eines Out-of-Range-Index",
-      "KeyError": "Es gibt einen Fehler bei der Verwendung eines Wörterbuch-Schlüssels da er nicht existiert",
+      "KeyError": "Es gibt einen Fehler bei der Verwendung eines Wörterbuch-Schlüssels, da er nicht existiert",
       "NameError": "Es gibt einen Fehler mit einer Variable oder einem Funktionsnamen, der nicht definiert ist",
       "ParseError": "Fehler beim Lesen des Codes",
       "SyntaxError": "Es gibt einen Fehler mit der Syntax (oder Anordnung) des Codes",
