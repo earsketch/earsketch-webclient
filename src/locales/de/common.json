@@ -295,7 +295,7 @@
     "shortcuts.zoomHorizontal": "Zoomen (Horizontal)",
     "shortcuts.zoomVertical": "Zoomen (Vertikal)",
     "shortcuts.escapeEditor": "Editor-Fokus verlassen",
-    "shortcuts.playPause": "Play / Pause",
+    "shortcuts.playPause": "Wiedergabe/Pause",
     "hardware.ctrl": "Strg",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
@@ -909,14 +909,14 @@
       }
     },
     "readInput": {
-      "description": "Ask the user a question",
+      "description": "Dem Benutzer eine Frage stellen",
       "parameters": {
         "prompt": {
-          "description": "A message displayed to the user"
+          "description": "Eine Nachricht, die dem Benutzer angezeigt wird"
         }
       },
       "returns": {
-        "description": "The user's response"
+        "description": "Antwort des Benutzers"
       },
       "example": {
         "python": "# Vom Benutzer bereitgestellter Beat String\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
@@ -924,31 +924,31 @@
       }
     },
     "multiChoiceInput1": {
-      "description": "Ask the user to choose from a list",
+      "description": "Den Benutzer bitten, aus einer Liste auszuwählen",
       "parameters": {
         "prompt": {
-          "description": "A message displayed to the user"
+          "description": "Eine Nachricht, die dem Benutzer angezeigt wird"
         },
         "choices": {
-          "description": "A list of choices displayed to the user"
+          "description": "Eine Liste von Optionen, die dem Benutzer angezeigt werden"
         }
       },
       "returns": {
-        "description": "The selected index"
+        "description": "Der ausgewählte Index"
       },
       "example": {
-        "python": "# Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nbeatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices)\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex])",
-        "javascript": "// Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nvar beatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices);\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex]);"
+        "python": "# Auswahl eines beat strings\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nbeatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices)\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex])",
+        "javascript": "// Auswahl eines beat strings\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nvar beatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices);\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex]);"
       }
     },
     "multiChoiceInput2": {
-      "description": "Ask the user to choose one-or-more items from a list.",
+      "description": "Den Benutzer bitten, ein oder mehrere Elemente aus einer Liste auszuwählen.",
       "parameters": {
         "prompt": {
-          "description": "A message displayed to the user"
+          "description": "Eine Nachricht, die dem Benutzer angezeigt wird"
         },
         "choices": {
-          "description": "A list of choices displayed to the user"
+          "description": "Eine Liste von Optionen, die dem Benutzer angezeigt werden"
         },
         "allowMultiple": {
           "description": "Wenn true, kann der Benutzer mehrere Optionen auswählen. Wenn false, kann der Benutzer nur eine Auswahl auswählen."
