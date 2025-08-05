@@ -152,7 +152,7 @@ const CurriculumHeader = () => {
     const dispatch = useDispatch()
 
     return (
-        <div id="curriculum-header" style={{ position: "relative" }}>
+        <div id="curriculum-header" tabIndex={0} style={{ position: "relative" }}>
             <TitleBar />
             <NavigationBar />
 
