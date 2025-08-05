@@ -1,3 +1,4 @@
+import { fileTypeFromBlob } from "file-type"
 import i18n from "i18next"
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
@@ -12,7 +13,7 @@ import { LevelMeter, Metronome, Waveform } from "./Recorder"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
 import { getUserSounds } from "../browser/soundsThunks"
-import { encodeWAV } from "../audio/renderer"
+import { encodeFLAC } from "../audio/renderer"
 import * as userConsole from "../ide/console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
@@ -36,14 +37,42 @@ function validateUpload(username: string | null, name: string, tempo: number) {
     }
 }
 
+const AUDIO_FORMATS = [
+    { ext: "wav", mime: "wav" },
+    { ext: "mp3", mime: "mpeg" },
+    { ext: "ogg", mime: "ogg" },
+    { ext: "opus", mime: "ogg; codecs=opus" },
+    { ext: "flac", mime: "flac" },
+]
+
 async function uploadFile(username: string | null, file: Blob, name: string, extension: string, tempo: number, onProgress: (frac: number) => void) {
     validateUpload(username, name, tempo)
+
+    if (file.size > 10 * 1024 * 1024) {
+        throw new Error(i18n.t("messages:uploadcontroller.toobig"))
+    }
+
+    const type = await fileTypeFromBlob(file)
+    if (!AUDIO_FORMATS.map(f => `audio/${f.mime}`).includes(type?.mime!)) {
+        throw new Error(i18n.t("messages:uploadcontroller.wavsel"))
+    }
 
     const arrayBuffer = await file.arrayBuffer()
     const buffer = await audioContext.decodeAudioData(arrayBuffer)
     if (buffer.duration > 30) {
         esconsole("Rejecting the upload of audio file with duration: " + buffer.duration, ["upload", "error"])
-        throw new Error(i18n.t("messages:uploadcontroller.bigsize"))
+        throw new Error(i18n.t("messages:uploadcontroller.toolong"))
+    }
+
+    if (type!.mime === "audio/wav") {
+        const channels = [...new Array(buffer.numberOfChannels)].map((_, i) => buffer.getChannelData(i))
+        const flac = encodeFLAC(channels, buffer.sampleRate, buffer.numberOfChannels)
+        if (flac.size < file.size) {
+            // Ensure the FLAC file is actually smaller before choosing it over the original.
+            // (This should practically always be the case, but it's technically possible for WAV to contain compressed audio data.)
+            file = flac
+            extension = ".flac"
+        }
     }
 
     const data = request.form({
@@ -85,8 +114,6 @@ async function uploadFile(username: string | null, file: Blob, name: string, ext
     req.send(data)
     return promise
 }
-
-const AUDIO_FORMATS = [{ ext: "wav", mime: "wav" }, { ext: "mp3", mime: "mpeg" }, { ext: "flac", mime: "flac" }]
 
 const FileTab = ({ close }: { close: () => void }) => {
     const username = useSelector(user.selectUserName)
@@ -181,9 +208,8 @@ const RecordTab = ({ close }: { close: () => void }) => {
 
     const submit = async () => {
         try {
-            const view = encodeWAV(buffer!.getChannelData(0), audioContext.sampleRate, 1)
-            const blob = new Blob([view], { type: "audio/wav" })
-            await uploadFile(username, blob, name, ".wav", metronome ? tempo : 120, setProgress)
+            const blob = encodeFLAC(buffer!.getChannelData(0), audioContext.sampleRate, 1)
+            await uploadFile(username, blob, name, ".flac", metronome ? tempo : 120, setProgress)
             close()
         } catch (error: any) {
             setError(error.message)

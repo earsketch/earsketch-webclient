@@ -62,7 +62,7 @@ export function wav(script: Script) {
 }
 
 export function mp3(script: Script) {
-    return exportAudio(script, "mp3", renderer.renderMp3)
+    return exportAudio(script, "mp3", renderer.renderMP3)
 }
 
 export async function multiTrack(script: Script) {
