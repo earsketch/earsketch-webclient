@@ -42,7 +42,7 @@ const AUDIO_FORMATS = [
     { ext: "aiff", mime: "aiff" },
     { ext: "mp3", mime: "mpeg" },
     { ext: "ogg", mime: "ogg" },
-    { ext: "opus", mime: "opus" },
+    { ext: "opus", mime: "ogg; codecs=opus" },
     { ext: "flac", mime: "flac" },
 ]
 
