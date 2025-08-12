@@ -12,7 +12,6 @@ import layout from "./ide/layoutState"
 import bubble from "./bubble/bubbleState"
 import sounds from "./browser/soundsState"
 import scripts from "./browser/scriptsState"
-import collaboration from "./app/collaborationState"
 import api from "./browser/apiState"
 import daw from "./daw/dawState"
 import curriculum from "./browser/curriculumState"
@@ -28,7 +27,6 @@ const rootReducer = combineReducers({
     bubble,
     sounds,
     scripts,
-    collaboration,
     api,
     daw,
     curriculum,
