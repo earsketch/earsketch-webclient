@@ -15,7 +15,7 @@ import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
-import { importCollaborativeScript, importScript, saveScript } from "./scriptsThunks"
+import { importScript, saveScript } from "./scriptsThunks"
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
     return () => ({ x, y, left: x, right: x, top: y, bottom: y, width: 0, height: 0, toJSON: () => null })
@@ -125,7 +125,7 @@ export const ScriptDropdownMenu = ({
         onClick: () => submit(script!),
         icon: "icon-share2",
         disabled: !loggedIn,
-        visible: type === "regular" && loggedIn && FLAGS.SHOW_COMPETITION_SUBMIT,
+        visible: type === "regular" && loggedIn && ES_WEB_SHOW_COMPETITION_SUBMIT,
     }, {
         name: t("script.history"),
         aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),
@@ -150,12 +150,12 @@ export const ScriptDropdownMenu = ({
             let imported
             try {
                 // exception occurs below if api call fails
-                imported = await (script!.collaborative ? importCollaborativeScript : importScript)(script!)
+                imported = await importScript(script!)
             } catch {
                 userNotification.show(i18n.t("messages:createaccount.commerror"), "failure1")
                 return
             }
-            if (imported && script && openTabs.includes(script.shareid) && !script.collaborative) {
+            if (imported && script && openTabs.includes(script.shareid)) {
                 dispatch(closeTab(script.shareid))
                 dispatch(setActiveTabAndEditor(imported.shareid))
             }

@@ -1,6 +1,6 @@
 import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
-import React, { Fragment, useEffect, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
@@ -13,7 +13,6 @@ import * as bubble from "../bubble/bubbleState"
 import { ConfettiLauncher } from "./Confetti"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
-import * as collaboration from "./collaboration"
 import { Script, SoundEntity } from "common"
 import { CompetitionSubmission } from "./CompetitionSubmission"
 import * as curriculum from "../browser/curriculumState"
@@ -47,17 +46,24 @@ import * as tabThunks from "../ide/tabThunks"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
-import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice } from "../Utils"
 import * as websocket from "./websocket"
 
 import esLogo from "./ES_logo_extract.svg"
-import teachersLogo from "./teachers_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
-import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
+import HeaderBanner from "./HeaderBanner"
 
-// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
+// TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
     return (await openModal(Prompt, { message })) ?? ""
+}
+(window as any).esPromptChoice = async (message: string, choices: string[]) => {
+    return (await openModal(PromptChoice, { message, choices, allowMultiple: false })) ?? 0
+}
+
+(window as any).esPromptChoicesMultiple = async (message: string, choices: string[]) => {
+    return (await openModal(PromptChoice, { message, choices, allowMultiple: true })) ?? []
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
@@ -136,24 +142,16 @@ async function postLogin(username: string) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
 
-    // register callbacks to the collaboration service
-    collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
-    // TODO: potential race condition with server-side script renaming operation?
-    collaboration.callbacks.refreshSharedScriptBrowser = () => store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
-    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabThunks.closeTab(id))
-
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
     userNotification.callbacks.getSharedScripts = () => store.dispatch(scriptsThunks.getSharedScripts())
-
-    collaboration.setUserName(username)
 
     // used for managing websocket notifications locally
     userNotification.user.loginTime = Date.now()
 
     esconsole("List of scripts in Load script list successfully updated.", ["debug", "user"])
 
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         store.dispatch(caiState.resetState())
     }
 
@@ -223,7 +221,6 @@ async function refreshCodeBrowser() {
             script.saved = true
             script.tooltipText = ""
             scripts[script.shareid] = script
-            scriptsThunks.fixCollaborators(script)
         }
         store.dispatch(scriptsState.setRegularScripts(scripts))
     } else {
@@ -242,10 +239,6 @@ export async function renameScript(script: Script) {
         return
     }
     reporter.renameScript()
-    if (script.collaborative) {
-        collaboration.renameScript(script.shareid, name, user.selectUserName(store.getState())!)
-        reporter.renameSharedScript()
-    }
 }
 
 export function downloadScript(script: Script) {
@@ -253,9 +246,7 @@ export function downloadScript(script: Script) {
 }
 
 export async function openScriptHistory(script: Script, allowRevert: boolean) {
-    if (script.collaborative) {
-        collaboration.saveScript(script.id)
-    } else if (!script.isShared) {
+    if (!script.isShared) {
         // saveScript() saves regular scripts - if called for shared scripts, it will create a local copy (#2663).
         await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
     }
@@ -300,7 +291,6 @@ async function deleteScriptHelper(scriptid: string) {
             if (scripts[scriptid]) {
                 script.modified = Date.now()
                 store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
-                scriptsThunks.fixCollaborators(scripts[scriptid])
             } else {
                 // script doesn't exist
             }
@@ -318,9 +308,6 @@ async function deleteScriptHelper(scriptid: string) {
 
 async function deleteScript(script: Script) {
     if (await confirm({ textKey: "messages:confirm.deletescript", okKey: "script.delete", type: "danger" })) {
-        if (script.shareid === collaboration.scriptID && collaboration.active) {
-            collaboration.closeScript(script.shareid)
-        }
         await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
         await deleteScriptHelper(script.shareid)
         reporter.deleteScript()
@@ -331,30 +318,15 @@ async function deleteScript(script: Script) {
 }
 
 export async function deleteSharedScript(script: Script) {
-    if (script.collaborative) {
-        if (await confirm({ textKey: "messages:confirm.leaveCollaboration", textReplacements: { scriptName: script.name }, okKey: "leave", type: "danger" })) {
-            if (script.shareid === collaboration.scriptID && collaboration.active) {
-                collaboration.closeScript(script.shareid)
-            }
-            // Apply state change first
-            const { [script.shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
-            store.dispatch(scriptsState.setSharedScripts(sharedScripts))
-            store.dispatch(tabThunks.closeDeletedScript(script.shareid))
-            store.dispatch(tabs.removeModifiedScript(script.shareid))
-            // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
-            collaboration.leaveCollaboration(script.shareid, user.selectUserName(store.getState())!, false)
+    if (await confirm({ textKey: "messages:confirm.deleteSharedScript", textReplacements: { scriptName: script.name }, okKey: "script.delete", type: "danger" })) {
+        if (user.selectLoggedIn(store.getState())) {
+            await request.postAuth("/scripts/deleteshared", { scriptid: script.shareid })
+            esconsole("Deleted shared script: " + script.shareid, "debug")
         }
-    } else {
-        if (await confirm({ textKey: "messages:confirm.deleteSharedScript", textReplacements: { scriptName: script.name }, okKey: "script.delete", type: "danger" })) {
-            if (user.selectLoggedIn(store.getState())) {
-                await request.postAuth("/scripts/deleteshared", { scriptid: script.shareid })
-                esconsole("Deleted shared script: " + script.shareid, "debug")
-            }
-            const { [script.shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
-            store.dispatch(scriptsState.setSharedScripts(sharedScripts))
-            store.dispatch(tabThunks.closeDeletedScript(script.shareid))
-            store.dispatch(tabs.removeModifiedScript(script.shareid))
-        }
+        const { [script.shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
+        store.dispatch(scriptsState.setSharedScripts(sharedScripts))
+        store.dispatch(tabThunks.closeDeletedScript(script.shareid))
+        store.dispatch(tabs.removeModifiedScript(script.shareid))
     }
 }
 
@@ -417,16 +389,6 @@ export function openSharedScript(shareID: string) {
     })
 }
 
-export function openCollaborativeScript(shareID: string) {
-    const sharedScripts = scriptsState.selectSharedScripts(store.getState())
-    if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
-        openSharedScript(shareID)
-        store.dispatch(tabThunks.setActiveTabAndEditor(shareID))
-    } else {
-        userNotification.show("Error opening the collaborative script! You may no longer the access. Try refreshing the page and checking the shared scripts browser", "failure1")
-    }
-}
-
 function toggleColorTheme() {
     store.dispatch(appState.setColorTheme(store.getState().app.colorTheme === "light" ? "dark" : "light"))
     reporter.toggleColorTheme()
@@ -458,6 +420,7 @@ const KeyboardShortcuts = () => {
         undo: [modifier, "Z"],
         redo: [modifier, "Shift", "Z"],
         comment: [modifier, "/"],
+        playPause: ["Ctrl", "Space"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
@@ -596,7 +559,6 @@ const NotificationMenu = () => {
             <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-3/4">
                 {({ close }) => <NotificationList
                     openSharedScript={openSharedScript}
-                    openCollaborativeScript={openCollaborativeScript}
                     showHistory={setShowHistory}
                     close={close}
                 />}
@@ -655,11 +617,11 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
 
 function setup() {
     store.dispatch(soundsThunks.getStandardSounds())
-    if (FLAGS.SHOW_FEATURED_SOUNDS) {
+    if (ES_WEB_SHOW_FEATURED_SOUNDS) {
         store.dispatch(soundsState.setFeaturedSoundVisibility(true))
     }
-    if (FLAGS.FEATURED_ARTISTS && FLAGS.FEATURED_ARTISTS.length) {
-        store.dispatch(soundsState.setFeaturedArtists(FLAGS.FEATURED_ARTISTS))
+    if (ES_WEB_FEATURED_ARTISTS && ES_WEB_FEATURED_ARTISTS.length) {
+        store.dispatch(soundsState.setFeaturedArtists(ES_WEB_FEATURED_ARTISTS))
     }
 
     esconsole.updateLevelsFromURLParameters()
@@ -673,7 +635,7 @@ function setup() {
     }
 
     // If in CAI study mode, switch to active CAI view.
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
     }
 }
@@ -706,8 +668,6 @@ export const App = () => {
     ;(window as any).loadCurriculumChapter = (url: string) => {
         dispatch(curriculum.open(url))
     }
-
-    const showAfeCompetitionBanner = FLAGS.SHOW_COMPETITION_BANNER || location.href.includes("competition")
 
     const sharedScriptID = ESUtils.getURLParameter("sharing")
 
@@ -752,7 +712,7 @@ export const App = () => {
                     }
                 }
                 // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
+                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !ES_WEB_SHOW_CAI && !ES_WEB_SHOW_CHAT) {
                     store.dispatch(bubble.resume())
                 }
             }
@@ -846,10 +806,8 @@ export const App = () => {
             }
         }
 
-        leaveCollaborationSession()
-
         localStorage.clear()
-        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+        if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
         websocket.logout()
@@ -912,8 +870,6 @@ export const App = () => {
     }
 
     return <>
-        {/* dynamically set the color theme */}
-        <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
         <nav role="navigation">
             <ul className="skip-links">
                 <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
@@ -927,45 +883,33 @@ export const App = () => {
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <header role="banner" id="top-header-nav" className="shrink-0">
                 <div className="w-full flex items-center">
-                    <a href="http://earsketch.gatech.edu/landing"
-                        target="_blank" rel="noreferrer"
-                        className="flex items-center"
-                        tabIndex={0}>
-                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
+                    <a href="http://earsketch.gatech.edu/landing" target="_blank" rel="noreferrer" className="flex items-center" tabIndex={0}>
+                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo"/>
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-                    <ConfettiLauncher />
-                    {showAfeCompetitionBanner &&
-                    <div className="hidden w-full lg:flex justify-evenly">
-                        <a href="https://www.teachers.earsketch.org/compete"
-                            aria-label="Link to the competition website"
-                            target="_blank"
-                            className="text-black uppercase dark:text-white text-center"
-                            style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
-                            rel="noreferrer">
-                            <div className="flex flex-col items-center">
-                                <img style={{ height: "20px" }} src={teachersLogo} id="comp-logo" alt="Link to the competition site" />
-                                <div>Remix Competition</div>
-                            </div>
-                        </a>
-                    </div>}
+                    {ES_WEB_SHOW_COMPETITION_BANNER && <HeaderBanner />}
                 </div>
 
+                {/* for easter egg in passthrough.ts */}
+                <ConfettiLauncher/>
+
                 {/* temporary place for the app-generated notifications */}
-                <NotificationBar />
+                <NotificationBar/>
 
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
-                    {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }} onClick={toggleCaiWindow} title="CAI">
-                        <i
-                            id="caiButton"
-                            className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
-                        >
-                        </i>
-                    </button>}
+                    {(ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) &&
+                        <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }}
+                            onClick={toggleCaiWindow} title="CAI">
+                            <i
+                                id="caiButton"
+                                className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
+                            >
+                            </i>
+                        </button>}
 
-                    {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
+                    {ES_WEB_SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />
@@ -1050,24 +994,9 @@ export const ModalContainer = () => {
     </Transition>
 }
 
-function leaveCollaborationSession() {
-    const activeTabID = tabs.selectActiveTabID(store.getState())
-    if (activeTabID) {
-        const allScriptEntities = scriptsState.selectAllScripts(store.getState())
-        // Protect against scenario where the last tab opened was force-closed due to the current
-        // user being removed from that script's collaboration, causing
-        // allScriptEntities[activeTabID] to be undefined and error on ".collaborative".
-        if (allScriptEntities[activeTabID]?.collaborative) {
-            collaboration.leaveSession(activeTabID)
-        }
-    }
-}
-
 // websocket gets closed before onunload in FF
 window.onbeforeunload = () => {
     if (user.selectLoggedIn(store.getState())) {
-        leaveCollaborationSession()
-
         // Show page-close warning if saving.
         // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right way will be to call preventDefault.)
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.

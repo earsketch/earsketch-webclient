@@ -870,7 +870,7 @@ export async function showNextDialogue(utterance?: string, project?: string) {
 
     const structure = processUtterance(utterance)
 
-    if (!FLAGS.SHOW_CHAT && state[project].nodeHistory && utterance !== "" && structure.length > 0) {
+    if (!ES_WEB_SHOW_CHAT && state[project].nodeHistory && utterance !== "" && structure.length > 0) {
         addToNodeHistory([state[project].treeNode.id, parameters], undefined, project)
     }
     return structure
@@ -1028,7 +1028,7 @@ function generateSuggestion(project?: string): CaiTreeNode | CodeRecommendation 
     }
     if (isPrompted) {
         studentInteracted = true
-        if (!FLAGS.SHOW_CHAT) {
+        if (!ES_WEB_SHOW_CHAT) {
             student.trackEvent("codeRequest")
             addToNodeHistory(["request", "codeRequest"])
         }

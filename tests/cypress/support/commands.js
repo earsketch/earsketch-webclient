@@ -101,20 +101,15 @@ Cypress.Commands.add("login", (username = TEST_USER) => {
  * @param [standardAudioLibrary=DUBSTEP_BASS_WOBBLE_002]
  * @returns Chainable
  */
-Cypress.Commands.add("interceptAudioStandard", (standardAudioLibrary = [
-    {
-        artist: "RICHARD DEVINE",
-        folder: "DUBSTEP_140_BPM__DUBBASSWOBBLE",
-        genre: "DUBSTEP",
-        genreGroup: "DUBSTEP",
-        instrument: "SYNTH",
-        name: "DUBSTEP_BASS_WOBBLE_002",
-        path: "filename/placeholder/here.wav",
-        public: 1,
-        tempo: 140,
-        year: 2012,
-    },
-]) => {
+Cypress.Commands.add("interceptAudioStandard", (sounds = []) => {
+    const standardAudioLibrary = sounds.concat([1, 2].map(i => ({
+        artist: "EARSKETCH",
+        folder: "EARSKETCH",
+        name: `METRONOME0${i}`,
+        path: `standard-library/EarSketch/METRONOME0${i}.flac`,
+        public: 0,
+        tempo: -1,
+    })))
     cy.intercept(
         {
             hostname: CLOUDFRONT_HOST,
@@ -302,7 +297,10 @@ Cypress.Commands.add("interceptScriptById", (script) => {
 Cypress.Commands.add("interceptAudioMetadata", (testSoundMeta) => {
     cy.intercept(
         { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/metadata?name=*" },
-        { body: testSoundMeta }
+        req => {
+            const name = new URLSearchParams(req.url).name
+            req.reply(name === testSoundMeta.name ? testSoundMeta : "")
+        }
     ).as("audio_metadata")
 })
 

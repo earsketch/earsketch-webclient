@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
+import { Tab } from "@headlessui/react"
+import JSZip from "jszip"
+
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { ModalContainer } from "./App"
 import { readFile } from "./Autograder"
@@ -10,7 +13,6 @@ import { loadScript } from "../browser/scriptsThunks"
 import { getStandardSounds } from "../browser/soundsThunks"
 import { selectLoggedIn } from "../user/userState"
 import { parseLanguage } from "../esutils"
-import { Tab } from "@headlessui/react"
 
 const FormatButton = ({ label, formatChange, inputType, value }: {
     label: string, formatChange: (v: InputType) => void, inputType: InputType, value: InputType
@@ -324,6 +326,7 @@ export const CodeAnalyzer = () => {
         OVERVIEW: true,
         COUNTS: true,
         "CODE INDICATOR": true,
+        "CODE INDICATOR TOTAL": true,
         "CODE COMPLEXITY": true,
         MEASUREVIEW: false,
         SOUNDPROFILE: false,

@@ -10,7 +10,7 @@ export class Hilitor {
     wordColor = Object.create(null)
     targetNode: HTMLElement
     hiliteTag: string
-    matchRegex: RegExp
+    matchRegex: RegExp | undefined
     skipTags: RegExp
 
     constructor(id: string, tag?: string) {

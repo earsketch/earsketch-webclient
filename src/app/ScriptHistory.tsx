@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { useSelector, useDispatch } from "react-redux"
 
-import * as collaboration from "./collaboration"
 import { DAWData, Script } from "common"
 import * as runner from "./runner"
 import * as ESUtils from "../esutils"
@@ -8,17 +9,11 @@ import reporter from "./reporter"
 import * as tabs from "../ide/tabState"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
-import { useSelector, useDispatch } from "react-redux"
 import { Diff } from "./Diff"
 import { DAW, setDAWData } from "../daw/DAW"
-import { useTranslation } from "react-i18next"
 import type { AppDispatch } from "../reducers"
 import { ModalBody, ModalHeader } from "../Utils"
 import { setContents } from "../ide/Editor"
-
-function parseActiveUsers(activeUsers: string | string[]) {
-    return Array.isArray(activeUsers) ? activeUsers.join(", ") : activeUsers
-}
 
 const Version = ({ version, allowRevert, compiled, active, activate, run, revert, closeDAW }: {
     version: any, allowRevert: boolean, compiled: boolean, active: boolean, run: any, activate: any, revert: any, closeDAW: any
@@ -77,22 +72,17 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
     const revertScript = (index: number) => {
         const version = history![index]
 
-        if (script.collaborative) {
-            collaboration.reloadScriptText(version.source_code)
-            collaboration.saveScript()
-        } else {
-            // Replace code with reverted version and save.
-            dispatch(scripts.setScriptSource({ id: script.shareid, source: version.source_code }))
-            dispatch(scriptsThunks.saveScript({
-                name: script.name,
-                source: version.source_code,
-                status: version.run_status,
-            })).unwrap().then(() => {
-                if (openTabs.includes(script.shareid)) {
-                    setContents(version.source_code, script.shareid)
-                }
-            })
-        }
+        // Replace code with reverted version and save.
+        dispatch(scripts.setScriptSource({ id: script.shareid, source: version.source_code }))
+        dispatch(scriptsThunks.saveScript({
+            name: script.name,
+            source: version.source_code,
+            status: version.run_status,
+        })).unwrap().then(() => {
+            if (openTabs.includes(script.shareid)) {
+                setContents(version.source_code, script.shareid)
+            }
+        })
         close()
         reporter.revertScript()
     }
@@ -154,7 +144,6 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
                                     <pre className="p-3 bg-gray-100 rounded border">
                                         <Diff original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} />
                                     </pre>
-                                    {original?.activeUsers && <div>{t("scriptHistory.activeCollab")}: {parseActiveUsers(original.activeUsers)}</div>}
                                 </>
                             )
                         )}

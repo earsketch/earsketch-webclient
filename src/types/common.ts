@@ -8,8 +8,6 @@ export interface Script {
     modified: number | string
     saved: boolean
     tooltipText: string
-    collaborative: boolean
-    collaborators: string[]
     isShared: boolean
     run_status: number
     readonly: boolean
@@ -18,10 +16,8 @@ export interface Script {
     id?: string
     original_id?: string
     soft_delete?: boolean
-    activeUsers?: string | string[]
 }
 
-// Note: How about collaborative?
 export type ScriptType = "regular" | "shared" | "readonly" | "deleted";
 
 export type Language = "python" | "javascript"
@@ -33,13 +29,13 @@ export interface SoundEntity {
     folder: string
     artist: string
     year: string
-    public: number
+    public: number // Should this appear in the sound browser, autocomplete, etc.?
     genre: string
     instrument: string
     keySignature?: string
     keyConfidence?: number
-    // TODO: Server should omit or set to null to indicate no tempo, rather than -1.
-    tempo?: number
+    tempo?: number // TODO: Server should omit or set to null to indicate no tempo, rather than -1.
+    standard: boolean // Is this a standard sound (as opposed to a user sound)? (client-only flag)
 }
 
 export interface Clip {

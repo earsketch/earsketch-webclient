@@ -12,13 +12,13 @@ async function uploadCaiHistory(project: string, node: any, sourceCode?: string)
     }
 
     data.ui = "standard"
-    if (FLAGS.SHOW_CAI) {
-        if (FLAGS.SHOW_CHAT) {
+    if (ES_WEB_SHOW_CAI) {
+        if (ES_WEB_SHOW_CHAT) {
             data.ui = "Wizard"
         } else {
             data.ui = "CAI"
         }
-    } else if (FLAGS.SHOW_CHAT) {
+    } else if (ES_WEB_SHOW_CHAT) {
         data.ui = "Chat"
     }
 
@@ -32,9 +32,9 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project?: st
     if (location.href.includes("wizard") && nodeObj[0] !== "Slash") {
         return
     } // Disabled for Wizard of Oz operators.
-    if ((FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) && state[project] && state[project].nodeHistory) {
+    if ((ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) && state[project] && state[project].nodeHistory) {
         state[project].nodeHistory.push(nodeObj)
-        if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
+        if (ES_WEB_UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
             uploadCaiHistory(project, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
         }
         esconsole(["node history", String(state[project].nodeHistory)])

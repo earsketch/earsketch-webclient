@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from "react"
-
-import * as recorder from "./esrecorder"
+import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
+import * as recorder from "./esrecorder"
 
 export const LevelMeter = () => {
     const HEIGHT = 15

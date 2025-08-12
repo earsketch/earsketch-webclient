@@ -83,3 +83,76 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
         </form>
     </>
 }
+
+export const CheckboxButton = ({ value = 0, label = value.toString(), fullWidth = false, onClick, selected = false, submitOnClick = true, selectedColor = "amber" }: { value?: number, label?: string, fullWidth?: boolean, onClick: (input: number) => void, selected?: boolean, submitOnClick?: boolean, selectedColor?: "amber" | "green" }) => {
+    const classnames = classNames({
+        "rounded cursor-pointer p-1 mt-1 mr-2": true,
+        "hover:bg-amber-50 dark:hover:bg-amber-900 hover:text-black dark:text-white": selectedColor === "amber",
+        "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": selectedColor === "green",
+        "text-gray-500 border border-gray-500": !selected,
+        "bg-amber-400 hover:bg-amber-400 dark:bg-amber-500 text-black dark:text-white": selected && selectedColor === "amber",
+        "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected && selectedColor === "green",
+        "w-full": fullWidth,
+    })
+
+    return <button
+        role="option"
+        className={classnames}
+        onClick={e => {
+            if (!submitOnClick) { e.preventDefault() }
+            onClick(value)
+        }}
+        aria-selected={selected}
+    >
+        <div className="flex flex-row gap-x-1">
+            <span className="rounded-full inline-flex w-1 mr-2">
+                <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
+            </span>
+            <div className="text-xs select-none mr-4">
+                {label}
+            </div>
+        </div>
+    </button>
+}
+
+export const PromptChoice = ({ message, choices, allowMultiple, close }: { message: string, choices: string[], allowMultiple: boolean, close: (input: number | number[]) => void }) => {
+    const [currentChoice, setInput] = useState(-1)
+    const [currentChoices, setInputs] = useState<number[]>([])
+    const classnameForSubmit = classNames({
+        "btn text-sm py-1.5 px-3 ml-2 bg-sky-700 text-white hover:text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-75": true,
+    })
+    const { t } = useTranslation()
+    return <>
+        <ModalHeader>{message}</ModalHeader>
+        <form onSubmit={e => { e.preventDefault() }}>
+            <ModalBody>
+                <div className="flex flex-row flex-wrap" style={{ maxHeight: "40vh", overflowY: "scroll" }}>
+                    {choices.map((choice, index) =>
+                        <div key={index}>
+                            <CheckboxButton
+                                value={index}
+                                label={choice + "" /* coerce to string, for booleans */}
+                                onClick={(value) => {
+                                    if (allowMultiple) {
+                                        if (currentChoices.includes(value)) {
+                                            setInputs(currentChoices.filter(choice => choice !== value))
+                                        } else {
+                                            setInputs([...currentChoices, value])
+                                        }
+                                    } else {
+                                        setInput(value)
+                                    }
+                                }}
+                                selected={allowMultiple ? currentChoices.includes(index) : (currentChoice === index)}></CheckboxButton>
+                        </div>
+                    )}
+                </div>
+                <div className="flex flex-row justify-end mt-1">
+                    <button type="button" className={classnameForSubmit} onClick={() => close(allowMultiple ? currentChoices : currentChoice)} disabled={currentChoice < 0 && (currentChoices.length === 0)}>
+                        {t("ok").toLocaleUpperCase()}
+                    </button>
+                </div>
+            </ModalBody>
+        </form>
+    </>
+}

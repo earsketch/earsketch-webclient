@@ -182,7 +182,7 @@ const CurriculumSearchResults = () => {
 
     return showResults
         ? (
-            <div ref={resultsRef} className="absolute z-50 bg-white w-full border-b border-black bg-white dark:bg-gray-900" style={resultsStyle}>
+            <div ref={resultsRef} className="absolute z-50 w-full border-b border-black bg-white dark:bg-gray-900" style={resultsStyle}>
                 {results.map(result =>
                     <a key={result.id} href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
                         <div className="px-2.5 py-1 text-sm search-item text-black dark:text-white">{result.title}</div>
@@ -200,7 +200,7 @@ export const TitleBar = () => {
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const { t } = useTranslation()
 
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         useEffect(() => {
             if (!pageTitle?.includes("Loading")) {
                 dispatch(caiThunks.curriculumPage([location, pageTitle]))
@@ -293,22 +293,25 @@ const CurriculumPane = () => {
         return () => hilitor.remove()
     }, [content, searchText])
 
-    return paneIsOpen
-        ? (
-            <div dir={currentLocale.direction} className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
-                <CurriculumHeader />
-
-                <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
-                    {content
-                        ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
-                        : <div className="flex flex-col items-center">
-                            <div className="text-2xl text-center py-8">Loading curriculum...</div>
-                            <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />
-                        </div>}
-                </div>
-            </div>
-        )
-        : <Collapsed title={t("curriculum.title").toLocaleUpperCase()} position="east" />
+    return (
+        <div dir={currentLocale.direction} className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
+            {paneIsOpen
+                ? (
+                    <>
+                        <CurriculumHeader />
+                        <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
+                            {content
+                                ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
+                                : <div className="flex flex-col items-center">
+                                    <div className="text-2xl text-center py-8">Loading curriculum...</div>
+                                    <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />
+                                </div>}
+                        </div>
+                    </>
+                )
+                : <Collapsed title={t("curriculum.title").toLocaleUpperCase()} position="east" />}
+        </div>
+    )
 }
 
 const NavigationBar = () => {
@@ -325,8 +328,9 @@ const NavigationBar = () => {
     const triggerRef = useRef<HTMLButtonElement>(null)
     const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, "46px")
 
-    const handleClick = (event: Event & { target: HTMLElement }) => {
-        if (!dropdownRef.current?.contains(event.target) && !triggerRef.current?.contains(event.target)) {
+    const handleClick = (event: Event) => {
+        const target = event.target as Node
+        if (!dropdownRef.current?.contains(target) && !triggerRef.current?.contains(target)) {
             dispatch(curriculum.showTableOfContents(false))
         }
     }
