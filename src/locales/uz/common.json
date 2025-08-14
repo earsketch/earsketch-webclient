@@ -350,17 +350,17 @@
     "skipLink.daw": "Raqamli audio ish stantsiyasiga o'tish",
     "skipLink.editor": "Kod muharririga o'tish",
     "skipLink.navigation": "Navigatsiyaga o'tish",
-    "sounds.artistFilter": "Select one or more artists to filter by",
-    "sounds.genreFilter": "Select one or more genres to filter by",
-    "sounds.instrumentFilter": "Select one or more instruments to filter by",
-    "sounds.keyFilter": "Select one or more key signatures to filter by"
+    "sounds.artistFilter": "Filtrlash uchun bir yoki undan ortiq bastakor tanlang",
+    "sounds.genreFilter": "Filtrlash uchun bir yoki undan ortiq janr tanlang",
+    "sounds.instrumentFilter": "Filtrlash uchun bir yoki undan ortiq instrument tanlang",
+    "sounds.keyFilter": "Filtrlash uchun bir yoki undan ortiq musiqa kalitini tanlang"
   },
   "bubble": {
     "userLanguage": "Til",
     "script.name": "qisqa_sayohat",
-    "selectLanguage": "Select programming language",
+    "selectLanguage": "Dasturlash tilini tanlang",
     "defaultProgrammingLanguage": "Standart dasturlash tili",
-    "dialogTitle": "Quick tour page {{page}} out of {{total}}",
+    "dialogTitle": "Qisqa sayoxatning {{total}} daan {{page}}-bet",
     "screenreaderIntro": "Please note, all 9 steps of the EarSketch tour are listed below in an unordered list. Select the \"$t(bubble:buttons.close)\" button when you are ready to use EarSketch.",
     "screenreaderCloseTour": "Please note: In order to close the tour at any point, select the \"$t(bubble:buttons.close)\" button.",
     "buttons": {
@@ -526,8 +526,8 @@
       "floatOptional": "Suzish, Ixtiyoriy",
       "array": "Massiv",
       "integer": "Butun son",
-      "integerOptional": "Integer, Optional",
-      "listArray": "List (Python), Array (JavaScript)",
+      "integerOptional": "Butun son, ixtiyoriy",
+      "listArray": "Royxat (Python), Massiv (JavaScript)",
       "list": "Ro'yxat",
       "string": "Satr",
       "stringOptional": "Satr, Ixtiyoriy",
@@ -537,10 +537,10 @@
       "soundOrList": "Tovush Konstantasi yoki Ro'yxat/Massiv"
     },
     "analyze": {
-      "description": "This function analyzes a sound for the specified feature.",
+      "description": "Bu funktsiya belgilangan xususiyat uchun tovushni tahlil qiladi.",
       "parameters": {
         "sound": {
-          "description": "Sound to analyze. Typically this is a constant from the sound browser."
+          "description": "Tahlil qilish uchun ovoz. Odatda bu Ovoz Brauzerining konstantasi."
         },
         "feature": {
           "description": "Tahlil xususiyati konstantasi. Tahlil funktsiyalari hozirda ikkita xususiyatni rag'batlantiradi: RMS_AMPLITUDE tovushning balandlik darajasini tahlil qiladi va SPECTRAL_CENTROID tovushning yorqinlik darajasini tahlil qiladi."
@@ -555,13 +555,13 @@
       }
     },
     "analyzeForTime": {
-      "description": "This function analyzes a sound for the specified feature, for the specified start and end times.",
+      "description": "Bu funktsiya ovozni belgilangan xususiyat uchun, maxsus boshlanish va tugash vaqtlari uchun tahlil qiladi.",
       "parameters": {
         "sound": {
-          "description": "Sound to analyze. Typically this is a constant from the sound browser."
+          "description": "Tahlil qilish uchun ovoz. Odatda bu Ovoz Brauzerining konstantasi."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "Tahlil xususiyati konstantasi. Tahlil funktsiyalari hozirda ikkita xususiyatni rag'batlantiradi: RMS_AMPLITUDE tovushning balandlik darajasini tahlil qiladi va SPECTRAL_CENTROID tovushning yorqinlik darajasini tahlil qiladi."
         },
         "sliceStart": {
           "description": "Tahlilni boshlash uchun tovush ichidagi joylashuvni boshlang"
@@ -571,7 +571,7 @@
         }
       },
       "returns": {
-        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+        "description": "Maxsus xususiyat uchun hisoblash natijasi (doim 0 dan 1 gacha)."
       },
       "example": {
         "python": "# Spectral centroid for part of a sound\nsound = HOUSE_BREAKBEAT_001\ncentroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5)",
@@ -585,7 +585,7 @@
           "description": "Tahlil qilish uchun trek raqami."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "Tahlil xususiyati konstantasi. Tahlil funktsiyalari hozirda ikkita xususiyatni rag'batlantiradi: RMS_AMPLITUDE tovushning balandlik darajasini tahlil qiladi va SPECTRAL_CENTROID tovushning yorqinlik darajasini tahlil qiladi."
         }
       },
       "returns": {
@@ -600,10 +600,10 @@
       "description": "Bu funktsiya boshlanish va tugash vaqti o'rtasidagi belgilangan trekni tahlil qiladi.",
       "parameters": {
         "track": {
-          "description": "Track number to analyze."
+          "description": "Tahlil qilish uchun trek raqami."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "Tahlil xususiyati konstantasi. Tahlil funktsiyalari hozirda ikkita xususiyatni rag'batlantiradi: RMS_AMPLITUDE tovushning balandlik darajasini tahlil qiladi va SPECTRAL_CENTROID tovushning yorqinlik darajasini tahlil qiladi."
         },
         "start": {
           "description": "Tahlilni boshlash uchun trek ichida joylashuvni boshlang"
@@ -613,7 +613,7 @@
         }
       },
       "returns": {
-        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+        "description": "Maxsus xususiyat uchun hisoblash natijasi (doim 0 dan 1 gacha)."
       },
       "example": {
         "python": "# Spectral centroid for part of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5)",
@@ -624,7 +624,7 @@
       "description": "Returns a sound constant that represents a slice of another sound.",
       "parameters": {
         "sound": {
-          "description": "The sound from which to create a slice. This is a constant from the sound browser."
+          "description": "Bo'lak yaratish uchun ishlatiladigan ovoz. Bu tovush brauzeri konstantasi."
         },
         "sliceStart": {
           "description": "Bo'lakning boshlang'ich o'rni."
@@ -634,7 +634,7 @@
         }
       },
       "returns": {
-        "description": "A new sound constant representing a slice of audio."
+        "description": "Ovoz bo'lagini ifodalovchi yangi Ovoz Konstantasi. "
       },
       "example": {
         "python": "# Extract part of a sound\nsound = HOUSE_BREAKBEAT_001\nslice = createAudioSlice(sound, 1.5, 2.5)\nfitMedia(slice, 1, 1, 3)",
