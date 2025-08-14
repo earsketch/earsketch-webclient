@@ -367,7 +367,7 @@
       "skip": "O'tkazib yuborish",
       "skipTour": "Sayohatni o'tkazib yuborish",
       "start": "Boshla",
-      "close": "Close tour",
+      "close": "Sayohati yopish",
       "next": "Keyingi"
     },
     "header": {
@@ -385,7 +385,7 @@
     "body": {
       "start": "Dasturlash va musiqa bastalashni boshlash uchun tayyormisiz? Agar ilk marta foydalanayotgan bo'lsangiz, EarSketch haqida qisqa sayohat uchun quyidagi <span class=\"border-2 border-black rounded-full px-1 bg-black text-white font-thin\">Boshla</span> tugmasini bosing. Agar tajribali foydalanuvchi boshlangiz <span class=\"border-2 border-black rounded-full px-1 font-normal\">O'tkazib yuborish</span> tugmasini bosib dasturlashni boshlang.<br><br> EarSketch <a href=\"https://earsketch.gatech.edu/landing/#/license\" target=\"_blank\" rel=\"noreferrer\">litsenziyamiz shartlariga asoslangan holda</a> bepul ishlatishingiz mumkin.<br><br>Bu sayohat uchun standart dasturlash tili Python hisoblanadi. Uni JavaScript dasturlash tiliga o'zgartirish uchun quyidagini bosing.",
       "codeEditor": "Kod muharriri musiqa bastalash uchun sizning ish joyingizdir. Bu raqamlangan satrlarga ega matn muharriri.",
-      "runCode": "Run the code to generate your music. Click the <span class=\"font-black text-green-600 text-lg\"><i class=\"align-middle icon icon-arrow-right22\"></i>RUN</span> button and view your arrangement in the Digital Audio Workstation located above the code editor.",
+      "runCode": "Musiqangizni yaratish uchun kodni ishga tushiring.  <span class=\"font-black text-green-600 text-lg\"><i class=\"align-middle icon icon-arrow-right22\"></i>Ishga tushirish</span> tugmasinin bosing va ishingizni kod muhariridan yuqorida joylashgan RAIS da koring. ",
       "previewMusic": "The Digital Audio Workstation (DAW) is a timeline visualization of your music, showing time in both seconds and measures. Below the timeline sounds are arranged on one or more tracks.",
       "playMusic": "The buttons at the top right of the DAW will allow you to listen to your music. You can play your song by clicking the green triangle <span class=\"align-middle icon icon-play4 text-green-600 text-lg\"></span>.",
       "exploreCode": "The browsers are here on the left. Click the toggle switch at the top to hide or reveal them. There are several types of browsers, and we will explore each in the next steps.",
