@@ -120,7 +120,7 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         cy.get("@audio_sample.all").should("have.length", 3)
     })
 
-    it.only("allows user to login, edit script, and save", () => {
+    it("allows user to login, edit script, and save", () => {
         const username = "cypress"
         const scriptName = "RecursiveMelody.py"
 
