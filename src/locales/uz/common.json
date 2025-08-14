@@ -413,7 +413,7 @@
     "esaudio": {
       "stringindex": "Zarba satri chegaradan tashqarida",
       "nonlistRangeError": "zarba satrlari faqat 0, +, yoki - dan iborat bo'lishi mumkin",
-      "tempoRange": " Tempo must be between 45 BPM and 220 BPM",
+      "tempoRange": "Temp daqiqada 45 DZM va 220 DZM zarba orasida bo'lishi kerak",
       "analysisTimeTooShort": "Tahlil vaqti oynasi (endTime - startTime) juda kichik"
     },
     "user": {
@@ -457,8 +457,8 @@
       "alreadyused": " allaqachon konstanta sifatida ishlatilgan",
       "invalidconstant": " haqiqiy konstanta emas...",
       "tempointeger": "Temp ijobiy raqam bo'lishi shart...",
-      "toolong": "Sorry, the audio file cannot be longer than 30 seconds.",
-      "toobig": "Sorry, the audio file cannot be larger than 10 MB.",
+      "toolong": " Kechirasiz, audio fayl 30 soniyadan uzun bo'lmasligi kerak.",
+      "toobig": " Kechirasiz, audio fayl 10 MB dan katta bo'lmasligi kerak.",
       "timeout": "Tovushni Yuklashda Bog'lanish Vaqti Tugashi Bilan Bog‘liq Xato...",
       "uploadsuccess": "Maxsus tovush muvaffaqiyatli yuklandi",
       "commerror": "Tovushni yuklashda Aloqa Xatosi ...",
@@ -511,7 +511,7 @@
     "noparams": "Parametrlar Yoʻq",
     "parameters": "Parametrlar",
     "returnValue": "Qaytish Qiymati",
-    "pasteToCodeEditor": "Paste {{name}} function into code editor",
+    "pasteToCodeEditor": "{{name}} funktsiyasini muharrirga jolyashtirish",
     "example": "Misol",
     "defaultValue": "Standart Qiymat",
     "open": "Ochish",
@@ -550,8 +550,8 @@
         "description": "Maxsus xususiyat uchun hisoblash natijasi (doim 0 dan 1 gacha)."
       },
       "example": {
-        "python": "# Spectral centroid of a sound\ncentroid = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)",
-        "javascript": "// Spectral centroid of a sound\nvar centroid = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);"
+        "python": "# Ovozning spektral tsentroid tahlili\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrack(1, SPECTRAL_CENTROID)",
+        "javascript": "// Ovozning spektral tsentroid tahlili\nvar centroid = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);"
       }
     },
     "analyzeForTime": {
@@ -574,8 +574,8 @@
         "description": "Maxsus xususiyat uchun hisoblash natijasi (doim 0 dan 1 gacha)."
       },
       "example": {
-        "python": "# Spectral centroid for part of a sound\nsound = HOUSE_BREAKBEAT_001\ncentroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5)",
-        "javascript": "// Spectral centroid for part of a sound\nvar sound = HOUSE_BREAKBEAT_001;\nvar centroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5);"
+        "python": "# Ovoz parchasining spectral tsentroid tahlili\nsound = HOUSE_BREAKBEAT_001\ncentroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5)",
+        "javascript": "// # Ovoz parchasining spectral tsentroid tahlili\nvar sound = HOUSE_BREAKBEAT_001;\nvar centroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5);"
       }
     },
     "analyzeTrack": {
@@ -589,7 +589,7 @@
         }
       },
       "returns": {
-        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+        "description": "Maxsus xususiyat uchun hisoblash natijasi (doim 0 dan 1 gacha)."
       },
       "example": {
         "python": "# Spectral centroid of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrack(1, SPECTRAL_CENTROID)",
@@ -1188,25 +1188,25 @@
     "javascript": "// description: \nsetTempo(120);\n"
   },
   "console": {
-    "warning": "Warning",
-    "error": "Error",
+    "warning": "Диққат",
+    "error": "Xatolik",
     "errors": {
       "AssertionError": "An assert statement failed",
-      "AttributeError": "There is a mismatch between the object and the attribute",
+      "AttributeError": "Obyekt va uning hususiyati orasida kelishmovchilik mavjud",
       "ImportError": "The appropriate packages cannot be found or imported",
-      "IndentationError": "There is an indentation error in the code (lack or extra spaces)",
+      "IndentationError": "Kodda chekinish xatosi mavjud (ortiqcha yoki etishmagan checkinish)",
       "IndexError": "There is an error using an out of range index",
       "KeyError": "There is an error using a dictionary key that does not exist",
-      "NameError": "There is an error with a variable or function name that is not defined",
-      "ParseError": "There is an error when reading the code",
-      "SyntaxError": "There is an error with the syntax (or arrangement) of code",
-      "TypeError": "There is an error with the expected data type",
-      "TokenError": "There is an unexpected token error (extra or missing comma, space, or character) in the code",
-      "ValueError": "A provided argument is not within the set or range of acceptable values for a function",
-      "RangeError": "A provided argument is not within the set or range of acceptable values for a function",
-      "ReferenceError": "There is an error with a variable or function name that is not defined",
-      "NetworkError": "Please try running the code again. If the issue persists, check your internet connection or contact network administrator.",
-      "ServerError": "Please try running the code again. If the issue persists, please report the issue using 'Report Error' in the information menu."
+      "NameError": "O'zgaruvchi yoki funktsiya nomi belgilanmagani uchun xato mavjud",
+      "ParseError": "Kodni o'qishda xato bo'ldi",
+      "SyntaxError": "Kodning sintaksisi (yoki tuzilmasida) xato mavjud",
+      "TypeError": "Kutilgan ma'lumot turida xato mavjud",
+      "TokenError": "Kodda kutlilmagan belgi xatosi mavjud (ortiqcha yoki mavjud bo'lmagan vergul yoki boshqa belgi)",
+      "ValueError": "Beriglgan argument funktsiya qabul qiladigan qiymatlar to'plamidan tashqarida",
+      "RangeError": "Beriglgan argument funktsiya qabul qiladigan qiymatlar to'plamidan tashqarida",
+      "ReferenceError": "O'zgaruvchi yoki funktsiya nomi belgilanmagani uchun xato mavjud",
+      "NetworkError": "Kodni boshidan ishga tushiring. Agar bu xato qaytarilsa, internet aloqangizni tekshirib ko'ring yoki administrator bilan gaplashib ko'ring",
+      "ServerError": "Kodni boshidan ishga tushiring. Agar bu xato qaytarilsa, menyudan \"Xato Xaqida Xabar Berish\" ni ishlating. "
     }
   }
 }
