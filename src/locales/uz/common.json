@@ -652,7 +652,7 @@
         }
       },
       "returns": {
-        "description": "A new sound constant representing the timestretched audio."
+        "description": "Cho'zilgan ovoz bo'lagini ifodalovchi yangi ovoz konstantasi. "
       },
       "example": {
         "python": "# Stretch the sound to be twice as long\nsound = RD_ROCK_POPRHYTHM_MAINDRUMS_4\nstretched = createAudioStretch(sound, 2)\nfitMedia(stretched, 1, 1, 9)",
@@ -694,7 +694,7 @@
           "description": "Location within the track where the sound will begin (e.g. 1 will start at the beginning of measure 1)."
         },
         "end": {
-          "description": "Location within the track where the sound will end (e.g. 5 will stop the sound at the beginning of measure 5)."
+          "description": "Ovoz tugaydigan trek ichidagi joy (masalan, 5 tovush faylini beshinchi o'lchov boshida to'xtatadi)."
         }
       },
       "example": {
