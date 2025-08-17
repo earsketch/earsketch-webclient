@@ -389,8 +389,8 @@
       "previewMusic": "Raqamli Audio Ish Stantsiyasi (RAIS) - bu sizning kodingiz vaqtini soniya va o'lchovlarda ko'rsatadigan vaqt jadvalining vizualizatsiyasi. Xronologiyadan pastda qo'shig'ingizga qo'shilgan ovozlar treklarga joylashtiriladi.",
       "playMusic": "RAIS ninig tepa-o'ng tarafidagi tugmalar musiqangizni tinglash uchun yordam beradi. Qo'shig'ingizni ijro etish uchun ko'k uchburchakni bosing  <span class=\"align-middle icon icon-play4 text-green-600 text-lg\"></span>. ",
       "exploreCode": "Brauzerlar mana shu yearda, chapt tomonda. Ularni ko'rsatish/berkitish uchun yuqoridagi tugmani bosing. EarSketch da bir necha brauzer turi mavjud. Ularni biz keyingi qadamlarda birma bir ko'rib chiqamiz.",
-      "addSounds": "The first browser is <span class=\"text-yellow-500 text-lg align-middle icon icon-headphones\"></span> SOUNDS. Scroll, search, and filter through the list to discover 4,000+ sounds to use in your music, composed by popular recording artists.",
-      "saveCode": "Your code is automatically saved to <span class=\"text-yellow-500 text-lg align-middle icon icon-embed2\"></span> SCRIPTS. From the script menu <span class=\"icon-menu3 text-lg px-1 align-middle\"></span> you can download your music as an audio file.",
+      "addSounds": "Birinchi brauzer bu <span class=\"text-yellow-500 text-lg align-middle icon icon-headphones\"></span> OVOZLAR. Bu yerda aylantirim, filtrlab yoki qidiruv orqali 4000 dan ortiq ovozlarni ishlatishingiz mumkin. Ular taniqli musiqa sanatkorlari basta qilgan.",
+      "saveCode": "Sizning kodingiz avtomatik ravishda <span class=\"text-yellow-500 text-lg align-middle icon icon-embed2\"></span> SKRITPLARga saqlanadi. Skript menyusidan <span class=\"icon-menu3 text-lg px-1 align-middle\"></span> siz musiqangizni audio fayl shaklida yuklab olishingiz mumkin.",
       "readCurriculum": "O'ng tomonda o'quv paneli mavjud. Oʻquv rejasini koʻrish uchun almashtirish tugmasidan va kontent boʻylab harakatlanish uchun navigatsiya panelidan foydalaning.",
       "end": "Tabriklaymiz! Siz sayohatni yakunladingiz. Siz musiqa yaratishni boshlashga tayyorsiz. Yangi skript ochish va dasturlashni boshlash uchun <span class=\"align-middle icon icon-plus2\"></span> tugmasini bosing."
     }
@@ -637,26 +637,26 @@
         "description": "Ovoz bo'lagini ifodalovchi yangi Ovoz Konstantasi. "
       },
       "example": {
-        "python": "# Extract part of a sound\nsound = HOUSE_BREAKBEAT_001\nslice = createAudioSlice(sound, 1.5, 2.5)\nfitMedia(slice, 1, 1, 3)",
-        "javascript": "// Extract part of a sound\nvar sound = HOUSE_BREAKBEAT_001;\nvar slice = createAudioSlice(sound, 1.5, 2.5);\nfitMedia(slice, 1, 1, 3);"
+        "python": "# Ovozning bir parchasini chiqarib olish\nsound = HOUSE_BREAKBEAT_001\nslice = createAudioSlice(sound, 1.5, 2.5)\nfitMedia(slice, 1, 1, 3)",
+        "javascript": "// Ovozning bir parchasini chiqarib olish\nvar sound = HOUSE_BREAKBEAT_001;\nvar slice = createAudioSlice(sound, 1.5, 2.5);\nfitMedia(slice, 1, 1, 3);"
       }
     },
     "createAudioStretch": {
-      "description": "Returns a sound constant that represents a sound timestretched from its original tempo.",
+      "description": "Ovozning dastlabki tempidan cho'zilgan shaklida ovoz konstantasini qaytaradi.",
       "parameters": {
         "sound": {
           "description": "Cho'zilgan ovoz yaratish uchun ishlatiladigan ovoz. Bu tovush brauzeri konstantasi."
         },
         "stretchFactor": {
-          "description": "How much to timestretch the sound. Here \"2\" means \"twice as long\"."
+          "description": "Ovozni qanchalik cho'zish. Bu yerda \"2\" \"ikki baravar cho'zish\"ni bildiradi.\n"
         }
       },
       "returns": {
         "description": "Cho'zilgan ovoz bo'lagini ifodalovchi yangi ovoz konstantasi. "
       },
       "example": {
-        "python": "# Stretch the sound to be twice as long\nsound = RD_ROCK_POPRHYTHM_MAINDRUMS_4\nstretched = createAudioStretch(sound, 2)\nfitMedia(stretched, 1, 1, 9)",
-        "javascript": "// Stretch the sound to be twice as long\nvar sound = RD_ROCK_POPRHYTHM_MAINDRUMS_4;\nvar stretched = createAudioStretch(sound, 2);\nfitMedia(stretched, 1, 1, 9);"
+        "python": "# Ovozni ikki baravar cho'zish\nsound = RD_ROCK_POPRHYTHM_MAINDRUMS_4\nstretched = createAudioStretch(sound, 2)\nfitMedia(stretched, 1, 1, 9)",
+        "javascript": "// Ovozni ikki baravar cho'zish\nvar sound = RD_ROCK_POPRHYTHM_MAINDRUMS_4;\nvar stretched = createAudioStretch(sound, 2);\nfitMedia(stretched, 1, 1, 9);"
       }
     },
     "dur": {
@@ -691,15 +691,15 @@
           "description": "Ovozni kiritish uchun trek raqami"
         },
         "start": {
-          "description": "Location within the track where the sound will begin (e.g. 1 will start at the beginning of measure 1)."
+          "description": "Ovozning trek ichida boshlashish joylashuvi (m-n, 1 raqami 1-o'lchovda boshlashni bildiradi)."
         },
         "end": {
           "description": "Ovoz tugaydigan trek ichidagi joy (masalan, 5 tovush faylini beshinchi o'lchov boshida to'xtatadi)."
         }
       },
       "example": {
-        "python": "# Add a sound to a track, repeating or trimming as necessary\n# Here it repeats from measure 2 to the start of measure 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9)",
-        "javascript": "// Add a sound to a track, repeating or trimming as necessary\n// Here it repeats from measure 2 to the start of measure 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9);"
+        "python": "# Trekka ovoz qo'shish va uni keraklicha qaytarish yoki kesib tashalsh\n# Bu xolda u 2-o'lchamdan 9-o'lchamgacha qaytariladi\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9)",
+        "javascript": "// Trekka ovoz qo'shish va uni keraklicha qaytarish yoki kesib tashalsh\n// Bu xolda u 2-o'lchamdan 9-o'lchamgacha qaytariladi\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9);"
       }
     },
     "importImage": {
@@ -723,8 +723,8 @@
         "description": "Piksellarni ifodalovchi ko'p o'lchamli butun sonlar ro'yxati (0-255)."
       },
       "example": {
-        "python": "# Turn an image into a 10x10 grayscale list\nurl = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\"\npixelData = importImage(url, 10, 10, False)",
-        "javascript": "// Turn an image into a 10x10 grayscale list\nvar url = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\";\nvar pixelData = importImage(url, 10, 10, false);"
+        "python": "# Rasmni 10x10 o'lchamdagi oq-qora shkala ro'yxatiga aylantirish \nurl = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\"\npixelData = importImage(url, 10, 10, False)",
+        "javascript": "// Rasmni 10x10 o'lchamdagi oq-qora shkala ro'yxatiga aylantirish \nvar url = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\";\nvar pixelData = importImage(url, 10, 10, false);"
       }
     },
     "importFile": {
@@ -738,43 +738,43 @@
         "description": "Fayl tarkibi satr ko'rinishida."
       },
       "example": {
-        "python": "# Load a file via URL\nfileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\")",
-        "javascript": "// Load a file via URL\nvar fileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\");"
+        "python": "# faylni URL link orqali yuklash\nfileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\")",
+        "javascript": "// faylni URL link orqali yuklash\nvar fileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\");"
       }
     },
     "init": {
       "description": "Ushbu funktsiya ixtiyoriy ravishda skript boshida chaqirilishi mumkin (EarSketch-ning avvalgi versiyalarida bu majburiy bo'gan).",
       "example": {
-        "python": "init()\n# Rest of script below this line...",
-        "javascript": "init();\n// Rest of script below this line..."
+        "python": "init()\n# skriptning qolgani bu satrning tagida...",
+        "javascript": "init();\n// skriptning qolgani bu satrning tagida..."
       }
     },
     "insertMedia": {
       "description": "Belgilangan boshlanish vaqtida butun media faylni belgilangan trekka kiritadi.",
       "parameters": {
         "sound": {
-          "description": "Sound to insert on track. Typically this is a constant from the sound browser"
+          "description": "Trekka kiritiladigan ovozi. Odatda u ovoz brauzeridan olingan konstanta"
         },
         "track": {
-          "description": "Track number to insert sound onto"
+          "description": "Ovoz qoyiladigan trekning raqami"
         },
         "start": {
-          "description": "The location within the track at which to start playback of the sound. (The sound will play through one time, so the end time depends on the length of the sound.)"
+          "description": "Ovoz ijrosini boshlash uchun trek ichidagi joy. (Ovoz bir marta ijro etiladi, shuning uchun tugash vaqti tovush faylining uzunligiga bog'liq.)"
         }
       },
       "example": {
-        "python": "# Add a sound on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5)",
-        "javascript": "// Add a sound on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5);"
+        "python": "# 1-trekka, 2 o'lchovga, 3-zarbaga ovoz qo'yish\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5)",
+        "javascript": "// 1-trekka, 2 o'lchovga, 3-zarbaga ovoz qo'yish\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5);"
       }
     },
     "insertMediaSection": {
-      "description": "Inserts a part of a sound on a specified track at a specified location.",
+      "description": "Audio faylning bir qismini belgilangan trekdagi belgilangan joyga kiritadi.",
       "parameters": {
         "sound": {
-          "description": "Sound to insert on track. Typically this is a constant from the sound browser"
+          "description": "Trekka kiritiladigan ovoz. Odatda u ovoz brauzeridan olingan konstanta"
         },
         "track": {
-          "description": "Track number to insert sound onto"
+          "description": "Ovoz qoyiladigan trekning raqami"
         },
         "start": {
           "description": "The location within the track at which to start playback of the sound file (e.g. 1 will start at the beginning of measure 1)"
