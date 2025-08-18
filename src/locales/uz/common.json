@@ -777,49 +777,49 @@
           "description": "Ovoz qoyiladigan trekning raqami"
         },
         "start": {
-          "description": "The location within the track at which to start playback of the sound file (e.g. 1 will start at the beginning of measure 1)"
+          "description": "Trekda ovozning ijro etish boshlanish nuqtasi (masalan, 1-ovoz 1-o'lchovda boshlab ijro etiladi)"
         },
         "sliceStart": {
-          "description": "Start location within the sound to include (e.g. 1.0 is the beginning of the sound and 2.0 is measure 2 of the sound)"
+          "description": "Ovoz ichidagi boshlang'ich joylashuvi (masalan, 1.0 - ovozning boshi va 2.0 - tovush faylining 2-o'lchovi)"
         },
         "sliceEnd": {
-          "description": "End location within the sound to include (e.g. 2.0 is measure 2 of the sound)"
+          "description": "Ovoz ichidagi tugash joylashuvi (masalan, 2.0 - tovush faylining 2-o'lchovi)"
         }
       },
       "example": {
-        "python": "# Add part of a sound to a track\nsound = RD_UK_HOUSE_WURLITZER_3\ninsertMediaSection(sound, 1, 1.5, 2.5, 3.0)",
-        "javascript": "// Add part of a sound to a track\nvar sound = RD_UK_HOUSE_WURLITZER_3;\ninsertMediaSection(sound, 1, 1.5, 2.5, 3.0);"
+        "python": "# Ovoz parchasini trekka qo'shish\nsound = RD_UK_HOUSE_WURLITZER_3\ninsertMediaSection(sound, 1, 1.5, 2.5, 3.0)",
+        "javascript": "// Ovoz parchasini trekka qo'shish\nvar sound = RD_UK_HOUSE_WURLITZER_3;\ninsertMediaSection(sound, 1, 1.5, 2.5, 3.0);"
       }
     },
     "makeBeat1": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
+      "description": "Belgilar satrini belgilash orqali ritmik andoza yaratadi. Ushbu belgilar satri HAR QANDAY uzunlikda bo'lishi mumkin. Satr uzunliklarini 16 karrali (masalan, 16, 32, 64 va boshqalar) tanlashni tavsiya qilamiz, chunki bu oʻlchovlarga mos keladigan andoza uzunliklarini yaratadi (har bir oʻlchov 16 ta belgidan iborat).",
       "parameters": {
         "sound": {
-          "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
+          "description": "Bir dona ovoz yoki ovozlar ro'yxati/massivi, odatda bu ovoz brauzerining konstantasi"
         },
         "track": {
-          "description": "Track to place pattern onto"
+          "description": "Nanunani joylashtirish uchun trek"
         },
         "start": {
-          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+          "description": "Andozaning trek ichida boshlashish joylashuvi (m-n, 1 raqamli 1-o'lchovning boshida ijro etishini bildiradi)."
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
+          "description": "Ritmik andozani o'ynashni ko'rsatuvchi satr. \"0\" ovozi o'n oltinchi nota uchun ijro etadi. \"+\" tovush faylini qo'shimcha o'n oltinchi nota uchun bog'laydi (masalan, davom ettiradi yoki ushlab turadi). \"-\" o'n oltinchi nota uchun bo'sh qo'yadi (ya'ni sukunat yaratadi). Agar makeBeat-ning birinchi argumenti ovozlar roʻyxati/massivi boʻlsa, oʻn oltinchi nota uchun “0” dan “9” gacha ushbu roʻyxat/massiv indeksidagi tovushni ijro etadi."
         }
       },
       "example": {
-        "python": "# Remix sounds into a new beat\ns = HIPHOP_FUNKBEAT_001\nmakeBeat(s, 1, 1, \"0++-0---0---0---\")\ns = [Y01_HI_HATS_1, Y01_OPEN_HI_HATS_1]\nmakeBeat(s, 2, 1, \"--10--10--100010\")",
-        "javascript": "// Remix sounds into a new beat\nvar s1 = HIPHOP_FUNKBEAT_001;\nmakeBeat(s1, 1, 1, \"0++-0---0---0---\");\nvar s2 = [Y01_HI_HATS_1, Y01_OPEN_HI_HATS_1];\nmakeBeat(s2, 2, 1, \"--10--10--100010\");\n"
+        "python": "# Ovolarni yangi ovozni yaratish uchun remiks qilish\ns = HIPHOP_FUNKBEAT_001\nmakeBeat(s, 1, 1, \"0++-0---0---0---\")\ns = [Y01_HI_HATS_1, Y01_OPEN_HI_HATS_1]\nmakeBeat(s, 2, 1, \"--10--10--100010\")",
+        "javascript": "// Ovolarni yangi ovozni yaratish uchun remiks qilish\nvar s1 = HIPHOP_FUNKBEAT_001;\nmakeBeat(s1, 1, 1, \"0++-0---0---0---\");\nvar s2 = [Y01_HI_HATS_1, Y01_OPEN_HI_HATS_1];\nmakeBeat(s2, 2, 1, \"--10--10--100010\");\n"
       }
     },
     "makeBeat2": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
+      "description": "Belgilar satrini belgilash orqali ritmik andoza yaratadi. Ushbu belgilar satri HAR QANDAY uzunlikda bo'lishi mumkin. Satr uzunliklarini 16 karrali (masalan, 16, 32, 64 va boshqalar) tanlashni tavsiya qilamiz, chunki bu oʻlchovlarga mos keladigan andoza uzunliklarini yaratadi (har bir oʻlchov 16 ta belgidan iborat).",
       "parameters": {
         "sound": {
-          "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
+          "description": "Bir dona ovoz yoki ovozlar ro'yxati/massivi, odatda bu ovoz brauzerining konstantasi"
         },
         "track": {
-          "description": "Track to place pattern onto"
+          "description": "Nanunani joylashtirish uchun trek"
         },
         "start": {
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
