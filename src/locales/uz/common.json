@@ -1039,27 +1039,27 @@
           "description": "Andozani oʻrnatish uchun trek (yoki barcha treklarga qoʻllash uchun MIX_TRACK)."
         },
         "effect": {
-          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
+          "description": "Variantlar: BANDPASS, XOR, KOMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PASER, PITCHHIFT, REVERB, RINGMOD, TREMOLO, VOLUME yoki WAH."
         },
         "parameter": {
           "description": "EffektType-ning qaysi parametri uchun zarf yaratilishini ko'rsatuvchi konstanta. (effekt parametrlarining to'liq ro'yxati uchun o'quv dasturining yon paneliga qarang: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Har Bir Effektning Batafsil Tavsifi</a>.)"
         },
         "values": {
-          "description": "List/Array of effect parameter values (e.g. [0.0, 5.3, -12])."
+          "description": "Effekt parametr qiymatlarining roʻyxati/massivi (masalan, [0.0, 5.3, -12])."
         },
         "start": {
-          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+          "description": "Andozaning trek ichida boshlash joylashuvi (masalan, 1 raqamli 1-o'lchovning boshida ijro etishini bildiradi)."
         },
         "beat": {
-          "description": "A string indicating the effect pattern to create. Each character represents one \"step\" (default is a sixteenth note). Numbers 0 to 9 and then A to F indicate entries from the list/array (\"0\" represents the first value, \"1\" represents the second, \"A\" represents the eleventh, \"B\" represents the twelfth, etc). \"+\" ties (sustains/continues) the previous value. \"-\" ramps (creates a gradual change) from the previous to the next value."
+          "description": "Effektlar andozasini korsatadigan satr. Xar bir belgi bir \"qadamni\" bildiradu (standard bu notaning o'n oltidan bir qismi). \"0\" dan \"9\" gacha va \"A\" dan \"F\" gacha belgilar ro'yxat/massivning elementlarini bildiradi (\"0\" birinchi qiymatin, \"1\" ikkinchi qiymatni, \"A\" o'n birinchi qiymatni, \"B\" o'n ikkinchi qiymatni va hokazo). \"+\" undan oldingi qiymatni birlashtiradi (yani davom ettiradi). \"-\" o'zidan oldingi qiymatni asta sekin keyingi riymatgacha o'zgartiradi.  "
         },
         "stepsPerMeasure": {
-          "description": "A number that specifies the length of time of a single character in your beatString. The default value of 16 results in one sixteenth note."
+          "description": "beatString zarba satrida bitta belgining vaqt uzunigini belgilo'vchi raqam. Uning standard miqdori 16 va bu notaning o'noltidan bir qismini bildiradi."
         }
       },
       "example": {
-        "python": "# Change the pitchshift over time\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3)\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4)",
-        "javascript": "// Change the pitchshift over time\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3);\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4);"
+        "python": "# Ovoz ohangini vaqt o'tishi bilan o'zgartirish\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3)\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4)",
+        "javascript": "// # Ovoz ohangini vaqt o'tishi bilan o'zgartirish\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3);\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4);"
       }
     },
     "selectRandomFile": {
@@ -1073,8 +1073,8 @@
         "description": "Mos jildlardan tasodifiy Tovush Konstantasi."
       },
       "example": {
-        "python": "# Choose a random sound from a folder\nsound = selectRandomFile(ALT_POP_GUITAR)\nfitMedia(sound, 1, 1, 5)",
-        "javascript": "// Choose a random sound from a folder\nvar sound = selectRandomFile(ALT_POP_GUITAR);\nfitMedia(sound, 1, 1, 5);"
+        "python": "# Ovoz jildidan tasodifiy ovozni tanlash \nsound = selectRandomFile(ALT_POP_GUITAR)\nfitMedia(sound, 1, 1, 5)",
+        "javascript": "// # Ovoz jildidan tasodifiy ovozni tanlash\nvar sound = selectRandomFile(ALT_POP_GUITAR);\nfitMedia(sound, 1, 1, 5);"
       }
     },
     "setEffect1": {
@@ -1087,15 +1087,15 @@
           "description": "Variantlar: BANDPASS, XOR, KOMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PASER, PITCHHIFT, REVERB, RINGMOD, TREMOLO, VOLUME yoki WAH"
         },
         "parameter": {
-          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+          "description": "EffektType-ning qaysi parametri uchun zarf yaratilishini ko'rsatuvchi konstanta. (effekt parametrlarining to'liq ro'yxati uchun o'quv dasturining yon paneliga qarang: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Har Bir Effektning Batafsil Tavsifi</a>.)"
         },
         "value": {
           "description": "Effekt parametrining qiymati"
         }
       },
       "example": {
-        "python": "# Apply a delay effect\nfitMedia(Y11_SNARE_1, 1, 1, 5)\nsetEffect(1, DELAY, DELAY_TIME, 145)",
-        "javascript": "// Apply a delay effect\nfitMedia(Y11_SNARE_1, 1, 1, 5);\nsetEffect(1, DELAY, DELAY_TIME, 250);"
+        "python": "# Kechiktirish effektini qo'llash\nfitMedia(Y11_SNARE_1, 1, 1, 5)\nsetEffect(1, DELAY, DELAY_TIME, 145)",
+        "javascript": "// # Kechiktirish effektini qo'llash\nfitMedia(Y11_SNARE_1, 1, 1, 5);\nsetEffect(1, DELAY, DELAY_TIME, 250);"
       }
     },
     "setEffect2": {
@@ -1115,8 +1115,8 @@
         }
       },
       "example": {
-        "python": "# Increase the filter frequency over time\nfitMedia(HOUSE_BREAK_FILL_001, 1, 1, 3)\nsetEffect(1, FILTER, FILTER_FREQ, 600, 1, 6000, 3)",
-        "javascript": "// Increase the filter frequency over time\nfitMedia(HOUSE_BREAK_FILL_001, 1, 1, 3);\nsetEffect(1, FILTER, FILTER_FREQ, 600, 1, 6000, 3);"
+        "python": "# Vaqt o'tishi bilan filtr chastotasini oshirish\nfitMedia(HOUSE_BREAK_FILL_001, 1, 1, 3)\nsetEffect(1, FILTER, FILTER_FREQ, 600, 1, 6000, 3)",
+        "javascript": "// Vaqt o'tishi bilan filtr chastotasini oshirish\nfitMedia(HOUSE_BREAK_FILL_001, 1, 1, 3);\nsetEffect(1, FILTER, FILTER_FREQ, 600, 1, 6000, 3);"
       }
     },
     "setTempo1": {
@@ -1127,8 +1127,8 @@
         }
       },
       "example": {
-        "python": "# Set the tempo to 110 BPM\nsetTempo(110)",
-        "javascript": "// Set the tempo to 110 BPM\nsetTempo(110);"
+        "python": "# Tempni 110 DZM ga teng qilish\nsetTempo(110)",
+        "javascript": "// Tempni 110 DZM ga teng qilish\nsetTempo(110);"
       }
     },
     "setTempo2": {
@@ -1148,8 +1148,8 @@
         }
       },
       "example": {
-        "python": "# Set the tempo to 110 BPM at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 to 140 BPM from measures 3 to 6\nsetTempo(80, 3, 140, 6)",
-        "javascript": "// Set the tempo to 110 BPM at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 to 140 BPM from measures 3 to 6\nsetTempo(80, 3, 140, 6);"
+        "python": "# 2-o'lchovda tempni 110 DZM ga teng qilish\nsetTempo(110, 2)\n# Tempni 3-o'lchovdan to 6-o'lchovgacha asta sekin 80dan 140gacha asta sekin ko'tarish\nsetTempo(80, 3, 140, 6)",
+        "javascript": "// 2-o'lchovda tempni 110 DZM ga teng qilish\nsetTempo(110, 2);\n// Tempni 3-o'lchovdan to 6-o'lchovgacha asta sekin 80dan 140 DZBgacha asta sekin ko'tarish\nsetTempo(80, 3, 140, 6);"
       }
     },
     "shuffleList": {
@@ -1163,8 +1163,8 @@
         "description": "Roʻyxat elementlarining tartibi tasodifiy boʻlgan yangi roʻyxat/massiv."
       },
       "example": {
-        "python": "# Shuffle a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nshuffled = shuffleList(sounds)",
-        "javascript": "// Shuffle an array of sounds\nvar sounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar shuffled = shuffleList(sounds);"
+        "python": "# Ovozlar roy'xatini alashtirib tashlash\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nshuffled = shuffleList(sounds)",
+        "javascript": "// Ovozlar massivini aralashtirib tashlash\nvar sounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar shuffled = shuffleList(sounds);"
       }
     },
     "shuffleString": {
@@ -1178,25 +1178,25 @@
         "description": "Belgilar tartibi tasodifiy bo'lgan yangi satr."
       },
       "example": {
-        "python": "# Shuffle a beat string\nbeat = \"0-0-0-0-0-0-0-0-\"\nshuffled = shuffleString(beat)",
-        "javascript": "// Shuffle a beat string\nvar beat = \"0-0-0-0-0-0-0-0-\";\nvar shuffled = shuffleString(beat);"
+        "python": "# Zarba satrini aralashtirib olish\nbeat = \"0-0-0-0-0-0-0-0-\"\nshuffled = shuffleString(beat)",
+        "javascript": "// Zarba satrini aralashtirib olish\nvar beat = \"0-0-0-0-0-0-0-0-\";\nvar shuffled = shuffleString(beat);"
       }
     }
   },
   "templates": {
-    "python": "# description: \nfrom earsketch import *\n\nsetTempo(120)\n",
-    "javascript": "// description: \nsetTempo(120);\n"
+    "python": "# ta'rif: \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "javascript": "// ta'rif: \nsetTempo(120);\n"
   },
   "console": {
     "warning": "Диққат",
     "error": "Xatolik",
     "errors": {
-      "AssertionError": "An assert statement failed",
+      "AssertionError": "Bayonotda xato sodir bo'ldi",
       "AttributeError": "Obyekt va uning hususiyati orasida kelishmovchilik mavjud",
-      "ImportError": "The appropriate packages cannot be found or imported",
+      "ImportError": "Kerakli paketlar topilmadi yoki ularni import qilishda xato boldi",
       "IndentationError": "Kodda chekinish xatosi mavjud (ortiqcha yoki etishmagan checkinish)",
-      "IndexError": "There is an error using an out of range index",
-      "KeyError": "There is an error using a dictionary key that does not exist",
+      "IndexError": "Diapazon indexidan tashqari raqamni ishlatishda xato sodir bo'ldi",
+      "KeyError": "Lug'atda mavjud bo'lmagan ma'lumotni ishlatishda xato sodir bo'ldi",
       "NameError": "O'zgaruvchi yoki funktsiya nomi belgilanmagani uchun xato mavjud",
       "ParseError": "Kodni o'qishda xato bo'ldi",
       "SyntaxError": "Kodning sintaksisi (yoki tuzilmasida) xato mavjud",
