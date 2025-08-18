@@ -801,10 +801,10 @@
           "description": "Nanunani joylashtirish uchun trek"
         },
         "start": {
-          "description": "Andozaning trek ichida boshlashish joylashuvi (m-n, 1 raqamli 1-o'lchovning boshida ijro etishini bildiradi)."
+          "description": "Andozaning trek ichida boshlash joylashuvi (m-n, 1 raqamli 1-o'lchovning boshida ijro etishini bildiradi)."
         },
         "beat": {
-          "description": "Ritmik andozani o'ynashni ko'rsatuvchi satr. \"0\" ovozi o'n oltinchi nota uchun ijro etadi. \"+\" tovush faylini qo'shimcha o'n oltinchi nota uchun bog'laydi (masalan, davom ettiradi yoki ushlab turadi). \"-\" o'n oltinchi nota uchun bo'sh qo'yadi (ya'ni sukunat yaratadi). Agar makeBeat-ning birinchi argumenti ovozlar roʻyxati/massivi boʻlsa, oʻn oltinchi nota uchun “0” dan “9” gacha ushbu roʻyxat/massiv indeksidagi tovushni ijro etadi."
+          "description": "Ritmik andozani o'ynashni ko'rsatuvchi satr. \"0\" ovozi o'n oltidan bir nota qismini ijro etadi. \"+\" tovush faylini qo'shimcha o'n oltidan bir nota qismini bog'laydi (masalan, davom ettiradi yoki ushlab turadi). \"-\" o'n oltidan bir notaqismini bo'sh qo'yadi (ya'ni sukunat yaratadi). Agar makeBeat-ning birinchi argumenti ovozlar roʻyxati/massivi boʻlsa, oʻn oltidan bir notaqismi “0” dan “9” gacha va \"A\" dan \"F\" gacha ushbu roʻyxat/massiv indeksidagi tovushni ijro etadi."
         }
       },
       "example": {
@@ -822,69 +822,69 @@
           "description": "Nanunani joylashtirish uchun trek"
         },
         "start": {
-          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+          "description": "Andozaning trek ichida boshlanish joylashuvi (m-n, 1 raqamli 1-o'lchovning boshida ijro etishini bildiradi)."
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
+          "description": "Ritmik andozani o'ynashni ko'rsatuvchi satr. \"0\" ovozi o'n oltidan nota qismini ijro etadi. \"+\" tovush faylini qo'shimcha o'n oltidan bir nota qismini bog'laydi (masalan, davom ettiradi yoki ushlab turadi). \"-\" o'n oltidan bir nota qismini bo'sh qo'yadi (ya'ni sukunat yaratadi). Agar makeBeat-ning birinchi argumenti ovozlar roʻyxati/massivi boʻlsa, oʻn oltidan bir notaqismini “0” dan “9” gacha va \"A\" dan \"F\" gacha ushbu roʻyxat/massiv indeksidagi tovushni ijro etadi."
         },
         "stepsPerMeasure": {
-          "description": "A number that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
+          "description": "Zarba satrida bitta belgining vaqt uzunigini belgilo'vchi raqam. Uning standard miqdori 16 ba bu notaning o'noltidan bir qismini bildiradi."
         }
       },
       "example": {
-        "python": "# Bongo triplets\nmakeBeat(IRCA_OS_BONGO_HIGH_OPEN, 1, 1, \"000\", 3)\nmakeBeat(IRCA_OS_BONGO_LOW_OPEN, 2, 1, \"0000\", 4)",
-        "javascript": "// Bongo triplets\nmakeBeat(IRCA_OS_BONGO_HIGH_OPEN, 1, 1, \"000\", 3);\nmakeBeat(IRCA_OS_BONGO_LOW_OPEN, 2, 1, \"0000\", 4);"
+        "python": "# Bongo asbobining uchtaligi\nmakeBeat(IRCA_OS_BONGO_HIGH_OPEN, 1, 1, \"000\", 3)\nmakeBeat(IRCA_OS_BONGO_LOW_OPEN, 2, 1, \"0000\", 4)",
+        "javascript": "// Bongo asbobi uchtaligi\nmakeBeat(IRCA_OS_BONGO_HIGH_OPEN, 1, 1, \"000\", 3);\nmakeBeat(IRCA_OS_BONGO_LOW_OPEN, 2, 1, \"0000\", 4);"
       }
     },
     "makeBeatSlice1": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
+      "description": "Tovush faylidagi boshlang'ich pozitsiyasini ko'rsatadigan belgilar satrini belgilash orqali ritmik andoza yaratadi. Tovushlarni doim boshidan ijro etadigan makeBeat-dan farqli o'laroq, makeBeatSlice sizga ayni tovush faylidan ko'plab turli tovush bo'laklarini birlashtirgan ritmlarni yaratishga imkon beradi.",
       "parameters": {
         "sound": {
-          "description": "A single sound. Typically this is a constant from the sound browser"
+          "description": "Yagona ovoz. Odatda bu ovoz brauzerining konstantasi."
         },
         "track": {
-          "description": "Track to place pattern onto"
+          "description": "Nanunani joylashtirish uchun trek"
         },
         "start": {
-          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+          "description": "Andozaning trek ichida boshlash joylashuvi (masalan, 1 raqamli 1-o'lchovning boshida ijro etishini bildiradi)."
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+          "description": "Ijro qilish uchun ritmik andozani ko'rsatuvchi satr. \"0\" dan \"9\" gacha va \"A\" dan \"F\" gacha o'n oltidan bir nota qismini beatNumber ro'yxat/massivining tegishli indeksida ko'rsatilgan joyda ijro etadi. \"+\" qo'shimcha o'n oltidan bir nota qismini bog'laydi (masalan, davom ettiradi yoki ushlab turadi). \"-\" o'n oltidan bir nota qismini bo'sh qo'yadi (ya'ni sukunat yaratadi)."
         },
         "sliceStarts": {
-          "description": "A list/array of starting locations within the sound. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound that can be referenced in the beat string by \"0\" and \"1\" respectively."
+          "description": "Audio fayl ichidagi boshlang'ich joylar ro'yxati/massivi. Masalan, [1.0, 2.5] ovozga mos ravishda “0” va “1” bilan zarba satrida havola qilish mumkin bo'lgan 1- va 2.5-o'chovida ikkita vaqt joylashuvini yaratadi."
         }
       },
       "example": {
-        "python": "# Slice and rearrange by sixteenth notes\ns = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices)",
-        "javascript": "// Slice and rearrange by sixteenth notes\nvar s = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices);"
+        "python": "# O'n oltidan bir nota qismli kesish va qayta tuzish\ns = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices)",
+        "javascript": "// # O'n oltidan bir nota qismli kesish va qayta tuzish\nvar s = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices);"
       }
     },
     "makeBeatSlice2": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
+      "description": "Ovizning boshlang'ich joylashuvini ko'rsatadigan belgilar satrini belgilash orqali ritmik andoza yaratadi. Tovushlarni doim boshidan ijro etadigan makeBeat-dan farqli o'laroq, makeBeatSlice sizga ayni tovush faylidan ko'plab turli tovush bo'laklarini birlashtirgan ritmlarni yaratishga imkon beradi.",
       "parameters": {
         "sound": {
-          "description": "A single sound. Typically this is a constant from the sound browser"
+          "description": "Yagona ovoz. Odatda bu ovoz brauzerining konstantasi."
         },
         "track": {
-          "description": "Track to place pattern onto"
+          "description": "Nanunani joylashtirish uchun trek"
         },
         "start": {
-          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+          "description": "Andozaning trek ichida boshlash joylashuvi (masalan, 1 raqamli 1-o'lchovning boshida ijro etishini bildiradi)."
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+          "description": "Ijro qilish uchun ritmik andozani ko'rsatuvchi satr. \"0\" dan \"9\" gacha va \"A\" dan \"F\" gacha o'n oltidan bir nota qismini beatNumber ro'yxat/massivining tegishli indeksida ko'rsatilgan joyda ijro etadi. \"+\" qo'shimcha o'n oltidan bir nota qismini bog'laydi (masalan, davom ettiradi yoki ushlab turadi). \"-\" o'n oltidan bir nota qismini bo'sh qo'yadi (ya'ni sukunat yaratadi)."
         },
         "sliceStarts": {
-          "description": "A list/array of starting locations within the sound. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound that can be referenced in the beat string by \"0\" and \"1\" respectively."
+          "description": "Audio fayl ichidagi boshlang'ich joylar ro'yxati/massivi. Masalan, [1.0, 2.5] ovozga mos ravishda “0” va “1” bilan zarba satrida havola qilish mumkin bo'lgan 1- va 2.5-o'chovida ikkita vaqt joylashuvini yaratadi."
         },
         "stepsPerMeasure": {
-          "description": "A number that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
+          "description": "Zarba satrida bitta belgining vaqt uzunigini belgilo'vchi raqam. Uning standard miqdori 16 va bu notaning o'noltidan bir qismini bildiradi."
         }
       },
       "example": {
-        "python": "# Slice and rearrange by eighth notes\nsound = HIPHOP_TRAPHOP_BEAT_002\neighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"01261264\"\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8)",
-        "javascript": "// Slice and rearrange by eighth notes\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
+        "python": "# Sakkizdan bir nota qismli kesish va qayta tuzish\nsound = HIPHOP_TRAPHOP_BEAT_002\neighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"01261264\"\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8)",
+        "javascript": "// Sakkizdan bir nota qismli kesish va qayta tuzish\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
       }
     },
     "print": {
@@ -899,10 +899,10 @@
       }
     },
     "println": {
-      "description": "Displays the input in the console.",
+      "description": "Konsolda kiritishni ko'rsatadi.",
       "parameters": {
         "input": {
-          "description": "Value(s) to print"
+          "description": "Chop etish uchun qiymat(lar)"
         }
       },
       "example": {
@@ -910,32 +910,32 @@
       }
     },
     "readInput": {
-      "description": "Ask the user a question",
+      "description": "Foydalanuvchidan savol so'rash",
       "parameters": {
         "prompt": {
-          "description": "A message displayed to the user"
+          "description": "Foydalanuvchiga ko'rsatilgan xabar"
         }
       },
       "returns": {
-        "description": "The user's response"
+        "description": "Foydalanuvchining javobi"
       },
       "example": {
-        "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
-        "javascript": "// User-provided beat string\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+        "python": "# Foydalanuvchi ta'minlagan zarba satri\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
+        "javascript": "// Foydalanuvchi ta'minlagan zarba satri\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
       }
     },
     "multiChoiceInput1": {
-      "description": "Ask the user to choose from a list",
+      "description": "Foydalanuvchidan ro'yxatdan tanlashni so'rang",
       "parameters": {
         "prompt": {
-          "description": "A message displayed to the user"
+          "description": "Foydalanuvchiga ko'rsatilgan xabar"
         },
         "choices": {
-          "description": "A list of choices displayed to the user"
+          "description": "Foydalanuvchiga ko'rsatilgan tanlash ro'yxati"
         }
       },
       "returns": {
-        "description": "The selected index"
+        "description": "Tanlangan indeks"
       },
       "example": {
         "python": "# Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nbeatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices)\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex])",
@@ -943,20 +943,20 @@
       }
     },
     "multiChoiceInput2": {
-      "description": "Ask the user to choose one-or-more items from a list.",
+      "description": "Foydalanuvchidan ro'yxattan bitta yoki undan ko'p narsani tanlashni so'rang.",
       "parameters": {
         "prompt": {
-          "description": "A message displayed to the user"
+          "description": "Foydalanuvchiga ko'rsatilgan xabar"
         },
         "choices": {
-          "description": "A list of choices displayed to the user"
+          "description": "Foydalanuvchiga ko'rsatilgan tanlash ro'yxati"
         },
         "allowMultiple": {
           "description": "If true, the user can select multiple choices. If false, the user can only select one choice."
         }
       },
       "returns": {
-        "description": "The selected indices"
+        "description": "Tanlangan indekslar"
       },
       "example": {
         "python": "# Sound board\nsoundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808]\nchosenSounds = multiChoiceInput(\"Choose your sounds\", soundChoices, True)\ntrack = 1\nfor choice in chosenSounds:\n    sound = soundChoices[choice]\n    fitMedia(sound, track, 1, 5)\n    track += 1",
