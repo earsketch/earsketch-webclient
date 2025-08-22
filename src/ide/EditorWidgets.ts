@@ -120,8 +120,6 @@ function previews(view: EditorView, soundNames: string[], { preview, playing }: 
 let soundNames: string[] = []
 let currentPreview: PreviewState = { preview: null, playing: false }
 let appLocale: Locale = ENGLISH_LOCALE
-let beatStringAnnotation: boolean = true
-
 export const previewPlugin = ViewPlugin.fromClass(class {
     decorations: DecorationSet
 
@@ -143,7 +141,6 @@ export const previewPlugin = ViewPlugin.fromClass(class {
                     appLocale = effect.value
                     updated = true
                 } else if (effect.is(setBeatStringAnnotation)) {
-                    beatStringAnnotation = effect.value
                     updated = true
                 }
             }
