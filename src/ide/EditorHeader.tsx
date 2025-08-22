@@ -82,6 +82,7 @@ const SettingsMenu = () => {
     const blocksMode = useSelector(ide.selectBlocksMode)
     const autocomplete = useSelector(ide.selectAutocomplete)
     const playArrows = useSelector(ide.selectPlayArrows)
+    const showBeatStringLength = useSelector(ide.selectShowBeatStringLength)
     const dispatch = useDispatch()
 
     const actions = [
@@ -95,6 +96,13 @@ const SettingsMenu = () => {
                 if (state === false) {
                     editor.setDAWPlayingLines([])
                 }
+            },
+        },
+        {
+            nameKey: "editor.showBeatStringLength",
+            state: showBeatStringLength,
+            setState(state: boolean) {
+                dispatch(ide.setShowBeatStringLength(state))
             },
         },
     ]
