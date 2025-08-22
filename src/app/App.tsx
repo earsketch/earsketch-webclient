@@ -155,41 +155,45 @@ async function postLogin(username: string) {
         store.dispatch(caiState.resetState())
     }
 
-    // Copy scripts local storage to the web service.
-    // TODO: Break out into separate function?
-    const saved = scriptsState.selectRegularScripts(store.getState())
-    await refreshCodeBrowser()
-    if (Object.keys(saved).length > 0) {
-        const promises = []
-        for (const script of Object.values(saved)) {
-            if (!script.soft_delete) {
-                if (script.creator !== undefined && script.creator !== username && script.creator !== "earsketch") {
-                    if (script.original_id !== undefined) {
-                        promises.push(scriptsThunks.importSharedScript(script.original_id))
-                    }
-                } else {
-                    const tabEditorSession = Editor.getSession(script.shareid)
-                    if (tabEditorSession) {
-                        promises.push(store.dispatch(scriptsThunks.saveScript({
-                            name: script.name,
-                            source: Editor.getContents(Editor.getSession(script.shareid)),
-                            overwrite: false,
-                            ...(script.creator === "earsketch" && { creator: "earsketch" }),
-                        })).unwrap())
-                    }
-                }
-            }
-        }
+    // Migrate scripts created or imported while logged out to the user's account.
+    const state = store.getState()
+    const saved = scriptsState.selectRegularScripts(state)
+    const openTabs = tabs.selectOpenTabs(state)
 
+    // Fetch the user's scripts now that they're logged in.
+    // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
+    await refreshCodeBrowser()
+
+    const promises = []
+    for (const script of Object.values(saved)) {
+        if (script.soft_delete) {
+            // Don't migrate scripts the user deleted while logged out.
+            continue
+        }
+        let promise
+        if (script.original_id !== undefined) {
+            promise = scriptsThunks.importSharedScript(script.original_id)
+        } else {
+            promise = store.dispatch(scriptsThunks.saveScript({
+                name: script.name,
+                source: script.source_code,
+                overwrite: false,
+                ...(script.creator === "earsketch" && { creator: "earsketch" }),
+            })).unwrap()
+        }
+        promise = promise.then(script => ({ script, reopen: openTabs.includes(script.shareid) }))
+        promises.push(promise)
+    }
+
+    if (promises.length > 0) {
         store.dispatch(tabThunks.resetTabs())
 
-        const savedScripts = await Promise.all(promises)
-
-        await refreshCodeBrowser()
-        // once all scripts have been saved open them
-        for (const savedScript of savedScripts) {
-            if (savedScript) {
-                store.dispatch(tabThunks.setActiveTabAndEditor(savedScript.shareid))
+        const results = await Promise.all(promises)
+        // Re-open scripts that were opened before login (which now have new IDs).
+        // TODO: Ideally, we would preserve the order of the open tabs.
+        for (const { script, reopen } of results) {
+            if (reopen) {
+                store.dispatch(tabThunks.setActiveTabAndEditor(script.shareid))
             }
         }
     }
