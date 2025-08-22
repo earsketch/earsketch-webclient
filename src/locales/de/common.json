@@ -1013,7 +1013,7 @@
           "description": "Ein String, der das zu erstellende Effektmuster angibt. Jedes Zeichen stellt einen \"Schritt\" dar (Standard ist eine sechzehnte Notiz). Zahlen 0 bis 9 und dann A bis F zeigen Einträge aus der Liste/dem Array an (\"0\" stellt den ersten Wert dar \"1\" stellt die zweite, \"A\" die elf, \"B\" repräsentiert den zwölften usw.). \"+\" Verbindungen (stützen/fortfährt) den vorherigen Wert. \"-\" Rampen (erzeugt eine allmähliche Änderung) vom vorherigen zum nächsten Wert."
         },
         "stepsPerMeasure": {
-          "description": "Eine Zahl, die die Dauer eines einzelnen Zeichens in deinem Beat String Angibt. Der Standardwert von 16 führt zu einer Sechzehntelnote."
+          "description": "Eine Zahl, die die Dauer eines einzelnen Zeichens in deinem beatString Angibt. Der Standardwert von 16 führt zu einer Sechzehntelnote."
         }
       },
       "example": {
