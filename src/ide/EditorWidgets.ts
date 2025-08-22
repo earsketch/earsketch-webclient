@@ -73,6 +73,7 @@ function previews(view: EditorView, soundNames: string[], { preview, playing }: 
     const beatStringRegex = /^[0-9A-Fa-f\-+]+$/
     // Get the current showBeatStringLength setting from the store
     const showBeatStringLength = store.getState().ide.showBeatStringLength
+    const MINIMUM_BEAT_STRING_LENGTH = 2 // TODO: Agree on this value
     for (const { from, to } of view.visibleRanges) {
         syntaxTree(view.state).iterate({
             from,
@@ -102,7 +103,7 @@ function previews(view: EditorView, soundNames: string[], { preview, playing }: 
                             side: 1,
                         })
                         widgets.push(deco.range(node.from))
-                        if (showBeatStringLength) {
+                        if (showBeatStringLength && beat.length >= MINIMUM_BEAT_STRING_LENGTH) {
                             const charCount = Decoration.widget({
                                 widget: new BeatCharacterCountWidget(beat, locale),
                                 side: 1,
