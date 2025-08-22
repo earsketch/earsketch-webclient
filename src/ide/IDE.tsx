@@ -310,11 +310,9 @@ async function runScript() {
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
+    ideConsole.status(i18n.t("messages:idecontroller.success"))
     store.dispatch(ide.setScriptMatchesDAW(true))
     saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
-
-    // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
-    setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
 
     // asynchronously report the script complexity
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
