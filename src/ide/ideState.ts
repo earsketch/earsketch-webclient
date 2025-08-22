@@ -16,7 +16,7 @@ const ideSlice = createSlice({
         logs: [] as Log[],
         autocomplete: true,
         playArrows: true,
-        beatStringAnnotation: true,
+        showBeatStringLength: true,
         scriptMatchesDAW: false,
     },
     reducers: {
@@ -35,8 +35,8 @@ const ideSlice = createSlice({
         setPlayArrows(state, { payload }) {
             state.playArrows = payload
         },
-        setBeatStringAnnotation(state, { payload }) {
-            state.beatStringAnnotation = payload
+        setShowBeatStringLength(state, { payload }) {
+            state.showBeatStringLength = payload
         },
         setScriptMatchesDAW(state, { payload }) {
             state.scriptMatchesDAW = payload
@@ -46,7 +46,7 @@ const ideSlice = createSlice({
 
 const persistConfig = {
     key: "ide",
-    whitelist: ["autocomplete", "playArrows", "beatStringAnnotation"],
+    whitelist: ["autocomplete", "playArrows", "showBeatStringLength"],
     storage,
 }
 
@@ -57,7 +57,7 @@ export const {
     pushLog,
     setAutocomplete,
     setPlayArrows,
-    setBeatStringAnnotation,
+    setShowBeatStringLength,
     setScriptMatchesDAW,
 } = ideSlice.actions
 
@@ -65,5 +65,5 @@ export const selectBlocksMode = (state: RootState) => state.ide.blocksMode
 export const selectLogs = (state: RootState) => state.ide.logs
 export const selectAutocomplete = (state: RootState) => state.ide.autocomplete
 export const selectPlayArrows = (state: RootState) => state.ide.playArrows
-export const selectBeatStringAnnotation = (state: RootState) => state.ide.beatStringAnnotation
+export const selectShowBeatStringLength = (state: RootState) => state.ide.showBeatStringLength
 export const selectScriptMatchesDAW = (state: RootState) => state.ide.scriptMatchesDAW

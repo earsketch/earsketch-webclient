@@ -16,14 +16,14 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 import { gutter, GutterMarker, keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
-import { setSoundNames, setPreview, previewPlugin, setAppLocale, setBeatStringAnnotation } from "./EditorWidgets"
+import { setSoundNames, setPreview, previewPlugin, setAppLocale, setShowBeatStringLength } from "./EditorWidgets"
 
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW, selectBeatStringAnnotation } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW, selectShowBeatStringLength } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
@@ -431,7 +431,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const [inBlocksMode, setInBlocksMode] = useState(false)
     const [shaking, setShaking] = useState(false)
     const locale = useSelector(appState.selectLocale)
-    const beatStringAnnotation = useSelector(selectBeatStringAnnotation)
+    const showBeatStringLength = useSelector(selectShowBeatStringLength)
 
     useEffect(() => {
         if (!editorElement.current || !blocksElement.current) return
@@ -461,7 +461,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => view.dispatch({ effects: setAppLocale.of(locale) }), [locale])
 
-    useEffect(() => view.dispatch({ effects: setBeatStringAnnotation.of(beatStringAnnotation) }), [beatStringAnnotation])
+    useEffect(() => view.dispatch({ effects: setShowBeatStringLength.of(showBeatStringLength) }), [showBeatStringLength])
 
     const tryToEnterBlocksMode = () => {
         droplet.on("change", () => {})

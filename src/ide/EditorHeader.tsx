@@ -82,7 +82,7 @@ const SettingsMenu = () => {
     const blocksMode = useSelector(ide.selectBlocksMode)
     const autocomplete = useSelector(ide.selectAutocomplete)
     const playArrows = useSelector(ide.selectPlayArrows)
-    const beatStringAnnotation = useSelector(ide.selectBeatStringAnnotation)
+    const showBeatStringLength = useSelector(ide.selectShowBeatStringLength)
     const dispatch = useDispatch()
 
     const actions = [
@@ -99,10 +99,10 @@ const SettingsMenu = () => {
             },
         },
         {
-            nameKey: "editor.beatStringAnnotation",
-            state: beatStringAnnotation,
+            nameKey: "editor.showBeatStringLength",
+            state: showBeatStringLength,
             setState(state: boolean) {
-                dispatch(ide.setBeatStringAnnotation(state))
+                dispatch(ide.setShowBeatStringLength(state))
             },
         },
     ]
