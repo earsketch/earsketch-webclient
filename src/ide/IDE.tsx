@@ -263,8 +263,6 @@ async function runScript() {
 
     setLoading(true)
 
-    const code = editor.getContents()
-
     const startTime = Date.now()
     const state = store.getState()
     const hideEditor = appState.selectHideEditor(state)
@@ -276,11 +274,13 @@ async function runScript() {
     ideConsole.status(i18n.t("messages:idecontroller.running"))
 
     const scriptID = tabs.selectActiveTabID(state)
+    const script = scriptsState.selectAllScripts(store.getState())[scriptID!]
+    const code = script.source_code
     store.dispatch(tabs.removeModifiedScript(scriptID))
 
     let result: DAWData
     try {
-        result = await runner.run(language, editor.getContents())
+        result = await runner.run(language, code)
     } catch (error: any) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
