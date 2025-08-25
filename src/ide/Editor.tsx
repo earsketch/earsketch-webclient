@@ -13,7 +13,7 @@ import { Compartment, EditorState, Extension, StateEffect, StateField, RangeSet,
 import { indentUnit } from "@codemirror/language"
 import { pythonLanguage } from "@codemirror/lang-python"
 import { javascriptLanguage } from "@codemirror/lang-javascript"
-import { gutter, GutterMarker, keymap } from "@codemirror/view"
+import { gutter, GutterMarker, keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setPreview, previewPlugin, setAppLocale } from "./EditorWidgets"
@@ -23,13 +23,14 @@ import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
 import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
+import * as scripts from "../browser/scriptsState"
 
 Object.assign(window, { Sk, ace }) // for droplet
 
@@ -250,6 +251,7 @@ export function createSession(id: string, language: Language, contents: string) 
             ),
             EditorView.updateListener.of(update => {
                 sessions[id] = update.state
+                if (update.docChanged) onEdit(update)
             }),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
@@ -396,6 +398,19 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
 }
 
 // Callbacks
+function onEdit(update: ViewUpdate) {
+    changeListeners.forEach(f => f(update.transactions.some(t => t.isUserEvent("delete"))))
+
+    // If updating the source in Redux on every update turns out to be a bottleneck, we can buffer updates or move state out of Redux.
+    const activeTabID = tabs.selectActiveTabID(store.getState())
+    const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
+    if (script) {
+        store.dispatch(scripts.setScriptSource({ id: activeTabID, source: getContents() }))
+        store.dispatch(tabs.addModifiedScript(activeTabID))
+        store.dispatch(setScriptMatchesDAW(false))
+    }
+}
+
 let shakeImportButton = () => {}
 let updateBlocks: () => void
 

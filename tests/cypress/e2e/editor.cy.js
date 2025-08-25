@@ -10,7 +10,6 @@ describe("Editor", () => {
         cy.interceptAudioStandard([testSoundMeta])
         cy.interceptAudioMetadata(testSoundMeta)
         cy.interceptAudioSample()
-
         cy.visit("/")
         cy.skipTour()
         // Create a new script.
@@ -119,5 +118,73 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         // We expect 3 intercepted calls: METRONOME01, METRONOME02, and OS_CLAP01
         // https://github.com/cypress-io/cypress/issues/16655
         cy.get("@audio_sample.all").should("have.length", 3)
+    })
+
+    it("allows user to login, edit script, and save", () => {
+        const username = "cypress"
+        const scriptName = "RecursiveMelody.py"
+
+        // Setup intercepts for login and save
+        cy.interceptScriptSave(scriptName)
+        cy.interceptUsersToken()
+        cy.interceptUsersInfo(username)
+        cy.interceptAudioUser([])
+        cy.interceptAudioFavorites()
+        cy.interceptScriptsShared()
+        cy.interceptAudioUpload()
+
+        cy.interceptScriptsOwned([{
+            created: "2022-01-02 16:20:00.0",
+            file_location: "",
+            id: -1,
+            modified: "2022-02-14 16:19:00.0",
+            name: scriptName,
+            run_status: 1,
+            shareid: "1111111111111111111111",
+            soft_delete: false,
+            source_code: "from earsketch import *\nsetTempo(91)\n",
+            username,
+        }])
+
+        cy.interceptAudioUser()
+        // Login with placeholder username
+        cy.login("username")
+        // wait for the already created script to be saved during login
+        cy.wait("@scripts_save")
+        cy.get(`[title="Open ${scriptName} in Code Editor"]`).click()
+
+        const message = "Hello from saved script"
+        cy.get("#editor").type(`{moveToEnd}{enter}print("${message}")`)
+
+        cy.get("button").contains("button", scriptName).parent().should("have.class", "text-red-500")
+
+        // NOTE: Clicking "RUN" instead of using Ctrl+Enter because the shortcut is different on Mac.
+        cy.get("button").contains("RUN").click()
+        // Verify the save API was called
+        cy.wait("@scripts_save").then((interception) => {
+            expect(interception.request.body).to.contain(`name=${scriptName}`)
+            expect(interception.request.body.replaceAll("+", " ")).to.contain(message)
+        })
+
+        cy.get("#console-frame").contains(message)
+        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+
+        const message2 = "another message"
+        cy.get("#editor").type(`{moveToEnd}{enter}print("${message2}")`)
+
+        cy.get("button").contains("button", scriptName).parent().should("have.class", "text-red-500")
+
+        if (Cypress.platform === "darwin") {
+            cy.get("#editor").type("{meta+s}")
+        } else {
+            cy.get("#editor").type("{ctrl+s}")
+        }
+
+        cy.wait("@scripts_save").then((interception) => {
+            expect(interception.request.body).to.contain(`name=${scriptName}`)
+            expect(interception.request.body.replaceAll("+", " ")).to.contain(message2)
+        })
+
+        cy.get("#console-frame").should("not.contain", message2)
     })
 })
