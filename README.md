@@ -10,7 +10,7 @@ Run EarSketch on your local machine for development and testing purposes.
 
 ### Installing
 
-Install JavaScript dependencies. Node.js v14 required.
+Install JavaScript dependencies. Node.js v20 required.
 
 ```bash
 npm install
@@ -22,7 +22,9 @@ Run the app in development mode.
 npm run dev
 ```
 
-In your web browser, go to [http://localhost:8888](http://localhost:8888). Start the quick tour, "run", and "play".
+In your web browser, go to [http://localhost:8888](http://localhost:8888).
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for details about the project structure and important files.
 
 ### Available Scripts
 
@@ -44,15 +46,21 @@ In your web browser, go to [http://localhost:8888](http://localhost:8888). Start
 
 Production deployments should use `npm run build` with additional command-line options. See `webpack.build.js` for details.
 
-The curriculum HTML is sourced elsewhere, by following the `curriculum` soft link. These files can be omitted, and are not publicly available at this time.
+You may optionally choose to install the curriculum, although the webclient will work without it.
 
-## Issues / Contact
-
-Please use our contact form at https://earsketch.gatech.edu/landing/#/contact.
+The curriculum HTML is sourced from the earsketch-curriculum repository, and referenced by following the `curriculum` soft link. Clone the repository and place it in the same parent directory as this repository.
 
 ## Contributing
 
-The EarSketch webclient is not accepting outside contributions at this time. See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details about contributing to EarSketch.
+
+## Reporting Issues
+
+Please report technical issues by submitting a [GitHub issue](https://github.com/earsketch/earsketch-webclient/issues).
+
+## Contact
+
+You may contact our team using the landing page [contact form](https://earsketch.gatech.edu/landing/#/contact).
 
 ## License
 
