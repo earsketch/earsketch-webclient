@@ -282,10 +282,6 @@ export function setActiveSession(session: EditorSession) {
     }
 }
 
-export function getContents(session?: EditorSession) {
-    return (session ?? view.state).doc.toString()
-}
-
 export function setContents(contents: string, id?: string, doUpdateBlocks = false) {
     if (id && sessions[id] !== view.state) {
         sessions[id] = sessions[id].update({ changes: { from: 0, to: sessions[id].doc.length, insert: contents } }).state
@@ -405,7 +401,7 @@ function onEdit(update: ViewUpdate) {
     const activeTabID = tabs.selectActiveTabID(store.getState())
     const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
     if (script) {
-        store.dispatch(scripts.setScriptSource({ id: activeTabID, source: getContents() }))
+        store.dispatch(scripts.setScriptSource({ id: activeTabID, source: view.state.doc.toString() }))
         store.dispatch(tabs.addModifiedScript(activeTabID))
         store.dispatch(setScriptMatchesDAW(false))
     }
@@ -468,7 +464,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.setMode(language, blocksModes[language].modeOptions)
             droplet.setPalette(blocksModes[language].palette)
         }
-        const result = droplet.setValue_raw(getContents())
+        const result = droplet.setValue_raw(view.state.doc.toString())
         if (result.success) {
             droplet.resize()
             setInBlocksMode(true)
