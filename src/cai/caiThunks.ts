@@ -6,7 +6,7 @@ import * as scripts from "../browser/scriptsState"
 import * as tabs from "../ide/tabState"
 import { parseLanguage } from "../esutils"
 import { changeListeners } from "../ide/Editor"
-import store, { RootState, ThunkAPI } from "../reducers"
+import store, { ThunkAPI } from "../reducers"
 import { selectUserName } from "../user/userState"
 import { analyzeCode, analyzeMusic } from "./analysis"
 import {
@@ -177,11 +177,6 @@ const introduceCai = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-function getOpenScriptContents(state: RootState) {
-    const scriptID = tabs.selectActiveTabID(state)!
-    return scripts.selectAllScripts(state)[scriptID].source_code
-}
-
 export const sendCaiMessage = createAsyncThunk<void, [CaiButton, boolean], ThunkAPI>(
     "cai/sendCaiMessage",
     async ([input, isDirect], { getState, dispatch }) => {
@@ -197,7 +192,7 @@ export const sendCaiMessage = createAsyncThunk<void, [CaiButton, boolean], Thunk
             sender: selectUserName(getState()),
         } as CaiMessage
 
-        const text = getOpenScriptContents(state)
+        const text = tabs.selectActiveTabScript(state)!.source_code
 
         dialogue.setCodeObj(text)
         dispatch(addToMessageList({ message }))
@@ -336,7 +331,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
         const state = getState()
-        const contents = getOpenScriptContents(state)
+        const contents = tabs.selectActiveTabScript(state)!.source_code
         const errorReturn = dialogue.handleError(data, contents)
         const activeProject = selectActiveProject(state)
         errorHandlingState[activeProject].errorMessage = storeErrorInfo(data, contents, app.selectScriptLanguage(state))
@@ -389,7 +384,7 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
 const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
     (_, { getState }) => {
-        dialogue.checkForCodeUpdates(getOpenScriptContents(getState()))
+        dialogue.checkForCodeUpdates(tabs.selectActiveTabScript(getState())!.source_code)
     }
 )
 

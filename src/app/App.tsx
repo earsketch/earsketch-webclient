@@ -342,7 +342,7 @@ export async function submitToCompetition(script: Script) {
 
 export async function importScript(script: Script) {
     if (!script) {
-        script = tabs.selectActiveTabScript(store.getState())
+        script = tabs.selectActiveTabScript(store.getState())!
     }
 
     let imported

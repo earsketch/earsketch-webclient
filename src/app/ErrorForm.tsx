@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next"
 import UAParser from "ua-parser-js"
 
 import * as app from "../app/appState"
-import * as scripts from "../browser/scriptsState"
 import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import { REPORT_LOG } from "../esconsole"
@@ -77,9 +76,8 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
             body += `\r\n**Error Description:** ${description}\r\n`
         }
 
-        const activeTabID = tabs.selectActiveTabID(store.getState())
-        if (activeTabID !== null) {
-            const script = scripts.selectAllScripts(store.getState())[activeTabID]
+        const script = tabs.selectActiveTabScript(store.getState())
+        if (script !== null) {
             body += "\r\n**SOURCE CODE:**\r\n```" + language + "\r\n" + script.source_code + "\r\n```"
         }
 

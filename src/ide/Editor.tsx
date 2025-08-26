@@ -356,7 +356,7 @@ export function pasteCode(code: string) {
 }
 
 export function highlightError(err: any) {
-    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
+    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState())!.name)
     let lineNumber = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
     if (lineNumber !== undefined) {
         // Skulpt reports a line number greater than the document length for EOF; clamp to valid range.

@@ -266,7 +266,7 @@ async function runScript() {
     const startTime = Date.now()
     const state = store.getState()
     const hideEditor = appState.selectHideEditor(state)
-    const scriptName = (hideEditor ? appState.selectEmbeddedScriptName(state) : tabs.selectActiveTabScript(state).name)!
+    const scriptName = (hideEditor ? appState.selectEmbeddedScriptName(state) : tabs.selectActiveTabScript(state)!.name)!
     const language = ESUtils.parseLanguage(scriptName)
 
     editor.clearErrors()
