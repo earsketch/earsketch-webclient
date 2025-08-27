@@ -19,7 +19,7 @@ export const CompetitionSubmission = ({ name, shareID, close }: { name: string, 
                         <li>Song must include sounds from more than one artist</li>
                         <li>Students can only submit one song for the competition</li>
                         <li>A reflection describing song&apos;s message must be included with submission</li>
-                        <li>For more information, please visit the <a href="https://www.teachers.earsketch.org/compete" target="_blank" rel="noreferrer">competition website</a>.</li>
+                        <li>For more information, please visit the <a href="https://www.teachers.earsketch.org/compete" target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-400">competition website</a>.</li>
                     </ul>
                 </div>
                 <div className="text-center m-auto">
