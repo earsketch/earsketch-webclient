@@ -51,6 +51,7 @@ describe("Editor", () => {
         cy.get(".cm-line").contains("fitMedia(OS_CLAP01,")
         cy.get("button[title='Editor Settings']").click()
         cy.get("button[title='Disable autocomplete']").click()
+        cy.get("button[title='Editor Settings']").click()
         cy.get("#editor").type("{moveToEnd}{enter}m")
         cy.get(".cm-tooltip-autocomplete").should("not.exist")
         cy.realType("{enter}")
