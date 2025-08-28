@@ -457,7 +457,7 @@
       "alreadyused": " est déjà utilisé comme constante",
       "invalidconstant": " n'est pas une constante valide...",
       "tempointeger": "Le tempo doit être un nombre positif...",
-      "toolong": "Sorry, the audio file cannot be longer than 30 seconds.",
+      "toolong": " Désolé, le fichier audio ne peut pas dépasser 30 secondes.",
       "toobig": "Sorry, the audio file cannot be larger than 10 MB.",
       "timeout": "Erreur de communication de délai d'attente lors du chargement du son ...",
       "uploadsuccess": "Téléchargement du son personnalisé réussi",
@@ -910,14 +910,14 @@
       }
     },
     "readInput": {
-      "description": "Ask the user a question",
+      "description": "Utilisez cette fonction pour inviter un utilisateur à faire une entrée.",
       "parameters": {
         "prompt": {
-          "description": "A message displayed to the user"
+          "description": "Une invite adressée à l'utilisateur lors de la demande d'entrée."
         }
       },
       "returns": {
-        "description": "The user's response"
+        "description": "Le résultat de l'entrée de l'utilisateur."
       },
       "example": {
         "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
