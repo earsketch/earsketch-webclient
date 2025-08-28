@@ -1,0 +1,82 @@
+import { useEffect, useRef, useState } from "react"
+
+import { TitleBar } from "../browser/Curriculum"
+import * as editor from "../ide/Editor"
+
+const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
+    getEditorContents() {
+        return editor.getContents()
+    },
+}
+
+export const ExtensionHost = () => {
+    const [extensionUrl, setExtensionUrl] = useState<string>("")
+    const extensionTargetOrigin = new URL(extensionUrl, window.location.href).origin
+    const iframeRef = useRef<HTMLIFrameElement>(null)
+
+    useEffect(() => {
+        const onMessage = (event: MessageEvent) => {
+            const isFromLocalOriginIframe = event.source === iframeRef.current?.contentWindow
+            const isFromRemoteOriginIframe = event.origin === extensionTargetOrigin && event.origin !== window.location.origin
+
+            if (isFromLocalOriginIframe || isFromRemoteOriginIframe) {
+                console.log("Received message from iframe:", event.data)
+                const data = JSON.parse(event.data)
+                const result = extensionFunctions[data.fn](...(data.args ?? []))
+
+                // event.source!.postMessage(JSON.stringify(result), event.origin) // TODO this works but typscript is complaining about the event.origin type
+                if (iframeRef.current?.contentWindow) {
+                    iframeRef.current.contentWindow.postMessage(JSON.stringify(result), "*") // TODO extensionTargetOrigin isn't working for remote html
+                } else {
+                    console.warn("iframe contentWindow is not available")
+                }
+            }
+        }
+        window.addEventListener("message", onMessage)
+        return () => { window.removeEventListener("message", onMessage) }
+    }, [])
+
+    return (<>
+        <TitleBar />
+        <div>
+            <button
+                style={{ margin: "3px 10px", padding: "1px 10px", borderRadius: "5px", color: "black", fontSize: "0.7rem", border: "1px solid black" }}
+                onClick={() => {
+                    const url = "myExtension.html"
+                    const element = document.getElementById("extension-url-input") as HTMLInputElement
+                    element.value = url
+                }}>PASTE DEMO URL</button>
+        </div><div>
+            <input
+                id="extension-url-input"
+                type="text"
+                placeholder="Extension URL"
+                style={{ width: "300px", margin: "10px", padding: "10px", borderRadius: "5px", border: "1px solid #ccc", fontSize: "0.7rem" }} />
+        </div><div>
+            <button
+                style={{ margin: "10px", padding: "10px", borderRadius: "5px", color: "black", fontSize: "0.7rem", border: "1px solid black" }}
+                onClick={() => {
+                    setExtensionUrl((document.getElementById("extension-url-input") as HTMLInputElement).value)
+                }}>LOAD</button>
+            <button
+                style={{ margin: "10px", padding: "10px", borderRadius: "5px", color: "black", fontSize: "0.7rem", border: "1px solid black" }}
+                onClick={() => {
+                    setExtensionUrl("")
+                }}>UNLOAD</button>
+        </div>
+        <div style={{ padding: "10px" }}>{extensionUrl}</div>
+        <iframe
+            ref={iframeRef}
+            src={extensionUrl}
+            onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOrigin) }}
+            style={{
+                width: "100%",
+                height: "400px",
+                border: "1px solid #ccc",
+            }}
+            title="EarSketch Extension"
+        />
+    </>)
+}
+
+export default ExtensionHost
