@@ -87,8 +87,7 @@ const SettingsMenu = () => {
 
     const actions = [
         { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) } },
-        // cosmetic divider line between "blocks mode" and the rest of the settings
-        { nameKey: "line", state: null, setState: null},
+        { type: "divider" }, // cosmetic divider between blocksMode and rest of the menu
         { nameKey: "editor.autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
         {
             nameKey: "editor.showBeatStringLength",
@@ -117,14 +116,18 @@ const SettingsMenu = () => {
             </div>
         </Menu.Button>
         <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-            {actions.map(({ nameKey, state, setState }) =>
-                {if (nameKey == "line") {
-                    return <hr className="mx-3 my-1 bg-black h-0.5" />
-                } else {
-                    return <Menu.Item key={nameKey}>
-                        {({ active }) => <ToggleButton hovered={active} labelKey={nameKey} state={state} setState={setState} />}
-                    </Menu.Item>
+            {actions.map((action, index) => {
+                if (action.type === "divider") {
+                    return <hr key={`divider-${index}`} className="mx-3 my-1 bg-black h-0.5" />
                 }
+                return (
+                    <Menu.Item key={action.nameKey}>
+                        {({ active }) => <ToggleButton hovered={active} 
+                        labelKey={action.nameKey} 
+                        state={action.state} 
+                        setState={action.setState} />}
+                    </Menu.Item>
+                )
             })}
         </Menu.Items>
     </Menu>
