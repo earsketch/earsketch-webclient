@@ -87,7 +87,16 @@ const SettingsMenu = () => {
 
     const actions = [
         { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) } },
+        // cosmetic divider line between "blocks mode" and the rest of the settings
+        { nameKey: "line", state: null, setState: null},
         { nameKey: "editor.autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
+        {
+            nameKey: "editor.showBeatStringLength",
+            state: showBeatStringLength,
+            setState(state: boolean) {
+                dispatch(ide.setShowBeatStringLength(state))
+            },
+        },
         {
             nameKey: "editor.playArrows",
             state: playArrows,
@@ -96,13 +105,6 @@ const SettingsMenu = () => {
                 if (state === false) {
                     editor.setDAWPlayingLines([])
                 }
-            },
-        },
-        {
-            nameKey: "editor.showBeatStringLength",
-            state: showBeatStringLength,
-            setState(state: boolean) {
-                dispatch(ide.setShowBeatStringLength(state))
             },
         },
     ]
@@ -116,9 +118,14 @@ const SettingsMenu = () => {
         </Menu.Button>
         <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {actions.map(({ nameKey, state, setState }) =>
-                <Menu.Item key={nameKey}>
-                    {({ active }) => <ToggleButton hovered={active} labelKey={nameKey} state={state} setState={setState} />}
-                </Menu.Item>)}
+                {if (nameKey == "line") {
+                    return <hr className="mx-3 my-1 bg-black h-0.5" />
+                } else {
+                    return <Menu.Item key={nameKey}>
+                        {({ active }) => <ToggleButton hovered={active} labelKey={nameKey} state={state} setState={setState} />}
+                    </Menu.Item>
+                }
+            })}
         </Menu.Items>
     </Menu>
 }
