@@ -910,14 +910,14 @@
       }
     },
     "readInput": {
-      "description": "Foydalanuvchidan savol so'rash",
+      "description": "Kiritishni foydalanuvchiga taklif qilish uchun ushbu funktsiyadan foydalaning.",
       "parameters": {
         "prompt": {
-          "description": "Foydalanuvchiga ko'rsatilgan xabar"
+          "description": "Kiritish so'ralganda foydalanuvchini ta'minlash taklifi."
         }
       },
       "returns": {
-        "description": "Foydalanuvchining javobi"
+        "description": "Foydalanuvchining kiritish natijasi."
       },
       "example": {
         "python": "# Foydalanuvchi ta'minlagan zarba satri\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
