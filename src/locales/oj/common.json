@@ -457,7 +457,7 @@
       "alreadyused": "mii owe medwesing",
       "invalidconstant": "gaawiin madwesisinoon...",
       "tempointeger": "Meshkodaabikinigan gwayakobii’ igan...",
-      "toolong": "Sorry, the audio file cannot be longer than 30 seconds.",
+      "toolong": "Hay’, gaawiiin nawaj ji - ginwaag 30 diba’ igaansens.",
       "toobig": "Sorry, the audio file cannot be larger than 10 MB.",
       "timeout": "Aatawe aatawaatebii’ igan...",
       "uploadsuccess": "Anokiimagadoon enitaagwakin",
@@ -910,14 +910,14 @@
       }
     },
     "readInput": {
-      "description": "Ask the user a question",
+      "description": "Wiindamaw ge - aabajitood ge - izhi - atood odanokiiwin aazhawaatebii’ iganing.",
       "parameters": {
         "prompt": {
-          "description": "A message displayed to the user"
+          "description": " Mii omaa ge-onji-gikendang aandi ge-atood."
         }
       },
       "returns": {
-        "description": "The user's response"
+        "description": "Mii owe ge - izhichigemagak atooyan gidaazhawaatebii’ iganing."
       },
       "example": {
         "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
