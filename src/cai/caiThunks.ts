@@ -1,12 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import { DAWData, Language, Script } from "common"
-import { chatListeners, sendChatMessage } from "../app/collaboration"
 import { selectRegularScripts } from "../browser/scriptsState"
 import { parseLanguage } from "../esutils"
-import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
-import { elaborate } from "../ide/console"
-import { selectActiveTabScript } from "../ide/tabState"
+import { changeListeners, getContents } from "../ide/Editor"
 import store, { ThunkAPI } from "../reducers"
 import { selectUserName } from "../user/userState"
 import { analyzeCode, analyzeMusic } from "./analysis"
@@ -26,7 +23,6 @@ import {
     selectResponseOptions,
     selectWizard,
     setActiveProject,
-    setCurriculumView,
     setDropupLabel,
     setErrorOptions,
     setHighlight,
@@ -78,32 +74,6 @@ if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
     }
 }
 
-// Listen for chat messages.
-chatListeners.push(message => {
-    const outputMessage = message.caiMessage!
-
-    switch (message.caiMessageType) {
-        case "cai":
-            outputMessage.sender = "CAI"
-            store.dispatch(addCaiMessage([outputMessage, { remote: true }]))
-            break
-        case "cai suggestion":
-            outputMessage.sender = "CAI"
-            store.dispatch(addCaiMessage([outputMessage, { remote: true, suggestion: true }]))
-            break
-        case "wizard":
-            outputMessage.sender = "CAI"
-            store.dispatch(addCaiMessage([outputMessage, { remote: true, wizard: true }]))
-            break
-        case "user":
-            store.dispatch(addCaiMessage([outputMessage, { remote: true }]))
-            break
-        case "curriculum":
-            store.dispatch(setCurriculumView(message.sender + " is viewing " + outputMessage.text[0][1][0]))
-            break
-    }
-})
-
 // TODO: Avoid DOM manipulation.
 export const newCaiMessage = () => {
     const east = store.getState().layout.east
@@ -154,7 +124,6 @@ const addCaiMessage = createAsyncThunk<void, [CaiMessage, MessageParameters], Th
         } else {
             // Messages from CAI: save as suggestion and send to wizard.
             addToNodeHistory(["chat", [combineMessageText(message), "CAI Suggestion"]])
-            sendChatMessage(message, "cai suggestion")
         }
     }
 )
@@ -288,10 +257,6 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(setActiveProject(activeProject))
             dialogue.setActiveProject(activeProject)
 
-            if (selectWizard(getState()) && selectActiveTabScript(getState()).collaborative) {
-                setReadOnly(true)
-            }
-
             if (!selectMessageList(getState()).length) {
                 dispatch(setMessageList([]))
                 if (ES_WEB_SHOW_CAI && !selectWizard(getState())) {
@@ -313,16 +278,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 export const compileCai = createAsyncThunk<void, [DAWData, Language, string], ThunkAPI>(
     "cai/compileCai",
     async (data, { getState, dispatch }) => {
-        if (ES_WEB_SHOW_CAI && ES_WEB_SHOW_CHAT) {
-            if (!selectWizard(getState())) {
-                const message = {
-                    text: [["plaintext", ["Compiled the script!"]]],
-                    date: Date.now(),
-                    sender: selectUserName(getState()),
-                } as CaiMessage
-                sendChatMessage(message, "user")
-            }
-        } else if (dialogueState[selectActiveProject(getState())].isDone) {
+        if (dialogueState[selectActiveProject(getState())].isDone) {
             return
         }
 
@@ -374,14 +330,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
         const errorReturn = dialogue.handleError(data, getContents())
         const activeProject = selectActiveProject(getState())
         errorHandlingState[activeProject].errorMessage = storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
-        if (ES_WEB_SHOW_CAI && ES_WEB_SHOW_CHAT && !selectWizard(getState())) {
-            const message = {
-                text: [["plaintext", ["Compiled the script with error: " + elaborate(data)]]],
-                date: Date.now(),
-                sender: selectUserName(getState()),
-            } as CaiMessage
-            sendChatMessage(message, "user")
-        } else if (dialogueState[activeProject].isDone) {
+        if (dialogueState[activeProject].isDone) {
             return
         }
 
@@ -402,14 +351,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
 
 export const closeCurriculum = createAsyncThunk<void, void, ThunkAPI>(
     "cai/closeCurriculum",
-    (_, { getState }) => {
-        if (ES_WEB_SHOW_CAI && ES_WEB_SHOW_CHAT && !selectWizard(store.getState())) {
-            sendChatMessage({
-                text: [["plaintext", ["the CAI Window"]]],
-                sender: selectUserName(getState()),
-                date: Date.now(),
-            } as CaiMessage, "curriculum")
-        }
+    () => {
         addToNodeHistory(["curriculum", "CAI window"])
     }
 )
@@ -429,19 +371,8 @@ export const autoScrollCai = createAsyncThunk<void, void, ThunkAPI>(
 
 export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkAPI>(
     "cai/curriculumPage",
-    ([location, title], { getState }) => {
+    ([location, _]) => {
         dialogue.addCurriculumPageToHistory(location)
-        const east = getState().layout.east
-        if (!(east.open && east.kind === "CAI")) {
-            if (ES_WEB_SHOW_CAI && ES_WEB_SHOW_CHAT && !selectWizard(getState())) {
-                const page = title || location as unknown as string
-                sendChatMessage({
-                    text: [["plaintext", ["Curriculum Page " + page]]],
-                    sender: selectUserName(getState()),
-                    date: Date.now(),
-                } as CaiMessage, "curriculum")
-            }
-        }
     }
 )
 
