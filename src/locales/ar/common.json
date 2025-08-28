@@ -457,7 +457,7 @@
       "alreadyused": " يُستخدم كثابت",
       "invalidconstant": " ثابت غير صالح...",
       "tempointeger": "يجب أن يكون معدل الإيقاع رقمًا موجبًا...",
-      "toolong": "Sorry, the audio file cannot be longer than 30 seconds.",
+      "toolong": " عذرًا ، لا يمكن أن يكون الملف الصوتي أطول من 30 ثانية.",
       "toobig": "Sorry, the audio file cannot be larger than 10 MB.",
       "timeout": "خطأ في مهلة الاتصال أثناء تحميل الصوت ...",
       "uploadsuccess": "تم تحميل الصوت المخصص نجاح",
@@ -910,14 +910,14 @@
       }
     },
     "readInput": {
-      "description": "Ask the user a question",
+      "description": "استخدم هذه الدالة لاستدعاء المستخدم بالإدخال.",
       "parameters": {
         "prompt": {
-          "description": "A message displayed to the user"
+          "description": "موجه لتزويد المستخدم عند طلب الإدخال."
         }
       },
       "returns": {
-        "description": "The user's response"
+        "description": "نتيجة مدخلات المستخدم."
       },
       "example": {
         "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
