@@ -126,7 +126,7 @@ const SettingsMenu = () => {
                 if (action.divider) {
                     return (<div key={`menu-item-with-divider-${index}`}>
                         {menuItem}
-                        <hr key={`divider-${index}`} className="mx-3 my-1 bg-black h-1" />
+                        <hr key={`divider-${index}`} className="mx-3 my-1 bg-black h-[2px]" />
                     </div>)
                 }
                 return menuItem
