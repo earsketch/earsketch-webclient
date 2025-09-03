@@ -119,9 +119,9 @@ const SettingsMenu = () => {
                 const menuItem =
                     <Menu.Item key={action.nameKey}>
                         {({ active }) => <ToggleButton hovered={active}
-                        labelKey={action.nameKey}
-                        state={action.state}
-                        setState={action.setState} />}
+                            labelKey={action.nameKey}
+                            state={action.state}
+                            setState={action.setState} />}
                     </Menu.Item>
                 if (action.divider) {
                     return (<div key={`menu-item-with-divider-${index}`}>
