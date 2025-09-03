@@ -431,7 +431,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const [inBlocksMode, setInBlocksMode] = useState(false)
     const [shaking, setShaking] = useState(false)
     const locale = useSelector(appState.selectLocale)
-    const showBeatStringAnnotation = useSelector(selectShowBeatStringAnnotation)
+    const showBeatStringAnnotations = useSelector(selectShowBeatStringAnnotation)
 
     useEffect(() => {
         if (!editorElement.current || !blocksElement.current) return
@@ -461,7 +461,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => view.dispatch({ effects: setAppLocale.of(locale) }), [locale])
 
-    useEffect(() => view.dispatch({ effects: setShowBeatStringAnnotation.of(showBeatStringAnnotation) }), [showBeatStringAnnotation])
+    useEffect(() => view.dispatch({ effects: setShowBeatStringAnnotation.of(showBeatStringAnnotations) }), [showBeatStringAnnotations])
 
     const tryToEnterBlocksMode = () => {
         droplet.on("change", () => {})

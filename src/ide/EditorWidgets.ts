@@ -71,8 +71,8 @@ class BeatCharacterCountWidget extends WidgetType {
 function previews(view: EditorView, soundNames: string[], { preview, playing }: PreviewState, locale: Locale) {
     const widgets: Range<Decoration>[] = []
     const beatStringRegex = /^[0-9A-Fa-f\-+]+$/
-    // Get the current showBeatStringAnnotation setting from the store
-    const showBeatStringAnnotation = store.getState().ide.showBeatStringAnnotation
+    // Get the current showBeatStringAnnotations setting from the store
+    const showBeatStringAnnotations = store.getState().ide.showBeatStringAnnotations
     const MINIMUM_BEAT_STRING_LENGTH = 2
     for (const { from, to } of view.visibleRanges) {
         syntaxTree(view.state).iterate({
@@ -98,12 +98,12 @@ function previews(view: EditorView, soundNames: string[], { preview, playing }: 
                         const state = preview?.kind === "beat" && preview.beat === beat
                             ? playing ? "playing" : "loading"
                             : "stopped"
-                        const deco = Decoration.widget({
-                            widget: new PreviewWidget({ kind: "beat", beat }, state),
-                            side: 1,
-                        })
-                        widgets.push(deco.range(node.from))
-                        if (showBeatStringAnnotation && beat.length >= MINIMUM_BEAT_STRING_LENGTH) {
+                        if (showBeatStringAnnotations && beat.length >= MINIMUM_BEAT_STRING_LENGTH) {
+                            const deco = Decoration.widget({
+                                widget: new PreviewWidget({ kind: "beat", beat }, state),
+                                side: 1,
+                            })
+                            widgets.push(deco.range(node.from))
                             const charCount = Decoration.widget({
                                 widget: new BeatCharacterCountWidget(beat, locale),
                                 side: 1,

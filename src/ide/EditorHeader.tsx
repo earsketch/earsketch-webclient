@@ -82,15 +82,15 @@ const SettingsMenu = () => {
     const blocksMode = useSelector(ide.selectBlocksMode)
     const autocomplete = useSelector(ide.selectAutocomplete)
     const playArrows = useSelector(ide.selectPlayArrows)
-    const showBeatStringAnnotation = useSelector(ide.selectShowBeatStringAnnotation)
+    const showBeatStringAnnotations = useSelector(ide.selectShowBeatStringAnnotation)
     const dispatch = useDispatch()
 
     const actions = [
         { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) }, divider: true },
         { nameKey: "editor.autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
         {
-            nameKey: "editor.showBeatStringAnnotation",
-            state: showBeatStringAnnotation,
+            nameKey: "editor.showBeatStringAnnotations",
+            state: showBeatStringAnnotations,
             setState(state: boolean) {
                 dispatch(ide.setShowBeatStringAnnotation(state))
             },
