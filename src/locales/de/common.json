@@ -295,6 +295,7 @@
     "shortcuts.zoomHorizontal": "Zoomen (Horizontal)",
     "shortcuts.zoomVertical": "Zoomen (Vertikal)",
     "shortcuts.escapeEditor": "Editor-Fokus verlassen",
+    "shortcuts.playPause": "Wiedergabe/Pause",
     "hardware.ctrl": "Strg",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
@@ -457,6 +458,7 @@
       "invalidconstant": " ist keine gültige Konstante...",
       "tempointeger": "Das Tempo muss eine positive Zahl sein...",
       "toolong": " Die Audiodatei darf leider nicht länger als 30 Sekunden sein.",
+      "toobig": "Die Audiodatei darf nicht größer als 10 MB sein.",
       "timeout": "Zeitüberschreitungsfehler beim Hochladen des Sounds...",
       "uploadsuccess": "Benutzerdefinierter Sound wurde erfolgreich hochgeladen",
       "commerror": "Kommunikationsfehler beim Hochladen des Sounds ...",
@@ -826,7 +828,7 @@
           "description": "Ein String, der das zu spielende rhythmische Muster angibt. „0“ spielt die Sounddatei für eine Sechzehntelnote ab. „+“ setzt sie für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote. Wenn das erste Argument von makeBeat eine Liste bzw. ein Array von Sounds ist, spielen die Werte „0“ bis „9“ den Sound an diesem Listen-/Array-Index für eine Sechzehntelnote."
         },
         "stepsPerMeasure": {
-          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat-String angibt. Der Standardwert von 16 führt zu einer sechzehnten Note."
+          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat String angibt. Der Standardwert von 16 führt zu einer sechzehnten Note."
         }
       },
       "example": {
@@ -877,12 +879,12 @@
           "description": "Liste bzw. Array von Startpositionen innerhalb des Sounds. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die im Beat-String mit „0“ bzw. „1“ referenziert werden können."
         },
         "stepsPerMeasure": {
-          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat-String angibt. Der Standardwert von 16 führt zu einer Sechzehntelnote."
+          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat String angibt. Der Standardwert von 16 führt zu einer Sechzehntelnote."
         }
       },
       "example": {
         "python": "# Slicen und neu ordnen durch Achtelnoten\nsound = HIPHOP_TRAPHOP_BEAT_002\neighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"01261264\"\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8)",
-        "javascript": "// Slice und neu ordnen durch Achtelnoten\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
+        "javascript": "// Slicen und neu ordnen durch Achtelnoten\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
       }
     },
     "print": {
@@ -918,8 +920,47 @@
         "description": "Ergebnis der Benutzereingabe."
       },
       "example": {
-        "python": "# Vom Benutzer bereitgestellter Beat-String\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
-        "javascript": "// Vom Benutzer bereitgestellter Beat-String\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+        "python": "# Vom Benutzer bereitgestellter Beat String\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
+        "javascript": "// Vom Benutzer bereitgestellter Beat String\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+      }
+    },
+    "multiChoiceInput1": {
+      "description": "Den Benutzer bitten, aus einer Liste auszuwählen",
+      "parameters": {
+        "prompt": {
+          "description": "Eine Nachricht, die dem Benutzer angezeigt wird"
+        },
+        "choices": {
+          "description": "Eine Liste von Optionen, die dem Benutzer angezeigt werden"
+        }
+      },
+      "returns": {
+        "description": "Der ausgewählte Index"
+      },
+      "example": {
+        "python": "# Auswahl eines beat strings\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nbeatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices)\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex])",
+        "javascript": "// Auswahl eines beat strings\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nvar beatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices);\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex]);"
+      }
+    },
+    "multiChoiceInput2": {
+      "description": "Den Benutzer bitten, ein oder mehrere Elemente aus einer Liste auszuwählen.",
+      "parameters": {
+        "prompt": {
+          "description": "Eine Nachricht, die dem Benutzer angezeigt wird"
+        },
+        "choices": {
+          "description": "Eine Liste von Optionen, die dem Benutzer angezeigt werden"
+        },
+        "allowMultiple": {
+          "description": "Wenn true, kann der Benutzer mehrere Optionen auswählen. Wenn false, kann der Benutzer nur eine Auswahl auswählen."
+        }
+      },
+      "returns": {
+        "description": "Die ausgewählten Indizes"
+      },
+      "example": {
+        "python": "# Sound board\nsoundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808]\nchosenSounds = multiChoiceInput(\"Choose your sounds\", soundChoices, True)\ntrack = 1\nfor choice in chosenSounds:\n    sound = soundChoices[choice]\n    fitMedia(sound, track, 1, 5)\n    track += 1",
+        "javascript": "// Sound board\nvar soundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808];\nvar chosenSounds = multiChoiceInput(\"Choose your sounds\", soundChoices, true);\nfor (var i = 0; i < chosenSounds.length; i++) {\n    var choice = chosenSounds[i]\n    var sound = soundChoices[choice]\n    fitMedia(sound, i+1, 1, 5)\n}"
       }
     },
     "replaceListElement": {
@@ -987,8 +1028,8 @@
         "description": "Ein neuer String mit den Zeichen in umgekehrter Reihenfolge"
       },
       "example": {
-        "python": "# Umkehren eines Beat-Strings\nbeat = \"0+++0---0----000\"\nreversed = reverseString(beat)",
-        "javascript": "// Umkehren eines Beat-Strings\nvar beat = \"0+++0---0----000\";\nvar reversed = reverseString(beat);"
+        "python": "# Umkehren eines Beat Strings\nbeat = \"0+++0---0----000\"\nreversed = reverseString(beat)",
+        "javascript": "// Umkehren eines Beat Strings\nvar beat = \"0+++0---0----000\";\nvar reversed = reverseString(beat);"
       }
     },
     "rhythmEffects": {
@@ -1112,7 +1153,7 @@
       }
     },
     "shuffleList": {
-      "description": "Die Elemente in einer Listen/Array zufällig neu anordnen.",
+      "description": "Die Elemente in einer Liste/Array zufällig neu anordnen.",
       "parameters": {
         "list": {
           "description": "Liste/Array, die/das gemischt werden soll."
@@ -1155,7 +1196,7 @@
       "ImportError": "Die entsprechenden Pakete können nicht gefunden oder importiert werden",
       "IndentationError": "Es gibt einen Einrückungsfehler im Code (fehlende oder zusätzliche Leerzeichen)",
       "IndexError": "Es gibt einen Fehler bei der Verwendung eines Out-of-Range-Index",
-      "KeyError": "Es gibt einen Fehler bei der Verwendung eines Wörterbuch-Schlüssels da er nicht existiert",
+      "KeyError": "Es gibt einen Fehler bei der Verwendung eines Wörterbuch-Schlüssels, da er nicht existiert",
       "NameError": "Es gibt einen Fehler mit einer Variable oder einem Funktionsnamen, der nicht definiert ist",
       "ParseError": "Fehler beim Lesen des Codes",
       "SyntaxError": "Es gibt einen Fehler mit der Syntax (oder Anordnung) des Codes",

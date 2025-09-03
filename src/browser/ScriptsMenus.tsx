@@ -123,7 +123,7 @@ export const ScriptDropdownMenu = ({
         name: t("script.submitCompetition"),
         aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
         onClick: () => submit(script!),
-        icon: "icon-share2",
+        icon: "icon-earth",
         disabled: !loggedIn,
         visible: type === "regular" && loggedIn && ES_WEB_SHOW_COMPETITION_SUBMIT,
     }, {

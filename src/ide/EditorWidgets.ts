@@ -73,7 +73,7 @@ function previews(view: EditorView, soundNames: string[], { preview, playing }: 
     const beatStringRegex = /^[0-9A-Fa-f\-+]+$/
     // Get the current showBeatStringAnnotation setting from the store
     const showBeatStringAnnotation = store.getState().ide.showBeatStringAnnotation
-    const MINIMUM_BEAT_STRING_LENGTH = 2 // TODO: Agree on this value
+    const MINIMUM_BEAT_STRING_LENGTH = 2
     for (const { from, to } of view.visibleRanges) {
         syntaxTree(view.state).iterate({
             from,
