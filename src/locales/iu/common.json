@@ -295,6 +295,7 @@
     "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
     "shortcuts.zoomVertical": "Zoom (Vertical)",
     "shortcuts.escapeEditor": "Escape editor focus",
+    "shortcuts.playPause": "Play / Pause",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
@@ -457,6 +458,7 @@
       "invalidconstant": " ᐊᑐᕐᓂᖅ ᐊᔪᖅᑐᖅ ᐆᒃᑐᕋᐅᓂᓗᒃᑐᖅ...",
       "tempointeger": "ᓂᐱᖓᑕ ᓈᓴᐅᑎᖓ ᓈᒻᒪᒋᐊᓕᒃ...",
       "toolong": " ᒪᒥᐊᓇᕋᓗᐊᖅᐳᖅ, ᓂᐱᖃᑕ ᐃᓂᖃᕐᕕᖓ ᑕᑭᓂᖃᕆᐊᓕᒃ 30 ᓯᑲᓐᔅ ᐅᑖᓂᐅᖏᑐᖅ.",
+      "toobig": "Sorry, the audio file cannot be larger than 10 MB.",
       "timeout": "ᓄᖃᖓᓚᐅᕐᓂᖓᓐᓄᑦ ᖃᕆᑕᐅᔭᒻᒥ ᐊᒧᓂᐊᕐᓗᒍ ᑕᒻᒪᖅᓯᒪᔪᖅ ...",
       "uploadsuccess": "ᑲᔪᓯᑎᐊᖅᑐᖅ ᐊᒧᓂᐊᕐᓂᖓ ᓂᐱᓕᐅᖅᓯᒪᔪᑉ",
       "commerror": "ᐊᒧᓂᐊᕐᓗᒍ ᓂᐱᓕᐅᖅᓯᒪᔪᖅ ᑕᒻᒪᖅᓯᒪᔪᖅ ...",
@@ -920,6 +922,45 @@
       "example": {
         "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
         "javascript": "// User-provided beat string\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+      }
+    },
+    "multiChoiceInput1": {
+      "description": "Ask the user to choose from a list",
+      "parameters": {
+        "prompt": {
+          "description": "A message displayed to the user"
+        },
+        "choices": {
+          "description": "A list of choices displayed to the user"
+        }
+      },
+      "returns": {
+        "description": "The selected index"
+      },
+      "example": {
+        "python": "# Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nbeatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices)\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex])",
+        "javascript": "// Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nvar beatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices);\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex]);"
+      }
+    },
+    "multiChoiceInput2": {
+      "description": "Ask the user to choose one-or-more items from a list.",
+      "parameters": {
+        "prompt": {
+          "description": "A message displayed to the user"
+        },
+        "choices": {
+          "description": "A list of choices displayed to the user"
+        },
+        "allowMultiple": {
+          "description": "If true, the user can select multiple choices. If false, the user can only select one choice."
+        }
+      },
+      "returns": {
+        "description": "The selected indices"
+      },
+      "example": {
+        "python": "# Sound board\nsoundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808]\nchosenSounds = multiChoiceInput(\"Choose your sounds\", soundChoices, True)\ntrack = 1\nfor choice in chosenSounds:\n    sound = soundChoices[choice]\n    fitMedia(sound, track, 1, 5)\n    track += 1",
+        "javascript": "// Sound board\nvar soundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808];\nvar chosenSounds = multiChoiceInput(\"Choose your sounds\", soundChoices, true);\nfor (var i = 0; i < chosenSounds.length; i++) {\n    var choice = chosenSounds[i]\n    var sound = soundChoices[choice]\n    fitMedia(sound, i+1, 1, 5)\n}"
       }
     },
     "replaceListElement": {
