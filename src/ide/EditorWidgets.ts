@@ -13,7 +13,7 @@ type PreviewState = { preview: Preview | null, playing: boolean }
 export const setPreview: StateEffectType<PreviewState> = StateEffect.define()
 export const setSoundNames: StateEffectType<string[]> = StateEffect.define()
 export const setAppLocale: StateEffectType<Locale> = StateEffect.define()
-export const setShowBeatStringLength: StateEffectType<boolean> = StateEffect.define()
+export const setShowBeatStringAnnotation: StateEffectType<boolean> = StateEffect.define()
 
 class PreviewWidget extends WidgetType {
     constructor(readonly preview: Preview, readonly state: "playing" | "loading" | "stopped") {
@@ -71,8 +71,8 @@ class BeatCharacterCountWidget extends WidgetType {
 function previews(view: EditorView, soundNames: string[], { preview, playing }: PreviewState, locale: Locale) {
     const widgets: Range<Decoration>[] = []
     const beatStringRegex = /^[0-9A-Fa-f\-+]+$/
-    // Get the current showBeatStringLength setting from the store
-    const showBeatStringLength = store.getState().ide.showBeatStringLength
+    // Get the current showBeatStringAnnotation setting from the store
+    const showBeatStringAnnotation = store.getState().ide.showBeatStringAnnotation
     const MINIMUM_BEAT_STRING_LENGTH = 2 // TODO: Agree on this value
     for (const { from, to } of view.visibleRanges) {
         syntaxTree(view.state).iterate({
@@ -103,7 +103,7 @@ function previews(view: EditorView, soundNames: string[], { preview, playing }: 
                             side: 1,
                         })
                         widgets.push(deco.range(node.from))
-                        if (showBeatStringLength && beat.length >= MINIMUM_BEAT_STRING_LENGTH) {
+                        if (showBeatStringAnnotation && beat.length >= MINIMUM_BEAT_STRING_LENGTH) {
                             const charCount = Decoration.widget({
                                 widget: new BeatCharacterCountWidget(beat, locale),
                                 side: 1,
@@ -141,7 +141,7 @@ export const previewPlugin = ViewPlugin.fromClass(class {
                 } else if (effect.is(setAppLocale)) {
                     appLocale = effect.value
                     updated = true
-                } else if (effect.is(setShowBeatStringLength)) {
+                } else if (effect.is(setShowBeatStringAnnotation)) {
                     updated = true
                 }
             }

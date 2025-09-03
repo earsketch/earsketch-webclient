@@ -82,18 +82,17 @@ const SettingsMenu = () => {
     const blocksMode = useSelector(ide.selectBlocksMode)
     const autocomplete = useSelector(ide.selectAutocomplete)
     const playArrows = useSelector(ide.selectPlayArrows)
-    const showBeatStringLength = useSelector(ide.selectShowBeatStringLength)
+    const showBeatStringAnnotation = useSelector(ide.selectShowBeatStringAnnotation)
     const dispatch = useDispatch()
 
     const actions = [
-        { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) } },
-        { type: "divider" }, // cosmetic divider between blocksMode and rest of the menu
+        { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) }, divider: true },
         { nameKey: "editor.autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
         {
-            nameKey: "editor.showBeatStringLength",
-            state: showBeatStringLength,
+            nameKey: "editor.showBeatStringAnnotation",
+            state: showBeatStringAnnotation,
             setState(state: boolean) {
-                dispatch(ide.setShowBeatStringLength(state))
+                dispatch(ide.setShowBeatStringAnnotation(state))
             },
         },
         {
@@ -117,7 +116,7 @@ const SettingsMenu = () => {
         </Menu.Button>
         <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {actions.map((action, index) => {
-                if (action.type === "divider") {
+                if (action.divider) {
                     return <hr key={`divider-${index}`} className="mx-3 my-1 bg-black h-0.5" />
                 }
                 return (
