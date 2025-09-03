@@ -116,17 +116,17 @@ const SettingsMenu = () => {
         </Menu.Button>
         <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {actions.map((action, index) => {
-                const menuItem = 
-                <Menu.Item key={action.nameKey}>
-                    {({ active }) => <ToggleButton hovered={active} 
-                    labelKey={action.nameKey}
-                    state={action.state}
-                    setState={action.setState} />}
-                </Menu.Item>
+                const menuItem =
+                    <Menu.Item key={action.nameKey}>
+                        {({ active }) => <ToggleButton hovered={active}
+                        labelKey={action.nameKey}
+                        state={action.state}
+                        setState={action.setState} />}
+                    </Menu.Item>
                 if (action.divider) {
                     return (<div key={`menu-item-with-divider-${index}`}>
-                    {menuItem}
-                    <hr key={`divider-${index}`} className="mx-3 my-1 bg-black h-1" />
+                        {menuItem}
+                        <hr key={`divider-${index}`} className="mx-3 my-1 bg-black h-1" />
                     </div>)
                 }
                 return menuItem
