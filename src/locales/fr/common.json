@@ -94,7 +94,7 @@
     "editor.blocksMode": "Mode blocs",
     "editor.autocomplete": "Autocomplete",
     "editor.playArrows": "Playback Arrows",
-    "editor.showBeatStringAnnotation": "Beat String Annotation",
+    "editor.showBeatStringAnnotation": "Beat String Annotations",
     "editor.blocksMode.tooltip-enable": "Enable blocks mode",
     "editor.autocomplete.tooltip-enable": "Enable autocomplete",
     "editor.playArrows.tooltip-enable": "Enable playback arrows",
