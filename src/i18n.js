@@ -6,6 +6,7 @@ import fr from "./locales/fr/common.json"
 import de from "./locales/de/common.json"
 import iu from "./locales/iu/common.json"
 import oj from "./locales/oj/common.json"
+import uz from "./locales/uz/common.json"
 
 i18n
     .use(initReactI18next) // passes i18n down to react-i18next
@@ -27,6 +28,7 @@ i18n
             de,
             iu,
             oj,
+            uz,
         },
     })
 
