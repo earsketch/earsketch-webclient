@@ -50,7 +50,6 @@ const UndoRedoButtons = () => {
 }
 
 // eslint-disable-next-line react/display-name
-// eslint-disable-next-line react/display-name
 const ToggleButton = React.forwardRef(({ hovered, labelKey, state, setState, ...props }: { hovered: boolean, labelKey: string, state: boolean, setState: (x: boolean) => void, props?: any }, ref) => {
     const { t } = useTranslation()
     const stateSuffix = state ? "disable" : "enable"
