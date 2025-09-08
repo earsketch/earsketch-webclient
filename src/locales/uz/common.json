@@ -63,7 +63,7 @@
     "script": "Skript",
     "version": "Versiya",
     "numSounds": "{{count}} tovush",
-    "numSounds_plural": "{{count}} tobushlar",
+    "numSounds_plural": "{{count}} tovushlar",
     "script_plural": "Skriptlar",
     "scriptBrowser.myScripts": "Mening Skriptlarim",
     "scriptBrowser.sharedScripts": "Ulashilgan Skriptlar",
