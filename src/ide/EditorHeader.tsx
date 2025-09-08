@@ -50,6 +50,7 @@ const UndoRedoButtons = () => {
 }
 
 // eslint-disable-next-line react/display-name
+// eslint-disable-next-line react/display-name
 const ToggleButton = React.forwardRef(({ hovered, labelKey, state, setState, ...props }: { hovered: boolean, labelKey: string, state: boolean, setState: (x: boolean) => void, props?: any }, ref) => {
     const { t } = useTranslation()
     const stateSuffix = state ? "disable" : "enable"
@@ -198,17 +199,15 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
                         {t("script.share").toLocaleUpperCase()}
                     </button>
                 )}
-                <div className="w-24">
-                    <button
-                        className={"flex rounded-full px-2.5 text-white items-center " + button.bgClass}
-                        id={button.id} title={button.title} aria-label={button.title} onClick={button.action}
-                    >
-                        <div className="flex bg-white rounded-full text-xs mr-1 p-0.5">
-                            <i className={`${button.icon} font-bold ${button.fgClass}`} />
-                        </div>
-                        {button.title.toLocaleUpperCase()}
-                    </button>
-                </div>
+                <button
+                    className={"flex rounded-full px-2.5 text-white items-center whitespace-nowrap " + button.bgClass}
+                    id={button.id} title={button.title} aria-label={button.title} onClick={button.action}
+                >
+                    <div className="flex bg-white rounded-full text-xs mr-1 p-0.5">
+                        <i className={`${button.icon} font-bold ${button.fgClass}`} />
+                    </div>
+                    {button.title.toLocaleUpperCase()}
+                </button>
             </div>
         </div>
     )
