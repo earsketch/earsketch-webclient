@@ -29,10 +29,8 @@ export const ExtensionHost = () => {
         },
         getScriptExecutionResult() {
             const currentLogs = logsRef.current
-            const success = currentLogs.some(log => log.text === "Script ran successfully")
             return JSON.stringify({
                 output: currentLogs,
-                success,
             })
         },
         getDawState() {
