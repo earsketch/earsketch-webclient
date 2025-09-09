@@ -1,18 +1,40 @@
 import { useEffect, useRef, useState } from "react"
 
 import { TitleBar } from "../browser/Curriculum"
+import { selectTracks } from "../daw/dawState"
+import { useAppSelector as useSelector } from "../hooks"
 import * as editor from "../ide/Editor"
-
-const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
-    getEditorContents() {
-        return editor.getContents()
-    },
-}
+import { Log, selectLogs } from "../ide/ideState"
+import { Track } from "../types/common"
 
 export const ExtensionHost = () => {
     const [extensionUrl, setExtensionUrl] = useState<string>("")
     const extensionTargetOrigin = new URL(extensionUrl, window.location.href).origin
     const iframeRef = useRef<HTMLIFrameElement>(null)
+    const logs: Log[] = useSelector(selectLogs)
+    const tracks: Track[] = useSelector(selectTracks)
+
+    const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
+        getEditorContents() {
+            // TODO use instead:
+            // const script = scriptsState.selectAllScripts(store.getState())[scriptID!]
+            // const code = script.source_code
+            return editor.getContents()
+        },
+        getScriptExecutionResult() {
+            console.log("getScriptExecutionResult called, logs:", logs)
+            const success = logs.find(log => log.text === "Script ran successfully") !== undefined
+            return JSON.stringify({
+                output: logs,
+                success,
+            })
+        },
+        getDawState() {
+            // TODO return a cleaned version of the daw state that can be serialized
+            console.log("getDawState called, dawState:", tracks)
+            return JSON.stringify(tracks)
+        },
+    }
 
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {

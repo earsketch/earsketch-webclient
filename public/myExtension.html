@@ -14,7 +14,19 @@
                 fn: 'getEditorContents',
             }), '*')
             return new Promise(resolve => { resolver = resolve })
-        }
+        },
+        getScriptExecutionResult() {
+            window.parent.postMessage(JSON.stringify({
+                fn: 'getScriptExecutionResult',
+            }), '*')
+            return new Promise(resolve => { resolver = resolve })
+        },
+        getDawState() {
+            window.parent.postMessage(JSON.stringify({
+                fn: 'getDawState',
+            }), '*')
+            return new Promise(resolve => { resolver = resolve })
+        },
     }
 
     window.addEventListener("message", (event) => {
@@ -27,6 +39,7 @@
 
             earsketch.onload()
         } else if (resolver) {
+            console.log("[EXTENSION] Resolving promise...")
             resolver(JSON.parse(event.data))
         }
     })
@@ -40,8 +53,20 @@
             console.log("[EXTENSION] Button clicked, fetching editor contents...")
             const contents = await earsketch.getEditorContents()
 
-            const sendElement = document.createElement("pre")
-            sendElement.textContent = "Sending to LLM (mock):\n" + contents + "\n\n---"
+            console.log("[EXTENSION] ...fetching script run result...")
+            const scriptResult = await earsketch.getScriptExecutionResult()
+            const dawState = await earsketch.getDawState()
+
+            let sendElement = document.createElement("pre")
+            sendElement.textContent = "Sending to code to LLM (mock):\n" + contents.slice(0, 20) + "...\n\n---"
+            document.querySelector("#output").appendChild(sendElement)
+
+            sendElement = document.createElement("pre")
+            sendElement.textContent = "Sending run result to LLM (mock):\n" + scriptResult + "\n\n---"
+            document.querySelector("#output").appendChild(sendElement)
+
+            sendElement = document.createElement("pre")
+            sendElement.textContent = "Sending daw state to LLM (mock):\n" + dawState + "\n\n---"
             document.querySelector("#output").appendChild(sendElement)
 
             setTimeout(() => {
