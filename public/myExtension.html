@@ -58,15 +58,18 @@
             const dawState = await earsketch.getDawState()
 
             let sendElement = document.createElement("pre")
-            sendElement.textContent = "Sending to code to LLM (mock):\n" + contents.slice(0, 20) + "...\n\n---"
+            const contentsPretty = contents.slice(0, 20)
+            sendElement.textContent = "Sending to code to LLM (mock):\n" + contentsPretty + "...\n\n---"
             document.querySelector("#output").appendChild(sendElement)
 
             sendElement = document.createElement("pre")
-            sendElement.textContent = "Sending run result to LLM (mock):\n" + scriptResult + "\n\n---"
+            const scriptResultPretty = JSON.stringify(JSON.parse(scriptResult), null, 2)
+            sendElement.textContent = "Sending run result to LLM (mock):\n" + scriptResultPretty + "\n\n---"
             document.querySelector("#output").appendChild(sendElement)
 
             sendElement = document.createElement("pre")
-            sendElement.textContent = "Sending daw state to LLM (mock):\n" + dawState + "\n\n---"
+            const dawStatePretty = JSON.stringify(JSON.parse(dawState), null, 2)
+            sendElement.textContent = "Sending daw state to LLM (mock):\n" + dawStatePretty + "\n\n---"
             document.querySelector("#output").appendChild(sendElement)
 
             setTimeout(() => {
