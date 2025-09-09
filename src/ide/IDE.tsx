@@ -19,6 +19,7 @@ import * as editor from "./Editor"
 import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
+import { ExtensionHost } from "../extensions/ExtensionHost"
 import { setReady } from "../bubble/bubbleState"
 import { dismiss } from "../bubble/bubbleThunks"
 import * as ide from "./ideState"
@@ -479,10 +480,17 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                 : <CAI />)}
                         </div>)}
                     <div className={showCai ? "h-full hidden" : "h-full"}>
-                        <Curriculum />
+                        <EastPane />
                     </div>
                 </div>
             </Split>
         </div>
     </main>
+}
+
+const EastPane = () => {
+    const eastContent = useSelector(appState.selectEastContent)
+    return <div>
+        {eastContent === "curriculum" ? <Curriculum /> : <ExtensionHost />}
+    </div>
 }
