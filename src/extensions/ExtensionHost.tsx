@@ -14,6 +14,12 @@ export const ExtensionHost = () => {
     const logs: Log[] = useSelector(selectLogs)
     const tracks: Track[] = useSelector(selectTracks)
 
+    const logsRef = useRef(logs)
+    const tracksRef = useRef(tracks)
+
+    useEffect(() => { logsRef.current = logs }, [logs])
+    useEffect(() => { tracksRef.current = tracks }, [tracks])
+
     const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
         getEditorContents() {
             // TODO use instead:
@@ -22,17 +28,17 @@ export const ExtensionHost = () => {
             return editor.getContents()
         },
         getScriptExecutionResult() {
-            console.log("getScriptExecutionResult called, logs:", logs)
-            const success = logs.find(log => log.text === "Script ran successfully") !== undefined
+            const currentLogs = logsRef.current
+            const success = currentLogs.some(log => log.text === "Script ran successfully")
             return JSON.stringify({
-                output: logs,
+                output: currentLogs,
                 success,
             })
         },
         getDawState() {
+            const currentTracks = tracksRef.current
             // TODO return a cleaned version of the daw state that can be serialized
-            console.log("getDawState called, dawState:", tracks)
-            return JSON.stringify(tracks)
+            return JSON.stringify(currentTracks)
         },
     }
 

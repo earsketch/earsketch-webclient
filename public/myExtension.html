@@ -30,7 +30,7 @@
     }
 
     window.addEventListener("message", (event) => {
-        console.log("[EXTENSION] Received message from host:", event.data)
+        // console.log("[EXTENSION] Received message from host:", event.data)
 
         if (event.data === 'init') {
             const sendElement = document.createElement("pre")
