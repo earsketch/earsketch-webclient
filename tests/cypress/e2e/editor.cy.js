@@ -1,4 +1,6 @@
 describe("Editor", () => {
+    const anonymousScriptName = "cypress_test"
+
     beforeEach(() => {
         const testSoundMeta = {
             folder: "STUB FOLDER",
@@ -15,9 +17,9 @@ describe("Editor", () => {
         // Create a new script.
         cy.get('[title="Open SCRIPTS Tab"]').click()
         cy.get('[data-test="newScript"]').click()
-        cy.get("#scriptName").type("cypress_test")
+        cy.get("#scriptName").type(anonymousScriptName)
         cy.get("input").contains("CREATE").click()
-        cy.get("div").contains("cypress_test.py")
+        cy.get("div").contains(`${anonymousScriptName}.py`)
         cy.waitForHeadlessDialog()
     })
 
@@ -123,9 +125,22 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
     it("allows user to login, edit script, and save", () => {
         const username = "cypress"
         const scriptName = "RecursiveMelody.py"
+        const anonymousScriptMessage1 = "Greetings from anonymous script."
+        const anonymousScriptName2 = "cypress_test_anon2"
+        const anonymousScriptMessage2 = "Greetings from another anonymous script 2."
+        cy.get("#editor").type(`{moveToEnd}{enter}# ${anonymousScriptMessage1}`)
+
+        // Create another anonymouse script.
+        cy.get('[title="Open SCRIPTS Tab"]').click()
+        cy.get('[data-test="newScript"]').click()
+        cy.get("#scriptName").type(anonymousScriptName2)
+        cy.get("input").contains("CREATE").click()
+        cy.get("div").contains(`${anonymousScriptName2}.py`)
+        cy.waitForHeadlessDialog()
+        cy.get("#editor").type(`{moveToEnd}{enter}# ${anonymousScriptMessage2}`)
 
         // Setup intercepts for login and save
-        cy.interceptScriptSave(scriptName)
+        cy.interceptScriptSave()
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
         cy.interceptAudioUser([])
@@ -149,8 +164,18 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         cy.interceptAudioUser()
         // Login with placeholder username
         cy.login("username")
-        // wait for the already created script to be saved during login
-        cy.wait("@scripts_save")
+
+        // Verify the save API was called for 2 anonymous scripts during login
+        cy.wait("@scripts_save").then((interception) => {
+            expect(interception.request.body).to.contain(`name=${anonymousScriptName}.py`)
+            expect(interception.request.body.replaceAll("+", " ")).to.contain(anonymousScriptMessage1)
+        })
+        cy.wait("@scripts_save").then((interception) => {
+            expect(interception.request.body).to.contain(`name=${anonymousScriptName2}.py`)
+            expect(interception.request.body.replaceAll("+", " ")).to.contain(anonymousScriptMessage2)
+        })
+        cy.get(`[title="Open ${anonymousScriptName}.py in Code Editor"]`).click()
+        cy.get(`[title="Open ${anonymousScriptName2}.py in Code Editor"]`).click()
         cy.get(`[title="Open ${scriptName} in Code Editor"]`).click()
 
         const message = "Hello from saved script"
