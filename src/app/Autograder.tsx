@@ -99,6 +99,18 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
             clip.sourceLine = 0
         }
     }
+
+    // remove sourceLine property from effects
+    for (const track of reference.tracks.concat(test.tracks)) {
+        for (const effect of Object.keys(track.effects)) {
+            for (const effectParam of Object.keys(track.effects[effect])) {
+                for (const paramValues in track.effects[effect][effectParam]) {
+                    track.effects[effect][effectParam][paramValues].sourceLine = 0
+                }
+            }
+        }
+    }
+
     return JSON.stringify(reference) === JSON.stringify(test)
 }
 
