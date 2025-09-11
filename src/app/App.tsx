@@ -407,6 +407,42 @@ function forgotPass() {
     openModal(ForgotPassword)
 }
 
+// Inline Hook to jump high level panels using keyboard shortcuts
+export const usePanelNavigation = () => {
+    useEffect(() => {
+        const handleKeyPress = (event: KeyboardEvent) => {
+            const isCtrlShift = event.ctrlKey
+            const isNumberKey = /^[1-8]$/.test(event.key)
+
+            if (isCtrlShift && isNumberKey) {
+                event.preventDefault()
+                console.log("Here", event.key)
+
+                const panelMap: { [key: string]: string } = {
+                    1: "SOUNDS",
+                    2: "SCRIPTS",
+                    3: "API",
+                    4: "dawHeader",
+                    5: "editorWindow",
+                    6: "curriculum-header",
+                }
+
+                const targetPanelId = panelMap[event.key]
+                const targetElement = document.getElementById(targetPanelId)
+
+                if (targetElement) {
+                    // Using The HTMLElement.focus() method
+                    targetElement.focus()
+                    targetElement.scrollIntoView({ behavior: "smooth", block: "nearest" })
+                }
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyPress)
+        return () => window.removeEventListener("keydown", handleKeyPress)
+    })
+}
+
 const KeyboardShortcuts = () => {
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
@@ -426,6 +462,13 @@ const KeyboardShortcuts = () => {
         </>,
         zoomVertical: [modifier, "Shift", "Wheel"],
         escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
+        focusSounds: ["Ctrl", "1"],
+        focusScripts: ["Ctrl", "2"],
+        focusAPI: ["Ctrl", "3"],
+        focusDAW: ["Ctrl", "4"],
+        focusEditor: ["Ctrl", "5"],
+        focusCurriculum: ["Ctrl", "6"],
+
     }
 
     return <Popover>
@@ -868,6 +911,7 @@ export const App = () => {
             }
         }
     }
+    usePanelNavigation()
 
     return <>
         <nav role="navigation">

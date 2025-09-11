@@ -528,7 +528,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         <div id="editor" className="code-container" style={{ fontSize }}>
             <div ref={blocksElement} className={"h-full w-full absolute" + (inBlocksMode ? "" : " invisible")} onClick={shakeImportButton} />
             <div
-                ref={editorElement} className={"h-full w-full" + (inBlocksMode ? " hidden" : "")}
+                ref={editorElement} id ="editorWindow" tabIndex={0} className={"h-full w-full" + (inBlocksMode ? " hidden" : "")}
                 onClick={shakeImportButton} onCut={shakeImportButton} onPaste={shakeImportButton} onKeyDown={({ key }) => {
                     if (key.length === 1 || ["Enter", "Backspace", "Delete", "Tab"].includes(key)) {
                         shakeImportButton()
