@@ -275,8 +275,8 @@ export const selectFavorites = (state: RootState) => state.sounds.filters.favori
 export const selectSearchText = (state: RootState) => state.sounds.filters.searchText
 export const selectFilters = (state: RootState) => state.sounds.filters
 
-function filterKeySignature(keySignatures: string []) {
-    const filteredKeys: string [] = []
+function filterKeySignature(keySignatures: string[]) {
+    const filteredKeys: string[] = []
     for (const key of keySignatures) {
         if (key.includes("/")) {
             const values = splitEnharmonics(key)
