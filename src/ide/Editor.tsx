@@ -16,14 +16,14 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 import { gutter, GutterMarker, keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
-import { setSoundNames, setPreview, previewPlugin, setAppLocale } from "./EditorWidgets"
+import { setSoundNames, setPreview, previewPlugin, setAppLocale, setShowBeatStringAnnotation } from "./EditorWidgets"
 
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
@@ -431,6 +431,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const [inBlocksMode, setInBlocksMode] = useState(false)
     const [shaking, setShaking] = useState(false)
     const locale = useSelector(appState.selectLocale)
+    const showBeatStringAnnotations = useSelector(selectShowBeatStringAnnotation)
 
     useEffect(() => {
         if (!editorElement.current || !blocksElement.current) return
@@ -459,6 +460,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     useEffect(() => view.dispatch({ effects: themeConfig.reconfigure(getTheme()) }), [theme])
 
     useEffect(() => view.dispatch({ effects: setAppLocale.of(locale) }), [locale])
+
+    useEffect(() => view.dispatch({ effects: setShowBeatStringAnnotation.of(showBeatStringAnnotations) }), [showBeatStringAnnotations])
 
     const tryToEnterBlocksMode = () => {
         droplet.on("change", () => {})

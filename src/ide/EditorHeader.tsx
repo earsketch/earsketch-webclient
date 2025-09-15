@@ -82,11 +82,19 @@ const SettingsMenu = () => {
     const blocksMode = useSelector(ide.selectBlocksMode)
     const autocomplete = useSelector(ide.selectAutocomplete)
     const playArrows = useSelector(ide.selectPlayArrows)
+    const showBeatStringAnnotations = useSelector(ide.selectShowBeatStringAnnotation)
     const dispatch = useDispatch()
 
     const actions = [
-        { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) } },
+        { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) }, divider: true },
         { nameKey: "editor.autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
+        {
+            nameKey: "editor.showBeatStringAnnotations",
+            state: showBeatStringAnnotations,
+            setState(state: boolean) {
+                dispatch(ide.setShowBeatStringAnnotation(state))
+            },
+        },
         {
             nameKey: "editor.playArrows",
             state: playArrows,
@@ -107,10 +115,22 @@ const SettingsMenu = () => {
             </div>
         </Menu.Button>
         <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-            {actions.map(({ nameKey, state, setState }) =>
-                <Menu.Item key={nameKey}>
-                    {({ active }) => <ToggleButton hovered={active} labelKey={nameKey} state={state} setState={setState} />}
-                </Menu.Item>)}
+            {actions.map((action, index) => {
+                const menuItem =
+                    <Menu.Item key={action.nameKey}>
+                        {({ active }) => <ToggleButton hovered={active}
+                            labelKey={action.nameKey}
+                            state={action.state}
+                            setState={action.setState} />}
+                    </Menu.Item>
+                if (action.divider) {
+                    return (<div key={`menu-item-with-divider-${index}`}>
+                        {menuItem}
+                        <hr key={`divider-${index}`} className="mx-3 my-1 bg-black h-[2px]" />
+                    </div>)
+                }
+                return menuItem
+            })}
         </Menu.Items>
     </Menu>
 }
@@ -178,17 +198,15 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
                         {t("script.share").toLocaleUpperCase()}
                     </button>
                 )}
-                <div className="w-24">
-                    <button
-                        className={"flex rounded-full px-2.5 text-white items-center " + button.bgClass}
-                        id={button.id} title={button.title} aria-label={button.title} onClick={button.action}
-                    >
-                        <div className="flex bg-white rounded-full text-xs mr-1 p-0.5">
-                            <i className={`${button.icon} font-bold ${button.fgClass}`} />
-                        </div>
-                        {button.title.toLocaleUpperCase()}
-                    </button>
-                </div>
+                <button
+                    className={"flex rounded-full px-2.5 text-white items-center whitespace-nowrap " + button.bgClass}
+                    id={button.id} title={button.title} aria-label={button.title} onClick={button.action}
+                >
+                    <div className="flex bg-white rounded-full text-xs mr-1 p-0.5">
+                        <i className={`${button.icon} font-bold ${button.fgClass}`} />
+                    </div>
+                    {button.title.toLocaleUpperCase()}
+                </button>
             </div>
         </div>
     )

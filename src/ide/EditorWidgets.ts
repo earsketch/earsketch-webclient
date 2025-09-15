@@ -13,6 +13,7 @@ type PreviewState = { preview: Preview | null, playing: boolean }
 export const setPreview: StateEffectType<PreviewState> = StateEffect.define()
 export const setSoundNames: StateEffectType<string[]> = StateEffect.define()
 export const setAppLocale: StateEffectType<Locale> = StateEffect.define()
+export const setShowBeatStringAnnotation: StateEffectType<boolean> = StateEffect.define()
 
 class PreviewWidget extends WidgetType {
     constructor(readonly preview: Preview, readonly state: "playing" | "loading" | "stopped") {
@@ -70,6 +71,9 @@ class BeatCharacterCountWidget extends WidgetType {
 function previews(view: EditorView, soundNames: string[], { preview, playing }: PreviewState, locale: Locale) {
     const widgets: Range<Decoration>[] = []
     const beatStringRegex = /^[0-9A-Fa-f\-+]+$/
+    // Get the current showBeatStringAnnotations setting from the store
+    const showBeatStringAnnotations = store.getState().ide.showBeatStringAnnotations
+    const MINIMUM_BEAT_STRING_LENGTH = 2
     for (const { from, to } of view.visibleRanges) {
         syntaxTree(view.state).iterate({
             from,
@@ -94,16 +98,18 @@ function previews(view: EditorView, soundNames: string[], { preview, playing }: 
                         const state = preview?.kind === "beat" && preview.beat === beat
                             ? playing ? "playing" : "loading"
                             : "stopped"
-                        const deco = Decoration.widget({
-                            widget: new PreviewWidget({ kind: "beat", beat }, state),
-                            side: 1,
-                        })
-                        const charCount = Decoration.widget({
-                            widget: new BeatCharacterCountWidget(beat, locale),
-                            side: 1,
-                        })
-                        widgets.push(deco.range(node.from))
-                        widgets.push(charCount.range(node.to))
+                        if (showBeatStringAnnotations && beat.length >= MINIMUM_BEAT_STRING_LENGTH) {
+                            const deco = Decoration.widget({
+                                widget: new PreviewWidget({ kind: "beat", beat }, state),
+                                side: 1,
+                            })
+                            widgets.push(deco.range(node.from))
+                            const charCount = Decoration.widget({
+                                widget: new BeatCharacterCountWidget(beat, locale),
+                                side: 1,
+                            })
+                            widgets.push(charCount.range(node.to))
+                        }
                     }
                 }
             },
@@ -115,7 +121,6 @@ function previews(view: EditorView, soundNames: string[], { preview, playing }: 
 let soundNames: string[] = []
 let currentPreview: PreviewState = { preview: null, playing: false }
 let appLocale: Locale = ENGLISH_LOCALE
-
 export const previewPlugin = ViewPlugin.fromClass(class {
     decorations: DecorationSet
 
@@ -135,6 +140,8 @@ export const previewPlugin = ViewPlugin.fromClass(class {
                     updated = true
                 } else if (effect.is(setAppLocale)) {
                     appLocale = effect.value
+                    updated = true
+                } else if (effect.is(setShowBeatStringAnnotation)) {
                     updated = true
                 }
             }
