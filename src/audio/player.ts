@@ -224,6 +224,6 @@ export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
 }
 
 export const callbacks = {
-    onStartedCallback: () => { },
-    onFinishedCallback: () => { },
+    onStartedCallback: () => {},
+    onFinishedCallback: () => {},
 }
