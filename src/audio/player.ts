@@ -38,7 +38,7 @@ const out = context.createGain()
 out.connect(context.destination)
 
 // Export the gain node for preview audio to use
-export { out as previewGain }
+export { out as volumeSliderGain }
 
 function reset() {
     pause()
@@ -224,6 +224,6 @@ export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
 }
 
 export const callbacks = {
-    onStartedCallback: () => {},
-    onFinishedCallback: () => {},
+    onStartedCallback: () => { },
+    onFinishedCallback: () => { },
 }
