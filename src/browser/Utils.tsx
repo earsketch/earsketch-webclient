@@ -8,6 +8,9 @@ import * as layout from "../ide/layoutState"
 import * as caiState from "../cai/caiState"
 import * as student from "../cai/dialogue/student"
 
+import * as soundsState from "./soundsState"
+import AudioSearchEngine from "./clapSearch"
+
 interface SearchBarProps {
     searchText: string
     aria?: string
@@ -20,32 +23,117 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
+    const [audioSearchEngine] = useState(() => new AudioSearchEngine())
+    const [isAudioEngineReady, setIsAudioEngineReady] = useState(false)
+    const [isSearching, setIsSearching] = useState(false)
 
-    return (
-        <form
-            className={`p-1.5 pb-1 ${(highlight ? "border-yellow-500 border-4" : "")}`}
-            onSubmit={e => e.preventDefault()}
-        >
-            <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
-                <input
-                    id={id}
-                    className="w-full outline-none p-1 bg-transparent font-normal text-sm"
-                    type="text"
-                    placeholder={t("search")}
-                    value={searchText}
-                    onChange={dispatchSearch}
-                    onKeyDown={(e) => { student.addUIClick(id + ": " + e.key) }}
-                    onFocus={() => { if (highlight) { dispatch(caiState.setHighlight({ zone: null })) } }}
-                />
-                {searchText.length !== 0 &&
-                    (
-                        <i
-                            className="icon-cross2 pr-1 cursor-pointer"
-                            onClick={dispatchReset}
-                        />
-                    )}
-            </label>
-        </form>
+    useEffect(() => {
+        const initializeEngine = async () => {
+            try {
+                await audioSearchEngine.initialize()
+                setIsAudioEngineReady(true)
+                console.log("Audio search engine ready")
+            } catch (error) {
+                console.error("Failed to initialize audio search engine:", error)
+            }
+        }
+
+        initializeEngine()
+    }, [audioSearchEngine])
+
+    useEffect(() => {
+        const handleAudioSearch = async () => {
+            if (!searchText.toLowerCase().startsWith("clap:")) {
+                // Clear audio search if not a clap query
+                dispatch(soundsState.clearAudioSearch())
+                return
+            }
+
+            if (!isAudioEngineReady) return
+
+            const query = searchText.slice(5).trim() // Remove "clap:" prefix
+            if (query.length === 0) {
+                dispatch(soundsState.clearAudioSearch())
+                return
+            }
+
+            setIsSearching(true)
+            console.log(query)
+            try {
+                const filenames = await audioSearchEngine.searchFilenames(query, 10)
+                dispatch(soundsState.setAudioSearchResults(filenames))
+            } catch (error) {
+                console.error("Audio search failed:", error)
+                dispatch(soundsState.clearAudioSearch())
+            } finally {
+                setIsSearching(false)
+            }
+        }
+        const timeoutId = setTimeout(handleAudioSearch, 500)
+        return () => clearTimeout(timeoutId)
+    }, [searchText, isAudioEngineReady, audioSearchEngine, dispatch])
+
+    const isAudioSearch = searchText.toLowerCase().startsWith("clap:")
+
+    return (<form
+        className={`p-1.5 pb-1 ${(highlight ? "border-yellow-500 border-4" : "")}`}
+        onSubmit={e => e.preventDefault()}
+    >
+        <label className={`w-full border-b-2 flex justify-between items-center ${
+            theme === "light" ? "border-black" : "border-white"
+        } ${isAudioSearch ? "border-blue-500" : ""}`}>
+            <input
+                id={id}
+                className="w-full outline-none p-1 bg-transparent font-normal text-sm"
+                type="text"
+                placeholder={isAudioEngineReady
+                    ? t("search") + " (use 'clap: your query' for audio search)"
+                    : t("search") + " (loading audio search...)"}
+                value={searchText}
+                onChange={dispatchSearch}
+                onKeyDown={(e) => { student.addUIClick(id + ": " + e.key) }}
+                onFocus={() => { if (highlight) { dispatch(caiState.setHighlight({ zone: null })) } }}
+            />
+            <div className="flex items-center">
+                {isAudioSearch && (isSearching || !isAudioEngineReady) && (
+                    <div className="flex items-center mr-2">
+                        {isSearching
+                            ? (
+                                <i className="icon-spinner animate-spin text-blue-500" />
+                            )
+                            : (
+                                <i className="icon-music text-gray-400" />
+                            )}
+                    </div>
+                )}
+                {searchText.length !== 0 && (
+                    <i
+                        className="icon-cross2 pr-1 cursor-pointer"
+                        onClick={dispatchReset}
+                    />
+                )}
+            </div>
+        </label>
+        {isAudioSearch && (
+            <div className="text-xs text-gray-500 mt-1">
+                {!isAudioEngineReady
+                    ? (
+                        "Loading audio search engine..."
+                    )
+                    : isSearching
+                        ? (
+                            "Searching audio files..."
+                        )
+                        : searchText.slice(5).trim().length > 0
+                            ? (
+                                `Audio search: "${searchText.slice(5).trim()}"`
+                            )
+                            : (
+                                "Enter your audio search query after 'clap:'"
+                            )}
+            </div>
+        )}
+    </form>
     )
 }
 

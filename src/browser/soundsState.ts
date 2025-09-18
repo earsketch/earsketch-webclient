@@ -40,6 +40,10 @@ export interface SoundsState {
         value: Preview | null
         nodes: AudioBufferSourceNode[]
     }
+    audioSearch: {
+        results: string[]
+        isActive: boolean
+    }
 }
 
 export interface SoundPreview {
@@ -81,6 +85,10 @@ const soundsSlice = createSlice({
         preview: {
             value: null,
             nodes: [],
+        },
+        audioSearch: {
+            results: [],
+            isActive: false,
         },
     } as SoundsState,
     reducers: {
@@ -129,6 +137,10 @@ const soundsSlice = createSlice({
         },
         setSearchText(state, { payload }) {
             state.filters.searchText = payload
+            if (!payload.toLowerCase().startsWith("clap:")) {
+                state.audioSearch.results = []
+                state.audioSearch.isActive = false
+            }
         },
         addFilterItem(state, { payload }) {
             state.filters[payload.category as keyof Filters].push(payload.value)
@@ -163,6 +175,14 @@ const soundsSlice = createSlice({
             state.preview.value = null
             state.preview.nodes = []
         },
+        setAudioSearchResults(state, { payload }) {
+            state.audioSearch.results = payload
+            state.audioSearch.isActive = payload.length > 0
+        },
+        clearAudioSearch(state) {
+            state.audioSearch.results = []
+            state.audioSearch.isActive = false
+        },
     },
 })
 
@@ -188,6 +208,8 @@ export const {
     setPreview,
     setPreviewNodes,
     resetPreview,
+    setAudioSearchResults,
+    clearAudioSearch,
 } = soundsSlice.actions
 
 /* Selectors */
@@ -274,6 +296,8 @@ export const selectFilterByFavorites = (state: RootState) => state.sounds.filter
 export const selectFavorites = (state: RootState) => state.sounds.filters.favorites
 export const selectSearchText = (state: RootState) => state.sounds.filters.searchText
 export const selectFilters = (state: RootState) => state.sounds.filters
+export const selectAudioSearchResults = (state: RootState) => state.sounds.audioSearch.results
+export const selectIsAudioSearchActive = (state: RootState) => state.sounds.audioSearch.isActive
 
 function filterKeySignature(keySignatures: string []) {
     const filteredKeys: string [] = []
@@ -305,13 +329,27 @@ function filterEntities(entities: SoundEntities, filters: ReturnType<typeof sele
 }
 
 export const selectFilteredRegularEntities = createSelector(
-    [selectAllRegularEntities, selectFilters],
-    filterEntities
+    [selectAllRegularEntities, selectFilters, selectIsAudioSearchActive, selectAudioSearchResults],
+    (allEntities, filters, isAudioSearchActive, audioResults) => {
+        // If audio search is active, filter entities to only include audio results
+        if (isAudioSearchActive && audioResults.length > 0) {
+            return pickBy(allEntities, (entity, name) => audioResults.includes(name))
+        }
+        // Otherwise, use normal filtering
+        return filterEntities(allEntities, filters)
+    }
 )
 
 export const selectFilteredRegularNames = createSelector(
-    [selectFilteredRegularEntities],
-    (entities: SoundEntities) => Object.keys(entities)
+    [selectFilteredRegularEntities, selectIsAudioSearchActive, selectAudioSearchResults],
+    (entities: SoundEntities, isAudioSearchActive, audioResults) => {
+        // If audio search is active, return audio results directly
+        if (isAudioSearchActive && audioResults.length > 0) {
+            return audioResults
+        }
+        // Otherwise, return normal filtered results
+        return Object.keys(entities)
+    }
 )
 
 export const selectFilteredRegularFolders = createSelector(
