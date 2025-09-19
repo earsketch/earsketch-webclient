@@ -161,7 +161,7 @@ async function postLogin(username: string) {
 
     // Fetch the user's scripts now that they're logged in.
     // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
-    await refreshCodeBrowser()
+    await refreshScriptBrowser()
 
     const promises = []
     for (const script of Object.values(saved)) {
@@ -211,7 +211,7 @@ async function postLogin(username: string) {
     websocket.login(username)
 }
 
-async function refreshCodeBrowser() {
+async function refreshScriptBrowser() {
     if (user.selectLoggedIn(store.getState())) {
         const fetchedScripts: Script[] = await request.getAuth("/scripts/owned")
 
