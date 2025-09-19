@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import context from "../audio/context"
 import * as audioLibrary from "../app/audiolibrary"
+import { volumeSliderGain } from "../audio/player"
 import { SoundEntity } from "common"
 import { fillDict } from "../app/recommender"
 import { ThunkAPI } from "../reducers"
@@ -127,7 +128,7 @@ export const togglePreview = createAsyncThunk<void | null, Preview, ThunkAPI>(
 
         const endNode = new AudioBufferSourceNode(context)
         const nodes: AudioBufferSourceNode[] = [endNode]
-        endNode.connect(context.destination)
+        endNode.connect(volumeSliderGain)
         endNode.onended = () => dispatch(resetPreview())
 
         if (preview.kind === "beat") {
@@ -141,7 +142,7 @@ export const togglePreview = createAsyncThunk<void | null, Preview, ThunkAPI>(
                 if (typeof current === "number") {
                     const delay = i * beat
                     const node = new AudioBufferSourceNode(context, { buffer: sound.buffer })
-                    node.connect(context.destination)
+                    node.connect(volumeSliderGain)
                     node.start(start + delay)
                     nodes.push(node)
                 }
