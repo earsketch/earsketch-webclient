@@ -66,7 +66,7 @@ function cloneDAWDataForComparison(data: DAWData): DAWData {
     }
 }
 
-function roundToDecimalPlaces(num, places) {
+function roundToDecimalPlaces(num: number, places: number) {
     const factor = 10 ** places
     return Math.round(num * factor) / factor
 }
