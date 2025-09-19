@@ -54,7 +54,8 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
             script.modified = Date.now()
             script.saved = true
             script.tooltipText = ""
-            dispatch(setRegularScripts({ ...scripts, [script.shareid]: script }))
+            // Get latest script state to avoid race conditions with e.g. other instances of this thunk.
+            dispatch(setRegularScripts({ ...selectRegularScripts(getState()), [script.shareid]: script }))
             return script
         } else {
             let shareid
