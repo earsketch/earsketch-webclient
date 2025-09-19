@@ -358,7 +358,11 @@
     "sounds.artistFilter": "Wähle einen oder mehrere Artists zum Filtern aus",
     "sounds.genreFilter": "Wähle einen oder mehrere Genres zum Filtern aus",
     "sounds.instrumentFilter": "Wähle einen oder mehrere Instrumente zum Filtern aus",
-    "sounds.keyFilter": "Wähle einen oder mehrere Schlüsselsignaturen zum Filtern aus"
+    "sounds.keyFilter": "Wähle einen oder mehrere Schlüsselsignaturen zum Filtern aus",
+    "recorder.stopRecording": "Stop recording",
+    "recorder.stopPreview": "Stop preview",
+    "recorder.startPreview": "Start preview",
+    "recorder.startRecording": "Start recording"
   },
   "bubble": {
     "userLanguage": "Sprache",
