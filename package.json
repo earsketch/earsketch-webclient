@@ -80,7 +80,8 @@
     "skulpt": "file:lib/skulpt",
     "tslib": "^2.3.1",
     "ua-parser-js": "^1.0.33",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "vite-bundle-analyzer": "^1.2.3"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.0",
