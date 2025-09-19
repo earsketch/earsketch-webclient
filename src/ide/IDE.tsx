@@ -91,7 +91,7 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
         differences.push(i18n.t("messages:idecontroller.tracksRemoved", { count: prevTrackCount - currentTrackCount }))
     }
 
-    // Compare project length (tempo-related changes)
+    // Compare project length
     if (previous.length !== current.length) {
         if (current.length > previous.length) {
             differences.push(i18n.t("messages:idecontroller.projectLengthIncreased", { from: previous.length, to: current.length }))
@@ -109,7 +109,9 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
 
         if (!prevTrack && currentTrack) {
             // New track added
-            const totalMeasures = currentTrack.clips?.reduce((sum, clip) => sum + (clip.end - clip.start), 0) || 0
+            const totalMeasures = currentTrack.clips?.reduce((sum, clip) => {
+                return clip.tempo !== undefined ? sum + (clip.end - clip.start) : sum
+            }, 0) || 0
             const effectCount = Object.keys(currentTrack.effects || {}).length
             differences.push(i18n.t("messages:idecontroller.trackAddedWithDetails", { trackNum, clipCount: totalMeasures.toFixed(1), effectCount }))
         } else if (prevTrack && !currentTrack) {
@@ -117,8 +119,12 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
             differences.push(i18n.t("messages:idecontroller.trackRemoved", { trackNum }))
         } else if (prevTrack && currentTrack) {
             // Compare existing tracks
-            const prevTotalMeasures = prevTrack.clips?.reduce((sum, clip) => sum + (clip.end - clip.start), 0) || 0
-            const currentTotalMeasures = currentTrack.clips?.reduce((sum, clip) => sum + (clip.end - clip.start), 0) || 0
+            const prevTotalMeasures = prevTrack.clips?.reduce((sum, clip) => {
+                return clip.tempo !== undefined ? sum + (clip.end - clip.start) : sum
+            }, 0) || 0
+            const currentTotalMeasures = currentTrack.clips?.reduce((sum, clip) => {
+                return clip.tempo !== undefined ? sum + (clip.end - clip.start) : sum
+            }, 0) || 0
             const prevEffectCount = Object.keys(prevTrack.effects || {}).length
             const currentEffectCount = Object.keys(currentTrack.effects || {}).length
 
