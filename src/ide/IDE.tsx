@@ -139,17 +139,8 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
                 }
             }
 
-            // Compare effects
-            if (currentEffectCount !== prevEffectCount) {
-                if (currentEffectCount > prevEffectCount) {
-                    const addedEffects = currentEffectCount - prevEffectCount
-                    differences.push(i18n.t("messages:idecontroller.trackEffectsAdded", { trackNum, count: addedEffects }))
-                } else {
-                    const removedEffects = prevEffectCount - currentEffectCount
-                    differences.push(i18n.t("messages:idecontroller.trackEffectsRemoved", { trackNum, count: removedEffects }))
-                }
-            } else if (currentEffectCount > 0) {
-                // Compare effect types
+            // Compare effects and types
+            if (currentEffectCount || prevEffectCount) {
                 const prevEffectKeys = new Set(Object.keys(prevTrack.effects || {}))
                 const currentEffectKeys = new Set(Object.keys(currentTrack.effects || {}))
 
@@ -157,10 +148,10 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
                 const removedEffectTypes = [...prevEffectKeys].filter(key => !currentEffectKeys.has(key))
 
                 if (addedEffectTypes.length > 0) {
-                    differences.push(i18n.t("messages:idecontroller.trackEffectTypesAdded", { trackNum, effects: addedEffectTypes.join(", ") }))
+                    differences.push(i18n.t("messages:idecontroller.trackEffectTypesAdded", { trackNum, count: addedEffectTypes.length, effects: addedEffectTypes.join(", ") }))
                 }
                 if (removedEffectTypes.length > 0) {
-                    differences.push(i18n.t("messages:idecontroller.trackEffectTypesRemoved", { trackNum, effects: removedEffectTypes.join(", ") }))
+                    differences.push(i18n.t("messages:idecontroller.trackEffectTypesRemoved", { trackNum, count: removedEffectTypes.length, effects: removedEffectTypes.join(", ") }))
                 }
             }
         }

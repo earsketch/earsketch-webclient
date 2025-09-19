@@ -522,8 +522,10 @@
       "trackEffectsAdded_plural": "Track {{trackNum}}: Added {{count}} effects",
       "trackEffectsRemoved": "Track {{trackNum}}: Removed {{count}} effect",
       "trackEffectsRemoved_plural": "Track {{trackNum}}: Removed {{count}} effects",
-      "trackEffectTypesAdded": "Track {{trackNum}}: Added effect(s): {{effects}}",
-      "trackEffectTypesRemoved": "Track {{trackNum}}: Removed effect(s): {{effects}}"
+      "trackEffectTypesAdded": "Track {{trackNum}}: Added {{count}} effect: {{effects}}",
+      "trackEffectTypesAdded_plural": "Track {{trackNum}}: Added {{count}} effects: {{effects}}",
+      "trackEffectTypesRemoved": "Track {{trackNum}}: Removed {{count}} effect: {{effects}}",
+      "trackEffectTypesRemoved_plural": "Track {{trackNum}}: Removed {{count}} effects: {{effects}}"
     },
     "shareScript": {
       "menuDescriptions": {
