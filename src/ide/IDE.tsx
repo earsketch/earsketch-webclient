@@ -66,6 +66,12 @@ function cloneDAWDataForComparison(data: DAWData): DAWData {
     }
 }
 
+function roundToDecimalPlaces(num, places) {
+    const factor = 10 ** places
+    return Math.round(num * factor) / factor
+}
+
+// TODO handle project-level tempo differences
 // Function to compare two DAWData objects and log human-readable differences
 function logDAWDataDifferences(previous: DAWData, current: DAWData) {
     if (!previous || (!previous.tracks && !previous.length)) {
@@ -119,10 +125,10 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
             // Compare total measures of clips
             if (currentTotalMeasures !== prevTotalMeasures) {
                 if (currentTotalMeasures > prevTotalMeasures) {
-                    const addedMeasures = (currentTotalMeasures - prevTotalMeasures).toFixed(1)
+                    const addedMeasures = roundToDecimalPlaces(currentTotalMeasures - prevTotalMeasures, 2)
                     differences.push(i18n.t("messages:idecontroller.trackClipsAdded", { trackNum, count: addedMeasures }))
                 } else {
-                    const removedMeasures = (prevTotalMeasures - currentTotalMeasures).toFixed(1)
+                    const removedMeasures = roundToDecimalPlaces(prevTotalMeasures - currentTotalMeasures, 2)
                     differences.push(i18n.t("messages:idecontroller.trackClipsRemoved", { trackNum, count: removedMeasures }))
                 }
             }
