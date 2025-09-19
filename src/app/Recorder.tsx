@@ -53,12 +53,6 @@ export const Metronome = ({ beat, hasBuffer, useMetro, startRecording }: { beat:
     const [state, setState] = useState("")
     const measure = Math.floor(beat / 4) + 1
     const { t } = useTranslation()
-    const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault()
-            action()
-        }
-    }
 
     if (hasBuffer) {
         if (state === "record") {
@@ -71,38 +65,34 @@ export const Metronome = ({ beat, hasBuffer, useMetro, startRecording }: { beat:
             if (useMetro) {
                 return measure > 0 ? <span className="text-5xl">{measure}</span> : <span className="font-bold">{t("soundUploader.record.getReady")}</span>
             } else {
-                return <i className="cursor-pointer text-3xl icon icon-recording blink recording"
+                return <button className="text-3xl"
                     onClick={() => { recorder.stopRecording(); setState("") }}
-                    onKeyDown={(e) => handleKeyDown(e, () => { recorder.stopRecording(); setState("") })}
-                    tabIndex={0}
-                    role="button"
-                    aria-label="Stop recording"/>
+                    aria-label={t("ariaDescriptors.recorder.stopRecording")}>
+                    <i className="icon icon-recording blink recording" />
+                </button>
             }
         } else if (state === "preview") {
-            return <i className="cursor-pointer text-3xl block icon icon-stop2"
+            return <button className="text-3xl"
                 onClick={() => { recorder.stopPreview(); setState("") }}
-                onKeyDown={(e) => handleKeyDown(e, () => { recorder.stopPreview(); setState("") })}
-                tabIndex={0}
-                role="button"
-                aria-label="Stop preview" />
+                aria-label={t("ariaDescriptors.recorder.stopPreview")}>
+                <i className="icon icon-stop2" />
+            </button>
         } else if (hasBuffer) {
-            return <i className="cursor-pointer text-3xl block icon icon-play4"
+            return <button className="text-3xl"
                 onClick={() => { recorder.startPreview(() => setState("")); setState("preview") }}
-                onKeyDown={(e) => handleKeyDown(e, () => { recorder.startPreview(() => setState("")); setState("preview") })}
-                tabIndex={0}
-                role="button"
-                aria-label="Start preview" />
+                aria-label={t("ariaDescriptors.recorder.startPreview")}>
+                <i className="icon icon-play4" />
+            </button>
         } else {
-            return <i className="cursor-pointer text-3xl icon icon-recording"
+            return <button className="text-3xl"
                 onClick={() => { startRecording(); setState("record") }}
-                onKeyDown={(e) => handleKeyDown(e, () => { startRecording(); setState("record") })}
-                tabIndex={0}
-                role="button"
-                aria-label="Start recording" />
+                aria-label={t("ariaDescriptors.recorder.startRecording")}>
+                <i className="icon icon-recording" />
+            </button>
         }
     }
 
-    return <div className="flex items-center">
+    return <div className="flex items-center select-none">
         <div className="text-center z-10" style={{ marginLeft: "10px", width: "60px" }}><IndicatorButton /></div>
         <div className={"fixed counter-meter " + (useMetro ? BEAT_POSITIONS[((beat % 4) + 4) % 4] : "hide-metronome")} />
     </div>
