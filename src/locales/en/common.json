@@ -518,8 +518,6 @@
       "trackRemoved": "Track {{trackNum}}: Removed",
       "trackClipsAdded": "Track {{trackNum}}: Added {{count}} measures of audio",
       "trackClipsRemoved": "Track {{trackNum}}: Removed {{count}} measures of audio",
-      "trackTempoChanged": "Track {{trackNum}}: Tempo changed to {{tempos}} BPM",
-      "trackTempoRemoved": "Track {{trackNum}}: Tempo effects removed",
       "trackEffectsAdded": "Track {{trackNum}}: Added {{count}} effect",
       "trackEffectsAdded_plural": "Track {{trackNum}}: Added {{count}} effects",
       "trackEffectsRemoved": "Track {{trackNum}}: Removed {{count}} effect",

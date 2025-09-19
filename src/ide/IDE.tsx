@@ -139,25 +139,6 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
                 }
             }
 
-            if (currentTotalMeasures > 0 && prevTotalMeasures > 0) {
-                // Check for tempo changes in clips
-                const prevTempos = new Set(prevTrack.clips?.map(clip => clip.tempo).filter(t => t !== undefined))
-                const currentTempos = new Set(currentTrack.clips?.map(clip => clip.tempo).filter(t => t !== undefined))
-
-                if (prevTempos.size > 0 || currentTempos.size > 0) {
-                    const prevTempoArray = Array.from(prevTempos)
-                    const currentTempoArray = Array.from(currentTempos)
-
-                    if (JSON.stringify(prevTempoArray.sort()) !== JSON.stringify(currentTempoArray.sort())) {
-                        if (currentTempoArray.length > 0) {
-                            differences.push(i18n.t("messages:idecontroller.trackTempoChanged", { trackNum, tempos: currentTempoArray.join(", ") }))
-                        } else {
-                            differences.push(i18n.t("messages:idecontroller.trackTempoRemoved", { trackNum }))
-                        }
-                    }
-                }
-            }
-
             // Compare effects
             if (currentEffectCount !== prevEffectCount) {
                 if (currentEffectCount > prevEffectCount) {
