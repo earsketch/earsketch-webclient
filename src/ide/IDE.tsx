@@ -46,6 +46,143 @@ const STATUS_UNSUCCESSFUL = 2
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
+let previousDAWData: DAWData = { length: 0, tracks: [], transformedClips: {} }
+let lastScriptID: string | null = null
+
+// Function to clone DAWData without AudioBuffer properties (which can't be cloned)
+function cloneDAWDataForComparison(data: DAWData): DAWData {
+    return {
+        length: data.length,
+        tracks: data.tracks?.map(track => ({
+            ...track,
+            clips: track.clips?.map(clip => ({
+                ...clip,
+                // Exclude AudioBuffer properties that can't be cloned
+                audio: undefined as any,
+                sourceAudio: undefined as any,
+            })) || [],
+        })) || [],
+        transformedClips: { ...data.transformedClips },
+    }
+}
+
+// Function to compare two DAWData objects and log human-readable differences
+function logDAWDataDifferences(previous: DAWData, current: DAWData) {
+    if (!previous || (!previous.tracks && !previous.length)) {
+        // First run, no comparison needed
+        return
+    }
+
+    const differences: string[] = []
+
+    // Compare number of tracks (excluding first track which is metronome)
+    const prevTrackCount = Math.max(0, (previous.tracks?.length || 0) - 1)
+    const currentTrackCount = Math.max(0, (current.tracks?.length || 0) - 1)
+
+    if (currentTrackCount > prevTrackCount) {
+        differences.push(i18n.t("messages:idecontroller.tracksAdded", { count: currentTrackCount - prevTrackCount }))
+    } else if (currentTrackCount < prevTrackCount) {
+        differences.push(i18n.t("messages:idecontroller.tracksRemoved", { count: prevTrackCount - currentTrackCount }))
+    }
+
+    // Compare project length (tempo-related changes)
+    if (previous.length !== current.length) {
+        if (current.length > previous.length) {
+            differences.push(i18n.t("messages:idecontroller.projectLengthIncreased", { from: previous.length, to: current.length }))
+        } else {
+            differences.push(i18n.t("messages:idecontroller.projectLengthDecreased", { from: previous.length, to: current.length }))
+        }
+    }
+
+    // Compare tracks in detail (skip first track which is metronome)
+    const maxTracks = Math.max((previous.tracks?.length || 0), (current.tracks?.length || 0))
+    for (let trackIndex = 1; trackIndex < maxTracks; trackIndex++) {
+        const prevTrack = previous.tracks?.[trackIndex]
+        const currentTrack = current.tracks?.[trackIndex]
+        const trackNum = trackIndex
+
+        if (!prevTrack && currentTrack) {
+            // New track added
+            const totalMeasures = currentTrack.clips?.reduce((sum, clip) => sum + (clip.end - clip.start), 0) || 0
+            const effectCount = Object.keys(currentTrack.effects || {}).length
+            differences.push(i18n.t("messages:idecontroller.trackAddedWithDetails", { trackNum, clipCount: totalMeasures.toFixed(1), effectCount }))
+        } else if (prevTrack && !currentTrack) {
+            // Track removed
+            differences.push(i18n.t("messages:idecontroller.trackRemoved", { trackNum }))
+        } else if (prevTrack && currentTrack) {
+            // Compare existing tracks
+            const prevTotalMeasures = prevTrack.clips?.reduce((sum, clip) => sum + (clip.end - clip.start), 0) || 0
+            const currentTotalMeasures = currentTrack.clips?.reduce((sum, clip) => sum + (clip.end - clip.start), 0) || 0
+            const prevEffectCount = Object.keys(prevTrack.effects || {}).length
+            const currentEffectCount = Object.keys(currentTrack.effects || {}).length
+
+            // Compare total measures of clips
+            if (currentTotalMeasures !== prevTotalMeasures) {
+                if (currentTotalMeasures > prevTotalMeasures) {
+                    const addedMeasures = (currentTotalMeasures - prevTotalMeasures).toFixed(1)
+                    differences.push(i18n.t("messages:idecontroller.trackClipsAdded", { trackNum, count: addedMeasures }))
+                } else {
+                    const removedMeasures = (prevTotalMeasures - currentTotalMeasures).toFixed(1)
+                    differences.push(i18n.t("messages:idecontroller.trackClipsRemoved", { trackNum, count: removedMeasures }))
+                }
+            }
+
+            if (currentTotalMeasures > 0 && prevTotalMeasures > 0) {
+                // Check for tempo changes in clips
+                const prevTempos = new Set(prevTrack.clips?.map(clip => clip.tempo).filter(t => t !== undefined))
+                const currentTempos = new Set(currentTrack.clips?.map(clip => clip.tempo).filter(t => t !== undefined))
+
+                if (prevTempos.size > 0 || currentTempos.size > 0) {
+                    const prevTempoArray = Array.from(prevTempos)
+                    const currentTempoArray = Array.from(currentTempos)
+
+                    if (JSON.stringify(prevTempoArray.sort()) !== JSON.stringify(currentTempoArray.sort())) {
+                        if (currentTempoArray.length > 0) {
+                            differences.push(i18n.t("messages:idecontroller.trackTempoChanged", { trackNum, tempos: currentTempoArray.join(", ") }))
+                        } else {
+                            differences.push(i18n.t("messages:idecontroller.trackTempoRemoved", { trackNum }))
+                        }
+                    }
+                }
+            }
+
+            // Compare effects
+            if (currentEffectCount !== prevEffectCount) {
+                if (currentEffectCount > prevEffectCount) {
+                    const addedEffects = currentEffectCount - prevEffectCount
+                    differences.push(i18n.t("messages:idecontroller.trackEffectsAdded", { trackNum, count: addedEffects }))
+                } else {
+                    const removedEffects = prevEffectCount - currentEffectCount
+                    differences.push(i18n.t("messages:idecontroller.trackEffectsRemoved", { trackNum, count: removedEffects }))
+                }
+            } else if (currentEffectCount > 0) {
+                // Compare effect types
+                const prevEffectKeys = new Set(Object.keys(prevTrack.effects || {}))
+                const currentEffectKeys = new Set(Object.keys(currentTrack.effects || {}))
+
+                const addedEffectTypes = [...currentEffectKeys].filter(key => !prevEffectKeys.has(key))
+                const removedEffectTypes = [...prevEffectKeys].filter(key => !currentEffectKeys.has(key))
+
+                if (addedEffectTypes.length > 0) {
+                    differences.push(i18n.t("messages:idecontroller.trackEffectTypesAdded", { trackNum, effects: addedEffectTypes.join(", ") }))
+                }
+                if (removedEffectTypes.length > 0) {
+                    differences.push(i18n.t("messages:idecontroller.trackEffectTypesRemoved", { trackNum, effects: removedEffectTypes.join(", ") }))
+                }
+            }
+        }
+    }
+
+    // Log differences to console
+    if (differences.length > 0) {
+        ideConsole.log(i18n.t("messages:idecontroller.changesFromPrevious"))
+        differences.forEach(diff => {
+            ideConsole.log(`  • ${diff}`)
+        })
+    } else if (prevTrackCount > 0 || previous.length > 0) {
+        ideConsole.log(i18n.t("messages:idecontroller.noChanges"))
+    }
+}
 
 // Prompts the user for a name and language, then calls the userProject
 // service to create the script from an empty template. The tab will be
@@ -305,8 +442,19 @@ async function runScript() {
     setLoading(false)
     if (result) {
         esconsole("Ran script, updating DAW.", "ide")
+
+        // Compare current result with previous DAW data and log differences
+        // Skip comparison if this is the first run of this script
+        if (lastScriptID === scriptID) {
+            logDAWDataDifferences(previousDAWData, result)
+        }
+
         setDAWData(result)
         reloadRecommendations()
+
+        // Update previousDAWData for next comparison and track current scriptID
+        previousDAWData = cloneDAWDataForComparison(result)
+        lastScriptID = scriptID
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")

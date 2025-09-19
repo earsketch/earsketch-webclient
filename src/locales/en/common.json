@@ -505,7 +505,27 @@
       "savefailed": "Script could not be saved to the cloud. Please save your script offline to avoid losing changes.",
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "Some scripts could not be saved to the cloud. Please save your changes offline to avoid losing them.",
-      "closealltabs":"This will close all open tabs. Are you sure you want to proceed?"
+      "closealltabs":"This will close all open tabs. Are you sure you want to proceed?",
+      "changesFromPrevious": "Changes from previous run:",
+      "noChanges": "No DAW changes from previous run",
+      "tracksAdded": "Added {{count}} track",
+      "tracksAdded_plural": "Added {{count}} tracks",
+      "tracksRemoved": "Removed {{count}} track",
+      "tracksRemoved_plural": "Removed {{count}} tracks",
+      "projectLengthIncreased": "Project length increased from {{from}} to {{to}} measures",
+      "projectLengthDecreased": "Project length decreased from {{from}} to {{to}} measures",
+      "trackAddedWithDetails": "Track {{trackNum}}: Added with {{clipCount}} measures of audio and {{effectCount}} effect(s)",
+      "trackRemoved": "Track {{trackNum}}: Removed",
+      "trackClipsAdded": "Track {{trackNum}}: Added {{count}} measures of audio",
+      "trackClipsRemoved": "Track {{trackNum}}: Removed {{count}} measures of audio",
+      "trackTempoChanged": "Track {{trackNum}}: Tempo changed to {{tempos}} BPM",
+      "trackTempoRemoved": "Track {{trackNum}}: Tempo effects removed",
+      "trackEffectsAdded": "Track {{trackNum}}: Added {{count}} effect",
+      "trackEffectsAdded_plural": "Track {{trackNum}}: Added {{count}} effects",
+      "trackEffectsRemoved": "Track {{trackNum}}: Removed {{count}} effect",
+      "trackEffectsRemoved_plural": "Track {{trackNum}}: Removed {{count}} effects",
+      "trackEffectTypesAdded": "Track {{trackNum}}: Added effect(s): {{effects}}",
+      "trackEffectTypesRemoved": "Track {{trackNum}}: Removed effect(s): {{effects}}"
     },
     "shareScript": {
       "menuDescriptions": {
