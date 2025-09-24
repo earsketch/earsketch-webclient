@@ -334,7 +334,7 @@ Cypress.Commands.add("interceptScriptSave", () => {
     cy.intercept({ hostname: API_HOST, method: "POST", path: "/EarSketchWS/scripts/save" }, (req) => {
         const formData = new URLSearchParams(req.body)
         const name = formData.get("name")
-        const sourceCode = formData.get("source_code")
+        const source = formData.get("source_code")
 
         req.reply({
             created: "2022-04-06 14:53:07.0",
@@ -343,9 +343,9 @@ Cypress.Commands.add("interceptScriptSave", () => {
             modified: "2022-04-06 14:53:07.0",
             name,
             run_status: 0,
-            shareid: "5555555555555555555555",
+            shareid: `cypress_${name}`,
             soft_delete: false,
-            sourceCode,
+            source_code: source,
             username: "cypress",
         })
     }).as("scripts_save")
