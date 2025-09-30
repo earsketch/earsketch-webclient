@@ -180,7 +180,8 @@ async function postLogin(username: string) {
                 ...(script.creator === "earsketch" && { creator: "earsketch" }),
             })).unwrap()
         }
-        promise = promise.then(script => ({ script, reopen: openTabs.includes(script.shareid) }))
+        const reopen = openTabs.includes(script.shareid)
+        promise = promise.then(script => ({ script, reopen }))
         promises.push(promise)
     }
 
