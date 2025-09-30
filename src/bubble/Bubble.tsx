@@ -22,7 +22,7 @@ const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolea
 
     return (
         <button
-            className={`text-sm border-2 ${borderColor} rounded-full p-2 px-4 mx-2 ${backgroundColor} ${pointer}`}
+            className={`text-sm border-2 ${borderColor} rounded-full p-2 px-4 mx-2 ${backgroundColor} ${pointer} max-h-14`}
             onClick={() => dispatch(action())}
             ref={pref}
         >
@@ -56,13 +56,13 @@ const MessageFooter = () => {
     }
 
     return (
-        <div className="flex justify-between mt-5">
-            <div className="w-2/3 flex">
+        <div className="flex flex-col lg:flex-row lg:justify-between mt-5 gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
                 {currentPage === 0 && <>
-                    <div className="mr-4">
+                    <div className="flex-1">
                         <div className="text-xs">{t("bubble:userLanguage")}</div>
                         <select
-                            className="border-0 border-b-2 border-black outline-none text-sm"
+                            className="border-0 border-b-2 border-black outline-none text-sm w-full"
                             onChange={e => {
                                 dispatch(app.setLocaleCode(e.currentTarget.value))
                             }}
@@ -73,10 +73,10 @@ const MessageFooter = () => {
                         </select>
                     </div>
 
-                    <div>
+                    <div className="flex-1">
                         <div className="text-xs">{t("bubble:defaultProgrammingLanguage")}</div>
                         <select
-                            className="border-0 border-b-2 border-black outline-none text-sm"
+                            className="border-0 border-b-2 border-black outline-none text-sm w-full"
                             onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                             id="language"
                             aria-label={t("bubble:selectLanguage")}
@@ -88,7 +88,7 @@ const MessageFooter = () => {
                     </div>
                 </>}
             </div>
-            <div className="w-1/3 flex justify-evenly">
+            <div className="flex flex-col sm:flex-row justify-center lg:justify-evenly gap-2">
                 {buttons}
             </div>
         </div>
