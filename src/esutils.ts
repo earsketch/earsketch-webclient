@@ -27,14 +27,28 @@ export const beatStringToArray = (beat: string) => {
     })
 }
 
-// Parses the language from a file extension using regex. Returns 'python' if
-// the extension is '.py' and 'javascript' otherwise.
+// Parses the language from a file extension using regex.
 export const parseLanguage = (filename: string) => {
     const ext = parseExt(filename)
     if (ext === ".py") {
         return "python"
-    } else {
+    } else if (ext === ".py3") {
+        return "python3"
+    } else if (ext === ".js") {
         return "javascript"
+    } else {
+        throw new Error("Invalid extension")
+    }
+}
+
+export function parseLanguageFamily(filename: string) {
+    const ext = parseExt(filename)
+    if ([".py", ".py3"].includes(ext)) {
+        return "python"
+    } else if (ext === ".js") {
+        return "javascript"
+    } else {
+        throw new Error("Invalid extension")
     }
 }
 

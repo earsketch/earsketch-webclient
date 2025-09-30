@@ -360,7 +360,7 @@ export function pasteCode(code: string) {
 }
 
 export function highlightError(err: any) {
-    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
+    const language = ESUtils.parseLanguageFamily(tabs.selectActiveTabScript(store.getState()).name)
     let lineNumber = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
     if (lineNumber !== undefined) {
         // Skulpt reports a line number greater than the document length for EOF; clamp to valid range.
@@ -465,7 +465,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     const tryToEnterBlocksMode = () => {
         droplet.on("change", () => {})
-        const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
+        const language = ESUtils.parseLanguageFamily(activeScript?.name ?? ".py")
         if (language !== droplet.getMode()) {
             droplet.setValue_raw("")
             droplet.setMode(language, blocksModes[language].modeOptions)

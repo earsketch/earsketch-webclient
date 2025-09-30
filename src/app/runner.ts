@@ -30,7 +30,14 @@ const YIELD_TIME_MS = 100
 
 export async function run(language: Language, code: string) {
     pendingCancel = false // Clear any old, pending cancellation.
-    const result = await (language === "python" ? runPython : runJavaScript)(code)
+    let result
+    if (language === "python") {
+        result = await runPython(2, code)
+    } else if (language === "python3") {
+        result = await runPython(3, code)
+    } else {
+        result = await runJavaScript(code)
+    }
     esconsole("Performing post-execution steps.", ["debug", "runner"])
     await postRun(result)
     esconsole("Post-execution steps finished. Return result.", ["debug", "runner"])
@@ -77,7 +84,7 @@ function _getLineNumber(): number {
 export let getLineNumber = _getLineNumber
 
 // Run a python script.
-async function runPython(code: string) {
+async function runPython(version: 2 | 3, code: string) {
     Sk.dateSet = false
     Sk.filesLoaded = false
     // Added to reset imports
@@ -86,7 +93,7 @@ async function runPython(code: string) {
     Sk.realsyspath = undefined
 
     Sk.resetCompiler()
-    pythonAPI.setup()
+    pythonAPI.setup(version)
     Sk.yieldLimit = YIELD_TIME_MS
 
     // special cases with these key functions when import ES module is missing

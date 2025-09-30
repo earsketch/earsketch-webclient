@@ -51,10 +51,9 @@ for (const constant of EFFECT_NAMES.concat(ANALYSIS_NAMES)) {
 }
 // Then, configure Skulpt options.
 Sk.pre = "output"
-// NOTE: We can opt into Python 3 (insofar as Skulpt supports it) by replacing `python2` with `python3` below.
-Sk.configure({ output: outf, read: builtinRead, __future__: Sk.python2 })
 
-export function setup() {
+export function setup(version: 2 | 3) {
+    Sk.configure({ output: outf, read: builtinRead, __future__: version === 2 ? Sk.python2 : Sk.python3 })
     // Reset DAW contents.
     dawData = Sk.ffi.remapToPy(passthrough.init())
     // Inject EarSketch Python API as `earsketch` module.

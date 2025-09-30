@@ -196,7 +196,7 @@ const ReferenceFile = ({ referenceScript, compilingReference }: {
                     : <a className="pull-right" onClick={() => setCollapse(true)}>Collapse</a>}
             </div>
             <div style={{ display: collapse ? "none" : "block" }}>
-                <CodeEmbed sourceCode={referenceScript.sourceCode} language={ESUtils.parseLanguage(referenceScript.name)} />
+                <CodeEmbed sourceCode={referenceScript.sourceCode} language={ESUtils.parseLanguageFamily(referenceScript.name)} />
             </div>
         </div>
     </div>
@@ -384,7 +384,7 @@ const TestResult = ({ upload, index }: { upload: Upload, index: number }) => {
         </div>
         <div>
             {upload.compiled && showCode &&
-                <CodeEmbed sourceCode={upload.script} language={ESUtils.parseLanguage(upload.file.name)} />}
+                <CodeEmbed sourceCode={upload.script} language={ESUtils.parseLanguageFamily(upload.file.name)} />}
         </div>
     </div>
 }

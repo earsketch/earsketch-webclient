@@ -59,7 +59,7 @@ export async function createScript() {
     reporter.createScript()
     const filename = await openModal(ScriptCreator)
     if (filename) {
-        const action = scriptsThunks.saveScript({ name: filename, source: i18n.t(`templates:${ESUtils.parseLanguage(filename)}`) })
+        const action = scriptsThunks.saveScript({ name: filename, source: i18n.t(`templates:${ESUtils.parseLanguageFamily(filename)}`) })
         const script = await store.dispatch(action).unwrap()
         store.dispatch(setActiveTabAndEditor(script.shareid))
     }

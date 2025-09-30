@@ -20,7 +20,7 @@ export interface Script {
 
 export type ScriptType = "regular" | "shared" | "readonly" | "deleted";
 
-export type Language = "python" | "javascript"
+export type Language = "python" | "javascript" | "python3"
 
 export interface SoundEntity {
     name: string

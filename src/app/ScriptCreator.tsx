@@ -22,7 +22,7 @@ export function validateScriptName(name: string, extension: string) {
     } else if (Object.values(scripts).some(script => script.soft_delete && script.name.toLocaleUpperCase() === fullname.toLocaleUpperCase())) {
         // Conflict with existing deleted script.
         throw new Error("messages:idecontroller.overwriteDeleted")
-    } else if (![".py", ".js"].includes(extension)) {
+    } else if (![".py", ".js", ".py3"].includes(extension)) {
         throw new Error("messages:idecontroller.illegalname")
     } else {
         // Valid name.
@@ -72,6 +72,7 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
                     <select className="form-select w-1/2 mx-6 dark:bg-transparent placeholder:text-gray-300" value={extension} onChange={e => setExtension(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
                         <option value=".py">Python</option>
                         <option value=".js">JavaScript</option>
+                        <option value=".py3">Python 3 (beta)</option>
                     </select>
                 </div>
             </ModalBody>
