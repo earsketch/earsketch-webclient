@@ -175,9 +175,11 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
             expect(interception.request.body).to.contain(`name=${anonymousScriptName2}.py`)
             expect(interception.request.body.replaceAll("+", " ")).to.contain(anonymousScriptMessage2)
         })
-        cy.get(`[title="Open ${anonymousScriptName}.py in Code Editor"]`).click()
-        cy.get(`[title="Open ${anonymousScriptName2}.py in Code Editor"]`).click()
+
+        cy.get("#coder").find(`button[title="${anonymousScriptName}.py"]`).click()
+        cy.get("#coder").find(`button[title="${anonymousScriptName2}.py"]`).click()
         cy.get(`[title="Open ${scriptName} in Code Editor"]`).click()
+        cy.get("#coder").find(`[title="${scriptName}"]`).click()
 
         const message = "Hello from saved script"
         cy.get("#editor").type(`{moveToEnd}{enter}print("${message}")`)
