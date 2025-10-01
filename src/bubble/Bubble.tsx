@@ -22,7 +22,7 @@ const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolea
 
     return (
         <button
-            className={`text-sm border-2 ${borderColor} rounded-full p-2 px-4 mx-2 ${backgroundColor} ${pointer} max-h-14`}
+            className={`text-sm border-2 ${borderColor} rounded-full p-2 px-4 mx-1 sm:mx-2 ${backgroundColor} ${pointer} flex-shrink-0`}
             onClick={() => dispatch(action())}
             ref={pref}
         >
@@ -37,6 +37,9 @@ const MessageFooter = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
 
+    // Prevent stacking on page 1 to avoid overflow past viewport top
+    const isCodeEditorPage = currentPage === 1
+
     let buttons
     if (currentPage === 0) {
         buttons = <>
@@ -45,7 +48,7 @@ const MessageFooter = () => {
         </>
     } else if (currentPage === 9) {
         buttons = <>
-            <div className="w-40" />
+            <div className="hidden lg:block w-40" />
             <NavButton name={t("bubble:buttons.close")} tag="dismiss" primary />
         </>
     } else {
@@ -56,8 +59,8 @@ const MessageFooter = () => {
     }
 
     return (
-        <div className="flex flex-col lg:flex-row lg:justify-between mt-5 gap-4">
-            <div className="flex flex-col sm:flex-row gap-4">
+        <div className={`flex ${isCodeEditorPage ? 'flex-row justify-between' : 'flex-col lg:flex-row lg:justify-between'} mt-5 gap-4`}>
+            <div className={`flex ${isCodeEditorPage ? 'flex-row' : 'flex-col sm:flex-row'} gap-4`}>
                 {currentPage === 0 && <>
                     <div className="flex-1">
                         <div className="text-xs">{t("bubble:userLanguage")}</div>
@@ -88,7 +91,7 @@ const MessageFooter = () => {
                     </div>
                 </>}
             </div>
-            <div className="flex flex-col sm:flex-row justify-center lg:justify-evenly gap-2">
+            <div className={`flex ${isCodeEditorPage ? 'flex-row justify-evenly' : 'flex-col sm:flex-row justify-center lg:justify-evenly'} gap-2`}>
                 {buttons}
             </div>
         </div>
@@ -221,7 +224,7 @@ export const Bubble = () => {
             {/* Backdrop. Reimplements close-on-outside-click, see above comments for details. */}
             <div className="fixed inset-0 bg-black/30" aria-hidden="true" onClick={() => dispatch(bubble.suspend())} />
             <div
-                className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
+                className={`absolute z-40 w-1/3 bg-white p-5 shadow-xl ${currentPage === 1 ? 'min-w-[400px]' : ''}`}
                 ref={setPopperElement as LegacyRef<HTMLDivElement>}
                 style={pages[currentPage].ref === null ? {} : styles.popper}
                 {...attributes.popper}
