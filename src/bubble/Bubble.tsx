@@ -59,8 +59,8 @@ const MessageFooter = () => {
     }
 
     return (
-        <div className={`flex ${isCodeEditorPage ? 'flex-row justify-between' : 'flex-col lg:flex-row lg:justify-between'} mt-5 gap-4`}>
-            <div className={`flex ${isCodeEditorPage ? 'flex-row' : 'flex-col sm:flex-row'} gap-4`}>
+        <div className={`flex ${isCodeEditorPage ? "flex-row justify-between" : "flex-col lg:flex-row lg:justify-between"} mt-5 gap-4`}>
+            <div className={`flex ${isCodeEditorPage ? "flex-row" : "flex-col sm:flex-row"} gap-4`}>
                 {currentPage === 0 && <>
                     <div className="flex-1">
                         <div className="text-xs">{t("bubble:userLanguage")}</div>
@@ -91,7 +91,7 @@ const MessageFooter = () => {
                     </div>
                 </>}
             </div>
-            <div className={`flex ${isCodeEditorPage ? 'flex-row justify-evenly' : 'flex-col sm:flex-row justify-center lg:justify-evenly'} gap-2`}>
+            <div className={`flex ${isCodeEditorPage ? "flex-row justify-evenly" : "flex-col sm:flex-row justify-center lg:justify-evenly"} gap-2`}>
                 {buttons}
             </div>
         </div>
@@ -224,7 +224,7 @@ export const Bubble = () => {
             {/* Backdrop. Reimplements close-on-outside-click, see above comments for details. */}
             <div className="fixed inset-0 bg-black/30" aria-hidden="true" onClick={() => dispatch(bubble.suspend())} />
             <div
-                className={`absolute z-40 w-1/3 bg-white p-5 shadow-xl ${currentPage === 1 ? 'min-w-[400px]' : ''}`}
+                className={`absolute z-40 w-1/3 bg-white p-5 shadow-xl ${currentPage === 1 ? "min-w-[400px]" : ""}`}
                 ref={setPopperElement as LegacyRef<HTMLDivElement>}
                 style={pages[currentPage].ref === null ? {} : styles.popper}
                 {...attributes.popper}
