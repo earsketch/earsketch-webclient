@@ -506,6 +506,7 @@
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "Some scripts could not be saved to the cloud. Please save your changes offline to avoid losing them.",
       "closealltabs":"This will close all open tabs. Are you sure you want to proceed?",
+      "changesFromPrevious": "Changes from previous run:",
       "noChanges": "No DAW changes from previous run",
       "tracksAdded": "Added {{count}} track",
       "tracksAdded_plural": "Added {{count}} tracks",

@@ -158,11 +158,12 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
     }
 
     // Log differences to console
-    for (const diff of differences) {
-        ideConsole.log(diff)
-    }
-
-    if (prevTrackCount > 0 || previous.length > 0) {
+    if (differences.length > 0) {
+        ideConsole.log(i18n.t("messages:idecontroller.changesFromPrevious"))
+        differences.forEach(diff => {
+            ideConsole.log(`  • ${diff}`)
+        })
+    } else if (prevTrackCount > 0 || previous.length > 0) {
         ideConsole.log(i18n.t("messages:idecontroller.noChanges"))
     }
 }
