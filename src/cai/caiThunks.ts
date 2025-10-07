@@ -1,9 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import { DAWData, Language, Script } from "common"
-import { selectRegularScripts } from "../browser/scriptsState"
+import * as app from "../app/appState"
+import * as scripts from "../browser/scriptsState"
+import * as tabs from "../ide/tabState"
 import { parseLanguage } from "../esutils"
-import { changeListeners, getContents } from "../ide/Editor"
+import { changeListeners } from "../ide/Editor"
 import store, { ThunkAPI } from "../reducers"
 import { selectUserName } from "../user/userState"
 import { analyzeCode, analyzeMusic } from "./analysis"
@@ -178,7 +180,8 @@ const introduceCai = createAsyncThunk<void, string, ThunkAPI>(
 export const sendCaiMessage = createAsyncThunk<void, [CaiButton, boolean], ThunkAPI>(
     "cai/sendCaiMessage",
     async ([input, isDirect], { getState, dispatch }) => {
-        const activeProject = selectActiveProject(getState())
+        const state = getState()
+        const activeProject = selectActiveProject(state)
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
@@ -189,7 +192,7 @@ export const sendCaiMessage = createAsyncThunk<void, [CaiButton, boolean], Thunk
             sender: selectUserName(getState()),
         } as CaiMessage
 
-        const text = getContents()
+        const text = tabs.selectActiveTabScript(state)!.source_code
 
         dialogue.setCodeObj(text)
         dispatch(addToMessageList({ message }))
@@ -231,7 +234,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                     numberToRun = 10
                 }
 
-                for (const script of Object.values(selectRegularScripts(store.getState()))) {
+                for (const script of Object.values(scripts.selectRegularScripts(store.getState()))) {
                     if (!savedNames.includes(script.name)) {
                         savedNames.push(script.name)
                         savedScripts.push(script)
@@ -327,9 +330,11 @@ export const compileCai = createAsyncThunk<void, [DAWData, Language, string], Th
 export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
-        const errorReturn = dialogue.handleError(data, getContents())
-        const activeProject = selectActiveProject(getState())
-        errorHandlingState[activeProject].errorMessage = storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
+        const state = getState()
+        const contents = tabs.selectActiveTabScript(state)!.source_code
+        const errorReturn = dialogue.handleError(data, contents)
+        const activeProject = selectActiveProject(state)
+        errorHandlingState[activeProject].errorMessage = storeErrorInfo(data, contents, app.selectScriptLanguage(state))
         if (dialogueState[activeProject].isDone) {
             return
         }
@@ -378,8 +383,8 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
 
 const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
-    () => {
-        dialogue.checkForCodeUpdates(getContents())
+    (_, { getState }) => {
+        dialogue.checkForCodeUpdates(tabs.selectActiveTabScript(getState())!.source_code)
     }
 )
 

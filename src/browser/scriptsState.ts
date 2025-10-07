@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import { createTransform, persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
-import dayjs from "dayjs"
 
 import { Script, ScriptType } from "common"
 import { selectUserName, selectLoggedIn } from "../user/userState"
@@ -350,8 +349,8 @@ const sortScriptIDs = (scripts: Scripts, sortBy: SortByAttribute, ascending: boo
                 : d.localeCompare(c, undefined, lexicalSortOptions)
         } else {
             // TODO: Consistency in our date fields.
-            c = typeof a.modified === "string" ? dayjs(a.modified).valueOf() : a.modified
-            d = typeof b.modified === "string" ? dayjs(b.modified).valueOf() : b.modified
+            c = typeof a.modified === "string" ? Date.parse(a.modified + "Z") : a.modified
+            d = typeof b.modified === "string" ? Date.parse(b.modified + "Z") : b.modified
             return ascending ? c - d : d - c
         }
     }).map(v => v.shareid)
