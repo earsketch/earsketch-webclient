@@ -78,7 +78,7 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
         // First run, no comparison needed
         return
     }
-
+    console.log(current)
     const differences: string[] = []
 
     // Compare number of tracks (excluding first track which is metronome)
@@ -109,33 +109,60 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
 
         if (!prevTrack && currentTrack) {
             // New track added
-            const totalMeasures = currentTrack.clips?.reduce((sum, clip) => {
-                return clip.tempo !== undefined ? sum + (clip.end - clip.start) : sum
-            }, 0) || 0
+            const clipsWithTempo = currentTrack.clips?.filter(clip => clip.tempo !== undefined) || []
+            const clipsWithoutTempo = currentTrack.clips?.filter(clip => clip.tempo === undefined) || []
+            const totalMeasures = clipsWithTempo.reduce((sum, clip) => sum + (clip.end - clip.start), 0)
+            const allClips = [...clipsWithTempo, ...clipsWithoutTempo]
+            const filekeys = [...new Set(allClips.map(clip => clip.filekey))].join(", ")
+            const startMeasure = clipsWithTempo.length > 0 ? Math.min(...clipsWithTempo.map(clip => clip.measure)) : 0
+            const endMeasure = clipsWithTempo.length > 0 ? Math.max(...clipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
+            const span = clipsWithTempo.length > 0 ? `${startMeasure}-${endMeasure.toFixed(1)}` : ""
             const effectCount = Object.keys(currentTrack.effects || {}).length
-            differences.push(i18n.t("messages:idecontroller.trackAddedWithDetails", { trackNum, clipCount: totalMeasures.toFixed(1), effectCount }))
+            const clipCountInfo = clipsWithTempo.length > 0 ? totalMeasures.toFixed(1) : `${clipsWithoutTempo.length} clips (no tempo)`
+            differences.push(i18n.t("messages:idecontroller.trackAddedWithDetails", { trackNum, clipCount: clipCountInfo, filekeys, span, effectCount }))
         } else if (prevTrack && !currentTrack) {
             // Track removed
             differences.push(i18n.t("messages:idecontroller.trackRemoved", { trackNum }))
         } else if (prevTrack && currentTrack) {
             // Compare existing tracks
-            const prevTotalMeasures = prevTrack.clips?.reduce((sum, clip) => {
-                return clip.tempo !== undefined ? sum + (clip.end - clip.start) : sum
-            }, 0) || 0
-            const currentTotalMeasures = currentTrack.clips?.reduce((sum, clip) => {
-                return clip.tempo !== undefined ? sum + (clip.end - clip.start) : sum
-            }, 0) || 0
+            const prevClipsWithTempo = prevTrack.clips?.filter(clip => clip.tempo !== undefined) || []
+            const currentClipsWithTempo = currentTrack.clips?.filter(clip => clip.tempo !== undefined) || []
+            const prevClipsWithoutTempo = prevTrack.clips?.filter(clip => clip.tempo === undefined) || []
+            const currentClipsWithoutTempo = currentTrack.clips?.filter(clip => clip.tempo === undefined) || []
+            const prevTotalMeasures = prevClipsWithTempo.reduce((sum, clip) => sum + (clip.end - clip.start), 0)
+            const currentTotalMeasures = currentClipsWithTempo.reduce((sum, clip) => sum + (clip.end - clip.start), 0)
             const prevEffectCount = Object.keys(prevTrack.effects || {}).length
             const currentEffectCount = Object.keys(currentTrack.effects || {}).length
 
-            // Compare total measures of clips
+            // Compare total measures of clips WITH tempo
             if (currentTotalMeasures !== prevTotalMeasures) {
                 if (currentTotalMeasures > prevTotalMeasures) {
-                    const addedMeasures = roundToDecimalPlaces(currentTotalMeasures - prevTotalMeasures, 2)
-                    differences.push(i18n.t("messages:idecontroller.trackClipsAdded", { trackNum, count: addedMeasures }))
+                    const addedMeasures = (currentTotalMeasures - prevTotalMeasures).toFixed(1)
+                    const currentFilekeys = [...new Set(currentClipsWithTempo.map(clip => clip.filekey))].join(", ")
+                    const startMeasure = currentClipsWithTempo.length > 0 ? Math.min(...currentClipsWithTempo.map(clip => clip.measure)) : 0
+                    const endMeasure = currentClipsWithTempo.length > 0 ? Math.max(...currentClipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
+                    const span = currentClipsWithTempo.length > 0 ? `${startMeasure}-${endMeasure % 1 !== 0 ? endMeasure.toFixed(1) : endMeasure}` : ""
+                    differences.push(i18n.t("messages:idecontroller.trackClipsAdded", { trackNum, count: addedMeasures, filekeys: currentFilekeys, span }))
                 } else {
-                    const removedMeasures = roundToDecimalPlaces(prevTotalMeasures - currentTotalMeasures, 2)
-                    differences.push(i18n.t("messages:idecontroller.trackClipsRemoved", { trackNum, count: removedMeasures }))
+                    const removedMeasures = (prevTotalMeasures - currentTotalMeasures).toFixed(1)
+                    const prevFilekeys = [...new Set(prevClipsWithTempo.map(clip => clip.filekey))].join(", ")
+                    const startMeasure = currentClipsWithTempo.length > 0 ? Math.min(...currentClipsWithTempo.map(clip => clip.measure)) : 0
+                    const endMeasure = currentClipsWithTempo.length > 0 ? Math.max(...currentClipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
+                    const span = currentClipsWithTempo.length > 0 ? `${startMeasure}-${endMeasure % 1 !== 0 ? endMeasure.toFixed(1) : endMeasure}` : ""
+                    differences.push(i18n.t("messages:idecontroller.trackClipsRemoved", { trackNum, count: removedMeasures, filekeys: prevFilekeys, span }))
+                }
+            }
+
+            // Compare clips WITHOUT tempo (count only, not measures)
+            if (currentClipsWithoutTempo.length !== prevClipsWithoutTempo.length) {
+                if (currentClipsWithoutTempo.length > prevClipsWithoutTempo.length) {
+                    const addedCount = currentClipsWithoutTempo.length - prevClipsWithoutTempo.length
+                    const currentFilekeys = [...new Set(currentClipsWithoutTempo.map(clip => clip.filekey))].join(", ")
+                    differences.push(i18n.t("messages:idecontroller.trackClipsAdded", { trackNum, count: addedCount, filekeys: currentFilekeys, span: "no-tempo clips" }))
+                } else {
+                    const removedCount = prevClipsWithoutTempo.length - currentClipsWithoutTempo.length
+                    const prevFilekeys = [...new Set(prevClipsWithoutTempo.map(clip => clip.filekey))].join(", ")
+                    differences.push(i18n.t("messages:idecontroller.trackClipsRemoved", { trackNum, count: removedCount, filekeys: prevFilekeys, span: "no-tempo clips" }))
                 }
             }
 
