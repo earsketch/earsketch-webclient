@@ -27,6 +27,12 @@
             }), '*')
             return new Promise(resolve => { resolver = resolve })
         },
+        getColorTheme() {
+            window.parent.postMessage(JSON.stringify({
+                fn: 'getColorTheme',
+            }), '*')
+            return new Promise(resolve => { resolver = resolve })
+        },
     }
 
     window.addEventListener("message", (event) => {
@@ -41,12 +47,35 @@
         } else if (resolver) {
             console.log("[EXTENSION] Resolving promise...")
             resolver(JSON.parse(event.data))
+            resolver = null
+        } else if (event.data) {
+          try {
+            const eventData = JSON.parse(event.data)
+            if (eventData?.messageType === "colorThemeChanged") {
+              console.log("[EXTENSION] Color theme changed:", eventData.colorTheme)
+
+              applyTheme(eventData.colorTheme)
+            }
+          } catch (e) {
+            console.log("[EXTENSION] Failed to unpack message from host... {0}", e.message)
+          }
         }
     })
 </script>
 
 <!-- Here's what the extension writer will actually code -->
 <script>
+    const applyTheme = (colorTheme) => {
+      console.log("hello from applyTheme")
+        if (colorTheme === "light") {
+            document.body.style.backgroundColor = "white"
+            document.body.style.color = "black"
+        } else if (colorTheme === "dark") {
+            document.body.style.backgroundColor = "black"
+            document.body.style.color = "white"
+        }
+    }
+
     earsketch.onload = async () => {
         document.querySelector("button").addEventListener("click", async () => {
             // Configure the button to simulate a chat message to a remote LLM
@@ -78,5 +107,7 @@
                 document.querySelector("#output").appendChild(respElement)
             }, 1000)
         })
+        const colorTheme = await earsketch.getColorTheme()
+        applyTheme(colorTheme)
     }
 </script>

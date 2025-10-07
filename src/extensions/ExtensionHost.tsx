@@ -6,6 +6,7 @@ import { useAppSelector as useSelector } from "../hooks"
 import * as editor from "../ide/Editor"
 import { Log, selectLogs } from "../ide/ideState"
 import { Track } from "../types/common"
+import { selectColorTheme } from "../app/appState"
 
 export const ExtensionHost = () => {
     const [extensionUrl, setExtensionUrl] = useState<string>("")
@@ -13,12 +14,26 @@ export const ExtensionHost = () => {
     const iframeRef = useRef<HTMLIFrameElement>(null)
     const logs: Log[] = useSelector(selectLogs)
     const tracks: Track[] = useSelector(selectTracks)
+    const colorTheme = useSelector(selectColorTheme)
 
     const logsRef = useRef(logs)
     const tracksRef = useRef(tracks)
+    const colorThemeRef = useRef(colorTheme)
 
     useEffect(() => { logsRef.current = logs }, [logs])
     useEffect(() => { tracksRef.current = tracks }, [tracks])
+    useEffect(() => {
+        colorThemeRef.current = colorTheme
+        if (iframeRef.current?.contentWindow) {
+            const message = {
+                messageType: "colorThemeChanged",
+                colorTheme: colorThemeRef.current,
+            }
+            if (iframeRef.current?.contentWindow) {
+                iframeRef.current.contentWindow.postMessage(JSON.stringify(message), "*") // TODO extensionTargetOrigin isn't working for remote html
+            }
+        }
+    }, [colorTheme])
 
     const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
         getEditorContents() {
@@ -37,6 +52,10 @@ export const ExtensionHost = () => {
             const currentTracks = tracksRef.current
             // TODO return a cleaned version of the daw state that can be serialized
             return JSON.stringify(currentTracks)
+        },
+        getColorTheme() {
+            const currentColorTheme = colorThemeRef.current
+            return currentColorTheme
         },
     }
 
