@@ -37,7 +37,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         if (!script) return
 
         let editSession
-        const language = ESUtils.parseLanguageFamily(script.name)
+        const language = ESUtils.parseLanguage(script.name)
 
         const restoredSession = getSession(scriptID)
         if (restoredSession) {

@@ -1230,6 +1230,7 @@
   },
   "templates": {
     "python": "# description: \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "python3": "#!python3\n# description: \nfrom earsketch import *\n\nsetTempo(120)\n",
     "javascript": "// description: \nsetTempo(120);\n"
   },
   "console": {

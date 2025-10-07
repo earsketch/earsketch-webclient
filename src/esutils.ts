@@ -32,19 +32,6 @@ export const parseLanguage = (filename: string) => {
     const ext = parseExt(filename)
     if (ext === ".py") {
         return "python"
-    } else if (ext === ".py3") {
-        return "python3"
-    } else if (ext === ".js") {
-        return "javascript"
-    } else {
-        throw new Error("Invalid extension")
-    }
-}
-
-export function parseLanguageFamily(filename: string) {
-    const ext = parseExt(filename)
-    if ([".py", ".py3"].includes(ext)) {
-        return "python"
     } else if (ext === ".js") {
         return "javascript"
     } else {
