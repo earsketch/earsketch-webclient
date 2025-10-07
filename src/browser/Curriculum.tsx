@@ -215,7 +215,7 @@ export const TitleBar = () => {
     }
 
     return (
-        <div className="flex items-center p-2">
+        <div className="flex items-center p-2 bg-white text-black dark:bg-gray-900 dark:text-white">
             <div className="ltr:pl-2 ltr:pr-4 rtl:pl-4 rtl:pr-3 font-semibold truncate">
                 <h2>{paneTitle.toLocaleUpperCase()}</h2>
             </div>
