@@ -114,12 +114,11 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
             const totalMeasures = clipsWithTempo.reduce((sum, clip) => sum + (clip.end - clip.start), 0)
             const allClips = [...clipsWithTempo, ...clipsWithoutTempo]
             const filekeys = [...new Set(allClips.map(clip => clip.filekey))].join(", ")
-            const startMeasure = clipsWithTempo.length > 0 ? Math.min(...clipsWithTempo.map(clip => clip.measure)) : 0
-            const endMeasure = clipsWithTempo.length > 0 ? Math.max(...clipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
-            const span = clipsWithTempo.length > 0 ? `${startMeasure}-${endMeasure.toFixed(1)}` : ""
+            const spanStart = clipsWithTempo.length > 0 ? Math.min(...clipsWithTempo.map(clip => clip.measure)) : 0
+            const spanEnd = clipsWithTempo.length > 0 ? Math.max(...clipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
             const effectCount = Object.keys(currentTrack.effects || {}).length
             const clipCountInfo = clipsWithTempo.length > 0 ? totalMeasures.toFixed(1) : `${clipsWithoutTempo.length} clips (no tempo)`
-            differences.push(i18n.t("messages:idecontroller.trackAddedWithDetails", { trackNum, clipCount: clipCountInfo, filekeys, span, effectCount }))
+            differences.push(i18n.t("messages:idecontroller.trackAddedWithDetails", { trackNum, clipCount: clipCountInfo, filekeys, spanStart, spanEnd, effectCount }))
         } else if (prevTrack && !currentTrack) {
             // Track removed
             differences.push(i18n.t("messages:idecontroller.trackRemoved", { trackNum }))
@@ -137,19 +136,17 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
             // Compare total measures of clips WITH tempo
             if (currentTotalMeasures !== prevTotalMeasures) {
                 if (currentTotalMeasures > prevTotalMeasures) {
-                    const addedMeasures = (currentTotalMeasures - prevTotalMeasures).toFixed(1)
+                    const addedMeasures = (currentTotalMeasures - prevTotalMeasures)
                     const currentFilekeys = [...new Set(currentClipsWithTempo.map(clip => clip.filekey))].join(", ")
-                    const startMeasure = currentClipsWithTempo.length > 0 ? Math.min(...currentClipsWithTempo.map(clip => clip.measure)) : 0
-                    const endMeasure = currentClipsWithTempo.length > 0 ? Math.max(...currentClipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
-                    const span = currentClipsWithTempo.length > 0 ? `${startMeasure}-${endMeasure % 1 !== 0 ? endMeasure.toFixed(1) : endMeasure}` : ""
-                    differences.push(i18n.t("messages:idecontroller.trackClipsAdded", { trackNum, count: addedMeasures, filekeys: currentFilekeys, span }))
+                    const spanStart = currentClipsWithTempo.length > 0 ? Math.min(...currentClipsWithTempo.map(clip => clip.measure)) : 0
+                    const spanEnd = currentClipsWithTempo.length > 0 ? Math.max(...currentClipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
+                    differences.push(i18n.t("messages:idecontroller.trackClipsAdded", { trackNum, count: addedMeasures, measures: addedMeasures.toFixed(1), filekeys: currentFilekeys, spanStart, spanEnd }))
                 } else {
-                    const removedMeasures = (prevTotalMeasures - currentTotalMeasures).toFixed(1)
+                    const removedMeasures = (prevTotalMeasures - currentTotalMeasures)
                     const prevFilekeys = [...new Set(prevClipsWithTempo.map(clip => clip.filekey))].join(", ")
-                    const startMeasure = currentClipsWithTempo.length > 0 ? Math.min(...currentClipsWithTempo.map(clip => clip.measure)) : 0
-                    const endMeasure = currentClipsWithTempo.length > 0 ? Math.max(...currentClipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
-                    const span = currentClipsWithTempo.length > 0 ? `${startMeasure}-${endMeasure % 1 !== 0 ? endMeasure.toFixed(1) : endMeasure}` : ""
-                    differences.push(i18n.t("messages:idecontroller.trackClipsRemoved", { trackNum, count: removedMeasures, filekeys: prevFilekeys, span }))
+                    const spanStart = currentClipsWithTempo.length > 0 ? Math.min(...currentClipsWithTempo.map(clip => clip.measure)) : 0
+                    const spanEnd = currentClipsWithTempo.length > 0 ? Math.max(...currentClipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
+                    differences.push(i18n.t("messages:idecontroller.trackClipsRemoved", { trackNum, count: removedMeasures, measures: removedMeasures.toFixed(1), filekeys: prevFilekeys, spanStart, spanEnd }))
                 }
             }
 
@@ -438,8 +435,6 @@ async function runScript() {
         const errType = String(error).split(":")[0]
         reporter.compile(language, false, errType, duration)
 
-        userNotification.showBanner(i18n.t("messages:interpreter.runFailed"), "failure1")
-
         saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
         if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
@@ -450,6 +445,11 @@ async function runScript() {
 
     const duration = Date.now() - startTime
     setLoading(false)
+    reporter.compile(language, true, undefined, duration)
+    ideConsole.status(i18n.t("messages:idecontroller.success", { seconds: duration / 1000 }))
+    store.dispatch(ide.setScriptMatchesDAW(true))
+    saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
+
     if (result) {
         esconsole("Ran script, updating DAW.", "ide")
 
@@ -466,11 +466,6 @@ async function runScript() {
         previousDAWData = cloneDAWDataForComparison(result)
         lastScriptID = scriptID
     }
-    reporter.compile(language, true, undefined, duration)
-    userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
-    ideConsole.status(i18n.t("messages:idecontroller.success"))
-    store.dispatch(ide.setScriptMatchesDAW(true))
-    saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
 
     // asynchronously report the script complexity
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
@@ -598,7 +593,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
 
                     <div ref={consoleContainer} id="console-frame" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <div className="row">
-                            <div id="console">
+                            <div id="console" aria-live="assertive">
                                 {logs.map((msg: ide.Log, index: number) => {
                                     const consoleLineClass = classNames({
                                         "console-line": true,
