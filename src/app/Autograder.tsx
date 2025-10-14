@@ -111,6 +111,10 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
         }
     }
 
+    console.log("Does reference match test: ", JSON.stringify(reference) === JSON.stringify(test))
+    console.log("reference: ", JSON.stringify(reference))
+    console.log("test: ", JSON.stringify(test))
+
     return JSON.stringify(reference) === JSON.stringify(test)
 }
 
