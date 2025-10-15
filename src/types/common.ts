@@ -16,6 +16,7 @@ export interface Script {
     id?: string
     original_id?: string
     soft_delete?: boolean
+    accessibility_mode: boolean
 }
 
 export type ScriptType = "regular" | "shared" | "readonly" | "deleted";

@@ -7,7 +7,8 @@ export interface BubbleState {
     active: boolean
     currentPage: number,
     readyToProceed: true,
-    language: Language
+    language: Language,
+    accessibilityMode: boolean
 }
 
 const bubbleSlice = createSlice({
@@ -17,6 +18,7 @@ const bubbleSlice = createSlice({
         currentPage: 0,
         readyToProceed: true,
         language: "python",
+        accessibilityMode: false,
     } as BubbleState,
     reducers: {
         reset(state) {
@@ -24,17 +26,19 @@ const bubbleSlice = createSlice({
             state.currentPage = 0
             state.readyToProceed = true
             state.language = "python"
+            state.accessibilityMode = false
         },
         resume(state) { state.active = true },
         suspend(state) { state.active = false },
         increment(state) { state.currentPage++ },
         setReady(state, { payload }) { state.readyToProceed = payload },
         setLanguage(state, { payload }) { state.language = payload },
+        setAccessibilityMode(state, { payload }) { state.accessibilityMode = payload }
     },
 })
 
 export default bubbleSlice.reducer
-export const { reset, resume, suspend, increment, setReady, setLanguage } = bubbleSlice.actions
+export const { reset, resume, suspend, increment, setReady, setLanguage, setAccessibilityMode } = bubbleSlice.actions
 
 export const selectActive = (state: RootState) => state.bubble.active
 export const selectCurrentPage = (state: RootState) => state.bubble.currentPage

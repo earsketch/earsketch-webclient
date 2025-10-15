@@ -19,6 +19,7 @@ const appSlice = createSlice({
     initialState: {
         locale: "",
         scriptLanguage: "python" as Language,
+        accessibilityMode: false,
         colorTheme: "light" as "light" | "dark",
         fontSize: 14,
         embedMode,
@@ -74,6 +75,9 @@ const appSlice = createSlice({
         setConfetti(state, { payload }) {
             state.confetti = payload
         },
+        setAccessibilityMode(state, { payload }) {
+            state.accessibilityMode = payload
+        },
     },
 })
 
@@ -98,6 +102,7 @@ export const {
     setLocaleCode,
     setModal,
     setConfetti,
+    setAccessibilityMode,
 } = appSlice.actions
 
 export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage
@@ -114,6 +119,7 @@ export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedSha
 export const selectLocaleCode = (state: RootState) => state.app.locale
 export const selectModal = (state: RootState) => state.app.modal
 export const selectConfetti = (state: RootState) => state.app.confetti
+export const selectAccessibilityMode = (state:RootState) => state.app.accessibilityMode
 
 export const selectLocale = createSelector(
     [selectLocaleCode],

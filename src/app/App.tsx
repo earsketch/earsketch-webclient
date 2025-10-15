@@ -398,6 +398,11 @@ function toggleColorTheme() {
     reporter.toggleColorTheme()
 }
 
+function toggleAccessibility() {
+    store.dispatch(appState.setAccessibilityMode(store.getState().app.accessibilityMode === true ? false : true))
+    reporter.toggleAccessibilityMode()
+}
+
 function resumeQuickTour() {
     store.dispatch(bubble.reset())
     store.dispatch(bubble.resume())
@@ -493,6 +498,20 @@ const SwitchThemeButton = () => {
         <button className="text-gray-400 hover:text-gray-300 text-2xl" onClick={toggleColorTheme} title={t(titleKey)} aria-label={t(titleKey)}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-brightness-contrast" /></div>
+            </div>
+        </button>
+    </div>
+}
+
+const ToggleAccessibilityButton = () => {
+    const { t } = useTranslation()
+    const accessibilityMode = useSelector(appState.selectAccessibilityMode)
+    const titleKey = accessibilityMode === true ? "toggleAccessibilityOn" : "toggleAccessibilityOff"
+
+    return <div className="relative inline-block text-left mx-3">
+        <button className="text-gray-400 hover:text-gray-300 text-2xl" onClick={toggleAccessibility} title={t(titleKey)} aria-label={t(titleKey)}>
+            <div className="flex flex-row items-center">
+                <div>BVI</div>
             </div>
         </button>
     </div>
@@ -914,6 +933,7 @@ export const App = () => {
                         </button>}
 
                     {ES_WEB_SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
+                    <ToggleAccessibilityButton />
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />

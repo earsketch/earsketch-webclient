@@ -86,6 +86,20 @@ const MessageFooter = () => {
                             <option value="javascript">JavaScript</option>
                         </select>
                     </div>
+
+                    <div>
+                        <div className="text-xs">{t("bubble:accessibilityMode")}</div>
+                        <select
+                            className="border-0 border-b-2 border-black outline-none text-sm"
+                            onChange={e => dispatch(bubble.setAccessibilityMode(e.currentTarget.value))}
+                            id="accessibilityMode"
+                            aria-label={t("bubble:setAccessibilty")}
+                            title={t("bubble:setAccessibility")}
+                        >
+                            <option value="false">Off</option>
+                            <option value="true">On</option>
+                        </select>
+                    </div>
                 </>}
             </div>
             <div className="w-1/3 flex justify-evenly">
