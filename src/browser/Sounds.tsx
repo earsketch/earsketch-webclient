@@ -18,8 +18,9 @@ import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
-import { SearchBar } from "./Utils"
+import { SearchBar, DropdownMultiSelector } from "./Utils"
 import { CheckboxButton } from "../Utils"
+import { selectArtists } from "./recommenderState"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -434,8 +435,48 @@ interface SoundSearchAndFiltersProps {
     setFilterHeight: React.Dispatch<React.SetStateAction<number>>
 }
 
+const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.Filters, value: string, isClearItem: boolean }) => {
+    const selected = isClearItem ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value))
+    const dispatch = useDispatch()
+    const { t } = useTranslation()
+    return (
+        <>
+            <div
+                className="flex justify-left items-center cursor-pointer pr-5 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
+                onClick={() => {
+                    if (isClearItem) {
+                        dispatch(sounds.resetFilter(category))
+                    } else {
+                        if (selected) dispatch(sounds.removeFilterItem({ category, value }))
+                        else dispatch(sounds.addFilterItem({ category, value }))
+                    }
+                }}
+                aria-selected={selected}
+            >
+                <div className="w-5">
+                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`}/>
+                </div>
+                <div className="text-sm select-none">
+                    {isClearItem ? t("clear") : value}
+                </div>
+            </div>
+            {isClearItem && <hr className="border-1 my-2 border-black dark:border-white" />}
+        </>
+    )
+}
+
 const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
     const filterRef: React.RefObject<HTMLDivElement> = createRef()
+    const { t } = useTranslation()
+    const [showMajMinPageOne, setShowMajMinPageOne] = useState(true)
+    const artists = useSelector(sounds.selectAllArtists)
+    const genres = useSelector(sounds.selectAllGenres)
+    const instruments = useSelector(sounds.selectAllInstruments)
+    const keys = useSelector(sounds.selectFilteredKeys)
+    const ItemsSelected = useSelector(sounds.selectNumItemsSelected)
+
+    const numItemsSelected = Object.values(ItemsSelected).reduce((sum, num) => sum + num, 0)
+
 
     useLayoutEffect(() => {
         const soundFilterHeight = filterRef.current?.offsetHeight || 0
@@ -447,7 +488,47 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
     if (acc_mode) {
         return (
             <div ref={filterRef} className="pb-1">
-            Nothing
+            <div className="pb-1">
+                <div className="pb-2 text-xs">{t("filter").toLocaleUpperCase()}</div>
+                <div className="flex justify-between">
+                    <DropdownMultiSelector
+                        title={t("soundBrowser.filterDropdown.artists")}
+                        category="artists"
+                        aria={t("soundBrowser.clip.tooltip.artist")}
+                        items={artists}
+                        numSelected={numItemsSelected}
+                        position="center"
+                        FilterItem={FilterItem}
+                    />
+                    <DropdownMultiSelector
+                        title={t("soundBrowser.filterDropdown.genres")}
+                        category="genres"
+                        aria={t("soundBrowser.filterDropdown.genres")}
+                        items={genres}
+                        numSelected={numItemsSelected}
+                        position="center"
+                        FilterItem={FilterItem}
+                    />
+                    <DropdownMultiSelector
+                        title={t("soundBrowser.filterDropdown.instruments")}
+                        category="instruments"
+                        aria={t("soundBrowser.filterDropdown.instruments")}
+                        items={instruments}
+                        numSelected={numItemsSelected}
+                        position="center"
+                        FilterItem={FilterItem}
+                    />
+                    <DropdownMultiSelector
+                        title={t("soundBrowser.filterDropdown.keys")}
+                        category="keys"
+                        aria={t("soundBrowser.filterDropdown.keys")}
+                        items={keys}
+                        numSelected={numItemsSelected}
+                        position="center"
+                        FilterItem={FilterItem}
+                    />
+                </div>
+            </div>
             </div>
         )
     }
@@ -467,7 +548,6 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
         </div>
     )
 }
-
 
 const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
     title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
