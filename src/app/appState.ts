@@ -19,7 +19,7 @@ const appSlice = createSlice({
     initialState: {
         locale: "",
         scriptLanguage: "python" as Language,
-        accessibilityMode: false,
+        accessibilityMode: false as true | false,
         colorTheme: "light" as "light" | "dark",
         fontSize: 14,
         embedMode,

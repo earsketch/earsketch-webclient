@@ -436,17 +436,29 @@ interface SoundSearchAndFiltersProps {
 
 const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
     const filterRef: React.RefObject<HTMLDivElement> = createRef()
+
     useLayoutEffect(() => {
         const soundFilterHeight = filterRef.current?.offsetHeight || 0
         setFilterHeight(soundFilterHeight)
-    })
+    }, [])
+
+    const acc_mode = useSelector(appState.selectAccessibilityMode)
+    console.log(acc_mode)
+    if (acc_mode) {
+        return (
+            <div ref={filterRef} className="pb-1">
+            Nothing
+            </div>
+        )
+    }
 
     return (
         <div ref={filterRef} className="pb-1">
             <div className="pb-1">
                 <Filters
                     currentFilterTab={currentFilterTab}
-                    setCurrentFilterTab={setCurrentFilterTab}/>
+                    setCurrentFilterTab={setCurrentFilterTab}
+                />
             </div>
             <div className="flex justify-between px-1.5 py-1 mb-0.5">
                 <ShowOnlyFavorites />
@@ -455,6 +467,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
         </div>
     )
 }
+
 
 const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
     title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
