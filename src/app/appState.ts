@@ -119,7 +119,7 @@ export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedSha
 export const selectLocaleCode = (state: RootState) => state.app.locale
 export const selectModal = (state: RootState) => state.app.modal
 export const selectConfetti = (state: RootState) => state.app.confetti
-export const selectAccessibilityMode = (state:RootState) => state.app.accessibilityMode
+export const selectAccessibilityMode = (state: RootState) => state.app.accessibilityMode
 
 export const selectLocale = createSelector(
     [selectLocaleCode],

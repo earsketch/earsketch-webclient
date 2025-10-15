@@ -399,7 +399,7 @@ function toggleColorTheme() {
 }
 
 function toggleAccessibility() {
-    store.dispatch(appState.setAccessibilityMode(store.getState().app.accessibilityMode === true ? false : true))
+    store.dispatch(appState.setAccessibilityMode(store.getState().app.accessibilityMode !== true))
     reporter.toggleAccessibilityMode()
 }
 

@@ -3,7 +3,7 @@
 import { Language } from "common"
 
 const ACTIONS = {
-    user: ["login", "logout", "openHistory", "sidebarTogglesClicked", "toggleColorTheme"],
+    user: ["login", "logout", "openHistory", "sidebarTogglesClicked", "toggleColorTheme", "toggleAccessibilityMode"],
     script: ["createScript", "deleteScript", "openScript", "openSharedScript", "renameScript", "renameSharedScript", "revertScript", "saveScript", "saveSharedScript"],
 }
 
