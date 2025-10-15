@@ -528,6 +528,10 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
                         FilterItem={FilterItem}
                     />
                 </div>
+                <div className="flex justify-between px-1.5 py-1 mb-0.5">
+                <ShowOnlyFavorites />
+                <AddSound />
+            </div>
             </div>
             </div>
         )
