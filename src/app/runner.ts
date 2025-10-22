@@ -86,8 +86,12 @@ async function runPython(code: string) {
     Sk.realsyspath = undefined
 
     Sk.resetCompiler()
-    // Check for shebang to determine intended Python version
-    const version = /^#!\s*python3\s*\n/.test(code) ? 3 : 2
+    // Check for imitation future statement to determine Python version
+    let version: 2 | 3 = 2
+    if (code.startsWith("from __future__ import python3")) {
+        version = 3
+        code = "#" + code
+    }
     pythonAPI.setup(version)
     Sk.yieldLimit = YIELD_TIME_MS
 
