@@ -498,7 +498,7 @@
     },
     "idecontroller": {
       "running": "Running script...",
-      "success": "Script ran successfully in {{seconds}} seconds",
+      "success": "Script ran successfully",
       "overwrite": "That name already exists. Please provide a unique name or first rename the existing script.",
       "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
       "illegalname": "Please use only regular characters, numbers, or _ in file names.",
@@ -525,7 +525,12 @@
       "trackEffectTypesAdded": "Track {{trackNum}}: Added {{count}} effect: {{effects}}",
       "trackEffectTypesAdded_plural": "Track {{trackNum}}: Added {{count}} effects: {{effects}}",
       "trackEffectTypesRemoved": "Track {{trackNum}}: Removed {{count}} effect: {{effects}}",
-      "trackEffectTypesRemoved_plural": "Track {{trackNum}}: Removed {{count}} effects: {{effects}}"
+      "trackEffectTypesRemoved_plural": "Track {{trackNum}}: Removed {{count}} effects: {{effects}}",
+      "trackClipsChanged": "Track {{trackNum}}: Changed audio files ({{measures}} measures){{addedText}}{{removedText}}. Track spans measures {{spanStart}} to {{spanEnd}}",
+      "trackClipsChangedNoTempo": "Track {{trackNum}}: Changed no-tempo clips ({{count}} total){{addedText}}{{removedText}}",
+      "trackClipsPositionChanged": "Track {{trackNum}}: Clip positions changed ({{measures}} measures, {{filekeys}}). Track spans measures {{spanStart}} to {{spanEnd}}",
+      "clipFilesAdded": ". Added: {{filekeys}}",
+      "clipFilesRemoved": ". Removed: {{filekeys}}"
     },
     "shareScript": {
       "menuDescriptions": {

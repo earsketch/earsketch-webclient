@@ -148,6 +148,46 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
                     const spanEnd = currentClipsWithTempo.length > 0 ? Math.max(...currentClipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
                     differences.push(i18n.t("messages:idecontroller.trackClipsRemoved", { trackNum, count: removedMeasures, measures: removedMeasures.toFixed(1), filekeys: prevFilekeys, spanStart, spanEnd }))
                 }
+            } else {
+                // Check for filekey changes in clips WITH tempo when total measures are the same
+                const prevFilekeys = new Set(prevClipsWithTempo.map(clip => clip.filekey))
+                const currentFilekeys = new Set(currentClipsWithTempo.map(clip => clip.filekey))
+
+                const addedFilekeys = [...currentFilekeys].filter(key => !prevFilekeys.has(key))
+                const removedFilekeys = [...prevFilekeys].filter(key => !currentFilekeys.has(key))
+
+                if (addedFilekeys.length > 0 || removedFilekeys.length > 0) {
+                    const spanStart = currentClipsWithTempo.length > 0 ? Math.min(...currentClipsWithTempo.map(clip => clip.measure)) : 0
+                    const spanEnd = currentClipsWithTempo.length > 0 ? Math.max(...currentClipsWithTempo.map(clip => clip.measure + (clip.end - clip.start))) : 0
+
+                    const addedText = addedFilekeys.length > 0 ? i18n.t("messages:idecontroller.clipFilesAdded", { filekeys: addedFilekeys.join(", ") }) : ""
+                    const removedText = removedFilekeys.length > 0 ? i18n.t("messages:idecontroller.clipFilesRemoved", { filekeys: removedFilekeys.join(", ") }) : ""
+                    differences.push(i18n.t("messages:idecontroller.trackClipsChanged", {
+                        trackNum,
+                        measures: currentTotalMeasures.toFixed(1),
+                        addedText,
+                        removedText,
+                        spanStart,
+                        spanEnd,
+                    }))
+                } else if (prevClipsWithTempo.length > 0 && currentClipsWithTempo.length > 0) {
+                    // Check for position changes when filekeys and total measures are the same
+                    const prevClipPositions = prevClipsWithTempo.map(clip => `${clip.filekey}@${clip.measure}-${clip.measure + (clip.end - clip.start)}`).sort()
+                    const currentClipPositions = currentClipsWithTempo.map(clip => `${clip.filekey}@${clip.measure}-${clip.measure + (clip.end - clip.start)}`).sort()
+
+                    if (prevClipPositions.join(",") !== currentClipPositions.join(",")) {
+                        const spanStart = Math.min(...currentClipsWithTempo.map(clip => clip.measure))
+                        const spanEnd = Math.max(...currentClipsWithTempo.map(clip => clip.measure + (clip.end - clip.start)))
+                        const allFilekeys = [...new Set(currentClipsWithTempo.map(clip => clip.filekey))].join(", ")
+                        differences.push(i18n.t("messages:idecontroller.trackClipsPositionChanged", {
+                            trackNum,
+                            measures: currentTotalMeasures.toFixed(1),
+                            filekeys: allFilekeys,
+                            spanStart,
+                            spanEnd,
+                        }))
+                    }
+                }
             }
 
             // Compare clips WITHOUT tempo (count only, not measures)
@@ -160,6 +200,24 @@ function logDAWDataDifferences(previous: DAWData, current: DAWData) {
                     const removedCount = prevClipsWithoutTempo.length - currentClipsWithoutTempo.length
                     const prevFilekeys = [...new Set(prevClipsWithoutTempo.map(clip => clip.filekey))].join(", ")
                     differences.push(i18n.t("messages:idecontroller.trackClipsRemoved", { trackNum, count: removedCount, filekeys: prevFilekeys, span: "no-tempo clips" }))
+                }
+            } else {
+                // Check for filekey changes in clips WITHOUT tempo when count is the same
+                const prevFilekeysNoTempo = new Set(prevClipsWithoutTempo.map(clip => clip.filekey))
+                const currentFilekeysNoTempo = new Set(currentClipsWithoutTempo.map(clip => clip.filekey))
+
+                const addedFilekeysNoTempo = [...currentFilekeysNoTempo].filter(key => !prevFilekeysNoTempo.has(key))
+                const removedFilekeysNoTempo = [...prevFilekeysNoTempo].filter(key => !currentFilekeysNoTempo.has(key))
+
+                if (addedFilekeysNoTempo.length > 0 || removedFilekeysNoTempo.length > 0) {
+                    const addedTextNoTempo = addedFilekeysNoTempo.length > 0 ? i18n.t("messages:idecontroller.clipFilesAdded", { filekeys: addedFilekeysNoTempo.join(", ") }) : ""
+                    const removedTextNoTempo = removedFilekeysNoTempo.length > 0 ? i18n.t("messages:idecontroller.clipFilesRemoved", { filekeys: removedFilekeysNoTempo.join(", ") }) : ""
+                    differences.push(i18n.t("messages:idecontroller.trackClipsChangedNoTempo", {
+                        trackNum,
+                        count: currentClipsWithoutTempo.length,
+                        addedText: addedTextNoTempo,
+                        removedText: removedTextNoTempo,
+                    }))
                 }
             }
 
@@ -415,7 +473,9 @@ async function runScript() {
 
     editor.clearErrors()
     ideConsole.clear()
+    await new Promise<void>(resolve => setTimeout(resolve, 0))
     ideConsole.status(i18n.t("messages:idecontroller.running"))
+    // await new Promise<void>(resolve => setTimeout(resolve, 2000))
 
     const scriptID = tabs.selectActiveTabID(state)
     const script = scriptsState.selectAllScripts(store.getState())[scriptID!]
@@ -446,7 +506,7 @@ async function runScript() {
     const duration = Date.now() - startTime
     setLoading(false)
     reporter.compile(language, true, undefined, duration)
-    ideConsole.status(i18n.t("messages:idecontroller.success", { seconds: duration / 1000 }))
+    ideConsole.status(i18n.t("messages:idecontroller.success"))
     store.dispatch(ide.setScriptMatchesDAW(true))
     saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
 
@@ -591,9 +651,10 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                         </div>
                     </div>
 
-                    <div ref={consoleContainer} id="console-frame" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
+                    <div ref={consoleContainer} id="console-frame" aria-live="assertive" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <div className="row">
-                            <div id="console" aria-live="assertive">
+                            <div id="console">
+                                {logs.length === 0 && <span>&nbsp;</span> /* hack for screen readers */}
                                 {logs.map((msg: ide.Log, index: number) => {
                                     const consoleLineClass = classNames({
                                         "console-line": true,
