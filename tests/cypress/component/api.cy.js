@@ -69,5 +69,6 @@ describe("API function tests", () => {
     testPythonAndJavaScript("rhythmEffects")
     testPython("fitMediaReturnsNone", ["None"], false) // #2839
     testPython("selectRandomFileReturnsNone", ["None"], false) // #2823
+    testPython("durWorksOnTransformedSounds", ["4"], false) // #3501
     // TODO: the rest of the API functions
 })
