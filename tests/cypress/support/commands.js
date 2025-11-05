@@ -330,28 +330,25 @@ Cypress.Commands.add("interceptAudioSample", () => {
  * @param [responsePayload]
  * @returns Chainable
  */
-Cypress.Commands.add("interceptScriptSave", (scriptName, responsePayload = {
-    created: "2022-04-06 14:53:07.0",
-    file_location: "",
-    id: -1,
-    modified: "2022-04-06 14:53:07.0",
-    name: scriptName,
-    run_status: 0,
-    shareid: "5555555555555555555555",
-    soft_delete: false,
-    source_code: "#\t\tpython code\n#\t\tscript_name:\n#\n#\t\tauthor:\n#\t\tdescription:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
-    username: "cypress",
-}) => {
-    cy.intercept(
-        {
-            hostname: API_HOST,
-            method: "POST",
-            path: "/EarSketchWS/scripts/save",
-        },
-        {
-            body: responsePayload,
-        }
-    ).as("scripts_save")
+Cypress.Commands.add("interceptScriptSave", () => {
+    cy.intercept({ hostname: API_HOST, method: "POST", path: "/EarSketchWS/scripts/save" }, (req) => {
+        const formData = new URLSearchParams(req.body)
+        const name = formData.get("name")
+        const source = formData.get("source_code")
+
+        req.reply({
+            created: "2022-04-06 14:53:07.0",
+            file_location: "",
+            id: -1,
+            modified: "2022-04-06 14:53:07.0",
+            name,
+            run_status: 0,
+            shareid: `cypress_${name}`,
+            soft_delete: false,
+            source_code: source,
+            username: "cypress",
+        })
+    }).as("scripts_save")
 })
 
 /**

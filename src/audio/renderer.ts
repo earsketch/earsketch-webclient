@@ -24,6 +24,7 @@ export async function renderBuffer(dawData: DAWData) {
     await context.audioWorklet.addModule(pitchshiftWorkletURL)
 
     const out = new GainNode(context)
+    out.connect(context.destination)
     const projectGraph: ProjectGraph = {
         tracks: [],
         mix: new GainNode(context),
