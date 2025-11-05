@@ -68,7 +68,7 @@ const MessageFooter = () => {
         "flex-row justify-evenly": isCodeEditorPage,
         "flex-col sm:flex-row justify-center lg:justify-evenly": !isCodeEditorPage,
     })
-    
+
     return (
         <div className={containerClass}>
             <div className={`flex ${isCodeEditorPage ? "flex-row" : "flex-col sm:flex-row"} gap-4`}>
