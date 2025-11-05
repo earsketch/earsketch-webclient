@@ -11,6 +11,7 @@ import { pages } from "./bubbleData"
 import * as bubble from "./bubbleState"
 import { proceed, dismiss } from "./bubbleThunks"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
+import classNames from "classnames"
 
 const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolean, name: string, pref?: Ref<HTMLButtonElement> }) => {
     const dispatch = useDispatch()
@@ -58,8 +59,18 @@ const MessageFooter = () => {
         </>
     }
 
+    const containerClass = classNames("flex mt-5 gap-4", {
+        "flex-row justify-between": isCodeEditorPage,
+        "flex-col lg:flex-row lg:justify-between": !isCodeEditorPage,
+    })
+
+    const buttonContainerClass = classNames("flex gap-2", {
+        "flex-row justify-evenly": isCodeEditorPage,
+        "flex-col sm:flex-row justify-center lg:justify-evenly": !isCodeEditorPage,
+    })
+    
     return (
-        <div className={`flex ${isCodeEditorPage ? "flex-row justify-between" : "flex-col lg:flex-row lg:justify-between"} mt-5 gap-4`}>
+        <div className={containerClass}>
             <div className={`flex ${isCodeEditorPage ? "flex-row" : "flex-col sm:flex-row"} gap-4`}>
                 {currentPage === 0 && <>
                     <div className="flex-1">
@@ -91,7 +102,7 @@ const MessageFooter = () => {
                     </div>
                 </>}
             </div>
-            <div className={`flex ${isCodeEditorPage ? "flex-row justify-evenly" : "flex-col sm:flex-row justify-center lg:justify-evenly"} gap-2`}>
+            <div className={buttonContainerClass}>
                 {buttons}
             </div>
         </div>
@@ -214,6 +225,12 @@ export const Bubble = () => {
         return () => window.removeEventListener("keydown", escape)
     })
 
+    // Prevent panel from being too tall on the code editor page
+    const isCodeEditorPage = currentPage === 1
+    const panelClass = classNames("absolute z-40 w-1/3 bg-white p-5 shadow-xl", {
+        "min-w-[400px]": isCodeEditorPage,
+    })
+
     return <Dialog
         open={active}
         onClose={() => { /* Disabled so user can click on highlighted elements outside the modal. */ }}
@@ -224,7 +241,7 @@ export const Bubble = () => {
             {/* Backdrop. Reimplements close-on-outside-click, see above comments for details. */}
             <div className="fixed inset-0 bg-black/30" aria-hidden="true" onClick={() => dispatch(bubble.suspend())} />
             <div
-                className={`absolute z-40 w-1/3 bg-white p-5 shadow-xl ${currentPage === 1 ? "min-w-[400px]" : ""}`}
+                className={panelClass}
                 ref={setPopperElement as LegacyRef<HTMLDivElement>}
                 style={pages[currentPage].ref === null ? {} : styles.popper}
                 {...attributes.popper}
