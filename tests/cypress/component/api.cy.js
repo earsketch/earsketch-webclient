@@ -12,35 +12,25 @@ describe("API function tests", () => {
     })
 
     function testPython(name, logs = [], checkResult = true) {
-        it(`should compile ${name} correctly in Python`, done => {
-            runner.run("python", API_SCRIPTS[`${name}.py`]).then(result => {
-                if (checkResult) {
-                    expect(result).to.matchResult(API_RESULTS[name], API_SCRIPTS[`${name}.py`])
-                }
-                // eslint-disable-next-line no-undef
-                const expectedLogs = logs.map(text => ({ level: "info", text: Sk.builtin.str(Sk.ffi.remapToPy(text)).v }))
-                expect(ide.selectLogs(store.getState())).to.deep.equal(expectedLogs)
-                done()
-            }).catch(err => {
-                expect(err).to.be.null
-                done()
-            })
+        it(`should compile ${name} correctly in Python`, async () => {
+            const result = await runner.run("python", API_SCRIPTS[`${name}.py`])
+            if (checkResult) {
+                expect(result).to.matchResult(API_RESULTS[name], API_SCRIPTS[`${name}.py`])
+            }
+            // eslint-disable-next-line no-undef
+            const expectedLogs = logs.map(text => ({ level: "info", text: Sk.builtin.str(Sk.ffi.remapToPy(text)).v }))
+            expect(ide.selectLogs(store.getState())).to.deep.equal(expectedLogs)
         })
     }
 
     function testPythonAndJavaScript(name, logs = []) {
         testPython(name, logs)
 
-        it(`should compile ${name} correctly in JavaScript`, done => {
-            runner.run("javascript", API_SCRIPTS[`${name}.js`]).then(result => {
-                expect(result).to.matchResult(API_RESULTS[name], API_SCRIPTS[`${name}.js`])
-                const str = obj => typeof obj === "string" ? obj : JSON.stringify(obj)
-                expect(ide.selectLogs(store.getState())).to.deep.equal(logs.map(text => ({ level: "info", text: str(text) })))
-                done()
-            }).catch(err => {
-                expect(err).to.be.null
-                done()
-            })
+        it(`should compile ${name} correctly in JavaScript`, async () => {
+            const result = await runner.run("javascript", API_SCRIPTS[`${name}.js`])
+            expect(result).to.matchResult(API_RESULTS[name], API_SCRIPTS[`${name}.js`])
+            const str = obj => typeof obj === "string" ? obj : JSON.stringify(obj)
+            expect(ide.selectLogs(store.getState())).to.deep.equal(logs.map(text => ({ level: "info", text: str(text) })))
         })
     }
 
