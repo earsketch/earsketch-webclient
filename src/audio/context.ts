@@ -1,5 +1,5 @@
 // Create a single AudioContext that can be used across modules.
-import pitchshiftWorkletURL from "pitchshiftWorklet"
+import pitchshiftWorkletURL from "@lib/pitchshift/worklet?url"
 
 // Workaround for pre-14.1 Safari:
 declare global {
@@ -17,11 +17,7 @@ export const context = new AudioContext({
     sampleRate: 44100,
 })
 
-// Hack to avoid breaking Karma tests.
-// (After much fiddling with configs, I haven't managed to get it to serve this worklet.)
-if ((window as any).__karma__ === undefined) {
-    context.audioWorklet.addModule(pitchshiftWorkletURL)
-}
+context.audioWorklet.addModule(pitchshiftWorkletURL)
 
 export default context
 

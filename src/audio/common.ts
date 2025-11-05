@@ -101,7 +101,6 @@ export function playTrack(
             mix.connect(effectInput ?? out)
         }
         trackGain.connect(out)
-        out.connect(context.destination)
     } else {
         trackGain.connect(effectInput ?? mix)
     }

@@ -101,20 +101,15 @@ Cypress.Commands.add("login", (username = TEST_USER) => {
  * @param [standardAudioLibrary=DUBSTEP_BASS_WOBBLE_002]
  * @returns Chainable
  */
-Cypress.Commands.add("interceptAudioStandard", (standardAudioLibrary = [
-    {
-        artist: "RICHARD DEVINE",
-        folder: "DUBSTEP_140_BPM__DUBBASSWOBBLE",
-        genre: "DUBSTEP",
-        genreGroup: "DUBSTEP",
-        instrument: "SYNTH",
-        name: "DUBSTEP_BASS_WOBBLE_002",
-        path: "filename/placeholder/here.wav",
-        public: 1,
-        tempo: 140,
-        year: 2012,
-    },
-]) => {
+Cypress.Commands.add("interceptAudioStandard", (sounds = []) => {
+    const standardAudioLibrary = sounds.concat([1, 2].map(i => ({
+        artist: "EARSKETCH",
+        folder: "EARSKETCH",
+        name: `METRONOME0${i}`,
+        path: `standard-library/EarSketch/METRONOME0${i}.flac`,
+        public: 0,
+        tempo: -1,
+    })))
     cy.intercept(
         {
             hostname: CLOUDFRONT_HOST,
@@ -302,7 +297,10 @@ Cypress.Commands.add("interceptScriptById", (script) => {
 Cypress.Commands.add("interceptAudioMetadata", (testSoundMeta) => {
     cy.intercept(
         { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/metadata?name=*" },
-        { body: testSoundMeta }
+        req => {
+            const name = new URLSearchParams(req.url).name
+            req.reply(name === testSoundMeta.name ? testSoundMeta : "")
+        }
     ).as("audio_metadata")
 })
 
@@ -332,28 +330,25 @@ Cypress.Commands.add("interceptAudioSample", () => {
  * @param [responsePayload]
  * @returns Chainable
  */
-Cypress.Commands.add("interceptScriptSave", (scriptName, responsePayload = {
-    created: "2022-04-06 14:53:07.0",
-    file_location: "",
-    id: -1,
-    modified: "2022-04-06 14:53:07.0",
-    name: scriptName,
-    run_status: 0,
-    shareid: "5555555555555555555555",
-    soft_delete: false,
-    source_code: "#\t\tpython code\n#\t\tscript_name:\n#\n#\t\tauthor:\n#\t\tdescription:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
-    username: "cypress",
-}) => {
-    cy.intercept(
-        {
-            hostname: API_HOST,
-            method: "POST",
-            path: "/EarSketchWS/scripts/save",
-        },
-        {
-            body: responsePayload,
-        }
-    ).as("scripts_save")
+Cypress.Commands.add("interceptScriptSave", () => {
+    cy.intercept({ hostname: API_HOST, method: "POST", path: "/EarSketchWS/scripts/save" }, (req) => {
+        const formData = new URLSearchParams(req.body)
+        const name = formData.get("name")
+        const source = formData.get("source_code")
+
+        req.reply({
+            created: "2022-04-06 14:53:07.0",
+            file_location: "",
+            id: -1,
+            modified: "2022-04-06 14:53:07.0",
+            name,
+            run_status: 0,
+            shareid: `cypress_${name}`,
+            soft_delete: false,
+            source_code: source,
+            username: "cypress",
+        })
+    }).as("scripts_save")
 })
 
 /**

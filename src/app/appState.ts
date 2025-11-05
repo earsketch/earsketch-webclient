@@ -7,7 +7,8 @@ import type { RootState } from "../reducers"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import { Language } from "common"
 
-export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element
+// TODO: Remove `& any` and fix up type magic in `modal.ts`
+export type Modal = (props: { [key: string]: any, close: (payload?: any) => void } & any) => JSX.Element
 
 const embedMode = ESUtils.getURLParameter("embedded") === "true"
 const hideDAW = embedMode && ESUtils.getURLParameter("hideDaw") !== null
@@ -24,9 +25,9 @@ const appSlice = createSlice({
         hideDAW,
         hideEditor,
         doNotDisturb: false,
-        embeddedScriptName: null,
-        embeddedScriptUsername: null,
-        embeddedShareID: null,
+        embeddedScriptName: null as string | null,
+        embeddedScriptUsername: null as string | null,
+        embeddedShareID: null as string | null,
         modal: null as { Modal: Modal, resolve: (_: any) => void } | null,
         confetti: false,
     },

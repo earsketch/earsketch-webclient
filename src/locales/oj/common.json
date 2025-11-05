@@ -2,6 +2,9 @@
   "common": {
     "loading": "boozitaasowin...",
     "contentManager.title": "genawenjigemagak",
+    "contentManager.openTab": "Open {{name}} Tab",
+    "thing.collapse": "Collapse {{name}}",
+    "thing.expand": "Expand {{name}}",
     "search": "endone’igemagak",
     "results": "mikigewin",
     "noResults": "Gaawiin gegoo mikigewin",
@@ -11,14 +14,23 @@
     "soundBrowser.title.recommendations": "Ge-gojitoong",
     "soundBrowser.button.addSound": "Atoon ge-initaagwak",
     "soundBrowser.button.showOnlyStars": "Naagwatoon eta go",
+    "soundBrowser.button.showOnlyStarsDescriptive": "Show only favorites",
+    "soundBrowser.button.backToTop": "Back To Top",
     "filter": "Biinichigan",
     "startQuickTour": "Naagajichigewinr",
-    "switchTheme": "Gwekinaagwatoon",
+    "switchThemeLight": "Switch to dark color theme",
+    "switchThemeDark": "Switch to light color theme",
     "reportError": "Naagwatoon Wanichigewin",
+    "whatsNew": "What's New",
     "leave": "Boonitoon",
+    "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",
+    "soundBrowser.expandFilters": "Expand sound browser filter button panel",
+    "soundBrowser.collapseFilters": "Collapse sound browser filter button panel",
+    "soundBrowser.clearFilters": "Clear filters",
     "soundBrowser.filterDropdown.artists": "Gaa-dazhiikamowaad",
     "soundBrowser.filterDropdown.genres": "Inweg",
     "soundBrowser.filterDropdown.instruments": "Gidochiganan",
+    "soundBrowser.filterDropdown.keys": "Keys",
     "soundBrowser.clip.tooltip.file": "Naa’isijigan",
     "soundBrowser.clip.tooltip.folder": "Biinjibii’iganan",
     "soundBrowser.clip.tooltip.artist": "Gaa-dazhiikamowaad",
@@ -29,16 +41,29 @@
     "soundBrowser.clip.tooltip.previewSound": "Bangii gii-pizindaan",
     "soundBrowser.clip.tooltip.markFavorite": "Daangibii’an menotaman",
     "soundBrowser.clip.tooltip.paste": "Naabibii’an izhichigewin",
+    "soundBrowser.clip.tooltip.key": "Key Signature",
+    "scriptBrowser.filterDropdown.clearFilter": "Clear Filter by {{filterName}}",
     "scriptBrowser.filterDropdown.owner": "Debendang",
     "scriptBrowser.filterDropdown.fileType": "Gaa’-inweg",
+    "scriptBrowser.filterDropdown.filterBy": "Filter By {{filter}}",
+    "scriptBrowser.filterDropdown.filterByFile": "Filter By File Type",
+    "scriptBrowser.filterDropdown.filterByOwner": "Filter By Owner",
     "scriptBrowser.filterDropdown.sortBy": "Andone’igewin",
+    "scriptBrowser.filterDropdown.sortByName": "Sort By {{filtername}}",
     "scriptBrowser.showDeleted": "Gaa-kaasiibii’igaadeg",
     "scriptBrowser.deletedscripts": "Ge-gaasiibii’igemagak",
+    "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "Azhe-naagwatoon",
+    "scriptBrowser.options.close": "Close Script Options",
+    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
+    "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
+    "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "Baakisidoon ezhibii’iganan",
-    "ignore": "Aanwetamowin",
+    "discardChanges": "Discard changes",
     "script": "Izhichigewin",
     "version": "Gaa-inweg",
+    "numSounds": "{{count}} sound",
+    "numSounds_plural": "{{count}} sounds",
     "script_plural": "Izhichigewinan",
     "scriptBrowser.myScripts": "Nindizhichigewinan",
     "scriptBrowser.sharedScripts": "Maamawichigewinan",
@@ -55,18 +80,38 @@
     "daw.tooltip.toggleVolume": "Epiitaweg",
     "daw.tooltip.solo": "Nishike",
     "daw.tooltip.mute": "Gibaabikinigan",
+    "daw.tooltip.muteTrack": "Mute track {{name}}",
+    "daw.tooltip.unmuteTrack": "Unmute track {{name}}",
+    "daw.tooltip.soloTrack": "Solo track {{name}}",
+    "daw.tooltip.unsoloTrack": "Solo off for track {{name}}",
     "daw.abbreviation.solo": "N",
     "daw.abbreviation.mute": "G",
     "daw.tooltip.toggleEffects": "Ayaandwewesidoon",
     "daw.bypass": "Baazijigan",
+    "daw.needsSync": "Run the script to sync the DAW",
     "newScript": "Oshki-izhichigewin",
     "editor.title": "Endazhi-wiindamaading",
     "editor.blocksMode": "Gibichibii’igan",
+    "editor.autocomplete": "Autocomplete",
+    "editor.playArrows": "Playback Arrows",
+    "editor.showBeatStringAnnotations": "Beat String Annotations",
+    "editor.blocksMode.tooltip-enable": "Enable blocks mode",
+    "editor.autocomplete.tooltip-enable": "Enable autocomplete",
+    "editor.playArrows.tooltip-enable": "Enable playback arrows",
+    "editor.showBeatStringAnnotations.tooltip-enable": "Enable beat string annotation",
+    "editor.blocksMode.tooltip-disable": "Disable blocks mode",
+    "editor.autocomplete.tooltip-disable": "Disable autocomplete",
+    "editor.playArrows.tooltip-disable": "Disable playback arrows",
+    "editor.showBeatStringAnnotations.tooltip-disable": "Disable beat string annotation",
     "editor.run": "Maajitoon",
+    "editor.undoEdit": "Undo Code Edit",
+    "editor.redoEdit": "Redo Code Edit",
     "editor.noScriptsLoaded": "Gaawiin gegoo izhichigewinan.",
     "editor.clickHereCreateScript": "Daanginan omaa ji-ozhitooyan oshki-izhichigewinan!",
     "editor.mode": "Aazha gibiinjibii’ige <span  class=\"empty-script-lang\">{{scriptlang}}</span> mode.",
     "editor.ifYouWant": "Giishpin aabajitooyan <span class=\"empty-script-lang\">{{otherScriptLang}}</span> mode, <br /> please open a script with <span class=\"empty-script-lang\">{{otherScriptExt}}</span> or create a new one <br /> and select <span class=\"empty-script-lang\">{{otherScriptLang}}</span> izhichigewin.",
+    "editor.stepCount": "{{count}} step",
+    "editor.stepCount_plural": "{{count}} steps",
     "tabs.otherTabs": "Aanind izhibii’iganan",
     "tabs.closeAll": "Gakina giba’an",
     "footer.teachers": "Gekinoo’amaagewaad",
@@ -79,8 +124,11 @@
     "script.print": "Saagijibii’an",
     "script.share": "Okowichigewin",
     "script.submitCompetition": "Miigiwen gidanokiiwin",
+    "script.submitCompetitionrDescriptive": "Submit {{name}} to Competition",
     "script.history": "Gaa-onjiigin izhichigewinan",
+    "script.historyDescriptive": "Show {{name}} History",
     "script.codeIndicator": "Gaa-onji-gikendaming",
+    "script.codeIndicatorDescriptive": "Code Indicator for {{name}}",
     "script.import": "Aazhawe atoon",
     "script.delete": "Gaasiibii’an",
     "sharedScript.noDescription": "Bizhishigwaa owe izhichigewin.",
@@ -111,6 +159,7 @@
     "formfieldPlaceholder.confirmPassword": "Miinawaa Ozhibii’an Gigiimoojibii’igan",
     "formFieldPlaceholder.email": "Gidaazhawaatebii’igan",
     "formFieldPlaceholder.emailOptional": "Gidaazhawaatebii’igan (Giin sa go)",
+    "formFieldPlaceholder.emailOptional.usedFor": "We only use this if you forget your password",
     "formFieldPlaceholder.firstName": "Nitaminkaazowin",
     "formFieldPlaceholder.lastName": "Ishkwenikaazowin",
     "formFieldPlaceholder.currentPassword": "Verify your current password",
@@ -125,6 +174,10 @@
     "registerAccount": "ozhitoon Oshki-gikinawaajibii’igan",
     "logout": "Gibaabikinan",
     "notifications.none": "Gaawiin gegoo wiindamaadiwin.",
+    "notifications.doNotDisturbEnabled": "Notification Pop-ups: OFF",
+    "notifications.doNotDisturbDisabled": "Notification Pop-ups: ON",
+    "notifications.switchDoNotDisturbOff": "Enable Notification Pop-ups",
+    "notifications.switchDoNotDisturbOn": "Disable Notifications Pop-ups",
     "profileEditor.prompt": "Aanji-ayaawiyaan {{izhinikaazowin}}",
     "profileEditor.error": "Wanichigewin gaa-aawiyaan.",
     "profileEditor.success": "Gaa-aawiyaan gwayakonaagwak!",
@@ -167,6 +220,7 @@
     "exit": "Gaasiibii’igan",
     "more": "Geyaabi",
     "scriptShare.title": "Aazhawinamaadiwin \"{{scriptName}}\"",
+    "scriptShare.tab.viewonly.downloadShortcutFile": "Download URL Shortcut File",
     "scriptShare.tab.viewonly.title": "Awiya Gewiinawaa Oga-waabandaanaawaa",
     "scriptShare.tab.viewonly.linkTitle": "Awiya Gewiinawaa Oga-waabandaanaawaa Eta Go Gaawiin Aanjitoowaad",
     "scriptShare.tab.viewonly.shareCurrent": "Aazhawinamaw enitaagwak",
@@ -186,6 +240,9 @@
     "soundUploader.file.prompt": "Onaabandan mazina’igan...",
     "soundUploader.constantRequired": "Wiinzowin (ji-ayaayan)",
     "soundUploader.tempoOptional": "Epiichiiyan (giin sa go)",
+    "soundUploader.constantPlaceholder.synth": "e.g. MYSYNTH_01",
+    "soundUploader.constantPlaceholder.recording": "e.g. MYRECORDING_01",
+    "soundUploader.constantPlaceholder.sound": "e.g. MYSOUND_01",
     "soundUploader.record.measures.title": "Gaa-apiichiiyan",
     "soundUploader.record.measures.metronomeClick": "Daanginan aazhawewesijigeyan",
     "soundUploader.record.measures.tempo": "Epiichiibideg",
@@ -197,6 +254,7 @@
     "clear": "Gaasiibii’igan",
     "soundUploader.record.mic.waiting": "Biitoon baswewesijigan...",
     "soundUploader.record.mic.reenable": "Daanginan aazhawewesijigan gagwe-aabajitoon.",
+    "soundUploader.record.firefoxMacError": "Sorry, recording in EarSketch currently does not work in Firefox on Mac. Please use Chrome or Safari.",
     "soundUploader.freesound.description": "aazhawaatebii’iganing ezhi-baatayiinakin michi-bizindamowinan, aazhawewsijiganan, omazina’iganigikinawaajibii’igan Creative Commons.  Anda-waabandan enwegin Freesound gaye ganawendan EarSketch naazhaya’ii.",
     "soundUploader.freesound.searching": "Anda-waabandan Freesound…",
     "soundUploader.freesound.uploadedBy": "Aazhabiinjibii’an Freesound wiinzowin {{awiya Wiinzowin}}",
@@ -218,9 +276,21 @@
     "curriculum.switchScriptLanguage": "Aanjisinging ikidowinan",
     "curriculum.showTOC": "Waabanda’ iwen Enaajimomagakin",
     "curriculum.toc": "Enaajimomagakin",
+    "curriculum.open": "Open Curriculum",
+    "curriculum.close": "Close Curriculum",
     "curriculum.previousPage": "Odaanaang Baakiiginigan",
     "curriculum.nextPage": "Niigaan Baakiiginigan",
     "curriculum.copyURL": "Naabibii’ an Inanokiiwibii’ igan",
+    "curriculum.expandUnitDescriptive": "Expand Unit: {{title}}",
+    "curriculum.collapseUnit": "Collapse Unit",
+    "curriculum.expandUnit": "Expand Unit",
+    "curriculum.collapseUnitDescriptive": "Collapse Unit: {{title}}",
+    "curriculum.expandChapterDescriptive": "Expand Chapter: {{title}}",
+    "curriculum.collapseChapterDescriptive": "Collapse Chapter: {{title}}",
+    "curriculum.expandChapter": "Expand Chapter",
+    "curriculum.collapseChapter": "Collapse Chapter",
+    "curriculum.openSection": "Open Section: {{section}}: ",
+    "curriculum.closeSection": "Close Section: {{section}}: ",
     "shortcuts.run": "Run script",
     "shortcuts.save": "Save script",
     "shortcuts.undo": "Undo",
@@ -229,6 +299,8 @@
     "shortcuts.autocomplete": "Autocomplete",
     "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
     "shortcuts.zoomVertical": "Zoom (Vertical)",
+    "shortcuts.escapeEditor": "Escape editor focus",
+    "shortcuts.playPause": "Play / Pause",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
@@ -236,12 +308,66 @@
     "hardware.option": "Option",
     "hardware.enter": "Enter",
     "hardware.space": "Space",
-    "hardware.wheel": "Mouse Wheel"
+    "hardware.wheel": "Mouse Wheel",
+    "hardware.esc": "Esc",
+    "hardware.tab": "Tab",
+    "errorReport.header": "Report an error"
+  },
+  "ariaDescriptors": {
+    "api.closeFunctionDetails": "Close {{functionName}} function details",
+    "api.openFunctionDetails": "Open {{functionName}} function details",
+    "contentManager.close": "Close Content Manager",
+    "contentManager.scriptName": "Script Name",
+    "curriculum.switchScriptLanguage": "Switch script language to {{language}}",
+    "daw.horizontalScroll": "Horizontal scroll",
+    "daw.horizontalZoomIn": "Horizontal zoom in",
+    "daw.horizontalZoomOut": "Horizontal zoom out",
+    "daw.verticalScroll": "Vertical scroll",
+    "daw.verticalZoomIn": "Vertical zoom in",
+    "daw.verticalZoomOut": "Vertical zoom out",
+    "editor.redoEditDisabled": "Redo edit disabled",
+    "editor.undoEditDisabled": "Undo edit disabled",
+    "editor.settings": "Editor Settings",
+    "general.openPanel": "Open {{panelName}}",
+    "general.selected": "Selected",
+    "general.notSelected": "Not selected",
+    "header.fontSize": "Select Font Size",
+    "header.selectLanguage": "Select Language",
+    "header.settings": "Settings and Additional Options",
+    "header.shortcuts": "Show/Hide Keyboard Shortcuts",
+    "header.toggleNotifications": "Show/Hide Notifications",
+    "header.unreadNotifications": "You have {{numUnread}} unread notifications",
+    "scriptBrowser.close": "Close {{scriptname}}",
+    "scriptBrowser.delete": "Delete {{scriptname}}",
+    "scriptBrowser.download": "Download {{scriptname}}",
+    "scriptBrowser.import": "Import {{scriptname}}",
+    "scriptBrowser.open": "Open {{scriptname}}",
+    "scriptBrowser.options": "Script Options for {{scriptname}}",
+    "scriptBrowser.print": "Print {{scriptname}}",
+    "scriptBrowser.rename": "Rename {{scriptname}}",
+    "scriptBrowser.restore": "Restore {{scriptname}}",
+    "scriptBrowser.share": "Share {{scriptname}}",
+    "sounds.clearFilter": "Clear sound browser search and filters",
+    "sounds.paste": "Paste {{name}} to the code editor",
+    "sounds.preview": "Preview sound {{name}}",
+    "skipLink.contentManager": "Skip to Content Manager",
+    "skipLink.curriculum": "Skip to Curriculum",
+    "skipLink.daw": "Skip to Digital Audio Workstation",
+    "skipLink.editor": "Skip to Code Editor",
+    "skipLink.navigation": "Skip to Navigation",
+    "sounds.artistFilter": "Select one or more artists to filter by",
+    "sounds.genreFilter": "Select one or more genres to filter by",
+    "sounds.instrumentFilter": "Select one or more instruments to filter by",
+    "sounds.keyFilter": "Select one or more key signatures to filter by"
   },
   "bubble": {
     "userLanguage": "Inwewin",
     "script.name": "Ajina izhichigewinan",
+    "selectLanguage": "Select programming language",
     "defaultProgrammingLanguage": "Nitam enweg aazhawaatebii’ iganan",
+    "dialogTitle": "Quick tour page {{page}} out of {{total}}",
+    "screenreaderIntro": "Please note, all 9 steps of the EarSketch tour are listed below in an unordered list. Select the \"$t(bubble:buttons.close)\" button when you are ready to use EarSketch.",
+    "screenreaderCloseTour": "Please note: In order to close the tour at any point, select the \"$t(bubble:buttons.close)\" button.",
     "buttons": {
       "skip": "Gaawiin Memwech",
       "skipTour": "Gaawiin Memwech Izhichigewinan",
@@ -336,7 +462,8 @@
       "alreadyused": "mii owe medwesing",
       "invalidconstant": "gaawiin madwesisinoon...",
       "tempointeger": "Meshkodaabikinigan gwayakobii’ igan...",
-      "bigsize": "Hay’, gaawiiin nawaj ji - ginwaag 30 diba’ igaansens.",
+      "toolong": "Hay’, gaawiiin nawaj ji - ginwaag 30 diba’ igaansens.",
+      "toobig": "Sorry, the audio file cannot be larger than 10 MB.",
       "timeout": "Aatawe aatawaatebii’ igan...",
       "uploadsuccess": "Anokiimagadoon enitaagwakin",
       "commerror": "Gii - wanitaagwad aazhawaatebii’ igan enitaagwakin...",
@@ -369,8 +496,10 @@
       "running": "Anokiimagad izhichigewin...",
       "success": "Weweni anokiimagad izhichigewin",
       "overwrite": "Aazha ayaamagad izhichigewin. Ozhitoon wiinzowin miinawaa aanjitoon.",
+      "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
       "illegalname": "Aabajitoon asibii’ iganensan eta go.",
       "savefailed": "Gaawiin aabadasinoon izhichigewin. Ingoji izhi - ganawendan gidizhichigewin.",
+      "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "Aanind gaawiin daa - ganawendaagwasinoon.Ingoji izhi - ganawendan gidizhichigewin.",
       "closealltabs": "Mii owe gakina ge - giba’ ang mazinaatebii’ iganansan. Geget ina giwii - maajitoon ?"
     },
@@ -387,6 +516,7 @@
     "noparams": "Gaawiin gegoo biminizha’ iganan",
     "parameters": "Ge - biminizha’ iman eta go",
     "returnValue": "Minik ge - ondiniman",
+    "pasteToCodeEditor": "Paste {{name}} function into code editor",
     "example": "Naske owe",
     "defaultValue": "Minik awiya ge - ondinang",
     "open": "Baakinan",
@@ -401,6 +531,7 @@
       "floatOptional": "Float, Optional",
       "array": "Ezhi - bebakaanakin",
       "integer": "Gii - izhichigewin",
+      "integerOptional": "Integer, Optional",
       "listArray": "Ezhibii’ igaadeg / Ezhi - bebakaanakin",
       "list": "Ezhibii’ igaadeg",
       "string": "Asigibii’ igan",
@@ -422,6 +553,10 @@
       },
       "returns": {
         "description": "Enitaagwakin gaye ezhinaagwakin(maagizhaa omaa 0 miinawaa 1)."
+      },
+      "example": {
+        "python": "# Spectral centroid of a sound\ncentroid = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)",
+        "javascript": "// Spectral centroid of a sound\nvar centroid = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);"
       }
     },
     "analyzeForTime": {
@@ -442,6 +577,10 @@
       },
       "returns": {
         "description": "Enitaagwakin gaye ezhinaagwakin(maagizhaa omaa 0 miinawaa 1 maamawi)."
+      },
+      "example": {
+        "python": "# Spectral centroid for part of a sound\nsound = HOUSE_BREAKBEAT_001\ncentroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5)",
+        "javascript": "// Spectral centroid for part of a sound\nvar sound = HOUSE_BREAKBEAT_001;\nvar centroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5);"
       }
     },
     "analyzeTrack": {
@@ -456,6 +595,10 @@
       },
       "returns": {
         "description": "Enitaagwakin gaye ezhinaagwakin(maagizhaa omaa 0 miinawaa 1 maamawi)."
+      },
+      "example": {
+        "python": "# Spectral centroid of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrack(1, SPECTRAL_CENTROID)",
+        "javascript": "// Spectral centroid of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar centroid = analyzeTrack(1, SPECTRAL_CENTROID);"
       }
     },
     "analyzeTrackForTime": {
@@ -476,6 +619,10 @@
       },
       "returns": {
         "description": "Enitaagwakin gaye ezhinaagwakin(maagizhaa omaa 0 miinawaa 1 maamawi)."
+      },
+      "example": {
+        "python": "# Spectral centroid for part of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5)",
+        "javascript": "// Spectral centroid for part of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar centroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5);"
       }
     },
     "createAudioSlice": {
@@ -493,6 +640,28 @@
       },
       "returns": {
         "description": "Enitaagwak bakweniman."
+      },
+      "example": {
+        "python": "# Extract part of a sound\nsound = HOUSE_BREAKBEAT_001\nslice = createAudioSlice(sound, 1.5, 2.5)\nfitMedia(slice, 1, 1, 3)",
+        "javascript": "// Extract part of a sound\nvar sound = HOUSE_BREAKBEAT_001;\nvar slice = createAudioSlice(sound, 1.5, 2.5);\nfitMedia(slice, 1, 1, 3);"
+      }
+    },
+    "createAudioStretch": {
+      "description": "Returns a sound constant that represents a sound timestretched from its original tempo.",
+      "parameters": {
+        "sound": {
+          "description": "The sound from which to create the timestretched sound. This is a constant from the sound browser."
+        },
+        "stretchFactor": {
+          "description": "How much to timestretch the sound. Here \"2\" means \"twice as long\"."
+        }
+      },
+      "returns": {
+        "description": "A new sound constant representing the timestretched audio."
+      },
+      "example": {
+        "python": "# Stretch the sound to be twice as long\nsound = RD_ROCK_POPRHYTHM_MAINDRUMS_4\nstretched = createAudioStretch(sound, 2)\nfitMedia(stretched, 1, 1, 9)",
+        "javascript": "// Stretch the sound to be twice as long\nvar sound = RD_ROCK_POPRHYTHM_MAINDRUMS_4;\nvar stretched = createAudioStretch(sound, 2);\nfitMedia(stretched, 1, 1, 9);"
       }
     },
     "dur": {
@@ -504,10 +673,18 @@
       },
       "returns": {
         "description": "Enigokwaag"
+      },
+      "example": {
+        "python": "duration = dur(HOUSE_BREAKBEAT_001)",
+        "javascript": "var duration = dur(HOUSE_BREAKBEAT_001);"
       }
     },
     "finish": {
-      "description": "Ji - wiindaman ji - giishitooyan EarSketch izhichigewin.Ji - noondaman enwek nagamon(DAW)."
+      "description": "Ji - wiindaman ji - giishitooyan EarSketch izhichigewin.Ji - noondaman enwek nagamon(DAW).",
+      "example": {
+        "python": "# Rest of script above this line...\nfinish()",
+        "javascript": "// Rest of script above this line...\nfinish();"
+      }
     },
     "fitMedia": {
       "description": "Mii omaa ge-onji-noondaman niigaan maagizhaa ishkweya’ii.  Ji-aanji-noondaagwak maagizhaa gaye bangii giin igo eshtigeyan.",
@@ -524,6 +701,10 @@
         "end": {
           "description": "Location within the track where the sound file will end (e.g. 5 will stop the sound file at the beginning of measure 5)."
         }
+      },
+      "example": {
+        "python": "# Add a sound to a track, repeating or trimming as necessary\n# Here it repeats from measure 2 to the start of measure 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9)",
+        "javascript": "// Add a sound to a track, repeating or trimming as necessary\n// Here it repeats from measure 2 to the start of measure 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9);"
       }
     },
     "importImage": {
@@ -545,6 +726,10 @@
       },
       "returns": {
         "description": "Ekosingin gaa - gagakaagin(0 - 225)."
+      },
+      "example": {
+        "python": "# Turn an image into a 10x10 grayscale list\nurl = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\"\npixelData = importImage(url, 10, 10, False)",
+        "javascript": "// Turn an image into a 10x10 grayscale list\nvar url = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\";\nvar pixelData = importImage(url, 10, 10, false);"
       }
     },
     "importFile": {
@@ -556,10 +741,18 @@
       },
       "returns": {
         "description": "Asigibii’ iganan gaa - gii - ozhitooyan."
+      },
+      "example": {
+        "python": "# Load a file via URL\nfileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\")",
+        "javascript": "// Load a file via URL\nvar fileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\");"
       }
     },
     "init": {
-      "description": "Mii owe nitam ge - izhichigeyan EarSketch izhichigewin.Ozhisinoon nagamonan waa - ozhitooyan."
+      "description": "Mii owe nitam ge - izhichigeyan EarSketch izhichigewin.Ozhisinoon nagamonan waa - ozhitooyan.",
+      "example": {
+        "python": "init()\n# Rest of script below this line...",
+        "javascript": "init();\n// Rest of script below this line..."
+      }
     },
     "insertMedia": {
       "description": "Mii omaa gakina ge - ategin nagamoning apii go endawendaman.",
@@ -573,6 +766,10 @@
         "start": {
           "description": "The location within the track at which to start playback of the sound file. (The sound file will play through one time, so the end time depends on the length of the sound file.)"
         }
+      },
+      "example": {
+        "python": "# Add a sound on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5)",
+        "javascript": "// Add a sound on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5);"
       }
     },
     "insertMediaSection": {
@@ -593,43 +790,106 @@
         "sliceEnd": {
           "description": "End location within the sound file to include (e.g. 2.0 is measure 2 of the sound file)"
         }
+      },
+      "example": {
+        "python": "# Add part of a sound to a track\nsound = RD_UK_HOUSE_WURLITZER_3\ninsertMediaSection(sound, 1, 1.5, 2.5, 3.0)",
+        "javascript": "// Add part of a sound to a track\nvar sound = RD_UK_HOUSE_WURLITZER_3;\ninsertMediaSection(sound, 1, 1.5, 2.5, 3.0);"
       }
     },
-    "makeBeat": {
-      "description": "Ozhising epiitaweg asigibii’ iganan. AMANJI IGO daa - akwaawan asigibii’ iganan .16 eta ji - akwaagin asigibii’ iganan(e.g .16, 32, 64, etc.), mii omaa ge - onji - gikendaman ekobii’ igaadegin asigibii’ iganan(16 akwaawan asigibii’ iganan.)",
+    "makeBeat1": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
       "parameters": {
         "sound": {
-          "description": "A single sound file or a list/array of sound files, typically this is a constant from the sound browser"
+          "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Etooyan enitaagwak"
+          "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
         }
+      },
+      "example": {
+        "python": "# Remix sounds into a new beat\ns = HIPHOP_FUNKBEAT_001\nmakeBeat(s, 1, 1, \"0++-0---0---0---\")\ns = [Y01_HI_HATS_1, Y01_OPEN_HI_HATS_1]\nmakeBeat(s, 2, 1, \"--10--10--100010\")",
+        "javascript": "// Remix sounds into a new beat\nvar s1 = HIPHOP_FUNKBEAT_001;\nmakeBeat(s1, 1, 1, \"0++-0---0---0---\");\nvar s2 = [Y01_HI_HATS_1, Y01_OPEN_HI_HATS_1];\nmakeBeat(s2, 2, 1, \"--10--10--100010\");\n"
       }
     },
-    "makeBeatSlice": {
-      "description": "Ozhising epiitaweg asigibii’ iganan giwiindamaagon wenji - maajiseg nagamon. MakeBeat, apane maajitaamagad, makeBeatSlice ji - ozhitooyan bebakaanakin enitaagwakin mii go bezhigon nagamon.",
+    "makeBeat2": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
       "parameters": {
         "sound": {
-          "description": "A single sound file, typically this is a constant from the sound browser"
+          "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Ge - atooyan nagamon"
+          "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
+        },
+        "stepsPerMeasure": {
+          "description": "A number that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
+        }
+      },
+      "example": {
+        "python": "# Bongo triplets\nmakeBeat(IRCA_OS_BONGO_HIGH_OPEN, 1, 1, \"000\", 3)\nmakeBeat(IRCA_OS_BONGO_LOW_OPEN, 2, 1, \"0000\", 4)",
+        "javascript": "// Bongo triplets\nmakeBeat(IRCA_OS_BONGO_HIGH_OPEN, 1, 1, \"000\", 3);\nmakeBeat(IRCA_OS_BONGO_LOW_OPEN, 2, 1, \"0000\", 4);"
+      }
+    },
+    "makeBeatSlice1": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
+      "parameters": {
+        "sound": {
+          "description": "A single sound. Typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Track to place pattern onto"
+        },
+        "start": {
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
         },
         "sliceStarts": {
-          "description": "A list/array of starting locations within audio file. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound file that can be referenced in the beat string by \"0\" and \"1\" respectively."
+          "description": "A list/array of starting locations within the sound. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound that can be referenced in the beat string by \"0\" and \"1\" respectively."
         }
+      },
+      "example": {
+        "python": "# Slice and rearrange by sixteenth notes\ns = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices)",
+        "javascript": "// Slice and rearrange by sixteenth notes\nvar s = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices);"
+      }
+    },
+    "makeBeatSlice2": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
+      "parameters": {
+        "sound": {
+          "description": "A single sound. Typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Track to place pattern onto"
+        },
+        "start": {
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+        },
+        "sliceStarts": {
+          "description": "A list/array of starting locations within the sound. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound that can be referenced in the beat string by \"0\" and \"1\" respectively."
+        },
+        "stepsPerMeasure": {
+          "description": "A number that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
+        }
+      },
+      "example": {
+        "python": "# Slice and rearrange by eighth notes\nsound = HIPHOP_TRAPHOP_BEAT_002\neighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"01261264\"\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8)",
+        "javascript": "// Slice and rearrange by eighth notes\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
       }
     },
     "print": {
@@ -638,6 +898,9 @@
         "input": {
           "description": "Minik ge - zaagijibii’ aman"
         }
+      },
+      "example": {
+        "python": "print(1 + 2)\nprint(\"hello!\")"
       }
     },
     "println": {
@@ -646,6 +909,9 @@
         "input": {
           "description": "Minik ge - zaagijibii’ aman"
         }
+      },
+      "example": {
+        "javascript": "println(1 + 2);\nprintln(\"hello!\");"
       }
     },
     "readInput": {
@@ -657,6 +923,49 @@
       },
       "returns": {
         "description": "Mii owe ge - izhichigemagak atooyan gidaazhawaatebii’ iganing."
+      },
+      "example": {
+        "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
+        "javascript": "// User-provided beat string\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+      }
+    },
+    "multiChoiceInput1": {
+      "description": "Ask the user to choose from a list",
+      "parameters": {
+        "prompt": {
+          "description": "A message displayed to the user"
+        },
+        "choices": {
+          "description": "A list of choices displayed to the user"
+        }
+      },
+      "returns": {
+        "description": "The selected index"
+      },
+      "example": {
+        "python": "# Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nbeatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices)\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex])",
+        "javascript": "// Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nvar beatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices);\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex]);"
+      }
+    },
+    "multiChoiceInput2": {
+      "description": "Ask the user to choose one-or-more items from a list.",
+      "parameters": {
+        "prompt": {
+          "description": "A message displayed to the user"
+        },
+        "choices": {
+          "description": "A list of choices displayed to the user"
+        },
+        "allowMultiple": {
+          "description": "If true, the user can select multiple choices. If false, the user can only select one choice."
+        }
+      },
+      "returns": {
+        "description": "The selected indices"
+      },
+      "example": {
+        "python": "# Sound board\nsoundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808]\nchosenSounds = multiChoiceInput(\"Choose your sounds\", soundChoices, True)\ntrack = 1\nfor choice in chosenSounds:\n    sound = soundChoices[choice]\n    fitMedia(sound, track, 1, 5)\n    track += 1",
+        "javascript": "// Sound board\nvar soundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808];\nvar chosenSounds = multiChoiceInput(\"Choose your sounds\", soundChoices, true);\nfor (var i = 0; i < chosenSounds.length; i++) {\n    var choice = chosenSounds[i]\n    var sound = soundChoices[choice]\n    fitMedia(sound, i+1, 1, 5)\n}"
       }
     },
     "replaceListElement": {
@@ -671,6 +980,10 @@
         "withElement": {
           "description": "Aanjitood enitaagwak oshki - izhichigewin."
         }
+      },
+      "example": {
+        "python": "# Replace OS_SNARE01 wth OS_CLAP01\nsounds = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01]\nreplaced = replaceListElement(sounds, OS_SNARE01, OS_CLAP01)",
+        "javascript": "// Replace OS_SNARE01 wth OS_CLAP01\nvar sounds = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01];\nvar replaced = replaceListElement(sounds, OS_SNARE01, OS_CLAP01);"
       }
     },
     "replaceString": {
@@ -688,6 +1001,10 @@
       },
       "returns": {
         "description": "Oshki - asigibii’ iganan gaa - gii - aanjitood gwayko - asigibii’ iganan"
+      },
+      "example": {
+        "python": "# Change all '0's to '1's\nbeat1 = \"0---0---0---0---\"\nbeat2 = replaceString(beat1, \"0\", \"1\")",
+        "javascript": "// Change all '0's to '1's\nvar beat1 = \"0---0---0---0---\";\nvar beat2 = replaceString(beat1, \"0\", \"1\");"
       }
     },
     "reverseList": {
@@ -699,6 +1016,10 @@
       },
       "returns": {
         "description": "Weshki - initaagwak gaa - azhetaagwakin"
+      },
+      "example": {
+        "python": "# Reverse a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nreversed = reverseList(sounds)",
+        "javascript": "// Reverse an array of sounds\nvar sounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar reversed = reverseList(sounds);"
       }
     },
     "reverseString": {
@@ -710,6 +1031,10 @@
       },
       "returns": {
         "description": "Weshki - initaagwak gaa - azhetaagwak"
+      },
+      "example": {
+        "python": "# Reverse a beat string\nbeat = \"0+++0---0----000\"\nreversed = reverseString(beat)",
+        "javascript": "// Reverse a beat string\nvar beat = \"0+++0---0----000\";\nvar reversed = reverseString(beat);"
       }
     },
     "rhythmEffects": {
@@ -718,21 +1043,28 @@
         "track": {
           "description": "Waa - atooyan ge - initaagwak(MIX_TRACK giga - aabajitoon)."
         },
-        "type": {
+        "effect": {
           "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
         },
         "parameter": {
           "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
         },
-        "list": {
-          "description": "List/array of effect parameter values (e.g. [0.0, 5.3, -12])."
+        "values": {
+          "description": "List/Array of effect parameter values (e.g. [0.0, 5.3, -12])."
         },
         "start": {
           "description": "Location within the track to start pattern"
         },
         "beat": {
           "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
+        },
+        "stepsPerMeasure": {
+          "description": "A number that specifies the length of time of a single character in your beatString. The default value of 16 results in one sixteenth note."
         }
+      },
+      "example": {
+        "python": "# Change the pitchshift over time\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3)\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4)",
+        "javascript": "// Change the pitchshift over time\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3);\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4);"
       }
     },
     "selectRandomFile": {
@@ -744,6 +1076,10 @@
       },
       "returns": {
         "description": "Wegonen igo enitaagwak ezhi - ganawenjigaadegin."
+      },
+      "example": {
+        "python": "# Choose a random sound from a folder\nsound = selectRandomFile(ALT_POP_GUITAR)\nfitMedia(sound, 1, 1, 5)",
+        "javascript": "// Choose a random sound from a folder\nvar sound = selectRandomFile(ALT_POP_GUITAR);\nfitMedia(sound, 1, 1, 5);"
       }
     },
     "setEffect1": {
@@ -761,6 +1097,10 @@
         "value": {
           "description": "Value of effect parameter"
         }
+      },
+      "example": {
+        "python": "# Apply a delay effect\nfitMedia(Y11_SNARE_1, 1, 1, 5)\nsetEffect(1, DELAY, DELAY_TIME, 145)",
+        "javascript": "// Apply a delay effect\nfitMedia(Y11_SNARE_1, 1, 1, 5);\nsetEffect(1, DELAY, DELAY_TIME, 250);"
       }
     },
     "setEffect2": {
@@ -778,6 +1118,10 @@
         "end": {
           "description": "Location within the track of the endValue"
         }
+      },
+      "example": {
+        "python": "# Increase the filter frequency over time\nfitMedia(HOUSE_BREAK_FILL_001, 1, 1, 3)\nsetEffect(1, FILTER, FILTER_FREQ, 600, 1, 6000, 3)",
+        "javascript": "// Increase the filter frequency over time\nfitMedia(HOUSE_BREAK_FILL_001, 1, 1, 3);\nsetEffect(1, FILTER, FILTER_FREQ, 600, 1, 6000, 3);"
       }
     },
     "setTempo1": {
@@ -786,6 +1130,10 @@
         "tempo": {
           "description": "The project tempo in beats per minute (BPM). Minimum tempo is 45 BPM. Maximum tempo is 220 BPM."
         }
+      },
+      "example": {
+        "python": "# Set the tempo to 110 BPM\nsetTempo(110)",
+        "javascript": "// Set the tempo to 110 BPM\nsetTempo(110);"
       }
     },
     "setTempo2": {
@@ -803,6 +1151,10 @@
         "end": {
           "description": "Measure where section ends"
         }
+      },
+      "example": {
+        "python": "# Set the tempo to 110 BPM at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 to 140 BPM from measures 3 to 6\nsetTempo(80, 3, 140, 6)",
+        "javascript": "// Set the tempo to 110 BPM at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 to 140 BPM from measures 3 to 6\nsetTempo(80, 3, 140, 6);"
       }
     },
     "shuffleList": {
@@ -814,6 +1166,10 @@
       },
       "returns": {
         "description": "Weshki - initaagwakin ginigawitaagwadoon."
+      },
+      "example": {
+        "python": "# Shuffle a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nshuffled = shuffleList(sounds)",
+        "javascript": "// Shuffle an array of sounds\nvar sounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar shuffled = shuffleList(sounds);"
       }
     },
     "shuffleString": {
@@ -825,11 +1181,37 @@
       },
       "returns": {
         "description": "Oshki-asigibii’iganan bebakaanisidoon."
+      },
+      "example": {
+        "python": "# Shuffle a beat string\nbeat = \"0-0-0-0-0-0-0-0-\"\nshuffled = shuffleString(beat)",
+        "javascript": "// Shuffle a beat string\nvar beat = \"0-0-0-0-0-0-0-0-\";\nvar shuffled = shuffleString(beat);"
       }
     }
   },
   "templates": {
     "python": "# description: \nfrom earsketch import *\n\nsetTempo(120)\n",
     "javascript": "// description: \nsetTempo(120);\n"
+  },
+  "console": {
+    "warning": "Warning",
+    "error": "Error",
+    "errors": {
+      "AssertionError": "An assert statement failed",
+      "AttributeError": "There is a mismatch between the object and the attribute",
+      "ImportError": "The appropriate packages cannot be found or imported",
+      "IndentationError": "There is an indentation error in the code (lack or extra spaces)",
+      "IndexError": "There is an error using an out of range index",
+      "KeyError": "There is an error using a dictionary key that does not exist",
+      "NameError": "There is an error with a variable or function name that is not defined",
+      "ParseError": "There is an error when reading the code",
+      "SyntaxError": "There is an error with the syntax (or arrangement) of code",
+      "TypeError": "There is an error with the expected data type",
+      "TokenError": "There is an unexpected token error (extra or missing comma, space, or character) in the code",
+      "ValueError": "A provided argument is not within the set or range of acceptable values for a function",
+      "RangeError": "A provided argument is not within the set or range of acceptable values for a function",
+      "ReferenceError": "There is an error with a variable or function name that is not defined",
+      "NetworkError": "Please try running the code again. If the issue persists, check your internet connection or contact network administrator.",
+      "ServerError": "Please try running the code again. If the issue persists, please report the issue using 'Report Error' in the information menu."
+    }
   }
 }

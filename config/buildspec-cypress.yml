@@ -20,8 +20,7 @@ phases:
   build:
     commands:
       - npm ci
-      - npx grunt less
-      - nohup npm run serve & echo $! > pidfile
+      - nohup npm run dev & echo $! > pidfile
       - npx wait-on --timeout 120000 http://localhost:8888
       - npm run test-cypress
       - kill $(cat pidfile)

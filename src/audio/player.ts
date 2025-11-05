@@ -34,6 +34,12 @@ let bypassedEffects: { [key: number]: string[] } = {}
 
 const out = context.createGain()
 
+// Connect gain node to destination so preview audio works even when DAW is not populated
+out.connect(context.destination)
+
+// Export the gain node for preview audio to use
+export { out as volumeSliderGain }
+
 function reset() {
     pause()
     playbackData = {
@@ -218,6 +224,6 @@ export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
 }
 
 export const callbacks = {
-    onStartedCallback: () => {},
-    onFinishedCallback: () => {},
+    onStartedCallback: () => { },
+    onFinishedCallback: () => { },
 }

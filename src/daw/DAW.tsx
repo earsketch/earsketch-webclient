@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
+import * as d3 from "d3"
 
 import * as appState from "../app/appState"
 import { EFFECT_MAP } from "../audio/effects"
@@ -129,6 +130,31 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
     const [titleKey, setTitleKey] = useState<string | null>(null)
 
+    const usePlayPauseShortcut = (playing: boolean, play: () => void, pause: () => void, hasDAWData: boolean) => {
+        useEffect(() => {
+            const handleKeyPress = (event: KeyboardEvent) => {
+            // Ctrl (ctrlKey) and spacebar key press
+                if ((event.ctrlKey) && event.key === " " && hasDAWData) {
+                    event.preventDefault()
+
+                    // Toggle between play and pause based on current state
+                    if (playing) {
+                        pause()
+                    } else {
+                        play()
+                    }
+                }
+            }
+            // Attach keydown event listener
+            window.addEventListener("keydown", handleKeyPress)
+            return () => {
+                window.removeEventListener("keydown", handleKeyPress)
+            }
+        }, [playing, play, pause, hasDAWData]) // Effect runs when 'playing', 'play', or 'pause' changes, DawData state
+    }
+    // Check if DAW is null
+    const hasDAWData = useSelector(daw.selectHasDAWData)
+    usePlayPauseShortcut(playing, play, pause, hasDAWData)
     const el = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -159,7 +185,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         }
     }, [el])
 
-    return <div ref={el} id="dawHeader" className="grow-0 bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+    return <div ref={el} id="dawHeader" className="grow-0 bg-white dark:bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div id="daw-label">
@@ -406,10 +432,10 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
 
     const info = EFFECT_MAP[effect].PARAMETERS[parameter]
 
-    const x = d3.scale.linear()
+    const x = d3.scaleLinear()
         .domain([1, playLength + 1])
         .range([0, xScale(playLength + 1)])
-    const y = d3.scale.linear()
+    const y = d3.scaleLinear()
         .domain([info.min, info.max])
         .range([effectHeight - 5, 5])
 
@@ -419,7 +445,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
         // draw a line to the end
         points.push({ measure: playLength + 1, value: points[points.length - 1].value })
         // map (x,y) pairs into a line
-        const line = d3.svg.line().interpolate("linear").x((d: typeof points[0]) => x(d.measure)).y((d: typeof points[0]) => y(d.value))
+        const line = d3.line().x((d: typeof points[0]) => x(d.measure)).y((d: typeof points[0]) => y(d.value))
         return line(points)
     }
 
@@ -546,9 +572,7 @@ const Measureline = () => {
         let n = 1
 
         // create d3 axis
-        const measureline = d3.svg.axis()
-            .scale(xScale) // scale ticks according to zoom
-            .orient("bottom")
+        const measureline = d3.axisBottom(xScale) // scale ticks according to zoom
             .tickValues(d3.range(1, playLength + 1, intervals.tickInterval))
             .tickSize(15)
             .tickFormat((d: any) => {
@@ -573,6 +597,10 @@ const Measureline = () => {
             .style("text-anchor", "start")
             .attr("y", 2)
             .attr("x", 3)
+
+        d3.select(element.current).selectAll("svg .tick")
+            .selectAll("line, text")
+            .attr("class", "stroke-gray-900 dark:stroke-white")
 
         if (intervals.tickDivision > 1) {
             let n = 1
@@ -625,7 +653,7 @@ const Timeline = () => {
     const ticks: number[] = d3.range(0, songDuration + 1, intervals.tickInterval)
 
     return <div ref={element} id="daw-timeline" className="relative w-full" style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }} tabIndex={-1}>
-        <svg className="axis">
+        <svg className="axis stroke-gray-900 dark:stroke-white">
             <g>
                 {ticks.map(t => {
                     const measure = tempoMap.timeToMeasure(t)
@@ -633,7 +661,7 @@ const Timeline = () => {
                         <line y2={t % intervals.labelInterval === 0 ? 6 : 2} x2={0} />
                         {t % intervals.labelInterval === 0 &&
                         <text dy=".71em" y={6} x={2}>
-                            {d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, t))}
+                            {d3.timeFormat("%M:%S")(new Date(1970, 0, 1, 0, 0, t))}
                         </text>}
                     </g>
                 })}

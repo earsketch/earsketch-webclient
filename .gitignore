@@ -2,21 +2,18 @@
 .vs/
 .vscode/
 
-# Web Client
-node_modules/*
-karma_html/
-dist/
-css/earsketch/allstyles.css
-
-# CSS generated on build
-css/earsketch/theme_dark.css
-css/earsketch/theme_light.css
-
 # IntelliJ IDEA & Fleet
 .idea/
 *.iml
 out/
 .fleet/
+
+# Zed
+/.zed
+
+# Web Client
+node_modules/*
+dist/
 
 # Binaries (non-text)
 *.zip
@@ -41,9 +38,7 @@ EarSketchRecommendations/*.txt
 EarSketchRecommendations/*.json
 
 # Test reports
-tests/karma/reports/
-tests/karma/_karma_webpack_/
-tests/jest/reports/
+tests/vitest/reports/
 tests/cypress/report.xml
 tests/cypress/reports/
 tests/cypress/screenshots/

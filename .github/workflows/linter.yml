@@ -77,7 +77,7 @@ jobs:
           VALIDATE_JSX: false
           VALIDATE_JSON: false
           VALIDATE_MARKDOWN: false
-          FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*|.*tests/karma/.*.results.js|.*tests/cypress/fixtures/.*|.*node_modules/.*)
+          FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*|.*tests/cypress/component/.*.results.js|.*tests/cypress/fixtures/.*|.*node_modules/.*)
 
       - name: Run ESLint
         run: npm run lint:report

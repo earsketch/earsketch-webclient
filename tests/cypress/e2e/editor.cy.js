@@ -1,4 +1,6 @@
 describe("Editor", () => {
+    const anonymousScriptName = "cypress_test"
+
     beforeEach(() => {
         const testSoundMeta = {
             folder: "STUB FOLDER",
@@ -10,15 +12,14 @@ describe("Editor", () => {
         cy.interceptAudioStandard([testSoundMeta])
         cy.interceptAudioMetadata(testSoundMeta)
         cy.interceptAudioSample()
-
         cy.visit("/")
         cy.skipTour()
         // Create a new script.
         cy.get('[title="Open SCRIPTS Tab"]').click()
         cy.get('[data-test="newScript"]').click()
-        cy.get("#scriptName").type("cypress_test")
+        cy.get("#scriptName").type(anonymousScriptName)
         cy.get("input").contains("CREATE").click()
-        cy.get("div").contains("cypress_test.py")
+        cy.get("div").contains(`${anonymousScriptName}.py`)
         cy.waitForHeadlessDialog()
     })
 
@@ -52,6 +53,7 @@ describe("Editor", () => {
         cy.get(".cm-line").contains("fitMedia(OS_CLAP01,")
         cy.get("button[title='Editor Settings']").click()
         cy.get("button[title='Disable autocomplete']").click()
+        cy.get("button[title='Editor Settings']").click()
         cy.get("#editor").type("{moveToEnd}{enter}m")
         cy.get(".cm-tooltip-autocomplete").should("not.exist")
         cy.realType("{enter}")
@@ -119,5 +121,98 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         // We expect 3 intercepted calls: METRONOME01, METRONOME02, and OS_CLAP01
         // https://github.com/cypress-io/cypress/issues/16655
         cy.get("@audio_sample.all").should("have.length", 3)
+    })
+
+    it("allows user to login, edit script, and save", () => {
+        const username = "cypress"
+        const scriptName = "RecursiveMelody.py"
+        const anonymousScriptMessage1 = "Greetings from anonymous script."
+        const anonymousScriptName2 = "cypress_test_anon2"
+        const anonymousScriptMessage2 = "Greetings from another anonymous script 2."
+        cy.get("#editor").type(`{moveToEnd}{enter}# ${anonymousScriptMessage1}`)
+
+        // Create another anonymouse script.
+        cy.get('[title="Open SCRIPTS Tab"]').click()
+        cy.get('[data-test="newScript"]').click()
+        cy.get("#scriptName").type(anonymousScriptName2)
+        cy.get("input").contains("CREATE").click()
+        cy.get("div").contains(`${anonymousScriptName2}.py`)
+        cy.waitForHeadlessDialog()
+        cy.get("#editor").type(`{moveToEnd}{enter}# ${anonymousScriptMessage2}`)
+
+        // Setup intercepts for login and save
+        cy.interceptScriptSave()
+        cy.interceptUsersToken()
+        cy.interceptUsersInfo(username)
+        cy.interceptAudioUser([])
+        cy.interceptAudioFavorites()
+        cy.interceptScriptsShared()
+        cy.interceptAudioUpload()
+
+        cy.interceptScriptsOwned([{
+            created: "2022-01-02 16:20:00.0",
+            file_location: "",
+            id: -1,
+            modified: "2022-02-14 16:19:00.0",
+            name: scriptName,
+            run_status: 1,
+            shareid: "1111111111111111111111",
+            soft_delete: false,
+            source_code: "from earsketch import *\nsetTempo(91)\n",
+            username,
+        }])
+
+        cy.interceptAudioUser()
+        // Login with placeholder username
+        cy.login("username")
+
+        // Verify the save API was called for 2 anonymous scripts during login
+        cy.wait("@scripts_save").then((interception) => {
+            expect(interception.request.body).to.contain(`name=${anonymousScriptName}.py`)
+            expect(interception.request.body.replaceAll("+", " ")).to.contain(anonymousScriptMessage1)
+        })
+        cy.wait("@scripts_save").then((interception) => {
+            expect(interception.request.body).to.contain(`name=${anonymousScriptName2}.py`)
+            expect(interception.request.body.replaceAll("+", " ")).to.contain(anonymousScriptMessage2)
+        })
+
+        cy.get("#coder").find(`button[title="${anonymousScriptName}.py"]`).click()
+        cy.get("#coder").find(`button[title="${anonymousScriptName2}.py"]`).click()
+        cy.get(`[title="Open ${scriptName} in Code Editor"]`).click()
+        cy.get("#coder").find(`[title="${scriptName}"]`).click()
+
+        const message = "Hello from saved script"
+        cy.get("#editor").type(`{moveToEnd}{enter}print("${message}")`)
+
+        cy.get("button").contains("button", scriptName).parent().should("have.class", "text-red-500")
+
+        // NOTE: Clicking "RUN" instead of using Ctrl+Enter because the shortcut is different on Mac.
+        cy.get("button").contains("RUN").click()
+        // Verify the save API was called
+        cy.wait("@scripts_save").then((interception) => {
+            expect(interception.request.body).to.contain(`name=${scriptName}`)
+            expect(interception.request.body.replaceAll("+", " ")).to.contain(message)
+        })
+
+        cy.get("#console-frame").contains(message)
+        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+
+        const message2 = "another message"
+        cy.get("#editor").type(`{moveToEnd}{enter}print("${message2}")`)
+
+        cy.get("button").contains("button", scriptName).parent().should("have.class", "text-red-500")
+
+        if (Cypress.platform === "darwin") {
+            cy.get("#editor").type("{meta+s}")
+        } else {
+            cy.get("#editor").type("{ctrl+s}")
+        }
+
+        cy.wait("@scripts_save").then((interception) => {
+            expect(interception.request.body).to.contain(`name=${scriptName}`)
+            expect(interception.request.body.replaceAll("+", " ")).to.contain(message2)
+        })
+
+        cy.get("#console-frame").should("not.contain", message2)
     })
 })

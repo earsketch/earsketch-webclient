@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import context from "../audio/context"
 import * as audioLibrary from "../app/audiolibrary"
+import { volumeSliderGain } from "../audio/player"
 import { SoundEntity } from "common"
 import { fillDict } from "../app/recommender"
 import { ThunkAPI } from "../reducers"
@@ -43,21 +44,13 @@ export const getStandardSounds = createAsyncThunk<void, void, ThunkAPI>(
 export const getUserSounds = createAsyncThunk<void, string, ThunkAPI>(
     "sounds/getUserSounds",
     async (username, { dispatch }) => {
-        const endPoint = URL_DOMAIN + "/audio/user"
-        const params = new URLSearchParams({ username })
-        const response = await fetch(`${endPoint}?${params}`, {
-            method: "GET",
-            cache: "default",
-        })
-        const data = await response.json()
-
+        const data = await audioLibrary.getUserSounds(username)
         const entities: { [key: string]: SoundEntity; } = {}
         const names = new Array(data.length)
-
-        data.forEach((sound: SoundEntity, i: number) => {
+        for (const [i, sound] of data.entries()) {
             entities[sound.name] = sound
             names[i] = sound.name
-        })
+        }
 
         dispatch(setUserSounds({ entities, names }))
     }
@@ -135,7 +128,7 @@ export const togglePreview = createAsyncThunk<void | null, Preview, ThunkAPI>(
 
         const endNode = new AudioBufferSourceNode(context)
         const nodes: AudioBufferSourceNode[] = [endNode]
-        endNode.connect(context.destination)
+        endNode.connect(volumeSliderGain)
         endNode.onended = () => dispatch(resetPreview())
 
         if (preview.kind === "beat") {
@@ -149,7 +142,7 @@ export const togglePreview = createAsyncThunk<void | null, Preview, ThunkAPI>(
                 if (typeof current === "number") {
                     const delay = i * beat
                     const node = new AudioBufferSourceNode(context, { buffer: sound.buffer })
-                    node.connect(context.destination)
+                    node.connect(volumeSliderGain)
                     node.start(start + delay)
                     nodes.push(node)
                 }

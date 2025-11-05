@@ -1,0 +1,55 @@
+<!-- htmlhint head-script-disabled:false -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="newrelic/newrelicbrowser.%ES_NEWRELIC_CONFIG%.js"></script>
+    <title>EarSketch</title>
+    <style>
+        .es-spinner {
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" version="1.1" id="svg8" viewBox="0 0 120 120"%3E%3Cstyle id="style959"/%3E%3Cg id="layer1" transform="translate(-30 -30)" fill-opacity="1" stroke-width="1"%3E%3Cpath id="path931" d="M46 90H30a60 60 0 0060 60v-16a44 44 0 01-44-44z" fill="%234286da"/%3E%3Cpath id="path953" d="M90 30a60 60 0 00-60 60h16a44 44 0 0144-44V30z" fill="%23f3f3f3"/%3E%3Cpath id="path950" d="M150 90h-16a44 44 0 01-44 44v16a60 60 0 0060-60z" fill="%23f3f3f3"/%3E%3Cpath id="path956" d="M90 30v16a44 44 0 0144 44h16a60 60 0 00-60-60z" fill="%234286da"/%3E%3C/g%3E%3C/svg%3E');
+            width: 1em;
+            height: 1em;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XTJQ05LB10"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+    </script>
+
+    <meta name="google-site-verification" content="ojwZ1r7MVOTRWsiqPITqwmhCOUou2CcqxRMG6itoci4"/>
+    <style>
+        .loading-text {
+            font-size: 2rem;
+            padding-bottom: 2rem;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+    </style>
+</head>
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <div id="loading-screen" style="z-index: 999; position: absolute; top: 0; left: 0; bottom: 0; right: 0; padding-bottom: 30vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white">
+        <div class="loading-text">Loading EarSketch...</div>
+        <div class="es-spinner" style="width: 120px; height: 120px; animation: spin 2s linear infinite"></div>
+    </div>
+    <script>
+        // Since React is loaded later, CSS file swapping will be too late to change the color of the loading screen.
+        if (localStorage['colorTheme'] === 'dark') {
+            const element = document.getElementById("loading-screen")
+            element.style['background-color'] = '#282828'
+            element.style['color'] = '#EEE'
+        }
+    </script>
+    <script type="module" src="/src/index.tsx"></script>
+</body>
+</html>

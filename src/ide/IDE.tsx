@@ -1,6 +1,6 @@
 import i18n from "i18next"
 import parse from "html-react-parser"
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 import Split from "react-split"
@@ -11,7 +11,6 @@ import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as caiThunks from "../cai/caiThunks"
 import { Chat } from "../cai/Chat"
-import * as collaboration from "../app/collaboration"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
@@ -72,10 +71,7 @@ function saveActiveScriptWithRunStatus(status: number) {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
     const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
-    if (script?.collaborative) {
-        script && collaboration.saveScript(script.shareid)
-        isWaitingForServerResponse = false
-    } else if (script && !script.readonly && !script.isShared && !script.saved) {
+    if (script && !script.readonly && !script.isShared && !script.saved) {
         // save the script on a successful run
         store.dispatch(scriptsThunks.saveScript({
             name: script.name,
@@ -104,11 +100,10 @@ function saveScript() {
     const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
     if (!script?.saved) {
-        store.dispatch(saveScriptIfModified(activeTabID))
-    } else if (script?.collaborative) {
-        collaboration.saveScript()
+        store.dispatch(saveScriptIfModified(activeTabID)).unwrap().catch(() => {
+            userNotification.show(i18n.t("messages:idecontroller.savefailed"), "failure1")
+        })
     }
-    activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
 }
 
 // Save scripts when not focused on editor.
@@ -268,12 +263,10 @@ async function runScript() {
 
     setLoading(true)
 
-    const code = editor.getContents()
-
     const startTime = Date.now()
     const state = store.getState()
     const hideEditor = appState.selectHideEditor(state)
-    const scriptName = (hideEditor ? appState.selectEmbeddedScriptName(state) : tabs.selectActiveTabScript(state).name)!
+    const scriptName = (hideEditor ? appState.selectEmbeddedScriptName(state) : tabs.selectActiveTabScript(state)!.name)!
     const language = ESUtils.parseLanguage(scriptName)
 
     editor.clearErrors()
@@ -281,12 +274,14 @@ async function runScript() {
     ideConsole.status(i18n.t("messages:idecontroller.running"))
 
     const scriptID = tabs.selectActiveTabID(state)
+    const script = scriptsState.selectAllScripts(store.getState())[scriptID!]
+    const code = script.source_code
     store.dispatch(tabs.removeModifiedScript(scriptID))
 
     let result: DAWData
     try {
-        result = await runner.run(language, editor.getContents())
-    } catch (error) {
+        result = await runner.run(language, code)
+    } catch (error: any) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
         setLoading(false)
@@ -300,7 +295,7 @@ async function runScript() {
 
         saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
-        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
+        if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
             store.dispatch(caiThunks.compileError(error))
         }
         return
@@ -315,14 +310,12 @@ async function runScript() {
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
+    ideConsole.status(i18n.t("messages:idecontroller.success"))
     store.dispatch(ide.setScriptMatchesDAW(true))
     saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
 
-    // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
-    setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
-
     // asynchronously report the script complexity
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
+    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
         setTimeout(() => {
             store.dispatch(caiThunks.compileCai([result, language, code]))
         })
@@ -354,7 +347,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
     const bubbleActive = useSelector(bubble.selectActive)
     const bubblePage = useSelector(bubble.selectCurrentPage)
 
-    const showCai = useSelector(layout.selectEastKind) === "CAI" && (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT)
+    const showCai = useSelector(layout.selectEastKind) === "CAI" && (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT)
 
     const logs = useSelector(ide.selectLogs)
     const consoleContainer = useRef<HTMLDivElement>(null)
@@ -433,7 +426,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                             {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-2xl text-center">
                                 <div className="leading-relaxed">
                                     <div id="no-scripts-warning">{t("editor.noScriptsLoaded")}</div>
-                                    <a href="#" onClick={e => { e.preventDefault(); createScript() }}>{t("editor.clickHereCreateScript")}</a>
+                                    <a href="#" className="text-blue-600 dark:text-blue-400" onClick={e => { e.preventDefault(); createScript() }}>{t("editor.clickHereCreateScript")}</a>
                                 </div>
 
                                 <div className="leading-relaxed empty-script-lang-message">
@@ -477,9 +470,9 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                 </Split>
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {(showCai || FLAGS.UPLOAD_CAI_HISTORY) &&
-                        (<div className={(!showCai && FLAGS.UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
-                            {(FLAGS.SHOW_CHAT
+                    {(showCai || ES_WEB_UPLOAD_CAI_HISTORY) &&
+                        (<div className={(!showCai && ES_WEB_UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
+                            {(ES_WEB_SHOW_CHAT
                                 ? <Chat />
                                 : <CAI />)}
                         </div>)}

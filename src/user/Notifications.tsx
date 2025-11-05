@@ -98,9 +98,8 @@ export const NotificationPopup = () => {
     </div>
 }
 
-const Notification = ({ item, openCollaborativeScript, openSharedScript, close }: {
-    item: user.Notification, close: () => void,
-    openCollaborativeScript: (s: string) => void, openSharedScript: (s: string) => void,
+const Notification = ({ item, openSharedScript, close }: {
+    item: user.Notification, close: () => void, openSharedScript: (s: string) => void,
 }) => {
     const { t } = useTranslation()
 
@@ -122,7 +121,7 @@ const Notification = ({ item, openCollaborativeScript, openSharedScript, close }
                     </div>
                     <div className="flex justify-between">
                         <div style={{ fontSize: "10px", color: "grey", float: "left" }}>
-                            {ESUtils.formatTime(Date.now() - item.time)}
+                            {ESUtils.humanReadableTimeAgo(item.time)}
                         </div>
 
                         {/* special actions */}
@@ -134,11 +133,6 @@ const Notification = ({ item, openCollaborativeScript, openSharedScript, close }
                         <div>
                             <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>
                         </div>}
-                        {item.notification_type === "collaborate_script" &&
-                        <div>
-                            {item.message.action === "userAddedToCollaboration" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>}
-                            {item.message.action === "scriptRenamed" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>}
-                        </div>}
                     </div>
                 </div>
             </div>
@@ -147,9 +141,10 @@ const Notification = ({ item, openCollaborativeScript, openSharedScript, close }
     </div>
 }
 
-export const NotificationList = ({ openCollaborativeScript, openSharedScript, showHistory, close }: {
-    openCollaborativeScript: (s: string) => void, openSharedScript: (s: string) => void,
-    showHistory: (b: boolean) => void, close: () => void,
+export const NotificationList = ({ openSharedScript, showHistory, close }: {
+    openSharedScript: (s: string) => void,
+    showHistory: (b: boolean) => void,
+    close: () => void,
 }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
@@ -179,7 +174,6 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
                 {notifications.slice(0, 5).map((item, index) =>
                     <Notification
                         key={index} item={item}
-                        openCollaborativeScript={openCollaborativeScript}
                         openSharedScript={openSharedScript}
                         close={close}
                     />)}
@@ -206,7 +200,6 @@ export const NotificationHistory = ({ openSharedScript, close }: {
 }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
-    const now = Date.now()
 
     return <div id="notification-history">
         <div className="flex justify-between" style={{ padding: "1em" }}>
@@ -233,7 +226,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                     <div className="flex justify-between">
                         <div>
                             <div>{item.message.text}</div>
-                            <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.formatTime(now - item.time)}</div>
+                            <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.humanReadableTimeAgo(item.time)}</div>
                         </div>
                         {item.message.hyperlink && <div>
                             <a href={item.message.hyperlink} target="_blank" className="cursor-pointer" rel="noreferrer">{t("more").toLocaleUpperCase()}</a>
@@ -258,7 +251,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                         <div>
                             <MarkdownLinkMessage text={item.message.text} />
                             <div style={{ fontSize: "10px", color: "grey" }}>
-                                {ESUtils.formatTime(now - item.time)}
+                                {ESUtils.humanReadableTimeAgo(item.time)}
                             </div>
                         </div>
                         {item.notification_type === "share_script" && <div>

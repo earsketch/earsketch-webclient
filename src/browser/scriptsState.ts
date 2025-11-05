@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import { createTransform, persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
-import dayjs from "dayjs"
 
 import { Script, ScriptType } from "common"
 import { selectUserName, selectLoggedIn } from "../user/userState"
@@ -29,7 +28,7 @@ interface AllFilters extends Filters {
 }
 
 interface ScriptsState {
-    // TODO: Rename to clarify: are regularScripts all scripts owned by user (including shared and collaborative scripts)?
+    // TODO: Rename to clarify: are regularScripts all scripts owned by user (including shared scripts)?
     regularScripts: Scripts
     sharedScripts: Scripts
     readOnlyScripts: Scripts
@@ -153,14 +152,10 @@ const scriptsSlice = createSlice({
             // TODO: Revisit this regrettable reducer once state consolidation is complete.
             if (id in state.regularScripts) {
                 state.regularScripts[id].source_code = source
-                if (!state.regularScripts[id].collaborative) {
-                    state.regularScripts[id].saved = false
-                }
+                state.regularScripts[id].saved = false
             } else if (id in state.sharedScripts) {
                 state.sharedScripts[id].source_code = source
-                if (!state.sharedScripts[id].collaborative) {
-                    state.sharedScripts[id].saved = false
-                }
+                state.sharedScripts[id].saved = false
             } else if (id in state.readOnlyScripts) {
                 // NOTE: This case only comes up because droplet sets editor contents
                 //       when blocks mode is toggled, even if the editor is read-only.
@@ -171,10 +166,6 @@ const scriptsSlice = createSlice({
         },
         setScriptName(state, { payload: { id, name } }) {
             state.regularScripts[id].name = name
-        },
-        setScriptCollaborators(state, { payload: { id, collaborators } }) {
-            state.regularScripts[id].collaborators = collaborators
-            state.regularScripts[id].collaborative = collaborators.length > 0
         },
     },
 })
@@ -220,7 +211,6 @@ export const {
     resetSharedScriptInfo,
     setScriptSource,
     setScriptName,
-    setScriptCollaborators,
 } = scriptsSlice.actions
 
 // === Thunks ===
@@ -249,30 +239,6 @@ export const {
 //     script.file_location && delete script.file_location
 // }
 
-// const setCollaborators = (script: Script, username: string | null = null) => {
-//     if (script.collaborators === undefined) {
-//         script.collaborators = []
-//     } else if (typeof script.collaborators === "string") {
-//         script.collaborators = [script.collaborators]
-//     }
-
-//     const collaborators = script.collaborators as string[]
-
-//     // Provide username for the shared script browser.
-//     if (username) {
-//         if (!!collaborators.length && collaborators.map(v => v.toLowerCase()).includes(username.toLowerCase())) {
-//             script.collaborative = true
-//             script.readonly = false
-//         } else {
-//             script.collaborative = false
-//             script.readonly = true
-//         }
-//     } else {
-//         // For regular (aka "my") script browser.
-//         script.collaborative = !!collaborators.length
-//     }
-// }
-
 // export const getRegularScripts = createAsyncThunk<void, { username: string, password: string }, ThunkAPI>(
 //     "scripts/getRegularScripts",
 //     async ({ username, password }, { dispatch }) => {
@@ -295,7 +261,6 @@ export const {
 //                 script.tooltipText = "" // For dirty tabs. Probably redundant.
 //                 removeUnusedFields(script)
 //                 formatDate(script)
-//                 setCollaborators(script)
 //             })
 //             dispatch(setRegularScripts(fromEntries(scriptList.map(script => [script.shareid, script]))))
 //         } catch (error) {
@@ -384,8 +349,8 @@ const sortScriptIDs = (scripts: Scripts, sortBy: SortByAttribute, ascending: boo
                 : d.localeCompare(c, undefined, lexicalSortOptions)
         } else {
             // TODO: Consistency in our date fields.
-            c = typeof a.modified === "string" ? dayjs(a.modified).valueOf() : a.modified
-            d = typeof b.modified === "string" ? dayjs(b.modified).valueOf() : b.modified
+            c = typeof a.modified === "string" ? Date.parse(a.modified + "Z") : a.modified
+            d = typeof b.modified === "string" ? Date.parse(b.modified + "Z") : b.modified
             return ascending ? c - d : d - c
         }
     }).map(v => v.shareid)
@@ -439,7 +404,7 @@ export const selectNumTypesSelected = (state: RootState) => state.scripts.filter
 
 /** If a script name already is taken, find the next possible name by appending a number (1), (2), etc. */
 export const selectNextScriptName = createSelector(
-    [selectRegularScripts, (state, name: string) => name],
+    [selectRegularScripts, (_, name: string) => name],
     (scripts, name) => {
         const base = ESUtils.parseName(name)
         const ext = ESUtils.parseExt(name)

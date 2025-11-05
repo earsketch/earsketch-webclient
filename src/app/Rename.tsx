@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -23,7 +23,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
     const confirm = () => {
         try {
             close(validateScriptName(name, extension))
-        } catch (error) {
+        } catch (error: any) {
             setError(error.message)
         }
     }

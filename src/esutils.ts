@@ -44,18 +44,10 @@ export const parseName = (filename: string) => {
     return match ? match[1] : filename
 }
 
-// Parse the extension from a filename. Returns empty string if there is no extension.
+// Parse the extension (including the leading '.') from a filename. Returns empty string if there is no extension.
 export const parseExt = (filename: string) => {
     const match = filename.match(/\.[^.]*$/)
     return match ? match[0] : ""
-}
-
-// Change our custom (?) date format into ISO 8601, then parse.
-// TODO: Dates should be stored in a standard format in the database so as to make this unnecessary.
-export function parseDate(date: string) {
-    // Change created date to ISO 8601
-    const isoFormat = date.slice(0, -2).replace(" ", "T")
-    return Date.parse(isoFormat)
 }
 
 export const isMobileBrowser = () => {
@@ -156,9 +148,18 @@ export const checkIllegalCharacters = (input: string) => {
     return input.match(matchPattern)
 }
 
-// Converts a time difference to a description of how much time has passed.
-export const formatTime = (milliseconds: number) => {
-    const seconds = Math.floor(milliseconds / 1000)
+/**
+ * Returns a human-readable description of how long ago the given date was.
+ * Supports dates in ISO 8601 format, timestamps, and Date objects.
+ * @example
+ * humanReadableTimeAgo("2024-01-01T00:00:00.000Z") // "1 year ago"
+ * humanReadableTimeAgo(1612147200000) // "1 year ago"
+ */
+export const humanReadableTimeAgo = (date: string | number | Date) => {
+    const then = new Date(date)
+    const diff = Date.now() - then.getTime()
+
+    const seconds = Math.floor(diff / 1000)
     const minutes = Math.floor(seconds / 60)
     const hours = Math.floor(minutes / 60)
     const days = Math.floor(hours / 24)

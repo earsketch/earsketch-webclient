@@ -8,13 +8,6 @@ import { getTimestampData } from "../../data/recommendationData"
 import { Results } from "../complexityCalculator"
 import { combinations, entropy, hammingDistance, normalize } from "./utils"
 
-type beatTimestampData = {
-    beat_timestamps: number[],
-    duration: number
-}
-
-const beatTimestampsPromise: Promise<{ [key: string]: beatTimestampData }> = getTimestampData()
-
 export interface CaiHistoryNode {
     created: string,
     username: string,
@@ -30,7 +23,7 @@ export interface Assessment {
         numTracks: number
         numInstruments: number
     }
-    flexibility: { genres: number }
+    flexibility: { genres: number, genreList: string[] }
     originality: { avgSoundsCooccurence: number }
     elaboration: {
         lengthSeconds: number
@@ -57,7 +50,7 @@ function emptyAssessment(): Assessment {
             numTracks: 0,
             numInstruments: 0,
         },
-        flexibility: { genres: 0 },
+        flexibility: { genres: 0, genreList: [] },
         originality: { avgSoundsCooccurence: 0 },
         elaboration: {
             lengthSeconds: 0,
@@ -138,9 +131,9 @@ export async function assess(complexity: Results, analysisReport: Report, timeOn
     // map BEAT_TIMESTAMPS to soundFeatures
     for (const sound of uniqueSounds) {
         // const beatTrack = [sound].beat_timestamps
-        const soundData = (await beatTimestampsPromise)[sound]
+        const soundData = (await getTimestampData())[sound]
         if (soundData) {
-            const beatTrack = (await beatTimestampsPromise)[sound].beat_timestamps
+            const beatTrack = soundData.beat_timestamps
             soundFeatures.push({ name: sound, beat_track: beatTrack })
         }
     }
@@ -177,7 +170,10 @@ export async function assess(complexity: Results, analysisReport: Report, timeOn
     }
 
     // Flexibility = z-# of genres
-    assessment.flexibility.genres = uniqueGenres.length
+    assessment.flexibility = {
+        genres: uniqueGenres.length,
+        genreList: uniqueGenres,
+    }
 
     // Originality = z- sound co-occurrence
     let cooccurence = 0
