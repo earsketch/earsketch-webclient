@@ -629,7 +629,6 @@ const DefaultSoundCollection = () => {
         reloadRecommendations()
     }, [activeTab, getStandardSounds])
 
-    // Step 1: Build nested structure: artist → folder → [clip names]
     const nestedFolders: Record<string, Record<string, string[]>> = {}
 
     for (const folder of folders) {
@@ -643,7 +642,6 @@ const DefaultSoundCollection = () => {
         nestedFolders[artist][folder] = clipNames
     }
 
-    // Step 2: Add recommendation folder at the top if applicable
     if (loggedIn && tabsOpen && !filtered) {
         const recLabel = t("soundBrowser.title.recommendations").toLocaleUpperCase()
         nestedFolders[recLabel] = {
@@ -651,7 +649,6 @@ const DefaultSoundCollection = () => {
         }
     }
 
-    // Step 3: Render with new nested structure
     return (
         <WindowedSoundCollection
             artistFolders={nestedFolders}
