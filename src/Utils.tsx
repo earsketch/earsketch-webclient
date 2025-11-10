@@ -1,7 +1,7 @@
 import React, { MutableRefObject, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import classNames from "classnames"
-import { Dialog } from "@headlessui/react"
+import { DialogTitle } from "@headlessui/react"
 
 // Useful for preventing absolute-positioned elements from exceeding window height.
 export const useHeightLimiter = (show: boolean, marginBottom: string|null = null): [MutableRefObject<HTMLDivElement|null>, React.CSSProperties] => {
@@ -42,7 +42,7 @@ interface Props {
 }
 
 export const ModalHeader: React.FC<Props> = ({ children }) => {
-    return <Dialog.Title className="border-b p-3.5 text-gray-900 dark:text-white">{children}</Dialog.Title>
+    return <DialogTitle className="border-b p-3.5 text-gray-900 dark:text-white">{children}</DialogTitle>
 }
 
 export const ModalBody: React.FC<Props> = ({ children }) => {
