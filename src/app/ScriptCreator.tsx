@@ -8,7 +8,7 @@ import store from "../reducers"
 import { ModalFooter, ModalHeader, ModalBody, Alert } from "../Utils"
 
 // Unallowed characters: ! " # $ % & ' ( ) * + , . / : ; < = > ? [ \ ^ ` { | } ~
-const ILLEGAL_SCRIPT_NAME_CHAR_PATTERN = /[!"#$%&'()*+,./:;<=>?\[\\\]^`{|}~]/g
+const ILLEGAL_SCRIPT_NAME_CHAR_PATTERN = /[!"#$%&'()*+,./:;<=>?[\\\]^`{|}~]/g
 
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
