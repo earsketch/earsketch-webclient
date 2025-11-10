@@ -39,19 +39,14 @@ describe("curriculum.scripts.cy.jsx", () => {
         }
         const language = ESUtils.parseLanguage(filename)
 
-        it(`should compile ${name} correctly in ${language.toUpperCase()}`, function (done) {
+        it(`should compile ${name} correctly in ${language.toUpperCase()}`, async function () {
             this.timeout(6000)
-            runner.run(language, script).then(result => {
-                if (filename in CURRICULUM_SCRIPTS) {
-                    expect(result).to.matchResult(CURRICULUM_RESULTS[name], script)
-                } else if (filename in CURRICULUM_V2_SCRIPTS) {
-                    expect(result).to.matchResult(CURRICULUM_V2_RESULTS[name], script)
-                }
-                done()
-            }).catch(err => {
-                expect(err).to.be.null
-                done()
-            })
+            const result = await runner.run(language, script)
+            if (filename in CURRICULUM_SCRIPTS) {
+                expect(result).to.matchResult(CURRICULUM_RESULTS[name], script)
+            } else if (filename in CURRICULUM_V2_SCRIPTS) {
+                expect(result).to.matchResult(CURRICULUM_V2_RESULTS[name], script)
+            }
         })
     }
 })

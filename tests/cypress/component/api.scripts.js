@@ -325,4 +325,8 @@ print(x)`,
 
     "selectRandomFileReturnsNone.py": `from earsketch import *
 print(selectRandomFile("NO_FOLDER_NAME_CONTAINS_THIS_SUBSTRING"))`,
+
+    "durWorksOnTransformedSounds.py": `from earsketch import *
+stretched = createAudioStretch(DUBSTEP_BASS_WOBBLE_001, 2)
+print(dur(stretched))`,
 }
