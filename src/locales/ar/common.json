@@ -501,7 +501,7 @@
       "success": "تم تشغيل البرنامج النصي بنجاح",
       "overwrite": "هذا الاسم موجود. الرجاء إدخال اسم اخر أو إعادة تسمية البرنامج النصي الموجود أولاً.",
       "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
-      "illegalname": "الرجاء استخدام فقط الأحرف العادية, الأرقام أو _ في أسماء الملفات.",
+      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
       "savefailed": "لا يمكن حفظ البرنامج النصي في السحابة(cloud). يرجى حفظ النص الخاص بك في وضع عدم الاتصال لتجنب فقدان التغييرات.",
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "لا يمكن حفظ بعض البرامج النصية في السحابة(could). يرجى حفظ التغييرات في وضع عدم الاتصال لتجنب فقدانها.",
