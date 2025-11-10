@@ -501,7 +501,7 @@
       "success": "Skript erfolgreich ausgeführt",
       "overwrite": "Dieser Name existiert bereits. Bitte gib einen eindeutigen Namen ein oder benenne zuerst das vorhandene Skript um.",
       "overwriteDeleted": "Dieser Name existiert bereits in deinen gelöschten Skripten. Bitte gebe einen eindeutigen Namen ein oder stelle das gelöschte Skript wieder her und benenne es um.",
-      "illegalname": "Bitte verwende in Dateinamen nur reguläre Zeichen, Zahlen oder „_“ (Unterstrich).",
+      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
       "savefailed": "Das Skript konnte nicht in der Cloud gespeichert werden. Bitte speichere dein Skript offline, um den Verlust von Änderungen zu vermeiden.",
       "blocksError": "Konnte den Block-Modus nicht betreten: {{error}}",
       "saveallfailed": "Einige Skripte konnten nicht in der Cloud gespeichert werden. Bitte speichere deine Änderungen offline, damit sie nicht verloren gehen.",
