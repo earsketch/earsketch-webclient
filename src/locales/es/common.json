@@ -501,7 +501,7 @@
       "success": "Script se ejecutó exitosamente",
       "overwrite": "Ese nombre ya existe. Por favor, crea un nombre único o renombra primero el script que existe.",
       "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
-      "illegalname": "Por favor, sólo usa caracteres regulares, números, o _ para los nombres de los archivos.",
+      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
       "savefailed": "No se pudo guardar el script en la nube. Por favor, guarda tu script offline para evitar perder los cambios.",
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "No se pudo guardar algunos scripts en la nube. Por favor, guarda tus cambios offline para no perderlos.",
