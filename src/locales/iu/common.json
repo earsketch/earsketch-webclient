@@ -501,7 +501,7 @@
       "success": "ᑎᑎᖃᑦ ᐅᖃᒐᒃᓴᑦ ᑲᔪᓯᑎᐊᖅᐳᑦ",
       "overwrite": "ᐊᑎᖅ ᐊᑐᒐᐅᓕᐊᓂᒃᑐᖅ. ᐊᓯᐊᓂᒃ ᐊᑐᕐᓂᐊᖅᐳᑎᑦ ᑭᓯᕕᑦ ᖃᐅᔨᒪᔭᖓᓐᓂᒃ ᓄᑕᒻᒥᒃ ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᐅᑉ ᐊᑎᒃᓴᖓᓐᓂᒃ.",
       "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
-      "illegalname": "ᐊᑐᕐᓗᑎᑦ ᑎᑎᕋᒥᐊᓂᒃ, ᓈᓴᐅᑎᓐᓂᒃ, ᐅᕙᓘᓃᑦ _ ᑐᖁᕆᐊᓕᐅᑉ ᐊᑎᒃᓴᖓᓐᓄᑦ.",
+      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
       "savefailed": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᖅ. ᑭᓯᐊᓐᓂ ᐅᖃᕆᐊᓕᒃ ᓄᖑᑕᐃᓕᔪᑎᑕᖓᑕ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᐳᑎᑦ.",
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "ᐃᓚᖏᑦ ᑎᑎᖃᑦ ᐅᖃᕆᐊᓖᑦ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᑦ, ᑭᓯᐊᓐᓂ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᑐᑦ ᐊᓯᐊᑕᐃᓕᔪᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ.",
