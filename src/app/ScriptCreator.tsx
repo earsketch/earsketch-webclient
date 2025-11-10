@@ -7,14 +7,16 @@ import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
 import { ModalFooter, ModalHeader, ModalBody, Alert } from "../Utils"
 
+// Unallowed characters: ! " # $ % & ' ( ) * + , . / : ; < = > ? [ \ ^ ` { | } ~
+const ILLEGAL_SCRIPT_NAME_CHAR_PATTERN = /[!"#$%&'()*+,./:;<=>?\[\\\]^`{|}~]/g
+
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
     const scripts = scriptsState.selectRegularScripts(store.getState())
 
     if (name.length < 3) {
         throw new Error("messages:general.shortname")
-    } else if (/[$-/:-?{-~!"^#`[\]\\]/g.test(name)) {
-        // Why are hyphens banned from script names?
+    } else if (ILLEGAL_SCRIPT_NAME_CHAR_PATTERN.test(name)) {
         throw new Error("messages:idecontroller.illegalname")
     } else if (Object.values(scripts).some(script => !script.soft_delete && script.name.toLocaleUpperCase() === fullname.toLocaleUpperCase())) {
         // Conflict with existing non-deleted script.
