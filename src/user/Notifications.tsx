@@ -7,6 +7,7 @@ import * as user from "./userState"
 import { useTranslation } from "react-i18next"
 import store from "../reducers"
 import * as appState from "../app/appState"
+import * as request from "../request"
 
 interface Message {
     text: string
@@ -152,6 +153,33 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
     const dndStatus = doNotDisturb ? "notifications.doNotDisturbEnabled" : "notifications.doNotDisturbDisabled"
     const titleKey = doNotDisturb ? "notifications.switchDoNotDisturbOff" : "notifications.switchDoNotDisturbOn"
 
+    const handleRefresh = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault()
+        const endpoint = "/users/notifications"
+        const token = user.selectToken(store.getState())
+        const fullUrl = URL_DOMAIN + endpoint
+        
+        console.log("Fetching notifications from:", fullUrl)
+        console.log("Token available:", !!token)
+        console.log("Token preview:", token ? token.substring(0, 20) + "..." : "none")
+        
+        try {
+            const result = await request.getAuth(endpoint)
+            console.log("Notifications endpoint response:", result)
+        } catch (error: any) {
+            console.error("Error fetching notifications:", error)
+            console.error("Full URL attempted:", fullUrl)
+            console.error("Error type:", error?.constructor?.name)
+            console.error("Error stack:", error?.stack)
+            if (error.code) {
+                console.error("HTTP Status Code:", error.code)
+            }
+            if (error.message) {
+                console.error("Error Message:", error.message)
+            }
+        }
+    }
+
     return <div style={{ minWidth: "15em" }}>
         {notifications.length === 0
             ? <div>
@@ -192,6 +220,7 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
                 <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
             </button>
         </div>
+        <a className="text-sm" href="#" onClick={handleRefresh} title="Refresh notifications">REFRESH</a>
     </div>
 }
 
