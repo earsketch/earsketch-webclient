@@ -977,7 +977,7 @@ export const ModalContainer = () => {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40" />
+                    <div className="fixed inset-0 bg-black bg-opacity-40"></div>
                 </Transition.Child>
 
                 <Transition.Child
