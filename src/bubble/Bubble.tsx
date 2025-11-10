@@ -64,6 +64,10 @@ const MessageFooter = () => {
         "flex-col lg:flex-row lg:justify-between": !isCodeEditorPage,
     })
 
+    const bubbleClass = classNames("flex gap-4", {
+        "flex-row": isCodeEditorPage,
+        "flex-col sm:flex-row": !isCodeEditorPage,
+    })
     const buttonContainerClass = classNames("flex gap-2", {
         "flex-row justify-evenly": isCodeEditorPage,
         "flex-col sm:flex-row justify-center lg:justify-evenly": !isCodeEditorPage,
@@ -71,7 +75,7 @@ const MessageFooter = () => {
 
     return (
         <div className={containerClass}>
-            <div className={`flex ${isCodeEditorPage ? "flex-row" : "flex-col sm:flex-row"} gap-4`}>
+            <div className={bubbleClass}>
                 {currentPage === 0 && <>
                     <div className="flex-1">
                         <div className="text-xs">{t("bubble:userLanguage")}</div>
