@@ -64,7 +64,7 @@ const MessageFooter = () => {
         "flex-col lg:flex-row lg:justify-between": !isCodeEditorPage,
     })
 
-    const bubbleClass = classNames("flex gap-4", {
+    const bubbleClass = classNames("flex gap-4 items-end", {
         "flex-row": isCodeEditorPage,
         "flex-col sm:flex-row": !isCodeEditorPage,
     })
