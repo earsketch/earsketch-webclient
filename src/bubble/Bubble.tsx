@@ -13,6 +13,10 @@ import { proceed, dismiss } from "./bubbleThunks"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 import classNames from "classnames"
 
+export const callbacks = {
+    runScript: () => {},
+}
+
 const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolean, name: string, pref?: Ref<HTMLButtonElement> }) => {
     const dispatch = useDispatch()
     const action = tag === "proceed" ? proceed : dismiss
@@ -46,6 +50,18 @@ const MessageFooter = () => {
         buttons = <>
             <NavButton name={t("bubble:buttons.skip")} tag="dismiss" />
             <NavButton name={t("bubble:buttons.start")} tag="proceed" primary />
+        </>
+    } else if (currentPage === 2) {
+        buttons = <>
+            <NavButton name={t("bubble:buttons.skipTour")} tag="dismiss" />
+            <NavButton name={t("bubble:buttons.next")} tag="proceed" primary />
+            (<button className="absolute top-[-2.8rem] right-[4.2rem] flex rounded-full px-2.5 text-white items-center whitespace-nowrap bg-green-700"
+                onClick={() => callbacks.runScript()}>
+                <div className="flex bg-white rounded-full text-xs mr-1 p-0.5">
+                    <i className={"icon-arrow-right22 font-bold text-green-600"} />
+                </div>
+                {t("editor.run").toLocaleUpperCase()}
+            </button>)
         </>
     } else if (currentPage === 9) {
         buttons = <>

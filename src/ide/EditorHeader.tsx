@@ -12,6 +12,8 @@ import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import reporter from "../app/reporter"
 import * as user from "../user/userState"
+import { selectCurrentPage, selectActive } from "../bubble/bubbleState"
+import classNames from "classnames"
 
 const UndoRedoButtons = () => {
     const enabled = "cursor-pointer text-black dark:text-white"
@@ -151,17 +153,26 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
         id: "run-button",
         title: t("editor.run"),
         action: run,
-        fgClass: "text-green-600",
-        bgClass: "bg-green-700",
+        iconColor: "text-green-600",
         icon: "icon-arrow-right22",
     }, {
         id: "cancel-button",
         title: t("cancel"),
         action: cancel,
-        fgClass: "text-red-600",
-        bgClass: "bg-red-700",
+        iconColor: "text-red-600",
         icon: "icon-cross2",
     }][+running]
+
+    const currentQuickTourPage = useSelector(selectCurrentPage)
+    const quickTourActive = useSelector(selectActive)
+
+    const runButtonClassNames = classNames(
+        "flex rounded-full px-2.5 text-white items-center whitespace-nowrap",
+        {
+            "invisible": quickTourActive && currentQuickTourPage === 2,
+            "bg-green-700": !running,
+            "bg-red-700": running,
+        })
 
     return (
         <div
@@ -199,11 +210,11 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
                     </button>
                 )}
                 <button
-                    className={"flex rounded-full px-2.5 text-white items-center whitespace-nowrap " + button.bgClass}
+                    className={runButtonClassNames}
                     id={button.id} title={button.title} aria-label={button.title} onClick={button.action}
                 >
                     <div className="flex bg-white rounded-full text-xs mr-1 p-0.5">
-                        <i className={`${button.icon} font-bold ${button.fgClass}`} />
+                        <i className={`${button.icon} font-bold ${button.iconColor}`} />
                     </div>
                     {button.title.toLocaleUpperCase()}
                 </button>
