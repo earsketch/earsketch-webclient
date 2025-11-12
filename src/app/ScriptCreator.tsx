@@ -36,12 +36,16 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
     const language = useSelector(app.selectScriptLanguage)
     const [name, setName] = useState("")
     const [error, setError] = useState("")
-    const [extension, setExtension] = useState(language === "python" ? ".py" : ".js")
+    const [selectedLanguage, setSelectedLanguage] = useState(language as string)
     const { t } = useTranslation()
+    const extension = selectedLanguage.startsWith("python") ? ".py" : ".js"
 
     const confirm = () => {
         try {
-            close(validateScriptName(name, extension))
+            close({
+                template: selectedLanguage,
+                filename: validateScriptName(name, extension),
+            })
         } catch (error: any) {
             setError(error.message)
         }
@@ -71,9 +75,10 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
                         <div className="absolute inset-y-0 right-0 flex items-center mr-2 text-gray-500 dark:text-gray-300">{extension}</div>
                     </div>
 
-                    <select className="form-select w-1/2 mx-6 dark:bg-transparent placeholder:text-gray-300" value={extension} onChange={e => setExtension(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
-                        <option value=".py">Python</option>
-                        <option value=".js">JavaScript</option>
+                    <select className="form-select w-1/2 mx-6 dark:bg-transparent placeholder:text-gray-300" value={selectedLanguage} onChange={e => setSelectedLanguage(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
+                        <option value="python">Python 2</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="python3">Python 3 (beta)</option>
                     </select>
                 </div>
             </ModalBody>
