@@ -74,7 +74,7 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
                     </div>
 
                     <select className="form-select w-1/2 mx-6 dark:bg-transparent placeholder:text-gray-300" value={selectedLanguage} onChange={e => setSelectedLanguage(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
-                        <option value="python">Python</option>
+                        <option value="python">Python 2</option>
                         <option value="javascript">JavaScript</option>
                         <option value="python3">Python 3 (beta)</option>
                     </select>
