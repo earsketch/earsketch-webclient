@@ -490,12 +490,14 @@ export function dur(result: DAWData, soundConstant: string) {
     checkType("sound", "string", soundConstant)
 
     const tempoMap = new TempoMap(result)
-    return audioLibrary.getSound(soundConstant).then(sound => {
-        // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-        const tempo = sound.tempo ?? tempoMap.points[0].tempo
-        // Round to nearest hundredth.
-        return Math.round(ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo) * 100) / 100
-    })
+    return postRun.loadBuffersForTransformedClips(result)
+        .then(() => audioLibrary.getSound(soundConstant))
+        .then(sound => {
+            // For consistency with old behavior, use clip tempo if available and initial tempo if not.
+            const tempo = sound.tempo ?? tempoMap.points[0].tempo
+            // Round to nearest hundredth.
+            return Math.round(ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo) * 100) / 100
+        })
 }
 
 // Return a Gaussian distributed random number.
