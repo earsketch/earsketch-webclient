@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === "production") {
     SITE_BASE_URI = process.env.ES_BASE_URI ?? "https://earsketch.gatech.edu/earsketch2"
     baseURL = process.env.ES_BASE_URL ?? "/earsketch2/"
 } else {
-    apiHost = "https://api-dev.ersktch.gatech.edu"
+    apiHost = "http://localhost:8080"
     const wsHost = apiHost.replace("http", "ws")
     URL_WEBSOCKET = `${wsHost}/EarSketchWS`
     const clientPath = process.env.path ? "/" + process.env.path : ""
