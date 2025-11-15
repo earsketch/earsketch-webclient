@@ -1,9 +1,7 @@
 import i18n from "i18next"
-import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
-import { usePopper } from "react-popper"
-import { Dialog, Menu } from "@headlessui/react"
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
 import PopperJS from "@popperjs/core"
 
 import { Script, ScriptType } from "common"
@@ -17,30 +15,10 @@ import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importScript, saveScript } from "./scriptsThunks"
 
-export function generateGetBoundingClientRect(x = 0, y = 0) {
-    return () => ({ x, y, left: x, right: x, top: y, bottom: y, width: 0, height: 0, toJSON: () => null })
-}
-
-export interface VirtualReference extends PopperJS.VirtualElement {
-    updatePopper: PopperJS.Instance["update"] | null
-}
-
-// TODO: Redundant... Figure out how to implement VirtualReference interface without declaring an unknown-type property.
-export class VirtualRef {
-    getBoundingClientRect: unknown
-    updatePopper: PopperJS.Instance["update"] | null
-
-    constructor() {
-        this.getBoundingClientRect = generateGetBoundingClientRect()
-        this.updatePopper = null
-    }
-}
-
-const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference
-
 type ScriptAction = (_: Script) => void
 
 interface ScriptActions {
+    script: Script, type: ScriptType
     delete: ScriptAction
     deleteShared: ScriptAction
     download: ScriptAction
@@ -52,22 +30,17 @@ interface ScriptActions {
 }
 
 export const ScriptDropdownMenu = ({
+    script,
+    type,
     delete: delete_, deleteShared, download, openIndicator, openHistory,
     rename, share, submit,
 }: ScriptActions) => {
     const dispatch = useDispatch()
-    const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu)
-    const script = useSelector(scripts.selectDropdownMenuScript)
-    const type = useSelector(scripts.selectDropdownMenuType)
     const context = useSelector(scripts.selectDropdownMenuContext)
     const { t } = useTranslation()
 
     const loggedIn = useSelector(user.selectLoggedIn)
     const openTabs = useSelector(tabs.selectOpenTabs)
-
-    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
-    const { styles, attributes, update } = usePopper(dropdownMenuVirtualRef, popperElement)
-    dropdownMenuVirtualRef.updatePopper = update
 
     const caiHighlight = useSelector(cai.selectHighlight)
     const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
@@ -183,102 +156,55 @@ export const ScriptDropdownMenu = ({
     // (See https://github.com/tailwindlabs/headlessui/discussions/649.)
     // Dialog allows you to manage open/close state, but isn't a Menu, and thus lacks arrow key navigation for menu items.
     // Thus, we have a Menu nested inside of a Dialog. Is it janky? Yes. Does it do everything we want? Yes.
-    return <Dialog
-        open={showDropdownMenu}
-        onClose={close}
-        className="absolute top-0 w-full h-full"
-    >
-        <Dialog.Panel className="border border-black p-2 z-50 bg-white dark:bg-black" ref={setPopperElement} style={styles.popper} {...attributes.popper}>
-            <Menu>
-                <Menu.Items static className="focus:outline-none" onKeyDown={(e: React.KeyboardEvent) => e.key === "Escape" && close()}>
-                    <Menu.Item disabled>
-                        <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
-                            <div className="truncate">
-                                {script?.name}
-                            </div>
-                            <button
-                                className="icon-cross2 pr-1 align-middle cursor-pointer text-gray-700 dark:text-gray-500"
-                                onClick={close}
-                                aria-label={script ? t("ariaDescriptors:scriptBrowser.close", { scriptname: script?.name }) : t("thing.close")}
-                                title={script ? t("ariaDescriptors:scriptBrowser.close") : t("thing.close")}
-                            >
-                            </button>
-                        </div>
-                    </Menu.Item>
-                    {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true, highlighted }) => visible && <Menu.Item key={name}>
-                        {({ active }) => (
-                            <button
-                                className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
-                                    (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
-                                    (disabled ? "cursor-not-allowed" : "cursor-pointer") + " " +
-                                    (highlighted ? "border-yellow-500 border-4" : "")}
-                                onClick={() => {
-                                    if (disabled) return
-                                    onClick()
-                                    close()
-                                }}
-                                aria-label={aria}
-                                title={aria}
-                            >
-                                <div className="flex justify-center items-center w-6">
-                                    <i className={`${icon} align-middle`} />
-                                </div>
-                                <div className={disabled ? "text-gray-500" : ""}>{name}</div>
-                            </button>
-                        )}
-                    </Menu.Item>)}
-                </Menu.Items>
-            </Menu>
-        </Dialog.Panel>
-    </Dialog>
-}
-
-export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
-    const dispatch = useDispatch()
-    const caiHighlight = useSelector(cai.selectHighlight)
-    const highlight = (caiHighlight.zone === "script" && caiHighlight.id === script.shareid)
-    const { t } = useTranslation()
-
-    return (
-        <button
-            onClick={event => {
-                event.preventDefault()
-                event.stopPropagation()
-                dropdownMenuVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY)
-                dropdownMenuVirtualRef.updatePopper?.()
-                dispatch(scripts.setDropdownMenu({ script, type }))
-                if (highlight) {
-                    dispatch(caiThunks.highlight({ zone: "history", id: script.shareid }))
-                }
-            }}
+    return <Menu>
+        <MenuButton
+            onClick={(event) => { event.stopPropagation() }}
             className={`flex justify-left truncate ${highlight ? "border-yellow-500 border-4" : ""}`}
             title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
-            aria-haspopup="true"
         >
             <div className="truncate min-w-0">
                 <i className="icon-menu3 text-2xl px-2 align-middle" />
             </div>
-        </button>
-    )
-}
+        </MenuButton>
+        <MenuItems anchor="bottom start" className="focus:outline-none border border-black p-2 z-50 bg-white dark:bg-black" onKeyDown={(e: React.KeyboardEvent) => e.key === "Escape" && close()}>
+            <MenuItem disabled>
+                <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
+                    <div className="truncate">
+                        {script?.name}
+                    </div>
+                    <button
+                        className="icon-cross2 pr-1 align-middle cursor-pointer text-gray-700 dark:text-gray-500"
+                        onClick={close}
+                        aria-label={script ? t("ariaDescriptors:scriptBrowser.close", { scriptname: script?.name }) : t("thing.close")}
+                        title={script ? t("ariaDescriptors:scriptBrowser.close") : t("thing.close")}
+                    >
+                    </button>
+                </div>
+            </MenuItem>
+            {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true, highlighted }) => visible && <MenuItem key={name}>
+                {({ active }) => (
+                    <button
+                        className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
+                                    (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
+                                    (disabled ? "cursor-not-allowed" : "cursor-pointer") + " " +
+                                    (highlighted ? "border-yellow-500 border-4" : "")}
+                        onClick={() => {
+                            if (disabled) return
+                            onClick()
+                            close()
+                        }}
+                        aria-label={aria}
+                        title={aria}
+                    >
+                        <div className="flex justify-center items-center w-6">
+                            <i className={`${icon} align-middle`} />
+                        </div>
+                        <div className={disabled ? "text-gray-500" : ""}>{name}</div>
+                    </button>
+                )}
+            </MenuItem>)}
+        </MenuItems>
+    </Menu>
 
-export const DropdownContextMenuCaller = ({ script, type, className, children }: {
-    script: Script, type: ScriptType, className: string, children: React.ReactNode
-}) => {
-    const dispatch = useDispatch()
-    return (
-        <div
-            className={className}
-            onContextMenu={event => {
-                event.preventDefault()
-                event.stopPropagation()
-                dropdownMenuVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY)
-                dropdownMenuVirtualRef.updatePopper?.()
-                dispatch(scripts.setDropdownMenu({ script, type, context: true }))
-            }}
-        >
-            {children}
-        </div>
-    )
 }
