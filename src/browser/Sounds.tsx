@@ -324,13 +324,14 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const userName = useSelector(user.selectUserName) as string
     const isUserOwned = loggedIn && clip.folder === userName.toUpperCase()
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+    const accessibleName = processName(name)
 
     return (
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
-                    <span className="text-sm truncate pl-2">{name}</span>
+                    <span className="text-sm truncate pl-2" tabIndex={0} aria-label={accessibleName}>{name}</span>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -414,6 +415,17 @@ interface FolderProps {
     listRef: React.RefObject<any>
 }
 
+function processName(name: string): string {
+    const parts = name.split('_'); // Split by underscore
+    const n = parts.length - 1; // Number of underscores
+    if (n <= 0) return name; // If no underscore, return original
+
+    const segmentsToKeep = n === 2 ? n : n - 1; // Keep n segments if n = 2, otherwise n - 1
+    return parts.slice(-segmentsToKeep)
+        .map(segment => segment === "808" ? "8 O 8" : segment) // Only transform "808"
+        .join(' ');
+}
+
 const Folder = ({ folder, names }: FolderProps) => {
     return (<>
         <div className="flex flex-row justify-start sticky top-0 bg-inherit">
@@ -421,7 +433,7 @@ const Folder = ({ folder, names }: FolderProps) => {
                 className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
                 title={folder}
             >
-                <div className="text-sm truncate">{folder}</div>
+                 <span tabIndex={0} aria-label={folder} className="text-sm truncate">{folder}</span>
             </div>
         </div>
         <ClipList names={names} />

@@ -20,6 +20,10 @@
     "test-vitest": "vitest tests/vitest/",
     "test-cypress": "cypress run",
     "test-cypress-gui": "cypress open",
+    "build": "npm run build-css && webpack --config webpack.build.js",
+    "serve": "npm run build-css && webpack-dev-server --open --config webpack.serve.js",
+    "build-css": "grunt less",
+    "lint": "eslint src",
     "serve-local": "export ES_API_HOST=https://api-dev.ersktch.gatech.edu ES_BASE_URI=/ NODE_ENV=development ES_BASE_URL=/; tsc -b && vite build --mode development && ln -s ../curriculum dist/curriculum && vite preview",
     "lint:report": "eslint --output-file eslint_report.json --format json src",
     "cypress:merge-reports": "jrm \"./tests/cypress/reports/cypress-combined.xml\" \"./tests/cypress/reports/*.xml\""
