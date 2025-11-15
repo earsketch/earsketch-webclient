@@ -34,8 +34,6 @@ export class VirtualRef {
     }
 }
 
-const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference
-
 type ScriptAction = (_: Script) => void
 
 interface ScriptActions {
