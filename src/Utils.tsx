@@ -2,6 +2,7 @@ import React, { MutableRefObject, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import classNames from "classnames"
 import { DialogTitle } from "@headlessui/react"
+import { openModal } from "./app/modal"
 
 // Useful for preventing absolute-positioned elements from exceeding window height.
 export const useHeightLimiter = (show: boolean, marginBottom: string|null = null): [MutableRefObject<HTMLDivElement|null>, React.CSSProperties] => {
@@ -155,4 +156,21 @@ export const PromptChoice = ({ message, choices, allowMultiple, close }: { messa
             </ModalBody>
         </form>
     </>
+}
+
+const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
+    const { t } = useTranslation()
+    return <>
+        <ModalHeader>{t("confirm")}</ModalHeader>
+        <form onSubmit={e => { e.preventDefault(); close(true) }}>
+            <ModalBody>
+                {textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div>}
+            </ModalBody>
+            <ModalFooter submit={okKey ?? "ok"} cancel={cancelKey} type={type} close={() => close(false)} />
+        </form>
+    </>
+}
+
+export function confirm({ textKey, textReplacements, okKey, cancelKey, type }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string }) {
+    return openModal(Confirm, { textKey, textReplacements, okKey, cancelKey, type })
 }

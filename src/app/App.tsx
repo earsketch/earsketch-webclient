@@ -45,13 +45,14 @@ import * as tabThunks from "../ide/tabThunks"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
-import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice, confirm } from "../Utils"
 import * as websocket from "./websocket"
 
 import esLogo from "./ES_logo_extract.svg"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
+import { downloadScript, shareScript } from "./scriptActions"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -232,113 +233,8 @@ async function refreshScriptBrowser() {
     }
 }
 
-export async function renameScript(script: Script) {
-    const name = await openModal(RenameScript, { script })
-    if (!name) return
-    try {
-        // exception occurs below if api call fails
-        await scriptsThunks.renameScript(script, name)
-    } catch {
-        userNotification.show(i18n.t("messages:createaccount.commerror"), "failure1")
-        return
-    }
-    reporter.renameScript()
-}
-
-export function downloadScript(script: Script) {
-    openModal(Download, { script })
-}
-
-export async function openScriptHistory(script: Script, allowRevert: boolean) {
-    if (!script.isShared) {
-        // saveScript() saves regular scripts - if called for shared scripts, it will create a local copy (#2663).
-        await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
-    }
-    store.dispatch(tabs.removeModifiedScript(script.shareid))
-    openModal(ScriptHistory, { script, allowRevert })
-    reporter.openHistory()
-}
-
-export function openCodeIndicator(script: Script) {
-    openModal(ScriptAnalysis, { script })
-}
-
 export function openAdminWindow() {
     openModal(AdminWindow)
-}
-
-const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
-    const { t } = useTranslation()
-    return <>
-        <ModalHeader>{t("confirm")}</ModalHeader>
-        <form onSubmit={e => { e.preventDefault(); close(true) }}>
-            <ModalBody>
-                {textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div>}
-            </ModalBody>
-            <ModalFooter submit={okKey ?? "ok"} cancel={cancelKey} type={type} close={() => close(false)} />
-        </form>
-    </>
-}
-
-function confirm({ textKey, textReplacements, okKey, cancelKey, type }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string }) {
-    return openModal(Confirm, { textKey, textReplacements, okKey, cancelKey, type })
-}
-
-async function deleteScriptHelper(scriptid: string) {
-    if (user.selectLoggedIn(store.getState())) {
-        // User is logged in so make a call to the web service
-        try {
-            const script = await request.postAuth("/scripts/delete", { scriptid })
-            esconsole("Deleted script: " + scriptid, "debug")
-
-            const scripts = scriptsState.selectRegularScripts(store.getState())
-            if (scripts[scriptid]) {
-                script.modified = Date.now()
-                store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
-            } else {
-                // script doesn't exist
-            }
-        } catch (err) {
-            esconsole("Could not delete script: " + scriptid, "debug")
-            esconsole(err, ["user", "error"])
-        }
-    } else {
-        // User is not logged in so alter local storage
-        const scripts = scriptsState.selectRegularScripts(store.getState())
-        const script = { ...scripts[scriptid], soft_delete: true }
-        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
-    }
-}
-
-async function deleteScript(script: Script) {
-    if (await confirm({ textKey: "messages:confirm.deletescript", okKey: "script.delete", type: "danger" })) {
-        await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
-        await deleteScriptHelper(script.shareid)
-        reporter.deleteScript()
-
-        store.dispatch(tabThunks.closeDeletedScript(script.shareid))
-        store.dispatch(tabs.removeModifiedScript(script.shareid))
-    }
-}
-
-export async function deleteSharedScript(script: Script) {
-    if (await confirm({ textKey: "messages:confirm.deleteSharedScript", textReplacements: { scriptName: script.name }, okKey: "script.delete", type: "danger" })) {
-        if (user.selectLoggedIn(store.getState())) {
-            await request.postAuth("/scripts/deleteshared", { scriptid: script.shareid })
-            esconsole("Deleted shared script: " + script.shareid, "debug")
-        }
-        const { [script.shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
-        store.dispatch(scriptsState.setSharedScripts(sharedScripts))
-        store.dispatch(tabThunks.closeDeletedScript(script.shareid))
-        store.dispatch(tabs.removeModifiedScript(script.shareid))
-    }
-}
-
-export async function submitToCompetition(script: Script) {
-    await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
-    store.dispatch(tabs.removeModifiedScript(script.shareid))
-    const shareID = await scriptsThunks.getLockedSharedScriptId(script.shareid)
-    openModal(CompetitionSubmission, { name: script.name, shareID })
 }
 
 export async function importScript(script: Script) {
@@ -377,13 +273,6 @@ export async function closeAllTabs() {
             userNotification.show(i18n.t("messages:idecontroller.saveallfailed"), "failure1")
         }
     }
-}
-
-export async function shareScript(script: Script) {
-    script = Object.assign({}, script) // copy to avoid mutating original
-    await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
-    store.dispatch(tabs.removeModifiedScript(script.shareid))
-    openModal(ScriptShare, { script })
 }
 
 export function openSharedScript(shareID: string) {
@@ -925,16 +814,6 @@ export const App = () => {
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
         </div>
         <Bubble />
-        <ScriptDropdownMenu
-            delete={deleteScript}
-            deleteShared={deleteSharedScript}
-            download={downloadScript}
-            openIndicator={openCodeIndicator}
-            openHistory={openScriptHistory}
-            rename={renameScript}
-            share={shareScript}
-            submit={submitToCompetition}
-        />
         <ModalContainer />
     </>
 }
