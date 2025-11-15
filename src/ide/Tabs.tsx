@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next"
 import { Menu } from "@headlessui/react"
 
 import * as appState from "../app/appState"
-import { DropdownContextMenuCaller } from "../browser/ScriptsMenus"
 import * as scripts from "../browser/scriptsState"
 import * as tabs from "./tabState"
 import * as tabThunks from "./tabThunks"
@@ -36,7 +35,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
 
     const allScripts = useSelector(scripts.selectAllScripts)
     const script = allScripts[scriptID]
-    const scriptType = (script.isShared && "shared") || (script.readonly && "readonly") || "regular"
+    // const scriptType = (script.isShared && "shared") || (script.readonly && "readonly") || "regular"
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const active = activeTabID === scriptID
     const { t } = useTranslation()
@@ -80,16 +79,16 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             title={script.name}
             aria-label={script.name}
         >
-            <DropdownContextMenuCaller
+            {/*<DropdownContextMenuCaller
                 className="flex justify-between items-center truncate p-2 pr-6 w-full"
                 script={script}
                 type={scriptType}
-            >
+            >*/}
                 <div className="flex items-center space-x-1.5 truncate">
                     {script.isShared && <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`}/>}
                     <div className="truncate select-none align-middle">{scriptName}</div>
                 </div>
-            </DropdownContextMenuCaller>
+            {/*</DropdownContextMenuCaller>*/}
             {active && (<div className="w-full border-b-4 border-amber absolute bottom-0"/>)}
         </button>
         <div className="flex items-center absolute top-0 bottom-0 right-0 my-auto mr-2">
@@ -116,7 +115,7 @@ const CloseAllTab = ({ closeAll }: { closeAll: () => void }) => {
         className={`
             shrink-0 h-8 p-1.5 cursor-pointer
             flex items-center
-            text-white bg-gray-800 border border-gray-800    
+            text-white bg-gray-800 border border-gray-800
         `}
         onClick={closeAll}
     >

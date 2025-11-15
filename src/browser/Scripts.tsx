@@ -15,11 +15,12 @@ import * as appState from "../app/appState"
 import * as user from "../user/userState"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
-import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, VirtualReference } from "./ScriptsMenus"
+import { generateGetBoundingClientRect, ScriptDropdownMenu, VirtualRef, VirtualReference } from "./ScriptsMenus"
 import { BrowserTabType } from "./BrowserTab"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
+import {deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, shareScript, submitToCompetition} from "../app/scriptActions"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -336,15 +337,22 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                             {shared && (<i className="icon-copy3 align-middle" title={t("scriptBrowser.shared.sharedBy", { username: script.creator ?? script.username })} />)}
                         </div>
                     </div>
-                    <div className={`${type === "regular" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
-                        <DownloadButton script={script} />
-                        {loggedIn && (<ShareButton script={script} />)}
-                        <DropdownMenuCaller script={script} type="regular" />
-                    </div>
-                    <div className={`${type === "shared" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
-                        <SharedScriptInfoCaller script={script} />
-                        <DropdownMenuCaller script={script} type="shared" />
-                    </div>
+
+                    {(type === "regular" || type === "shared") && <div className="flex flex-column items-center space-x-2">
+                        {type === "regular" && <DownloadButton script={script} />}
+                        {type === "regular" && loggedIn && (<ShareButton script={script} />)}
+                        {type === "shared" && <SharedScriptInfoCaller script={script} />}
+                        <ScriptDropdownMenu script={script} type={type}
+                            delete={deleteScript}
+                            deleteShared={deleteSharedScript}
+                            download={downloadScript}
+                            openIndicator={openCodeIndicator}
+                            openHistory={openScriptHistory}
+                            rename={renameScript}
+                            share={shareScript}
+                            submit={submitToCompetition} />
+                    </div>}
+
                     <div className={`${type === "deleted" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
                         <RestoreButton script={script} />
                     </div>
