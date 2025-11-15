@@ -15,6 +15,27 @@ import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importScript, saveScript } from "./scriptsThunks"
 
+export function generateGetBoundingClientRect(x = 0, y = 0) {
+    return () => ({ x, y, left: x, right: x, top: y, bottom: y, width: 0, height: 0, toJSON: () => null })
+}
+
+export interface VirtualReference extends PopperJS.VirtualElement {
+    updatePopper: PopperJS.Instance["update"] | null
+}
+
+// TODO: Redundant... Figure out how to implement VirtualReference interface without declaring an unknown-type property.
+export class VirtualRef {
+    getBoundingClientRect: unknown
+    updatePopper: PopperJS.Instance["update"] | null
+
+    constructor() {
+        this.getBoundingClientRect = generateGetBoundingClientRect()
+        this.updatePopper = null
+    }
+}
+
+const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference
+
 type ScriptAction = (_: Script) => void
 
 interface ScriptActions {
