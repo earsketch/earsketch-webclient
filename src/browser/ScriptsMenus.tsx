@@ -38,20 +38,6 @@ export class VirtualRef {
     }
 }
 
-type ScriptAction = (_: Script) => void
-
-interface ScriptActions {
-    script: Script, type: ScriptType
-    delete: ScriptAction
-    deleteShared: ScriptAction
-    download: ScriptAction
-    openIndicator: ScriptAction
-    openHistory: (script: Script, allowRevert: boolean) => void
-    rename: ScriptAction
-    share: ScriptAction
-    submit: ScriptAction
-}
-
 export const ScriptDropdownMenu = ({ script, type }: {script: Script, type: ScriptType}) => {
     const dispatch = useDispatch()
     const context = useSelector(scripts.selectDropdownMenuContext)
