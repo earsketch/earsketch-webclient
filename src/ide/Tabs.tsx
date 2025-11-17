@@ -9,6 +9,7 @@ import * as scripts from "../browser/scriptsState"
 import * as tabs from "./tabState"
 import * as tabThunks from "./tabThunks"
 import * as layout from "../ide/layoutState"
+import { ScriptContextMenu } from "../browser/ScriptsMenus"
 
 const CreateScriptButton = ({ create }: { create: () => void }) => {
     const { t } = useTranslation()
@@ -84,12 +85,17 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
                 script={script}
                 type={scriptType}
             >*/}
-                <div className="flex items-center space-x-1.5 truncate">
-                    {script.isShared && <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`}/>}
-                    <div className="truncate select-none align-middle">{scriptName}</div>
-                </div>
-            {/*</DropdownContextMenuCaller>*/}
-            {active && (<div className="w-full border-b-4 border-amber absolute bottom-0"/>)}
+            <ScriptContextMenu
+              className="flex justify-between items-center truncate p-2 pr-6 w-full"
+              script={script}
+              type={scriptType}
+            >
+              <div className="flex items-center space-x-1.5 truncate">
+                  {script.isShared && <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`}/>}
+                  <div className="truncate select-none align-middle">{scriptName}</div>
+              </div>
+            </ScriptContextMenu>
+{active && (<div className="w-full border-b-4 border-amber absolute bottom-0"/>)}
         </button>
         <div className="flex items-center absolute top-0 bottom-0 right-0 my-auto mr-2">
             <button

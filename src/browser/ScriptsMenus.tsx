@@ -14,6 +14,10 @@ import * as caiThunks from "../cai/caiThunks"
 import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importScript, saveScript } from "./scriptsThunks"
+import {deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, shareScript, submitToCompetition} from "../app/scriptActions"
+
+
+import { ContextMenu } from "radix-ui"
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
     return () => ({ x, y, left: x, right: x, top: y, bottom: y, width: 0, height: 0, toJSON: () => null })
@@ -48,12 +52,7 @@ interface ScriptActions {
     submit: ScriptAction
 }
 
-export const ScriptDropdownMenu = ({
-    script,
-    type,
-    delete: delete_, deleteShared, download, openIndicator, openHistory,
-    rename, share, submit,
-}: ScriptActions) => {
+export const ScriptDropdownMenu = ({ script, type }: {script: Script, type: ScriptType}) => {
     const dispatch = useDispatch()
     const context = useSelector(scripts.selectDropdownMenuContext)
     const { t } = useTranslation()
@@ -91,13 +90,13 @@ export const ScriptDropdownMenu = ({
     }, {
         name: t("script.rename"),
         aria: script ? t("ariaDescriptors:scriptBrowser.rename", { scriptname: script.name }) : t("script.rename"),
-        onClick: () => rename(script!),
+        onClick: () => renameScript(script!),
         icon: "icon-pencil2",
         visible: type === "regular",
     }, {
         name: t("script.download"),
         aria: script ? t("ariaDescriptors:scriptBrowser.download", { scriptname: script.name }) : t("script.download"),
-        onClick: () => download(script!),
+        onClick: () => downloadScript(script!),
         icon: "icon-cloud-download",
     }, {
         name: t("script.print"),
@@ -107,14 +106,14 @@ export const ScriptDropdownMenu = ({
     }, {
         name: t("script.share"),
         aria: script ? t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name }) : t("script.share"),
-        onClick: () => share(script!),
+        onClick: () => shareScript(script!),
         icon: "icon-share32",
         disabled: !loggedIn,
         visible: type === "regular",
     }, {
         name: t("script.submitCompetition"),
         aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
-        onClick: () => submit(script!),
+        onClick: () => submitToCompetition(script!),
         icon: "icon-earth",
         disabled: !loggedIn,
         visible: type === "regular" && loggedIn && ES_WEB_SHOW_COMPETITION_SUBMIT,
@@ -122,7 +121,7 @@ export const ScriptDropdownMenu = ({
         name: t("script.history"),
         aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),
         onClick: () => {
-            script && openHistory(script, !script.isShared)
+            script && openScriptHistory(script, !script.isShared)
             if (highlight) {
                 caiThunks.highlight({ zone: null })
             }
@@ -133,7 +132,7 @@ export const ScriptDropdownMenu = ({
     }, {
         name: t("script.codeIndicator"),
         aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
-        onClick: () => script && openIndicator(script),
+        onClick: () => script && openCodeIndicator(script),
         icon: "icon-info",
     }, {
         name: t("script.import"),
@@ -159,9 +158,9 @@ export const ScriptDropdownMenu = ({
         aria: script ? t("ariaDescriptors:scriptBrowser.delete", { scriptname: script.name }) : t("script.delete"),
         onClick: () => {
             if (type === "regular") {
-                delete_(script!)
+                deleteScript(script!)
             } else if (type === "shared") {
-                deleteShared(script!)
+                deleteSharedScript(script!)
             }
         },
         icon: "icon-bin",
@@ -227,4 +226,27 @@ export const ScriptDropdownMenu = ({
         </MenuItems>
     </Menu>
 
+}
+
+export const ScriptContextMenu = ({script, type, className, children}: {script: Script, type: ScriptType, className: string, children: React.ReactNode}) => {
+
+  return (
+    <ContextMenu.Root>
+      <ContextMenu.Trigger className={className}>
+        {children}
+      </ContextMenu.Trigger>
+      <ContextMenu.Portal>
+        <ContextMenu.Content className="flex flex-col bg-white dark:bg-black text-black dark:text-white">
+          <ContextMenu.Item>
+            <button className="flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full bg-white dark:bg-black cursor-pointer">
+              <div className="flex justify-center items-center w-6">
+                <i className="fas fa-trash" />
+              </div>
+              <div>Delete</div>
+            </button>
+          </ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Portal>
+    </ContextMenu.Root>
+  )
 }

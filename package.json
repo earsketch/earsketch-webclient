@@ -60,6 +60,7 @@
     "lodash": "^4.17.21",
     "lunr": "^2.3.9",
     "prop-types": "^15.8.1",
+    "radix-ui": "^1.4.3",
     "re-reselect": "^4.0.0",
     "react": "^18.2.0",
     "react-confetti": "^6.1.0",

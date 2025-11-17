@@ -20,7 +20,6 @@ import { BrowserTabType } from "./BrowserTab"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
-import {deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, shareScript, submitToCompetition} from "../app/scriptActions"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -342,15 +341,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                         {type === "regular" && <DownloadButton script={script} />}
                         {type === "regular" && loggedIn && (<ShareButton script={script} />)}
                         {type === "shared" && <SharedScriptInfoCaller script={script} />}
-                        <ScriptDropdownMenu script={script} type={type}
-                            delete={deleteScript}
-                            deleteShared={deleteSharedScript}
-                            download={downloadScript}
-                            openIndicator={openCodeIndicator}
-                            openHistory={openScriptHistory}
-                            rename={renameScript}
-                            share={shareScript}
-                            submit={submitToCompetition} />
+                        <ScriptDropdownMenu script={script} type={type}/>
                     </div>}
 
                     <div className={`${type === "deleted" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
