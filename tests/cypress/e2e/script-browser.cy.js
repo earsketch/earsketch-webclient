@@ -14,7 +14,7 @@ describe("script browser", () => {
 
         // Rename
         // NOTE: Cypress clicks are quite finicky with this dropdown menu.
-        cy.get(`[title="Script Options for ${scriptName}.py"]`).filter(":visible").trigger("click", "bottom")
+        cy.get(`[title="Script Options for ${scriptName}.py"]`).realClick()
         cy.get(`[title="Rename ${scriptName}.py"]`).click()
         cy.get(`input[value="${scriptName}"]`).clear().type("renamed_script")
         cy.get('input[type="submit"]').click()
