@@ -14,10 +14,11 @@ import * as caiThunks from "../cai/caiThunks"
 import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importScript, saveScript } from "./scriptsThunks"
-import {deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, shareScript, submitToCompetition} from "../app/scriptActions"
+import { deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, shareScript, submitToCompetition } from "../app/scriptActions"
 
 
 import { ContextMenu } from "radix-ui"
+import classNames from "classnames"
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
     return () => ({ x, y, left: x, right: x, top: y, bottom: y, width: 0, height: 0, toJSON: () => null })
@@ -48,7 +49,7 @@ interface ScriptMenuItem {
     highlighted?: boolean;
 }
 
-export const ScriptDropdownMenu = ({ script, scriptType, menuType, className, children }: {script: Script, scriptType: ScriptType, menuType: "buttonmenu" | "contextmenu", className?: string, children?: React.ReactNode}) => {
+export const ScriptDropdownMenu = ({ script, scriptType, menuType, className, children }: { script: Script, scriptType: ScriptType, menuType: "buttonmenu" | "contextmenu", className?: string, children?: React.ReactNode }) => {
     const dispatch = useDispatch()
     const context = menuType === "contextmenu"
     const { t } = useTranslation()
@@ -168,11 +169,11 @@ export const ScriptDropdownMenu = ({ script, scriptType, menuType, className, ch
     }]
 
     return menuType === "buttonmenu"
-        ? <ScriptMenuButton script={script} scriptType={scriptType} scriptMenuItems={scriptMenuItems} />
-        : <ScriptContextMenu script={script} scriptType={scriptType} scriptMenuItems={scriptMenuItems} className={className}>{children}</ScriptContextMenu>
+        ? <ScriptMenuButton script={script} scriptMenuItems={scriptMenuItems} />
+        : <ScriptContextMenu script={script} scriptMenuItems={scriptMenuItems} className={className}>{children}</ScriptContextMenu>
 }
 
-const ScriptMenuButton = ({script, scriptMenuItems}: {script: Script, scriptType: ScriptType, scriptMenuItems: ScriptMenuItem[]}) => {
+const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptMenuItems: ScriptMenuItem[] }) => {
     const { t } = useTranslation()
     const caiHighlight = useSelector(cai.selectHighlight)
     const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
@@ -233,23 +234,46 @@ const ScriptMenuButton = ({script, scriptMenuItems}: {script: Script, scriptType
     </Menu>
 }
 
-const ScriptContextMenu = ({script, scriptType, className, children, scriptMenuItems}: {script: Script, scriptType: ScriptType, className?: string, children: React.ReactNode, scriptMenuItems: ScriptMenuItem[]}) => {
-
+const ScriptContextMenu = ({ script, className, children, scriptMenuItems }: { script: Script, className?: string, children: React.ReactNode, scriptMenuItems: ScriptMenuItem[] }) => {
     return (
         <ContextMenu.Root>
             <ContextMenu.Trigger className={className}>
                 {children}
             </ContextMenu.Trigger>
             <ContextMenu.Portal>
-                <ContextMenu.Content className="flex flex-col bg-white dark:bg-black text-black dark:text-white">
-                    <ContextMenu.Item>
-                        <button className="flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full bg-white dark:bg-black cursor-pointer">
-                            <div className="flex justify-center items-center w-6">
-                                <i className="fas fa-trash" />
+                <ContextMenu.Content className="focus:outline-none border border-black p-2 z-50 bg-white dark:bg-black">
+                    <ContextMenu.Item className="" disabled>
+                        <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
+                            <div className="truncate">
+                                {script?.name}
                             </div>
-                            <div>Delete</div>
-                        </button>
+                        </div>
                     </ContextMenu.Item>
+                    {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible, highlighted }) => {
+                        const menuItemsClasses = classNames("flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full", {
+                            "cursor-not-allowed": disabled,
+                            "cursor-pointer": !disabled,
+                            "border-yellow-500 border-4": highlighted,
+                        })
+                        return visible && <ContextMenu.Item key={name} className="focus:outline-none data-[highlighted]:bg-blue-200 dark:data-[highlighted]:bg-blue-500 bg-white dark:bg-black">
+                            <button
+                                className={menuItemsClasses}
+                                onClick={() => {
+                                    if (disabled) return
+                                    onClick()
+                                    close()
+                                }}
+                                aria-label={aria}
+                                title={aria}
+                            >
+                                <div className="flex justify-center items-center w-6">
+                                    <i className={`${icon} align-middle`} />
+                                </div>
+                                <div className={disabled ? "text-gray-500" : ""}>{name}</div>
+                            </button>
+
+                        </ContextMenu.Item>
+                    })}
                 </ContextMenu.Content>
             </ContextMenu.Portal>
         </ContextMenu.Root>
