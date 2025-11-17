@@ -341,7 +341,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                         {type === "regular" && <DownloadButton script={script} />}
                         {type === "regular" && loggedIn && (<ShareButton script={script} />)}
                         {type === "shared" && <SharedScriptInfoCaller script={script} />}
-                        <ScriptDropdownMenu script={script} type={type}/>
+                        <ScriptDropdownMenu script={script} scriptType={type} menuType="buttonmenu"/>
                     </div>}
 
                     <div className={`${type === "deleted" ? "flex" : "hidden"} flex-column items-center space-x-2`}>

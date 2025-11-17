@@ -38,9 +38,19 @@ export class VirtualRef {
     }
 }
 
-export const ScriptDropdownMenu = ({ script, type }: {script: Script, type: ScriptType}) => {
+interface ScriptMenuItem {
+    name: string;
+    aria: string;
+    onClick: () => void;
+    icon: string;
+    visible: boolean;
+    disabled?: boolean;
+    highlighted?: boolean;
+}
+
+export const ScriptDropdownMenu = ({ script, scriptType, menuType, className, children }: {script: Script, scriptType: ScriptType, menuType: "buttonmenu" | "contextmenu", className?: string, children?: React.ReactNode}) => {
     const dispatch = useDispatch()
-    const context = useSelector(scripts.selectDropdownMenuContext)
+    const context = menuType === "contextmenu"
     const { t } = useTranslation()
 
     const loggedIn = useSelector(user.selectLoggedIn)
@@ -49,15 +59,15 @@ export const ScriptDropdownMenu = ({ script, type }: {script: Script, type: Scri
     const caiHighlight = useSelector(cai.selectHighlight)
     const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
 
-    const scriptMenuItems = [{
+    const scriptMenuItems: ScriptMenuItem[] = [{
         name: t("thing.open"),
         aria: script ? t("ariaDescriptors:scriptBrowser.open", { scriptname: script.name }) : t("thing.open"),
         onClick: () => {
             if (!script) return
 
-            if (type === "regular") {
+            if (scriptType === "regular") {
                 dispatch(setActiveTabAndEditor(script.shareid))
-            } else if (type === "shared") {
+            } else if (scriptType === "shared") {
                 dispatch(setActiveTabAndEditor(script.shareid))
             }
         },
@@ -72,37 +82,39 @@ export const ScriptDropdownMenu = ({ script, type }: {script: Script, type: Scri
             })
         },
         icon: "icon-copy",
-        visible: type === "regular",
+        visible: scriptType === "regular",
     }, {
         name: t("script.rename"),
         aria: script ? t("ariaDescriptors:scriptBrowser.rename", { scriptname: script.name }) : t("script.rename"),
         onClick: () => renameScript(script!),
         icon: "icon-pencil2",
-        visible: type === "regular",
+        visible: scriptType === "regular",
     }, {
         name: t("script.download"),
         aria: script ? t("ariaDescriptors:scriptBrowser.download", { scriptname: script.name }) : t("script.download"),
         onClick: () => downloadScript(script!),
         icon: "icon-cloud-download",
+        visible: true,
     }, {
         name: t("script.print"),
         aria: script ? t("ariaDescriptors:scriptBrowser.print", { scriptname: script.name }) : t("script.print"),
         onClick: () => exporter.print(script!),
         icon: "icon-printer",
+        visible: true,
     }, {
         name: t("script.share"),
         aria: script ? t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name }) : t("script.share"),
         onClick: () => shareScript(script!),
         icon: "icon-share32",
         disabled: !loggedIn,
-        visible: type === "regular",
+        visible: scriptType === "regular",
     }, {
         name: t("script.submitCompetition"),
         aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
         onClick: () => submitToCompetition(script!),
         icon: "icon-earth",
         disabled: !loggedIn,
-        visible: type === "regular" && loggedIn && ES_WEB_SHOW_COMPETITION_SUBMIT,
+        visible: scriptType === "regular" && loggedIn && ES_WEB_SHOW_COMPETITION_SUBMIT,
     }, {
         name: t("script.history"),
         aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),
@@ -113,13 +125,15 @@ export const ScriptDropdownMenu = ({ script, type }: {script: Script, type: Scri
             }
         },
         icon: "icon-history",
-        disabled: !loggedIn || type === "readonly",
+        disabled: !loggedIn || scriptType === "readonly",
         highlighted: highlight,
+        visible: true,
     }, {
         name: t("script.codeIndicator"),
         aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
         onClick: () => script && openCodeIndicator(script),
         icon: "icon-info",
+        visible: true,
     }, {
         name: t("script.import"),
         aria: script ? t("ariaDescriptors:scriptBrowser.import", { scriptname: script.name }) : t("script.import"),
@@ -138,26 +152,32 @@ export const ScriptDropdownMenu = ({ script, type }: {script: Script, type: Scri
             }
         },
         icon: "icon-import",
-        visible: ["shared", "readonly"].includes(type!),
+        visible: ["shared", "readonly"].includes(scriptType!),
     }, {
         name: t("script.delete"),
         aria: script ? t("ariaDescriptors:scriptBrowser.delete", { scriptname: script.name }) : t("script.delete"),
         onClick: () => {
-            if (type === "regular") {
+            if (scriptType === "regular") {
                 deleteScript(script!)
-            } else if (type === "shared") {
+            } else if (scriptType === "shared") {
                 deleteSharedScript(script!)
             }
         },
         icon: "icon-bin",
-        visible: type !== "readonly",
+        visible: scriptType !== "readonly",
     }]
 
-    // Headless UI's Menu has internally-managed open/close state that is always tied to left-clicking a Menu.Button,
-    // which is unfortunate if you want a right-click context menu - as we do.
-    // (See https://github.com/tailwindlabs/headlessui/discussions/649.)
-    // Dialog allows you to manage open/close state, but isn't a Menu, and thus lacks arrow key navigation for menu items.
-    // Thus, we have a Menu nested inside of a Dialog. Is it janky? Yes. Does it do everything we want? Yes.
+    return menuType === "buttonmenu"
+        ? <ScriptMenuButton script={script} scriptType={scriptType} scriptMenuItems={scriptMenuItems} />
+        : <ScriptContextMenu script={script} scriptType={scriptType} scriptMenuItems={scriptMenuItems} className={className}>{children}</ScriptContextMenu>
+}
+
+const ScriptMenuButton = ({script, scriptMenuItems}: {script: Script, scriptType: ScriptType, scriptMenuItems: ScriptMenuItem[]}) => {
+    const { t } = useTranslation()
+    const caiHighlight = useSelector(cai.selectHighlight)
+    const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
+
+
     return <Menu>
         <MenuButton
             onClick={(event) => { event.stopPropagation() }}
@@ -191,9 +211,9 @@ export const ScriptDropdownMenu = ({ script, type }: {script: Script, type: Scri
                 {({ active }) => (
                     <button
                         className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
-                                    (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
-                                    (disabled ? "cursor-not-allowed" : "cursor-pointer") + " " +
-                                    (highlighted ? "border-yellow-500 border-4" : "")}
+                                  (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
+                                  (disabled ? "cursor-not-allowed" : "cursor-pointer") + " " +
+                                  (highlighted ? "border-yellow-500 border-4" : "")}
                         onClick={() => {
                             if (disabled) return
                             onClick()
@@ -211,28 +231,27 @@ export const ScriptDropdownMenu = ({ script, type }: {script: Script, type: Scri
             </MenuItem>)}
         </MenuItems>
     </Menu>
-
 }
 
-export const ScriptContextMenu = ({script, type, className, children}: {script: Script, type: ScriptType, className: string, children: React.ReactNode}) => {
+const ScriptContextMenu = ({script, scriptType, className, children, scriptMenuItems}: {script: Script, scriptType: ScriptType, className?: string, children: React.ReactNode, scriptMenuItems: ScriptMenuItem[]}) => {
 
-  return (
-    <ContextMenu.Root>
-      <ContextMenu.Trigger className={className}>
-        {children}
-      </ContextMenu.Trigger>
-      <ContextMenu.Portal>
-        <ContextMenu.Content className="flex flex-col bg-white dark:bg-black text-black dark:text-white">
-          <ContextMenu.Item>
-            <button className="flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full bg-white dark:bg-black cursor-pointer">
-              <div className="flex justify-center items-center w-6">
-                <i className="fas fa-trash" />
-              </div>
-              <div>Delete</div>
-            </button>
-          </ContextMenu.Item>
-        </ContextMenu.Content>
-      </ContextMenu.Portal>
-    </ContextMenu.Root>
-  )
+    return (
+        <ContextMenu.Root>
+            <ContextMenu.Trigger className={className}>
+                {children}
+            </ContextMenu.Trigger>
+            <ContextMenu.Portal>
+                <ContextMenu.Content className="flex flex-col bg-white dark:bg-black text-black dark:text-white">
+                    <ContextMenu.Item>
+                        <button className="flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full bg-white dark:bg-black cursor-pointer">
+                            <div className="flex justify-center items-center w-6">
+                                <i className="fas fa-trash" />
+                            </div>
+                            <div>Delete</div>
+                        </button>
+                    </ContextMenu.Item>
+                </ContextMenu.Content>
+            </ContextMenu.Portal>
+        </ContextMenu.Root>
+    )
 }
