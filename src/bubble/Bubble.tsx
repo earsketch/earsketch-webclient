@@ -237,14 +237,6 @@ export const Bubble = () => {
         update?.()
     }, [currentPage])
 
-    // Close on escape. Perhaps someday we can avoid reimplementing this.
-    // See https://github.com/tailwindlabs/headlessui/issues/621; unfortunately the solution there (from June 23, 2021) no longer works.
-    useEffect(() => {
-        const escape = (e: KeyboardEvent) => e.key === "Escape" && dispatch(bubble.suspend())
-        window.addEventListener("keydown", escape)
-        return () => window.removeEventListener("keydown", escape)
-    })
-
     // Prevent panel from being too tall on the code editor page
     const isCodeEditorPage = currentPage === 1
     const panelClass = classNames("absolute z-40 w-1/3 bg-white p-5 shadow-xl", {
@@ -253,7 +245,7 @@ export const Bubble = () => {
 
     return <Dialog
         open={active}
-        onClose={() => { /* Disabled so user can click on highlighted elements outside the modal. */ }}
+        onClose={() => dispatch(bubble.suspend())}
         className="absolute top-0 w-full h-full"
     >
         <Dialog.Panel className="h-full flex justify-center items-center">
