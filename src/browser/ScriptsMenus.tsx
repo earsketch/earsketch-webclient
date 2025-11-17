@@ -168,8 +168,6 @@ export const ScriptDropdownMenu = ({
         visible: type !== "readonly",
     }]
 
-    const close = () => dispatch(scripts.resetDropdownMenu())
-
     // Headless UI's Menu has internally-managed open/close state that is always tied to left-clicking a Menu.Button,
     // which is unfortunate if you want a right-click context menu - as we do.
     // (See https://github.com/tailwindlabs/headlessui/discussions/649.)
@@ -186,20 +184,23 @@ export const ScriptDropdownMenu = ({
                 <i className="icon-menu3 text-2xl px-2 align-middle" />
             </div>
         </MenuButton>
-        <MenuItems anchor="bottom start" className="focus:outline-none border border-black p-2 z-50 bg-white dark:bg-black" onKeyDown={(e: React.KeyboardEvent) => e.key === "Escape" && close()}>
+        <MenuItems anchor="bottom start" className="focus:outline-none border border-black p-2 z-50 bg-white dark:bg-black">
             <MenuItem disabled>
-                <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
-                    <div className="truncate">
-                        {script?.name}
+                {({ close }) => (
+                    <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
+                        <div className="truncate">
+                            {script?.name}
+                        </div>
+                        <button
+                            className="icon-cross2 pr-1 align-middle cursor-pointer text-gray-700 dark:text-gray-500"
+                            onClick={close}
+                            aria-label={script ? t("ariaDescriptors:scriptBrowser.close", { scriptname: script?.name }) : t("thing.close")}
+                            title={script ? t("ariaDescriptors:scriptBrowser.close") : t("thing.close")}
+                        >
+                        </button>
                     </div>
-                    <button
-                        className="icon-cross2 pr-1 align-middle cursor-pointer text-gray-700 dark:text-gray-500"
-                        onClick={close}
-                        aria-label={script ? t("ariaDescriptors:scriptBrowser.close", { scriptname: script?.name }) : t("thing.close")}
-                        title={script ? t("ariaDescriptors:scriptBrowser.close") : t("thing.close")}
-                    >
-                    </button>
-                </div>
+                )}
+
             </MenuItem>
             {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true, highlighted }) => visible && <MenuItem key={name}>
                 {({ active }) => (

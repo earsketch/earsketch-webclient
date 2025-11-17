@@ -35,7 +35,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
 
     const allScripts = useSelector(scripts.selectAllScripts)
     const script = allScripts[scriptID]
-    // const scriptType = (script.isShared && "shared") || (script.readonly && "readonly") || "regular"
+    const scriptType = (script.isShared && "shared") || (script.readonly && "readonly") || "regular"
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const active = activeTabID === scriptID
     const { t } = useTranslation()
