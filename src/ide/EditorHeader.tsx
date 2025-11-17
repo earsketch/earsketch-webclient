@@ -169,7 +169,7 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
     const runButtonClassNames = classNames(
         "flex rounded-full px-2.5 text-white items-center whitespace-nowrap",
         {
-            "invisible": quickTourActive && currentQuickTourPage === 2,
+            invisible: quickTourActive && currentQuickTourPage === 2,
             "bg-green-700": !running,
             "bg-red-700": running,
         })

@@ -7,7 +7,6 @@ import PopperJS from "@popperjs/core"
 import { Script, ScriptType } from "common"
 import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
-import * as scripts from "./scriptsState"
 import * as tabs from "../ide/tabState"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
@@ -15,7 +14,6 @@ import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importScript, saveScript } from "./scriptsThunks"
 import { deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, shareScript, submitToCompetition } from "../app/scriptActions"
-
 
 import { ContextMenu } from "radix-ui"
 import classNames from "classnames"
@@ -177,7 +175,6 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
     const { t } = useTranslation()
     const caiHighlight = useSelector(cai.selectHighlight)
     const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
-
 
     return <Menu>
         <MenuButton

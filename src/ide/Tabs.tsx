@@ -9,7 +9,7 @@ import * as scripts from "../browser/scriptsState"
 import * as tabs from "./tabState"
 import * as tabThunks from "./tabThunks"
 import * as layout from "../ide/layoutState"
-import { ScriptContextMenu, ScriptDropdownMenu } from "../browser/ScriptsMenus"
+import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 
 const CreateScriptButton = ({ create }: { create: () => void }) => {
     const { t } = useTranslation()

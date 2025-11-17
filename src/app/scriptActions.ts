@@ -21,7 +21,6 @@ import * as userNotification from "../user/notification"
 import * as request from "../request"
 import { confirm } from "../Utils"
 
-
 export async function renameScript(script: Script) {
     const name = await openModal(RenameScript, { script })
     if (!name) return

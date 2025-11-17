@@ -58,7 +58,7 @@ const MessageFooter = () => {
             (<button className="animate-shake absolute top-[-2.8rem] right-[4.2rem] flex rounded-full px-2.5 text-white items-center whitespace-nowrap bg-green-700"
                 onClick={() => callbacks.runScript()}>
                 <div className="flex bg-white rounded-full text-xs mr-1 p-0.5">
-                    <i className={"icon-arrow-right22 font-bold text-green-600"} />
+                    <i className="icon-arrow-right22 font-bold text-green-600" />
                 </div>
                 {t("editor.run").toLocaleUpperCase()}
             </button>)
