@@ -1,22 +1,24 @@
 describe("script browser", () => {
     beforeEach(() => {
-        cy.visit("/")
-        cy.skipTour()
-
         cy.interceptAudioStandard([])
         cy.interceptAudioMetadata({})
         cy.interceptAudioSample()
+        cy.interceptCurriculumTOC()
+        cy.interceptCurriculumContent()
+
+        cy.visit("/")
+        cy.skipTour()
     })
 
     it("renames script", () => {
         const scriptName = "cypress_test"
         cy.createScript(scriptName)
-
         // Rename
-        // NOTE: Cypress clicks are quite finicky with this dropdown menu.
-        cy.get(`[title="Script Options for ${scriptName}.py"]`).realClick()
+        cy.get(`[title="Script Options for ${scriptName}.py"]`).click()
+
         cy.get(`[title="Rename ${scriptName}.py"]`).click()
-        cy.get(`input[value="${scriptName}"]`).clear().type("renamed_script")
+        cy.get(`input[value="${scriptName}"]`).clear()
+        cy.get("span").contains("Enter the new name for this script:").siblings().find("input").type("renamed_script")
         cy.get('input[type="submit"]').click()
         cy.contains("renamed_script.py")
     })
@@ -28,18 +30,16 @@ describe("script browser", () => {
         cy.createScript(scriptName2)
 
         // Delete
-        // NOTE: Cypress clicks are quite finicky with this dropdown menu.
-        // TODO: remove force click in Cypress 12: this is a workaround since the script browser re-renders multiple times and original button gets detached from DOM
-        cy.get(`[title="Script Options for ${scriptName1}.py"]`).filter(":visible").trigger("click", "bottom", { force: true })
+        cy.get(`[title="Script Options for ${scriptName1}.py"]`).click()
         cy.get(`[title="Delete ${scriptName1}.py"]`).click()
         cy.get('input[type="submit"]').click()
         cy.contains(scriptName1, { timeout: 10000 }).should("not.exist")
 
         // Attempt to rename to a deleted script name
-        // TODO: remove force click in Cypress 12: this is a workaround since the script browser re-renders multiple times and original button gets detached from DOM
-        cy.get(`[title="Script Options for ${scriptName2}.py"]`).filter(":visible").trigger("click", "bottom", { force: true })
+        cy.get(`[title="Script Options for ${scriptName2}.py"]`).click()
         cy.get(`[title="Rename ${scriptName2}.py"]`).click()
-        cy.get(`input[value="${scriptName2}"]`).clear().type(scriptName1)
+        cy.get(`input[value="${scriptName2}"]`).clear()
+        cy.get("span").contains("Enter the new name for this script:").siblings().find("input").type(scriptName1)
         cy.get('input[type="submit"]').click()
         cy.contains(scriptName2)
         cy.contains("That name already exists in your deleted scripts")
