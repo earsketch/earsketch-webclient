@@ -205,11 +205,9 @@ const RestoreButton = ({ script }: { script: Script }) => {
 const sharedInfoPanelVirtualRef = new VirtualRef() as VirtualReference
 
 const SharedScriptInfoItem = ({ title, body }: { title: string, body: string }) => {
-    const theme = useSelector(appState.selectColorTheme)
-
     return (
         <div className={`px-4 py-3 ${body ? "block" : "hidden"}`}>
-            <div className={`font-semibold ${theme === "light" ? "text-gray-600" : "text-gray-500"}`}>{title}</div>
+            <div className="font-semibold text-gray-600 dark:text-gray-500">{title}</div>
             <div className="break-words">{body}</div>
         </div>
     )
