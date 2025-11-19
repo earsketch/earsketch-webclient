@@ -2,7 +2,6 @@ import i18n from "i18next"
 import { useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
-import PopperJS from "@popperjs/core"
 
 import { Script, ScriptType } from "common"
 import * as exporter from "../app/exporter"
@@ -17,25 +16,6 @@ import { deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, op
 
 import { ContextMenu } from "radix-ui"
 import classNames from "classnames"
-
-export function generateGetBoundingClientRect(x = 0, y = 0) {
-    return () => ({ x, y, left: x, right: x, top: y, bottom: y, width: 0, height: 0, toJSON: () => null })
-}
-
-export interface VirtualReference extends PopperJS.VirtualElement {
-    updatePopper: PopperJS.Instance["update"] | null
-}
-
-// TODO: Redundant... Figure out how to implement VirtualReference interface without declaring an unknown-type property.
-export class VirtualRef {
-    getBoundingClientRect: unknown
-    updatePopper: PopperJS.Instance["update"] | null
-
-    constructor() {
-        this.getBoundingClientRect = generateGetBoundingClientRect()
-        this.updatePopper = null
-    }
-}
 
 interface ScriptMenuItem {
     name: string;

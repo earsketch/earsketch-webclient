@@ -1,9 +1,8 @@
-import React, { useState, useEffect, LegacyRef, ChangeEvent, MouseEvent } from "react"
+import React, { ChangeEvent, MouseEvent } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
 import { FixedSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
-import { usePopper } from "react-popper"
 
 import type { Script, ScriptType } from "common"
 import type { RootState } from "../reducers"
@@ -11,15 +10,15 @@ import * as scripts from "./scriptsState"
 import * as scriptsThunks from "./scriptsThunks"
 import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
-import * as appState from "../app/appState"
 import * as user from "../user/userState"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
-import { generateGetBoundingClientRect, ScriptDropdownMenu, VirtualRef, VirtualReference } from "./ScriptsMenus"
+import { ScriptDropdownMenu } from "./ScriptsMenus"
 import { BrowserTabType } from "./BrowserTab"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
+import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -202,8 +201,6 @@ const RestoreButton = ({ script }: { script: Script }) => {
     </PillButton>
 }
 
-const sharedInfoPanelVirtualRef = new VirtualRef() as VirtualReference
-
 const SharedScriptInfoItem = ({ title, body }: { title: string, body: string }) => {
     return (
         <div className={`px-4 py-3 ${body ? "block" : "hidden"}`}>
@@ -213,81 +210,33 @@ const SharedScriptInfoItem = ({ title, body }: { title: string, body: string }) 
     )
 }
 
-const SingletonSharedScriptInfo = () => {
+const SharedScriptInfoButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
-    const dispatch = useDispatch()
-    const showSharedScriptInfo = useSelector(scripts.selectShowSharedScriptInfo)
-    const script = useSelector(scripts.selectSharedInfoScript)
-
-    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
-    const { styles, attributes, update } = usePopper(sharedInfoPanelVirtualRef, popperElement)
-    sharedInfoPanelVirtualRef.updatePopper = update
-
-    // Note: Synchronous dispatches inside a setState can conflict with components rendering.
-    const handleClickAsync = (event: Event) => {
-        setPopperElement(ref => {
-            if (!ref?.contains(event.target as Node)) {
-                dispatch(scripts.resetSharedScriptInfoAsync())
-            }
-            return ref
-        })
-    }
-
-    useEffect(() => {
-        document.addEventListener("mousedown", handleClickAsync)
-        return () => document.removeEventListener("mousedown", handleClickAsync)
-    }, [])
 
     return (
-        <div
-            ref={setPopperElement as LegacyRef<HTMLDivElement>}
-            style={showSharedScriptInfo ? styles.popper : { display: "none" }}
-            {...attributes.popper}
-            className="border border-black p-2 z-50 bg-white dark:bg-black"
-        >
-            <i
-                className="icon-cross2 absolute top-0 right-0 p-4 align-middle cursor-pointer text-black dark:text-gray-200"
-                onClick={() => {
-                    dispatch(scripts.resetSharedScriptInfo())
-                }}
-            />
-            {script && (<>
-                <SharedScriptInfoItem
-                    title={script.name}
-                    body="Shared Script"
-                />
-                <SharedScriptInfoItem
-                    title={t("sharedScript.originalAuthor")}
-                    body={script.username}
-                />
-                <SharedScriptInfoItem
-                    title={t("lastModified")}
-                    body={script.modified as string}
-                />
-                <SharedScriptInfoItem
-                    title={t("sharedScript.viewOnlyLink")}
-                    body={`${SITE_BASE_URI}?sharing=${script.shareid}`}
-                />
-            </>)}
-        </div>
-    )
-}
-
-const SharedScriptInfoCaller = ({ script }: { script: Script }) => {
-    const dispatch = useDispatch()
-
-    return (
-        <div
-            onClick={event => {
-                event.preventDefault()
-                event.stopPropagation()
-                sharedInfoPanelVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY)
-                sharedInfoPanelVirtualRef.updatePopper?.()
-                dispatch(scripts.setSharedScriptInfo({ script }))
-            }}
-        >
-            <i className="icon-info text-lg align-middle" />
-        </div>
+        <Popover className="">
+            <PopoverButton><i className="icon-info text-lg align-middle" /></PopoverButton>
+            <PopoverPanel anchor="bottom start" className="border border-black p-2 z-50 bg-white dark:bg-black">
+                {script && (<>
+                    <SharedScriptInfoItem
+                        title={script.name}
+                        body="Shared Script"
+                    />
+                    <SharedScriptInfoItem
+                        title={t("sharedScript.originalAuthor")}
+                        body={script.username}
+                    />
+                    <SharedScriptInfoItem
+                        title={t("lastModified")}
+                        body={script.modified as string}
+                    />
+                    <SharedScriptInfoItem
+                        title={t("sharedScript.viewOnlyLink")}
+                        body={`${SITE_BASE_URI}?sharing=${script.shareid}`}
+                    />
+                </>)}
+            </PopoverPanel>
+        </Popover>
     )
 }
 
@@ -338,7 +287,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                     {(type === "regular" || type === "shared") && <div className="flex flex-column items-center space-x-2">
                         {type === "regular" && <DownloadButton script={script} />}
                         {type === "regular" && loggedIn && (<ShareButton script={script} />)}
-                        {type === "shared" && <SharedScriptInfoCaller script={script} />}
+                        {type === "shared" && <SharedScriptInfoButton script={script} />}
                         <ScriptDropdownMenu script={script} scriptType={type} menuType="buttonmenu"/>
                     </div>}
 
@@ -450,8 +399,6 @@ export const ScriptBrowser = () => {
                 <SharedScriptCollection />
                 <DeletedScriptCollection />
             </div>
-
-            <SingletonSharedScriptInfo />
         </>
     )
 }
