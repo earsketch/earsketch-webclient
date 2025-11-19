@@ -77,6 +77,11 @@ Cypress.Commands.add("createScript", (scriptName) => {
     // wait for modal to disappear
     cy.get("#scriptName", { timeout: 10000 }).should("not.exist")
     cy.get("div[id^='headlessui-dialog-']", { timeout: 10000 }).should("not.exist")
+    // TODO: this is a workaround for a UI bug we should probably fix...
+    // Move focus off the New Script button because our focus outline decreases the space available
+    // for the AutoSizer, so moving focus off the button allows AutoSizer to re-render before opening
+    // the script menu. Otherwise the menu will open briefly but will close when AutoSizer re-renders.
+    cy.press(Cypress.Keyboard.Keys.TAB)
 })
 
 /**

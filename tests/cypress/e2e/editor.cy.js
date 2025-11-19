@@ -78,12 +78,14 @@ print(5 % 2)
 `)
         cy.get("button[title='Editor Settings']").click()
         cy.get("button[title='Enable blocks mode']").click() // enable blocks
+        cy.get("button[title='Editor Settings']").click()
         cy.get("canvas.droplet-main-canvas").should("be.visible")
         cy.get("div.droplet-palette-element").should("be.visible")
         cy.get("button").contains("RUN").click()
 
         cy.get("button[title='Editor Settings']").click()
         cy.get("button[title='Disable blocks mode']").click() // disable blocks
+        cy.get("button[title='Editor Settings']").click()
         cy.get("canvas.droplet-main-canvas").should("not.be.visible")
         cy.get("div.droplet-palette-element").should("not.be.visible")
         cy.get("button").contains("RUN").click()
