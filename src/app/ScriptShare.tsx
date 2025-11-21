@@ -16,7 +16,7 @@ import store from "../reducers"
 
 function shareWithPeople(shareid: string, users: string[]) {
     for (const recipient of users) {
-        postAuth("/users/sendscriptsharenotificationCAUSEERROR", { scriptid: shareid, recipient })
+        postAuth("/users/sendscriptsharenotification", { scriptid: shareid, recipient })
     }
 }
 
