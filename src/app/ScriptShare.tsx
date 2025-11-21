@@ -10,22 +10,14 @@ import reporter from "./reporter"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
-import { get } from "../request"
+import { get, postAuth } from "../request"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import store from "../reducers"
-import * as websocket from "./websocket"
 
 function shareWithPeople(shareid: string, users: string[]) {
-    const data = {
-        notification_type: "sharewithpeople",
-        username: user.selectUserName(store.getState()),
-        sender: user.selectUserName(store.getState()),
-        scriptid: shareid,
-        // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
-        users: users.map(id => ({ id, exists: true })),
+    for (const recipient of users) {
+        postAuth("/users/sendscriptsharenotification", { scriptid: shareid, recipient })
     }
-
-    websocket.send(data)
 }
 
 // stuff for view-only share
