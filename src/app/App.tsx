@@ -204,6 +204,17 @@ async function postLogin(username: string) {
     await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
     // Wait to receive websocket notifications until *after* we have the list of existing shared scripts.
     // This prevents us from re-adding shared scripts when we get a bunch of unread share notifications.
+
+    // Load notifications on login
+    try {
+        const notifications = await request.getAuth("/users/notifications")
+        if (notifications && Array.isArray(notifications)) {
+            userNotification.loadHistory(notifications)
+        }
+    } catch (error) {
+        esconsole("Error loading notifications on login: " + error, ["debug", "user"])
+    }
+
     websocket.login(username)
 }
 
@@ -688,7 +699,7 @@ export const App = () => {
             esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
             setLoginState("logged-in")
-            userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
+            userNotification.show(i18n.t("messages:general.loginsuccess"), "normal", 0.5)
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
             succeeded = true

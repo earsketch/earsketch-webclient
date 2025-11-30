@@ -5,7 +5,6 @@ import * as ESUtils from "../esutils"
 import * as userNotification from "./notification"
 import * as user from "./userState"
 import { useTranslation } from "react-i18next"
-import store from "../reducers"
 import * as appState from "../app/appState"
 import * as request from "../request"
 
@@ -149,23 +148,24 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
 }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
-    const doNotDisturb = useSelector(appState.selectDoNotDisturb)
-    const dndStatus = doNotDisturb ? "notifications.doNotDisturbEnabled" : "notifications.doNotDisturbDisabled"
-    const titleKey = doNotDisturb ? "notifications.switchDoNotDisturbOff" : "notifications.switchDoNotDisturbOn"
 
     const handleRefresh = async (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault()
         const endpoint = "/users/notifications"
-        const token = user.selectToken(store.getState())
+        // const token = user.selectToken(store.getState())
         const fullUrl = URL_DOMAIN + endpoint
         
-        console.log("Fetching notifications from:", fullUrl)
-        console.log("Token available:", !!token)
-        console.log("Token preview:", token ? token.substring(0, 20) + "..." : "none")
+        // console.log("Fetching notifications from:", fullUrl)
+        // console.log("Token available:", !!token)
+        // console.log("Token preview:", token ? token.substring(0, 20) + "..." : "none")
         
         try {
             const result = await request.getAuth(endpoint)
             console.log("Notifications endpoint response:", result)
+            // Process the notifications and update the list
+            if (result && Array.isArray(result)) {
+                userNotification.loadHistory(result)
+            }
         } catch (error: any) {
             console.error("Error fetching notifications:", error)
             console.error("Full URL attempted:", fullUrl)
@@ -181,46 +181,33 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
     }
 
     return <div style={{ minWidth: "15em" }}>
+        <div className="flex justify-between">
+            <div className="text-sm float-left" style={{ color: "grey" }}>
+                <i className="icon icon-bell mr-3" />
+                {t("notifications.title")}
+            </div>
+            <div className="float-right">
+                <a className="text-sm" href="#" onClick={handleRefresh} title="Refresh notifications">REFRESH</a>
+            </div>
+        </div>
+        <hr className="border-solid border-black border-1 my-2" />
         {notifications.length === 0
             ? <div>
-                <div className="flex justify-between items-center">
-                    <div className="text-center m-auto">{t("notifications.none")}</div>
-                </div>
-                <hr style={{ border: "solid 1px dimgrey", marginTop: "10px", marginBottom: "10px" }} />
+                <div className="text-center m-auto">{t("notifications.none")}</div>
             </div>
             : <div>
-                <div className="flex justify-between">
-                    <div className="text-sm float-left" style={{ color: "grey" }}>
-                        <i className="icon icon-bell mr-3" />
-                        {t("notifications.title")}
-                    </div>
-                    <div className="float-right">
-                        <a className="text-sm" href="#" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
-                    </div>
-                </div>
-                <hr style={{ border: "solid 1px dimgrey", marginTop: "10px" }} />
                 {notifications.slice(0, 5).map((item, index) =>
                     <Notification
                         key={index} item={item}
                         openSharedScript={openSharedScript}
                         close={close}
                     />)}
-                {notifications.length > 5 &&
-                <div onClick={() => showHistory(true)} className="text-center" style={{ fontSize: "20px", marginTop: "-10px" }}>
-                    .....
-                </div>}
             </div>}
-        <div className="flex justify-between px-2">
-            <span>{t(dndStatus)}</span>
-            <button
-                className={`flex ${doNotDisturb ? "justify-start bg-gray-400" : "justify-end bg-black"} my-1 ml-2 w-7 h-4 p-0.5 rounded-full cursor-pointer`}
-                title={t(titleKey)}
-                aria-label={t(titleKey)}
-                onClick={() => store.dispatch(appState.setDoNotDisturb(!doNotDisturb))}>
-                <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
-            </button>
-        </div>
-        <a className="text-sm" href="#" onClick={handleRefresh} title="Refresh notifications">REFRESH</a>
+        {notifications.length > 0 && (
+            <div className="text-center">
+                <a className="text-sm" href="#" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
+            </div>
+        )}
     </div>
 }
 
