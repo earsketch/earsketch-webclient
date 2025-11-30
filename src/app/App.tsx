@@ -209,7 +209,7 @@ async function postLogin(username: string) {
     await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
     // Wait to receive websocket notifications until *after* we have the list of existing shared scripts.
     // This prevents us from re-adding shared scripts when we get a bunch of unread share notifications.
-    
+
     // Load notifications on login
     try {
         const notifications = await request.getAuth("/users/notifications")
@@ -219,7 +219,7 @@ async function postLogin(username: string) {
     } catch (error) {
         esconsole("Error loading notifications on login: " + error, ["debug", "user"])
     }
-    
+
     websocket.login(username)
 }
 
