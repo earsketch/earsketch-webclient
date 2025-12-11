@@ -4,7 +4,7 @@ import { Fragment, useEffect, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
-import { AccountCreator } from "./AccountCreator"
+import { AccountMenu } from "./AccountMenu"
 import { AdminWindow } from "./AdminWindow"
 import * as appState from "../app/appState"
 import * as audioLibrary from "./audiolibrary"
@@ -18,7 +18,6 @@ import { CompetitionSubmission } from "./CompetitionSubmission"
 import * as curriculum from "../browser/curriculumState"
 import { Download } from "./Download"
 import { ErrorForm } from "./ErrorForm"
-import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
@@ -407,10 +406,6 @@ function reportError() {
     openModal(ErrorForm, { email })
 }
 
-function forgotPass() {
-    openModal(ForgotPassword)
-}
-
 const KeyboardShortcuts = () => {
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
@@ -578,14 +573,6 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
 }) => {
     const { t } = useTranslation()
 
-    const createAccount = async () => {
-        const result = await openModal(AccountCreator)
-        if (result) {
-            setUsername(result.username)
-            login(result.username, result.password)
-        }
-    }
-
     const editProfile = async () => {
         const newEmail = await openModal(ProfileEditor, { username, email })
         if (newEmail !== undefined) {
@@ -593,30 +580,38 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         }
     }
 
-    return <>
-        {!loggedIn &&
-        <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-            <input type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">GO <i className="icon icon-arrow-right" /></button>
-        </form>}
-        <Menu as="div" className="relative inline-block text-left mx-3">
-            <Menu.Button className="text-gray-400">
-                {loggedIn
-                    ? <div className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md" role="button">{username}<span className="caret" /></div>
-                    : <div className="whitespace-nowrap py-1 px-2 text-xs bg-white text-black hover:text-black hover:bg-gray-200" role="button" style={{ marginLeft: "6px", height: "23px" }} title={t("createResetAccount")} aria-label={t("createResetAccount")}>{t("createResetAccount")}</div>}
-            </Menu.Button>
-            <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                {(loggedIn
-                    ? [{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
-                    : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
-                    .map(({ name, action }) =>
-                        <Menu.Item key={name}>
-                            {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{name}</button>}
-                        </Menu.Item>)}
-            </Menu.Items>
-        </Menu>
-    </>
+    const openAccountMenu = () => {
+        openModal(AccountMenu, {
+            loggedIn,
+            isAdmin,
+            username,
+            password,
+            email,
+            onLogin: login,
+            onEditProfile: editProfile,
+            onLogout: logout,
+            onAdminWindow: openAdminWindow,
+            setUsername,
+            setPassword,
+        })
+    }
+
+    return (
+        <button
+            className="mx-3 whitespace-nowrap py-1 px-2 rounded-md bg-gray-400 text-black"
+            onClick={openAccountMenu}
+            title={loggedIn ? t("accountMenu.title") : t("accountMenu.login")}
+            aria-label={loggedIn ? t("accountMenu.title") : t("accountMenu.login")}
+        >
+            {loggedIn
+                ? (
+                    <span>{username}<span className="caret" /></span>
+                )
+                : (
+                    <span>{t("accountMenu.login")}</span>
+                )}
+        </button>
+    )
 }
 
 function setup() {
