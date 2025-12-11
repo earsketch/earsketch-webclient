@@ -1194,6 +1194,7 @@
   },
   "templates": {
     "python": "# descripción: \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "python3": "# description: \nfrom __future__ import python3\nfrom earsketch import *\n\nsetTempo(120)\n",
     "javascript": "// descripción: \nsetTempo(120);\n"
   },
   "console": {
