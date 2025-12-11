@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import * as app from "../app/appState"
 import * as editor from "./ideState"
+import * as ESUtils from "../esutils"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import type { ThunkAPI } from "../reducers"
@@ -36,7 +37,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         if (!script) return
 
         let editSession
-        const language = script.name.slice(-2) === "py" ? "python" : "javascript"
+        const language = ESUtils.parseLanguage(script.name)
 
         const restoredSession = getSession(scriptID)
         if (restoredSession) {
