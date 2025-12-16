@@ -1,6 +1,6 @@
 import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
@@ -571,10 +571,12 @@ const NotificationMenu = () => {
     </>
 }
 
-const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }: {
-    loggedIn: boolean, isAdmin: boolean, username: string, password: string,
+type LoginState = "logged-out" | "logging-in" | "logged-in"
+
+const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }: {
+    loginState: LoginState, isAdmin: boolean, username: string, password: string,
     setUsername: (u: string) => void, setPassword: (p: string) => void,
-    login: (u: string, p: string) => void, logout: () => void,
+    login: (i: { username: string, password: string }) => void, logout: () => void,
 }) => {
     const { t } = useTranslation()
 
@@ -582,7 +584,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         const result = await openModal(AccountCreator)
         if (result) {
             setUsername(result.username)
-            login(result.username, result.password)
+            login(result)
         }
     }
 
@@ -593,12 +595,17 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         }
     }
 
+    const loggedIn = loginState === "logged-in"
+    const loggingIn = loginState === "logging-in"
+
     return <>
         {!loggedIn &&
-        <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-            <input type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">GO <i className="icon icon-arrow-right" /></button>
+        <form className="flex items-center" onSubmit={e => { e.preventDefault(); login({ username, password }) }}>
+            <input disabled={loggingIn} type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
+            <input disabled={loggingIn} type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
+            <button disabled={loggingIn} type="submit" className="disabled:bg-gray-400 whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">
+                GO <i className="icon icon-arrow-right" />
+            </button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400">
@@ -663,7 +670,8 @@ export const App = () => {
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
     const [isAdmin, setIsAdmin] = useState(false)
-    const [loggedIn, setLoggedIn] = useState(false)
+    const [loginState, setLoginState] = useState<LoginState>("logged-out")
+    const loginLock = useRef(false)
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
@@ -687,7 +695,7 @@ export const App = () => {
 
             // Attempt to load userdata from a previous session.
             if (savedLoginInfo) {
-                await login(username, password).then(() => {
+                await login({ username, password }).then(() => {
                     // Remove defunct localStorage key
                     localStorage.removeItem(USER_STATE_KEY)
                 }).catch((error: Error) => {
@@ -701,7 +709,7 @@ export const App = () => {
             } else {
                 const token = user.selectToken(store.getState())
                 if (token !== null) {
-                    await relogin(token)
+                    await login({ token })
                 }
             }
 
@@ -745,53 +753,69 @@ export const App = () => {
         }
     }, [currentLocale])
 
-    const login = async (username: string, password: string) => {
+    const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
+        if (loginLock.current) {
+            // Prevent duplicate login processes
+            return
+        }
+        loginLock.current = true
+        setLoginState("logging-in")
         esconsole("Logging in", ["DEBUG", "MAIN"])
-        scriptsThunks.saveAll()
+        let succeeded = false
 
-        let token
         try {
-            token = await request.getBasicAuth("/users/token", username, password)
-        } catch (error) {
-            userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
-            esconsole(error, ["main", "login"])
-            return
-        }
+            scriptsThunks.saveAll()
 
-        await relogin(token)
-    }
+            // Obtain token from username/password if necessary.
+            let token
+            if (loginInfo.token !== undefined) {
+                token = loginInfo.token
+            } else {
+                try {
+                    token = await request.getBasicAuth("/users/token", loginInfo.username, loginInfo.password)
+                } catch (error) {
+                    userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
+                    esconsole(error, ["main", "login"])
+                    return
+                }
+            }
 
-    const relogin = async (token: string) => {
-        let userInfo
-        try {
-            userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
-        } catch {
-            userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
-            dispatch(user.logout())
-            return
-        }
-        const username = userInfo.username
+            let userInfo
+            try {
+                userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
+            } catch {
+                userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
+                return
+            }
+            const username = userInfo.username
 
-        store.dispatch(user.login({ username, token }))
+            store.dispatch(user.login({ username, token }))
 
-        store.dispatch(soundsThunks.getUserSounds(username))
-        store.dispatch(soundsThunks.getFavorites(token))
+            store.dispatch(soundsThunks.getUserSounds(username))
+            store.dispatch(soundsThunks.getFavorites(token))
 
-        // Always override with the returned username in case the letter cases mismatch.
-        setUsername(username)
-        setIsAdmin(userInfo.isAdmin)
-        email = userInfo.email
-        userNotification.user.isAdmin = userInfo.isAdmin
+            // Always override with the returned username in case the letter cases mismatch.
+            setUsername(username)
+            setIsAdmin(userInfo.isAdmin)
+            email = userInfo.email
+            userNotification.user.isAdmin = userInfo.isAdmin
 
-        // Retrieve the user scripts.
-        await postLogin(username)
-        esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
+            // Retrieve the user scripts.
+            await postLogin(username)
+            esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
-        if (!loggedIn) {
-            setLoggedIn(true)
+            setLoginState("logged-in")
             userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+            succeeded = true
+        } catch (err) {
+            userNotification.show("Login failed due to network error.", "failure1", 3.5)
+        } finally {
+            if (!succeeded) {
+                loginLock.current = false
+                setLoginState("logged-out")
+            }
         }
     }
 
@@ -847,7 +871,8 @@ export const App = () => {
         // Clear out all the values set at login.
         setUsername("")
         setPassword("")
-        setLoggedIn(false)
+        loginLock.current = false
+        setLoginState("logged-out")
 
         // User data
         email = ""
@@ -919,7 +944,7 @@ export const App = () => {
                     <SwitchThemeButton />
                     <MiscActionMenu />
                     <NotificationMenu />
-                    <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
+                    <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
             </header>}
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
