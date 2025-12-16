@@ -771,7 +771,7 @@ export const App = () => {
                 console.error("Error fetching notifications:", error)
             }
         }
-        
+
         // Fetch immediately, then every 60 seconds
         fetchNotifications()
         const interval = setInterval(fetchNotifications, 60000)
