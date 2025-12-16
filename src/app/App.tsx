@@ -1,6 +1,6 @@
 import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
@@ -571,8 +571,10 @@ const NotificationMenu = () => {
     </>
 }
 
-const LoginMenu = ({ loggedIn, loggingIn, isAdmin, username, password, setUsername, setPassword, login, logout }: {
-    loggedIn: boolean, loggingIn: boolean, isAdmin: boolean, username: string, password: string,
+type LoginState = "logged-out" | "logging-in" | "logged-in"
+
+const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }: {
+    loginState: LoginState, isAdmin: boolean, username: string, password: string,
     setUsername: (u: string) => void, setPassword: (p: string) => void,
     login: (i: { username: string, password: string }) => void, logout: () => void,
 }) => {
@@ -592,6 +594,9 @@ const LoginMenu = ({ loggedIn, loggingIn, isAdmin, username, password, setUserna
             email = newEmail
         }
     }
+
+    const loggedIn = loginState === "logged-in"
+    const loggingIn = loginState === "logging-in"
 
     return <>
         {!loggedIn &&
@@ -646,8 +651,6 @@ function setup() {
     }
 }
 
-let loggingIn_ = false
-
 // TODO: Move to userState.
 let email = ""
 
@@ -667,8 +670,8 @@ export const App = () => {
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
     const [isAdmin, setIsAdmin] = useState(false)
-    const [loggedIn, setLoggedIn] = useState(false)
-    const [loggingIn, setLoggingIn] = useState(false)
+    const [loginState, setLoginState] = useState<LoginState>("logged-out")
+    const loginLock = useRef(false)
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
@@ -751,13 +754,14 @@ export const App = () => {
     }, [currentLocale])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
-        if (loggingIn_) {
+        if (loginLock.current) {
             // Prevent duplicate login processes
             return
         }
-        loggingIn_ = true
-        setLoggingIn(true)
+        loginLock.current = true
+        setLoginState("logging-in")
         esconsole("Logging in", ["DEBUG", "MAIN"])
+        let succeeded = false
 
         try {
             scriptsThunks.saveAll()
@@ -800,15 +804,18 @@ export const App = () => {
             await postLogin(username)
             esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
-            setLoggedIn(true)
+            setLoginState("logged-in")
             userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+            succeeded = true
         } catch (err) {
             userNotification.show("Login failed due to network error.", "failure1", 3.5)
         } finally {
-            loggingIn_ = false
-            setLoggingIn(false)
+            if (!succeeded) {
+                loginLock.current = false
+                setLoginState("logged-out")
+            }
         }
     }
 
@@ -864,7 +871,8 @@ export const App = () => {
         // Clear out all the values set at login.
         setUsername("")
         setPassword("")
-        setLoggedIn(false)
+        loginLock.current = false
+        setLoginState("logged-out")
 
         // User data
         email = ""
@@ -936,7 +944,7 @@ export const App = () => {
                     <SwitchThemeButton />
                     <MiscActionMenu />
                     <NotificationMenu />
-                    <LoginMenu {...{ loggedIn, loggingIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
+                    <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
             </header>}
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
