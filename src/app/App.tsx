@@ -644,6 +644,8 @@ function setup() {
     }
 }
 
+let loggingIn = false
+
 // TODO: Move to userState.
 let email = ""
 
@@ -762,6 +764,11 @@ export const App = () => {
     }
 
     const relogin = async (token: string) => {
+        if (loggingIn) {
+            // Prevent duplicate login processes
+            return
+        }
+        loggingIn = true
         let userInfo
         try {
             userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
@@ -793,6 +800,7 @@ export const App = () => {
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
         }
+        loggingIn = false
     }
 
     const logout = async () => {
