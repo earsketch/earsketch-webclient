@@ -571,8 +571,8 @@ const NotificationMenu = () => {
     </>
 }
 
-const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }: {
-    loggedIn: boolean, isAdmin: boolean, username: string, password: string,
+const LoginMenu = ({ loggedIn, loggingIn, isAdmin, username, password, setUsername, setPassword, login, logout }: {
+    loggedIn: boolean, loggingIn: boolean, isAdmin: boolean, username: string, password: string,
     setUsername: (u: string) => void, setPassword: (p: string) => void,
     login: (i: { username: string, password: string }) => void, logout: () => void,
 }) => {
@@ -596,9 +596,11 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
     return <>
         {!loggedIn &&
         <form className="flex items-center" onSubmit={e => { e.preventDefault(); login({ username, password }) }}>
-            <input type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">GO <i className="icon icon-arrow-right" /></button>
+            <input disabled={loggingIn} type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
+            <input disabled={loggingIn} type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
+            <button disabled={loggingIn} type="submit" className="disabled:bg-gray-400 whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">
+                GO <i className="icon icon-arrow-right" />
+            </button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400">
@@ -644,7 +646,7 @@ function setup() {
     }
 }
 
-let loggingIn = false
+let loggingIn_ = false
 
 // TODO: Move to userState.
 let email = ""
@@ -666,6 +668,7 @@ export const App = () => {
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
     const [isAdmin, setIsAdmin] = useState(false)
     const [loggedIn, setLoggedIn] = useState(false)
+    const [loggingIn, setLoggingIn] = useState(false)
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
@@ -748,11 +751,12 @@ export const App = () => {
     }, [currentLocale])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
-        if (loggingIn) {
+        if (loggingIn_) {
             // Prevent duplicate login processes
             return
         }
-        loggingIn = true
+        loggingIn_ = true
+        setLoggingIn(true)
         esconsole("Logging in", ["DEBUG", "MAIN"])
 
         try {
@@ -803,7 +807,8 @@ export const App = () => {
         } catch (err) {
             userNotification.show("Login failed due to network error.", "failure1", 3.5)
         } finally {
-            loggingIn = false
+            loggingIn_ = false
+            setLoggingIn(false)
         }
     }
 
@@ -931,7 +936,7 @@ export const App = () => {
                     <SwitchThemeButton />
                     <MiscActionMenu />
                     <NotificationMenu />
-                    <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
+                    <LoginMenu {...{ loggedIn, loggingIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
             </header>}
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
