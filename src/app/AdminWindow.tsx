@@ -56,7 +56,7 @@ async function setPasswordForUser(username: string, password: string, adminPassp
         password,
     }
     await postAuth("/users/modifypwdadmin", data)
-    notification.show("Successfully set a new password for " + username, "history", 3)
+    notification.show("Successfully set a new password for " + username, "normal", 3)
 }
 
 // Expires a broadcast using its ID

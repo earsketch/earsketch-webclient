@@ -209,6 +209,17 @@ async function postLogin(username: string) {
     await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
     // Wait to receive websocket notifications until *after* we have the list of existing shared scripts.
     // This prevents us from re-adding shared scripts when we get a bunch of unread share notifications.
+
+    // Load notifications on login
+    try {
+        const notifications = await request.getAuth("/users/notifications")
+        if (notifications && Array.isArray(notifications)) {
+            userNotification.loadHistory(notifications)
+        }
+    } catch (error) {
+        esconsole("Error loading notifications on login: " + error, ["error", "user"])
+    }
+
     websocket.login(username)
 }
 
@@ -745,6 +756,29 @@ export const App = () => {
         }
     }, [currentLocale])
 
+    // Automatically fetch notifications every 60 seconds when logged in
+    const isLoggedIn = useSelector(user.selectLoggedIn)
+    useEffect(() => {
+        if (!isLoggedIn) return
+
+        const fetchNotifications = async () => {
+            try {
+                const result = await request.getAuth("/users/notifications")
+                if (result && Array.isArray(result)) {
+                    userNotification.loadHistory(result)
+                }
+            } catch (error) {
+                console.error("Error fetching notifications:", error)
+            }
+        }
+
+        // Fetch immediately, then every 60 seconds
+        fetchNotifications()
+        const interval = setInterval(fetchNotifications, 60000)
+
+        return () => clearInterval(interval)
+    }, [isLoggedIn])
+
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
         scriptsThunks.saveAll()
@@ -789,7 +823,7 @@ export const App = () => {
 
         if (!loggedIn) {
             setLoggedIn(true)
-            userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
+            userNotification.show(i18n.t("messages:general.loginsuccess"), "normal", 0.5)
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
         }
