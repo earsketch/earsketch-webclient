@@ -574,7 +574,7 @@ const NotificationMenu = () => {
 const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }: {
     loggedIn: boolean, isAdmin: boolean, username: string, password: string,
     setUsername: (u: string) => void, setPassword: (p: string) => void,
-    login: (u: string, p: string) => void, logout: () => void,
+    login: (i: { username: string, password: string }) => void, logout: () => void,
 }) => {
     const { t } = useTranslation()
 
@@ -582,7 +582,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         const result = await openModal(AccountCreator)
         if (result) {
             setUsername(result.username)
-            login(result.username, result.password)
+            login(result)
         }
     }
 
@@ -595,7 +595,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
 
     return <>
         {!loggedIn &&
-        <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
+        <form className="flex items-center" onSubmit={e => { e.preventDefault(); login({ username, password }) }}>
             <input type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
             <input type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
             <button type="submit" className="whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">GO <i className="icon icon-arrow-right" /></button>
@@ -689,7 +689,7 @@ export const App = () => {
 
             // Attempt to load userdata from a previous session.
             if (savedLoginInfo) {
-                await login(username, password).then(() => {
+                await login({ username, password }).then(() => {
                     // Remove defunct localStorage key
                     localStorage.removeItem(USER_STATE_KEY)
                 }).catch((error: Error) => {
@@ -703,7 +703,7 @@ export const App = () => {
             } else {
                 const token = user.selectToken(store.getState())
                 if (token !== null) {
-                    await relogin(token)
+                    await login({ token })
                 }
             }
 
@@ -747,28 +747,31 @@ export const App = () => {
         }
     }, [currentLocale])
 
-    const login = async (username: string, password: string) => {
-        esconsole("Logging in", ["DEBUG", "MAIN"])
-        scriptsThunks.saveAll()
-
-        let token
-        try {
-            token = await request.getBasicAuth("/users/token", username, password)
-        } catch (error) {
-            userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
-            esconsole(error, ["main", "login"])
-            return
-        }
-
-        await relogin(token)
-    }
-
-    const relogin = async (token: string) => {
+    const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
         if (loggingIn) {
             // Prevent duplicate login processes
             return
         }
+        loggingIn = true
+        esconsole("Logging in", ["DEBUG", "MAIN"])
+
         try {
+            scriptsThunks.saveAll()
+
+            // Obtain token from username/password if necessary.
+            let token
+            if (loginInfo.token !== undefined) {
+                token = loginInfo.token
+            } else {
+                try {
+                    token = await request.getBasicAuth("/users/token", loginInfo.username, loginInfo.password)
+                } catch (error) {
+                    userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
+                    esconsole(error, ["main", "login"])
+                    return
+                }
+            }
+
             let userInfo
             try {
                 userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
