@@ -32,9 +32,8 @@ export function show(text: string, type: string = "", _duration: number | undefi
             pinned: false,
         }))
     } else {
-        // showCallback.apply(this, arguments)
+        callbacks.popup(text, type, _duration)
     }
-    // Popups disabled - callbacks.popup(text, type, duration)
 }
 
 export const showBanner = (text: string, type: string = "") => callbacks.show(text, type)

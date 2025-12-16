@@ -155,13 +155,8 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
         // const token = user.selectToken(store.getState())
         const fullUrl = URL_DOMAIN + endpoint
 
-        // console.log("Fetching notifications from:", fullUrl)
-        // console.log("Token available:", !!token)
-        // console.log("Token preview:", token ? token.substring(0, 20) + "..." : "none")
-
         try {
             const result = await request.getAuth(endpoint)
-            console.log("Notifications endpoint response:", result)
             // Process the notifications and update the list
             if (result && Array.isArray(result)) {
                 userNotification.loadHistory(result)

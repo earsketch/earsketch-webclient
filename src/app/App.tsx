@@ -212,7 +212,7 @@ async function postLogin(username: string) {
             userNotification.loadHistory(notifications)
         }
     } catch (error) {
-        esconsole("Error loading notifications on login: " + error, ["debug", "user"])
+        esconsole("Error loading notifications on login: " + error, ["error", "user"])
     }
 
     websocket.login(username)
