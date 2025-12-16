@@ -182,7 +182,7 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
                 {t("notifications.title")}
             </div>
             <div className="float-right">
-                <a className="text-sm" href="#" onClick={handleRefresh} title="Refresh notifications">REFRESH</a>
+                <a className="text-sm text-blue-500 hover:text-blue-700" href="#" onClick={handleRefresh} title="Refresh notifications">REFRESH</a>
             </div>
         </div>
         <hr className="border-solid border-black border-1 my-2" />
