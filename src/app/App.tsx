@@ -775,6 +775,7 @@ export const App = () => {
         } catch {
             userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
             dispatch(user.logout())
+            loggingIn = false
             return
         }
         const username = userInfo.username
