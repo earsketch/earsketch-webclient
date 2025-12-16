@@ -768,40 +768,40 @@ export const App = () => {
             // Prevent duplicate login processes
             return
         }
-        loggingIn = true
-        let userInfo
         try {
-            userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
-        } catch {
-            userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
-            dispatch(user.logout())
-            loggingIn = false
-            return
-        }
-        const username = userInfo.username
+            let userInfo
+            try {
+                userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
+            } catch {
+                userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
+                return
+            }
+            const username = userInfo.username
 
-        store.dispatch(user.login({ username, token }))
+            store.dispatch(user.login({ username, token }))
 
-        store.dispatch(soundsThunks.getUserSounds(username))
-        store.dispatch(soundsThunks.getFavorites(token))
+            store.dispatch(soundsThunks.getUserSounds(username))
+            store.dispatch(soundsThunks.getFavorites(token))
 
-        // Always override with the returned username in case the letter cases mismatch.
-        setUsername(username)
-        setIsAdmin(userInfo.isAdmin)
-        email = userInfo.email
-        userNotification.user.isAdmin = userInfo.isAdmin
+            // Always override with the returned username in case the letter cases mismatch.
+            setUsername(username)
+            setIsAdmin(userInfo.isAdmin)
+            email = userInfo.email
+            userNotification.user.isAdmin = userInfo.isAdmin
 
-        // Retrieve the user scripts.
-        await postLogin(username)
-        esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
+            // Retrieve the user scripts.
+            await postLogin(username)
+            esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
-        if (!loggedIn) {
             setLoggedIn(true)
             userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+        } catch (err) {
+            userNotification.show("Login failed due to network error.", "failure1", 3.5)
+        } finally {
+            loggingIn = false
         }
-        loggingIn = false
     }
 
     const logout = async () => {
