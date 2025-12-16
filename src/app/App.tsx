@@ -756,6 +756,29 @@ export const App = () => {
         }
     }, [currentLocale])
 
+    // Automatically fetch notifications every 60 seconds when logged in
+    const isLoggedIn = useSelector(user.selectLoggedIn)
+    useEffect(() => {
+        if (!isLoggedIn) return
+
+        const fetchNotifications = async () => {
+            try {
+                const result = await request.getAuth("/users/notifications")
+                if (result && Array.isArray(result)) {
+                    userNotification.loadHistory(result)
+                }
+            } catch (error) {
+                console.error("Error fetching notifications:", error)
+            }
+        }
+        
+        // Fetch immediately, then every 60 seconds
+        fetchNotifications()
+        const interval = setInterval(fetchNotifications, 60000)
+
+        return () => clearInterval(interval)
+    }, [isLoggedIn])
+
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
         scriptsThunks.saveAll()
