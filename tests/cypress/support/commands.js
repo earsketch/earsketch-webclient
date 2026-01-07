@@ -119,7 +119,7 @@ Cypress.Commands.add("interceptAudioStandard", (sounds = []) => {
         {
             hostname: CLOUDFRONT_HOST,
             method: "GET",
-            path: "/backend-static/audio-standard.json",
+            path: "/backend-static/audio-standard_1.json",
         },
         {
             body: standardAudioLibrary,
