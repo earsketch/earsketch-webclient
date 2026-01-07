@@ -21,6 +21,7 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { setReady } from "../bubble/bubbleState"
 import { dismiss } from "../bubble/bubbleThunks"
+import { callbacks as bubbleCallbacks } from "../bubble/Bubble"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
 import { openModal } from "../app/modal"
@@ -328,6 +329,7 @@ async function runScript() {
 }
 
 dawCallbacks.runScript = runScript
+bubbleCallbacks.runScript = runScript
 
 export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }: {
     closeAllTabs: () => void, importScript: (s: Script) => void, shareScript: (s: Script) => void, downloadScript: (s: Script) => void

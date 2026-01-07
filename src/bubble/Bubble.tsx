@@ -13,6 +13,10 @@ import { proceed, dismiss } from "./bubbleThunks"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 import classNames from "classnames"
 
+export const callbacks = {
+    runScript: () => {},
+}
+
 const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolean, name: string, pref?: Ref<HTMLButtonElement> }) => {
     const dispatch = useDispatch()
     const action = tag === "proceed" ? proceed : dismiss
@@ -46,6 +50,18 @@ const MessageFooter = () => {
         buttons = <>
             <NavButton name={t("bubble:buttons.skip")} tag="dismiss" />
             <NavButton name={t("bubble:buttons.start")} tag="proceed" primary />
+        </>
+    } else if (currentPage === 2) {
+        buttons = <>
+            <NavButton name={t("bubble:buttons.skipTour")} tag="dismiss" />
+            <NavButton name={t("bubble:buttons.next")} tag="proceed" primary />
+            <button className="animate-shake absolute top-[-2.8rem] right-[4.2rem] flex rounded-full px-2.5 text-white items-center whitespace-nowrap bg-green-700"
+                onClick={() => callbacks.runScript()}>
+                <div className="flex bg-white rounded-full text-xs mr-1 p-0.5">
+                    <i className="icon-arrow-right22 font-bold text-green-600" />
+                </div>
+                {t("editor.run").toLocaleUpperCase()}
+            </button>
         </>
     } else if (currentPage === 9) {
         buttons = <>
@@ -221,14 +237,6 @@ export const Bubble = () => {
         update?.()
     }, [currentPage])
 
-    // Close on escape. Perhaps someday we can avoid reimplementing this.
-    // See https://github.com/tailwindlabs/headlessui/issues/621; unfortunately the solution there (from June 23, 2021) no longer works.
-    useEffect(() => {
-        const escape = (e: KeyboardEvent) => e.key === "Escape" && dispatch(bubble.suspend())
-        window.addEventListener("keydown", escape)
-        return () => window.removeEventListener("keydown", escape)
-    })
-
     // Prevent panel from being too tall on the code editor page
     const isCodeEditorPage = currentPage === 1
     const panelClass = classNames("absolute z-40 w-1/3 bg-white p-5 shadow-xl", {
@@ -237,7 +245,7 @@ export const Bubble = () => {
 
     return <Dialog
         open={active}
-        onClose={() => { /* Disabled so user can click on highlighted elements outside the modal. */ }}
+        onClose={() => dispatch(bubble.suspend())}
         className="absolute top-0 w-full h-full"
     >
         <Dialog.Panel className="h-full flex justify-center items-center">
