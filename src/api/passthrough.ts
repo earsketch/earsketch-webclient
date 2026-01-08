@@ -939,6 +939,8 @@ const checkType = (name: string, expectedType: string, arg: any) => {
     // eslint-disable-next-line valid-typeof
     } else if (expectedType !== typeof arg) {
         throw new TypeError(`${name} must be a ${expectedType}`)
+    } else if (expectedType === "number" && Number.isNaN(arg)) {
+        throw new ValueError(`${name} is NaN (not a number)`)
     }
 }
 
