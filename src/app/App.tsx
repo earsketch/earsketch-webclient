@@ -850,7 +850,10 @@ export const ModalContainer = () => {
 
     const close = () => {
         setClosing(true)
-        resolve(undefined) // This has no effect if the modal already resolved with a payload.
+
+        // Bug fix: Guard `resolve` so it is only called once, or risk an infinite render loop in firefox.
+        resolve?.(undefined)
+
         setTimeout(() => {
             if (modalData === appState.selectModal(store.getState())) {
                 dispatch(appState.setModal(null))
