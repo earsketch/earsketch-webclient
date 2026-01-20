@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
 import esconsole from "../esconsole"
 import * as user from "../user/userState"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
-import * as websocket from "./websocket"
 import store from "../reducers"
 import { get, getAuth, postAuth } from "../request"
 import type { Notification } from "../user/userState"
@@ -170,15 +168,20 @@ const AdminSendBroadcast = () => {
         })
     }, [])
 
-    const sendBroadcast = () => {
-        postAuth("/users/sendbroadcast", {
-            text: message,
-            hyperlink: link ?? "",
-            expiration: expiration.toString(),
-        })
-        // TODO show success message or handle failure
-        setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
-        getBroadcasts().then((res: Notification[]) => setBroadcasts(res))
+    const sendBroadcast = async () => {
+        try {
+            await postAuth("/users/sendbroadcast", {
+                text: message,
+                hyperlink: link ?? "",
+                expiration: expiration.toString(),
+            })
+            setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
+            getBroadcasts().then((res: Notification[]) => setBroadcasts(res))
+        } catch (error) {
+            const m = "Failed to send broadcast."
+            esconsole(m, ["error", "admin"])
+            setBroadcastStatus({ message: m, style: "alert alert-danger" })
+        }
     }
 
     const expireBroadcast = async (id: string) => {
