@@ -195,7 +195,6 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
                         onClick={() => {
                             if (disabled) return
                             onClick()
-                            close()
                         }}
                         aria-label={aria}
                         title={aria}
@@ -238,7 +237,6 @@ const ScriptContextMenu = ({ script, className, children, scriptMenuItems }: { s
                                 onClick={() => {
                                     if (disabled) return
                                     onClick()
-                                    close()
                                 }}
                                 aria-label={aria}
                                 title={aria}
