@@ -163,7 +163,6 @@ const AdminSendBroadcast = () => {
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
     const [broadcasts, setBroadcasts] = useState([] as Notification[])
-    const username = useSelector(user.selectUserName)!
 
     useEffect(() => {
         getBroadcasts().then((res: Notification[]) => {
@@ -172,16 +171,12 @@ const AdminSendBroadcast = () => {
     }, [])
 
     const sendBroadcast = () => {
-        websocket.send({
-            notification_type: "broadcast",
-            username: username.toLowerCase(),
-            message: {
-                text: message,
-                hyperlink: link ?? "",
-                expiration,
-            },
+        postAuth("/users/sendbroadcast", {
+            text: message,
+            hyperlink: link ?? "",
+            expiration: expiration.toString(),
         })
-        // always show success message, as we have no indication of failure
+        // TODO show success message or handle failure
         setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
         getBroadcasts().then((res: Notification[]) => setBroadcasts(res))
     }
