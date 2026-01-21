@@ -191,10 +191,5 @@ export function getDAWDataDifferences(previous: DAWData, current: DAWData): stri
         }
     }
 
-    // Return "no changes" message if no differences found but there was previous content
-    if (differences.length === 0 && (prevTrackCount > 0 || previous.length > 0)) {
-        differences.push(i18n.t("messages:idecontroller.noChanges"))
-    }
-
     return differences
 }
