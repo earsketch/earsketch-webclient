@@ -1,12 +1,16 @@
-import React, { ChangeEventHandler, MouseEventHandler, LegacyRef, useEffect, useState } from "react"
+import React, { ChangeEventHandler, MouseEventHandler, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import { usePopper } from "react-popper"
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/react'
 
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as caiState from "../cai/caiState"
 import * as student from "../cai/dialogue/student"
+import { useAppSelector } from "../hooks"
+import * as scripts from "./scriptsState"
+import { MultiSelectFilterKey } from "./scriptsState"
 
 interface SearchBarProps {
     searchText: string
@@ -51,7 +55,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
 
 interface DropdownMultiSelectorProps {
     title: string
-    category: string
+    category: MultiSelectFilterKey
     aria?: string
     items: string[]
     position: "center" | "left" | "right"
@@ -59,85 +63,96 @@ interface DropdownMultiSelectorProps {
     FilterItem: React.FC<any>
 }
 
-export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
-    const theme = useSelector(appState.selectColorTheme)
-    const { t } = useTranslation()
-    const [showTooltip, setShowTooltip] = useState(false)
-    const [referenceElement, setReferenceElement] = useState<HTMLDivElement|null>(null)
-    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
-    const { styles, attributes, update } = usePopper(referenceElement, popperElement, {
-        modifiers: [{ name: "offset", options: { offset: [0, 5] } }],
-    })
+export const HeadlessMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
+  const theme = useSelector(appState.selectColorTheme)
+  const dispatch = useDispatch()
 
-    const handleClick = (event: Event) => {
-        setPopperElement(ref => {
-            setReferenceElement(rref => {
-                const target = event.target as Node
-                // TODO: Pretty hacky way to get the non-null (popper-initialized) multiple refs. Refactor if possible.
-                if (!ref?.contains(target) && !rref?.contains(target)) {
-                    setShowTooltip(false)
-                }
-                return rref
-            })
-            return ref
-        })
+  const selectedValues = useAppSelector(
+    (state) => state.scripts.filters[category]
+  )
+
+  const [referenceElement, setReferenceElement] =
+    useState<HTMLButtonElement | null>(null)
+  const [popperElement, setPopperElement] =
+    useState<HTMLDivElement | null>(null)
+
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    modifiers: [{ name: "offset", options: { offset: [0, 6] } }],
+  })
+
+  const handleChange = (newValues: string[]) => {
+    if (newValues.includes("__clear__")) {
+      dispatch(scripts.resetFilter(category))
+      return
     }
 
-    useEffect(() => {
-        document.addEventListener("mousedown", handleClick)
-        return () => document.removeEventListener("mousedown", handleClick)
-    }, [])
+    dispatch(
+      scripts.setFilter({
+        category,
+        values: newValues,
+      })
+    )
+  }
 
-    let margin
-    if (position === "left") margin = "mr-2"
-    else if (position === "right") margin = "ml-2"
-    else margin = "mx-1"
+  const margin =
+    position === "left" ? "mr-2" :
+    position === "right" ? "ml-2" : "mx-1"
 
-    return (<>
-        <div
-            ref={setReferenceElement as LegacyRef<HTMLDivElement>}
-            onClick={() => {
-                setShowTooltip(show => {
-                    update?.()
-                    return !show
-                })
-            }}
-            tabIndex={0}
-            className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme === "light" ? "border-black" : "border-white"}`}
-            aria-label={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { filter: aria })}
-            title={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { filter: aria })}
+  return (
+    <Listbox value={selectedValues} multiple onChange={handleChange}>
+      <div className="relative w-1/3">
+        <ListboxButton
+          ref={setReferenceElement}
+          className={`flex justify-between w-full border-b-2 ${margin}
+            ${theme === "light" ? "border-black" : "border-white"}`}
+          aria-label={aria}
         >
-            <div className="flex justify-left truncate text-sm">
-                <div className="truncate min-w-0">
-                    {title}
-                </div>
-                <div className="ml-1">
-                    {numSelected ? `(${numSelected})` : ""}
-                </div>
-            </div>
-            <i className="icon icon-arrow-down2 text-xs p-1" />
-        </div>
-        <div
-            ref={setPopperElement as LegacyRef<HTMLDivElement>}
-            style={showTooltip ? styles.popper : { display: "none" }}
-            {...attributes.popper}
-            className={`border border-black p-2 z-50 ${theme === "light" ? "bg-white" : "bg-black"}`}
-            role="listbox"
-            aria-multiselectable="true"
+          <span className="truncate">
+            {title} {numSelected ? `(${numSelected})` : ""}
+          </span>
+          <i className="icon icon-arrow-down2 text-xs p-1" />
+        </ListboxButton>
+
+        <ListboxOptions
+          ref={(el) => setPopperElement(el as HTMLDivElement | null)}
+          style={styles.popper}
+          {...attributes.popper}
+          className={`z-50 mt-1 border p-2 focus:outline-none
+            ${theme === "light" ? "bg-white" : "bg-black"}`}
         >
-            <div role="option">
+          <ListboxOption as="button" type="button" value="__clear__">
+            {({ active }) => (
+              <FilterItem
+                isClearItem
+                active={active}
+                selected={false}
+              />
+            )}
+          </ListboxOption>
+
+          <hr className="my-2 border-black dark:border-white" />
+
+          {items.map((item) => (
+            <ListboxOption
+              as="button"
+              type="button"
+              key={item}
+              value={item}
+              className="focus:outline-none"
+            >
+              {({ active, selected }) => (
                 <FilterItem
-                    category={category}
-                    isClearItem={true}
+                  value={item}
+                  active={active}
+                  selected={selected}
                 />
-                {items.map((item, index) => <FilterItem
-                    key={index}
-                    value={item}
-                    category={category}
-                />)}
-            </div>
-        </div>
-    </>)
+              )}
+            </ListboxOption>
+          ))}
+        </ListboxOptions>
+      </div>
+    </Listbox>
+  )
 }
 
 export const Collection = ({ title, visible = true, initExpanded = true, className = "", children }: {

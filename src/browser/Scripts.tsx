@@ -1,24 +1,29 @@
-import React, { ChangeEvent, MouseEvent } from "react"
+import React, { ChangeEvent, MouseEvent, useState } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
 import { FixedSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 
 import type { Script, ScriptType } from "common"
-import type { RootState } from "../reducers"
+import * as appState from "../app/appState"
 import * as scripts from "./scriptsState"
 import * as scriptsThunks from "./scriptsThunks"
 import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as user from "../user/userState"
 
-import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
+import { Collection, HeadlessMultiSelector, SearchBar } from "./Utils"
 import { ScriptDropdownMenu } from "./ScriptsMenus"
 import { BrowserTabType } from "./BrowserTab"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react"
+import { useEffect } from "react"
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/react'
+
+import { Fragment } from "react"
+import { usePopper } from "react-popper"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -49,61 +54,122 @@ const ScriptSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean }) => {
-    const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value))
-    const dispatch = useDispatch()
-    const { t } = useTranslation()
-    return (
-        <>
-            <div
-                className="flex justify-left items-center cursor-pointer pr-5 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
-                onClick={() => {
-                    if (isClearItem) {
-                        dispatch(scripts.resetFilter(category))
-                    } else {
-                        if (selected) dispatch(scripts.removeFilterItem({ category, value }))
-                        else dispatch(scripts.addFilterItem({ category, value }))
-                    }
-                }}
-                aria-selected={selected}
-            >
-                <div className="w-5">
-                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`}/>
-                </div>
-                <div className="text-sm select-none">
-                    {isClearItem ? t("clear") : value}
-                </div>
-            </div>
-            {isClearItem && <hr className="border-1 my-2 border-black dark:border-white" />}
-        </>
-    )
+interface FilterItemProps {
+  value?: string           // the item value
+  isClearItem?: boolean    // true for the "clear filters" option
+  active: boolean          // passed from Headless UI
+  selected?: boolean       // passed from Headless UI
 }
 
-const SortOptionsItem = ({ value, isClearItem }: { value: scripts.SortByAttribute, isClearItem: boolean }) => {
-    const selected = isClearItem ? false : useSelector(scripts.selectSortByAttribute) === value
-    const ascending = useSelector(scripts.selectSortByAscending)
-    const dispatch = useDispatch()
+export const FilterItem = ({ value, isClearItem = false, active, selected = false }: FilterItemProps) => {
+  const { t } = useTranslation()
 
-    if (isClearItem) return null
+  return (
+    <div
+      className={`flex items-center pr-5 select-none
+        ${active ? "bg-blue-200 dark:bg-blue-500" : ""}
+      `}
+    >
+      <div className="w-5" aria-hidden>
+        <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
+      </div>
 
-    return (
-        <div
-            className="flex justify-left items-center cursor-pointer pr-8 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
-            onClick={() => {
-                dispatch(scripts.setSorter(value))
-            }}
-            aria-label={value}
-            title={value}
+      <div className="text-sm">
+        {isClearItem ? t("clear") : value}
+      </div>
+    </div>
+  )
+}
+
+export const SORT_OPTIONS = [
+  { id: "date-desc", label: "Date (Newest)", attribute: "date", ascending: false },
+  { id: "date-asc", label: "Date (Oldest)", attribute: "date", ascending: true },
+  { id: "name-az", label: "A–Z", attribute: "name", ascending: true },
+  { id: "name-za", label: "Z–A", attribute: "name", ascending: false },
+] as const
+
+export const SortBySelector = () => {
+  const theme = useSelector(appState.selectColorTheme)
+  const dispatch = useDispatch()
+  const sortBy = useSelector((state: any) => state.scripts.filters.sortBy)
+
+  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null)
+  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null)
+
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    modifiers: [{ name: "offset", options: { offset: [0, 6] } }],
+  })
+
+  // Local state for the selected option
+  const [selectedId, setSelectedId] = useState<string>(
+    SORT_OPTIONS.find(
+      (o) => o.attribute === sortBy.attribute && o.ascending === sortBy.ascending
+    )?.id ?? SORT_OPTIONS[0].id
+  )
+
+  // Sync local state if Redux sortBy changes externally
+  useEffect(() => {
+    const currentId =
+      SORT_OPTIONS.find(
+        (o) => o.attribute === sortBy.attribute && o.ascending === sortBy.ascending
+      )?.id ?? SORT_OPTIONS[0].id
+    setSelectedId(currentId)
+  }, [sortBy.attribute, sortBy.ascending])
+
+  return (
+    <Listbox
+      value={selectedId}
+      onChange={(id: string) => {
+        const option = SORT_OPTIONS.find((o) => o.id === id)
+        if (!option) return
+        setSelectedId(id)
+        dispatch(scripts.setSortBy({ attribute: option.attribute, ascending: option.ascending }))
+      }}
+    >
+      <div className="relative w-1/3 ml-2">
+        <ListboxButton
+          ref={(el) => setReferenceElement(el as HTMLButtonElement | null)}
+          className={`flex justify-between w-full border-b-2 cursor-pointer select-none ${
+            theme === "light" ? "border-black" : "border-white"
+          }`}
+          aria-label="Sort by"
         >
-            <div className="w-8">
-                <i className={`icon ${ascending ? "icon-arrow-up" : "icon-arrow-down"} ${selected ? "block" : "hidden"}`} />
-            </div>
-            <div className="select-none">
-                {value}
-            </div>
-        </div>
-    )
+          <span className="truncate">
+            Sort by
+          </span>
+          <i className="icon icon-arrow-down2 text-xs p-1" />
+        </ListboxButton>
+
+        <ListboxOptions
+          ref={(el) => setPopperElement(el as HTMLDivElement | null)}
+          style={styles.popper}
+          {...attributes.popper}
+          className={`border p-2 z-50 focus:outline-none ${
+            theme === "light" ? "bg-white" : "bg-black"
+          }`}
+        >
+          {SORT_OPTIONS.map((option) => (
+            <ListboxOption key={option.id} value={option.id} as={Fragment}>
+              {({ active, selected }) => (
+                <div
+                  className={`flex items-center px-2 py-1 cursor-pointer select-none ${
+                    active ? "bg-blue-200 dark:bg-blue-500" : ""
+                  }`}
+                >
+                  <div className="w-5" aria-hidden>
+                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
+                  </div>
+                  <div className="text-sm">{option.label}</div>
+                </div>
+              )}
+            </ListboxOption>
+          ))}
+        </ListboxOptions>
+      </div>
+    </Listbox>
+  )
 }
+
 
 const Filters = () => {
     const owners = useSelector(scripts.selectAllScriptOwners)
@@ -115,7 +181,7 @@ const Filters = () => {
         <div className="p-3">
             <div className="pb-2 text-xs">{t("filter").toLocaleUpperCase()}</div>
             <div className="flex justify-between">
-                <DropdownMultiSelector
+                <HeadlessMultiSelector
                     title={t("scriptBrowser.filterDropdown.owner")}
                     category="owners"
                     items={owners}
@@ -124,7 +190,7 @@ const Filters = () => {
                     position="left"
                     FilterItem={FilterItem}
                 />
-                <DropdownMultiSelector
+                <HeadlessMultiSelector
                     title={t("scriptBrowser.filterDropdown.fileType")}
                     category="types"
                     aria={t("scriptBrowser.filterDropdown.fileType")}
@@ -133,14 +199,7 @@ const Filters = () => {
                     position="center"
                     FilterItem={FilterItem}
                 />
-                <DropdownMultiSelector
-                    title={t("scriptBrowser.filterDropdown.sortBy")}
-                    category="sortBy"
-                    aria={t("scriptBrowser.filterDropdown.sortBy")}
-                    items={["Date", "A-Z"]}
-                    position="right"
-                    FilterItem={SortOptionsItem}
-                />
+                <SortBySelector/>
             </div>
         </div>
     )
