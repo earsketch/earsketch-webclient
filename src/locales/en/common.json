@@ -501,7 +501,7 @@
       "success": "Script ran successfully",
       "overwrite": "That name already exists. Please provide a unique name or first rename the existing script.",
       "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
-      "illegalname": "Please use only regular characters, numbers, or _ in file names.",
+      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
       "savefailed": "Script could not be saved to the cloud. Please save your script offline to avoid losing changes.",
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "Some scripts could not be saved to the cloud. Please save your changes offline to avoid losing them.",
@@ -1255,6 +1255,7 @@
   },
   "templates": {
     "python": "# description: \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "python3": "# description: \nfrom __future__ import python3\nfrom earsketch import *\n\nsetTempo(120)\n",
     "javascript": "// description: \nsetTempo(120);\n"
   },
   "console": {

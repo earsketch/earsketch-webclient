@@ -41,6 +41,12 @@ export default ({ mode }: { mode: string }) => {
             commonjsOptions: {
                 include: [/droplet/, /skulpt/, /node_modules/],
             },
+            rollupOptions: {
+                input: {
+                    main: path.resolve(__dirname, "index.html"),
+                    autograder: path.resolve(__dirname, "autograder/index.html"),
+                },
+            },
         },
         test: {
             environment: "jsdom",
