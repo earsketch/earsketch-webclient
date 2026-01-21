@@ -28,9 +28,8 @@ interface AllFilters extends Filters {
 }
 
 export type MultiSelectFilterKey = {
-  [K in keyof AllFilters]: AllFilters[K] extends string[] ? K : never
+    [K in keyof AllFilters]: AllFilters[K] extends string[] ? K : never
 }[keyof AllFilters]
-
 
 interface ScriptsState {
     // TODO: Rename to clarify: are regularScripts all scripts owned by user (including shared scripts)?
