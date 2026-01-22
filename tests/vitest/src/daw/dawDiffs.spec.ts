@@ -21,6 +21,11 @@ vi.mock("i18next", () => ({
 const baselineData = baseline as unknown as DAWData
 const baselinePlus1TrackData = baselinePlus1Track as unknown as DAWData
 
+// Helper function to verify i18n.t was called with correct key and parameters
+function expectI18nCalledWith(key: string, params: Record<string, unknown>) {
+    expect(i18n.t).toHaveBeenCalledWith(key, expect.objectContaining(params))
+}
+
 describe("getDAWDataDifferences", () => {
     beforeEach(() => {
         vi.clearAllMocks()
@@ -46,28 +51,14 @@ describe("getDAWDataDifferences", () => {
         const differences = getDAWDataDifferences(baselineData, baselinePlus1TrackData)
         expect(differences).toHaveLength(3)
 
-        // Verify i18n.t was called with correct key and parameters
-        expect(i18n.t).toHaveBeenCalledWith(
-            "messages:idecontroller.projectLengthIncreased",
-            expect.objectContaining({
-                from: 8,
-                to: 9,
-            })
-        )
+        expectI18nCalledWith("messages:idecontroller.projectLengthIncreased", { from: 8, to: 9 })
     })
 
     it("detects project length decrease when comparing baseline-plus-1-track to baseline", () => {
         const differences = getDAWDataDifferences(baselinePlus1TrackData, baselineData)
         expect(differences.length).toBeGreaterThan(0)
 
-        // Verify i18n.t was called with correct key and parameters
-        expect(i18n.t).toHaveBeenCalledWith(
-            "messages:idecontroller.projectLengthDecreased",
-            expect.objectContaining({
-                from: 9,
-                to: 8,
-            })
-        )
+        expectI18nCalledWith("messages:idecontroller.projectLengthDecreased", { from: 9, to: 8 })
     })
 
     it("detects project length changes with custom data", () => {
@@ -76,25 +67,13 @@ describe("getDAWDataDifferences", () => {
 
         const increasedDiffs = getDAWDataDifferences(shorterProject, longerProject)
         expect(increasedDiffs.some(diff => diff.includes("projectLengthIncreased"))).toBe(true)
-        expect(i18n.t).toHaveBeenCalledWith(
-            "messages:idecontroller.projectLengthIncreased",
-            expect.objectContaining({
-                from: 5,
-                to: 20,
-            })
-        )
+        expectI18nCalledWith("messages:idecontroller.projectLengthIncreased", { from: 5, to: 20 })
 
         vi.clearAllMocks()
 
         const decreasedDiffs = getDAWDataDifferences(longerProject, shorterProject)
         expect(decreasedDiffs.some(diff => diff.includes("projectLengthDecreased"))).toBe(true)
-        expect(i18n.t).toHaveBeenCalledWith(
-            "messages:idecontroller.projectLengthDecreased",
-            expect.objectContaining({
-                from: 20,
-                to: 5,
-            })
-        )
+        expectI18nCalledWith("messages:idecontroller.projectLengthDecreased", { from: 20, to: 5 })
     })
 
     it("detects tracks added", () => {
