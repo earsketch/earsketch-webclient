@@ -148,22 +148,23 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
 }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
+    const [isRefreshing, setIsRefreshing] = useState(false)
 
     const handleRefresh = async (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault()
-        const endpoint = "/users/notifications"
-        // const token = user.selectToken(store.getState())
-        const fullUrl = URL_DOMAIN + endpoint
 
+        // Animate the refresh icon
+        setIsRefreshing(true)
+        setTimeout(() => setIsRefreshing(false), 500)
+
+        // Fetch the latest notifications and immediately update the state
         try {
-            const result = await request.getAuth(endpoint)
-            // Process the notifications and update the list
+            const result = await request.getAuth("/users/notifications")
             if (result && Array.isArray(result)) {
                 userNotification.loadHistory(result)
             }
         } catch (error: any) {
             console.error("Error fetching notifications:", error)
-            console.error("Full URL attempted:", fullUrl)
             console.error("Error type:", error?.constructor?.name)
             console.error("Error stack:", error?.stack)
             if (error.code) {
@@ -182,7 +183,9 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
                 {t("notifications.title")}
             </div>
             <div className="float-right pr-2">
-                <NotificationRefreshButton onClick={handleRefresh} />
+                <a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={handleRefresh} title="Refresh notifications">
+                    <i className={`icon icon-loop2 inline-block ${isRefreshing ? "animate-spin" : ""}`} />
+                </a>
             </div>
         </div>
         <hr className="border-solid border-black border-1 my-2" />
@@ -204,10 +207,6 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
             </div>
         )}
     </div>
-}
-
-const NotificationRefreshButton = ({ onClick }: { onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => {
-    return <a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={onClick} title="Refresh notifications"><i className="icon icon-loop2" /></a>
 }
 
 export const NotificationHistory = ({ openSharedScript, close }: {
