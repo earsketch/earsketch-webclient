@@ -220,7 +220,7 @@ const Notification = ({ item, openSharedScript, close }: {
                         </div>}
                         {item.notification_type === "share_script" &&
                         <div>
-                            <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>
+                            <a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>
                         </div>}
                     </div>
                 </div>
@@ -369,7 +369,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                             </div>
                         </div>
                         {item.notification_type === "share_script" && <div>
-                            <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>
+                            <a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>
                         </div>}
                     </div>
                 </div>
