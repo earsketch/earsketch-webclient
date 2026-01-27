@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { useSelector } from "react-redux"
 
 import * as ESUtils from "../esutils"
@@ -148,10 +148,21 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
 }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
+
     const [isRefreshing, setIsRefreshing] = useState(false)
+    const FETCH_COOLDOWN_MS = 3000 // 3 seconds
+    const lastClickRef = useRef(0)
 
     const handleRefresh = async (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault()
+
+        // Throttle clicks to once every FETCH_COOLDOWN_MS milliseconds
+        const now = Date.now()
+        if (now - lastClickRef.current < FETCH_COOLDOWN_MS) {
+            return // too soon, ignore click
+        }
+
+        lastClickRef.current = now
 
         // Animate the refresh icon
         setIsRefreshing(true)
