@@ -200,14 +200,14 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
             </div>}
         {notifications.length > 0 && (
             <div className="text-center">
-                <a className="text-sm text-blue-600 hover:text-blue-700" href="#" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
+                <a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
             </div>
         )}
     </div>
 }
 
 const NotificationRefreshButton = ({ onClick }: { onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => {
-    return <a className="text-sm text-blue-600 hover:text-blue-700" href="#" onClick={onClick} title="Refresh notifications"><i className="icon icon-loop2" /></a>
+    return <a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={onClick} title="Refresh notifications"><i className="icon icon-loop2" /></a>
 }
 
 export const NotificationHistory = ({ openSharedScript, close }: {
@@ -254,7 +254,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
 
         <div className="notification-type-header flex justify-between">
             <div>{t("notifications.other")}</div>
-            <div><a className="text-sm text-blue-600 hover:text-blue-700" href="#" onClick={e => { e.preventDefault(); userNotification.markAllAsRead() }}>{t("notifications.markAllRead").toLocaleUpperCase()}</a></div>
+            <div><a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={e => { e.preventDefault(); userNotification.markAllAsRead() }}>{t("notifications.markAllRead").toLocaleUpperCase()}</a></div>
         </div>
         {notifications.map((item, index) =>
             item.notification_type !== "broadcast" && <div key={index}>
