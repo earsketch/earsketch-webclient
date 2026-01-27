@@ -647,7 +647,7 @@ export const App = () => {
         }
     }, [currentLocale])
 
-    // Automatically fetch notifications every 60 seconds when logged in
+    // Automatically fetch notifications every X minutes when logged in
     const isLoggedIn = useSelector(user.selectLoggedIn)
     useEffect(() => {
         if (!isLoggedIn) return
@@ -663,7 +663,7 @@ export const App = () => {
             }
         }
 
-        // Fetch immediately, then every X seconds
+        // Fetch periodically
         fetchNotifications()
         const NOTIFICATION_FETCH_INTERVAL_MS = 5 * 60 * 1000 // 5 minutes
         const interval = setInterval(fetchNotifications, NOTIFICATION_FETCH_INTERVAL_MS)
