@@ -23,7 +23,7 @@ import { IDE, openShare } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
 import { chooseDetectedLanguage, LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
-import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
+import { NotificationBar, NotificationMenu } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameSound } from "./Rename"
 import reporter from "./reporter"
@@ -437,34 +437,6 @@ const MiscActionMenu = () => {
     </Menu>
 }
 
-const NotificationMenu = () => {
-    const notifications = useSelector(user.selectNotifications)
-    const numUnread = notifications.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
-    const { t } = useTranslation()
-
-    const [showHistory, setShowHistory] = useState(false)
-
-    return <>
-        {showHistory && <NotificationHistory openSharedScript={openSharedScript} close={() => setShowHistory(false)} />}
-        <Popover>
-            <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-3 relative" title={t("ariaDescriptors:header.toggleNotifications")}>
-                <i className="icon icon-bell" />
-                {numUnread > 0 && <div role="status" aria-label={t("ariaDescriptors:header.unreadNotifications", { numUnread })} className="text-sm w-4 h-4 text-white bg-red-600 rounded-full absolute top-0 -right-1 leading-none" data-test="numUnreadNotifications">{numUnread}</div>}
-            </Popover.Button>
-            <div className="relative right-1">
-                <NotificationPopup />
-            </div>
-            <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-3/4">
-                {({ close }) => <NotificationList
-                    openSharedScript={openSharedScript}
-                    showHistory={setShowHistory}
-                    close={close}
-                />}
-            </Popover.Panel>
-        </Popover>
-    </>
-}
-
 type LoginState = "logged-out" | "logging-in" | "logged-in"
 
 const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }: {
@@ -646,60 +618,6 @@ export const App = () => {
             changeLanguage(ENGLISH_LOCALE.localeCode)
         }
     }, [currentLocale])
-
-    // Automatically fetch notifications every X minutes when logged in
-    const isLoggedIn = useSelector(user.selectLoggedIn)
-    useEffect(() => {
-        if (!isLoggedIn) return
-
-        const fetchNotifications = async () => {
-            try {
-                const result = await request.getAuth("/users/notifications")
-                if (Array.isArray(result)) {
-                    userNotification.loadHistory(result)
-                }
-            } catch (error) {
-                console.error("Error fetching notifications:", error)
-            }
-        }
-
-        const NOTIFICATION_FETCH_INTERVAL_MS = 5 * 60 * 1000 // 5 minutes
-
-        let intervalId: number | null = null
-
-        const startPolling = () => {
-            if (intervalId != null) return
-            fetchNotifications()
-            intervalId = window.setInterval(
-                fetchNotifications,
-                NOTIFICATION_FETCH_INTERVAL_MS
-            )
-        }
-
-        const stopPolling = () => {
-            if (intervalId == null) return
-            clearInterval(intervalId)
-            intervalId = null
-        }
-
-        const onVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
-                startPolling()
-            } else {
-                stopPolling()
-            }
-        }
-
-        // start based on initial visibility
-        onVisibilityChange()
-
-        document.addEventListener("visibilitychange", onVisibilityChange)
-
-        return () => {
-            stopPolling()
-            document.removeEventListener("visibilitychange", onVisibilityChange)
-        }
-    }, [isLoggedIn])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
         if (loginLock.current) {
@@ -891,7 +809,7 @@ export const App = () => {
                     <FontSizeMenu />
                     <SwitchThemeButton />
                     <MiscActionMenu />
-                    <NotificationMenu />
+                    <NotificationMenu openSharedScript={openSharedScript} />
                     <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
             </header>}

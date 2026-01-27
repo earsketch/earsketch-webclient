@@ -1,4 +1,5 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
+import { Popover } from "@headlessui/react"
 import { useSelector } from "react-redux"
 
 import * as ESUtils from "../esutils"
@@ -96,6 +97,94 @@ export const NotificationPopup = () => {
             }}>X</span>
         </div>
     </div>
+}
+
+/** Automatically fetch notifications every X minutes when logged in */
+const useNotificationLongPolling = () => {
+    const FETCH_INTERVAL_MS = 5 * 60 * 1000 // 5 minutes
+
+    const isLoggedIn = useSelector(user.selectLoggedIn)
+
+    useEffect(() => {
+        if (!isLoggedIn) return
+
+        const fetchNotifications = async () => {
+            try {
+                const result = await request.getAuth("/users/notifications")
+                if (Array.isArray(result)) {
+                    userNotification.loadHistory(result)
+                }
+            } catch (error) {
+                console.error("Error fetching notifications:", error)
+            }
+        }
+
+        let intervalId: number | null = null
+
+        const startPolling = () => {
+            if (intervalId != null) return
+            fetchNotifications()
+            intervalId = window.setInterval(fetchNotifications, FETCH_INTERVAL_MS)
+        }
+
+        const stopPolling = () => {
+            if (intervalId == null) return
+            clearInterval(intervalId)
+            intervalId = null
+        }
+
+        const onVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                console.log("Visibility change: Start notification polling", new Date().toLocaleTimeString())
+                startPolling()
+            } else {
+                console.log("Visibility change: Stop notification polling", new Date().toLocaleTimeString())
+                stopPolling()
+            }
+        }
+
+        // start based on initial visibility
+        onVisibilityChange()
+
+        document.addEventListener("visibilitychange", onVisibilityChange)
+
+        return () => {
+            stopPolling()
+            document.removeEventListener("visibilitychange", onVisibilityChange)
+        }
+    }, [isLoggedIn])
+}
+
+/** Notification bell icon and dropdown menu for the header nav */
+export const NotificationMenu = ({ openSharedScript }: { openSharedScript: (s: string) => void }) => {
+    const notifications = useSelector(user.selectNotifications)
+    const numUnread = notifications.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
+    const { t } = useTranslation()
+
+    const [showHistory, setShowHistory] = useState(false)
+
+    // Initiate long-polling for notifications
+    useNotificationLongPolling()
+
+    return <>
+        {showHistory && <NotificationHistory openSharedScript={openSharedScript} close={() => setShowHistory(false)} />}
+        <Popover>
+            <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-3 relative" title={t("ariaDescriptors:header.toggleNotifications")}>
+                <i className="icon icon-bell" />
+                {numUnread > 0 && <div role="status" aria-label={t("ariaDescriptors:header.unreadNotifications", { numUnread })} className="text-sm w-4 h-4 text-white bg-red-600 rounded-full absolute top-0 -right-1 leading-none" data-test="numUnreadNotifications">{numUnread}</div>}
+            </Popover.Button>
+            <div className="relative right-1">
+                <NotificationPopup />
+            </div>
+            <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-3/4">
+                {({ close }) => <NotificationList
+                    openSharedScript={openSharedScript}
+                    showHistory={setShowHistory}
+                    close={close}
+                />}
+            </Popover.Panel>
+        </Popover>
+    </>
 }
 
 const Notification = ({ item, openSharedScript, close }: {
