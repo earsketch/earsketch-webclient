@@ -182,7 +182,7 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
                 {t("notifications.title")}
             </div>
             <div className="float-right pr-2">
-                <a className="text-sm text-blue-600 hover:text-blue-700" href="#" onClick={handleRefresh} title="Refresh notifications"><i className="icon icon-loop2" /></a>
+                <NotificationRefreshButton onClick={handleRefresh} />
             </div>
         </div>
         <hr className="border-solid border-black border-1 my-2" />
@@ -204,6 +204,10 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
             </div>
         )}
     </div>
+}
+
+const NotificationRefreshButton = ({ onClick }: { onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => {
+    return <a className="text-sm text-blue-600 hover:text-blue-700" href="#" onClick={onClick} title="Refresh notifications"><i className="icon icon-loop2" /></a>
 }
 
 export const NotificationHistory = ({ openSharedScript, close }: {
