@@ -655,7 +655,7 @@ export const App = () => {
         const fetchNotifications = async () => {
             try {
                 const result = await request.getAuth("/users/notifications")
-                if (result && Array.isArray(result)) {
+                if (Array.isArray(result)) {
                     userNotification.loadHistory(result)
                 }
             } catch (error) {
@@ -663,12 +663,42 @@ export const App = () => {
             }
         }
 
-        // Fetch periodically
-        fetchNotifications()
         const NOTIFICATION_FETCH_INTERVAL_MS = 5 * 60 * 1000 // 5 minutes
-        const interval = setInterval(fetchNotifications, NOTIFICATION_FETCH_INTERVAL_MS)
 
-        return () => clearInterval(interval)
+        let intervalId: number | null = null
+
+        const startPolling = () => {
+            if (intervalId != null) return
+            fetchNotifications()
+            intervalId = window.setInterval(
+                fetchNotifications,
+                NOTIFICATION_FETCH_INTERVAL_MS
+            )
+        }
+
+        const stopPolling = () => {
+            if (intervalId == null) return
+            clearInterval(intervalId)
+            intervalId = null
+        }
+
+        const onVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                startPolling()
+            } else {
+                stopPolling()
+            }
+        }
+
+        // start based on initial visibility
+        onVisibilityChange()
+
+        document.addEventListener("visibilitychange", onVisibilityChange)
+
+        return () => {
+            stopPolling()
+            document.removeEventListener("visibilitychange", onVisibilityChange)
+        }
     }, [isLoggedIn])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
