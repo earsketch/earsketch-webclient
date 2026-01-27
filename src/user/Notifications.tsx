@@ -181,8 +181,8 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
                 <i className="icon icon-bell mr-3" />
                 {t("notifications.title")}
             </div>
-            <div className="float-right">
-                <a className="text-sm text-blue-500 hover:text-blue-700" href="#" onClick={handleRefresh} title="Refresh notifications">REFRESH</a>
+            <div className="float-right pr-2">
+                <a className="text-sm text-blue-600 hover:text-blue-700" href="#" onClick={handleRefresh} title="Refresh notifications">REFRESH</a>
             </div>
         </div>
         <hr className="border-solid border-black border-1 my-2" />
@@ -200,7 +200,7 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
             </div>}
         {notifications.length > 0 && (
             <div className="text-center">
-                <a className="text-sm" href="#" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
+                <a className="text-sm text-blue-600 hover:text-blue-700" href="#" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
             </div>
         )}
     </div>
@@ -250,7 +250,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
 
         <div className="notification-type-header flex justify-between">
             <div>{t("notifications.other")}</div>
-            <div><a href="#" onClick={e => { e.preventDefault(); userNotification.markAllAsRead() }}>{t("notifications.markAllRead").toLocaleUpperCase()}</a></div>
+            <div><a className="text-sm text-blue-600 hover:text-blue-700" href="#" onClick={e => { e.preventDefault(); userNotification.markAllAsRead() }}>{t("notifications.markAllRead").toLocaleUpperCase()}</a></div>
         </div>
         {notifications.map((item, index) =>
             item.notification_type !== "broadcast" && <div key={index}>
