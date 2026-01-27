@@ -663,9 +663,10 @@ export const App = () => {
             }
         }
 
-        // Fetch immediately, then every 60 seconds
+        // Fetch immediately, then every X seconds
         fetchNotifications()
-        const interval = setInterval(fetchNotifications, 60000)
+        const NOTIFICATION_FETCH_INTERVAL_MS = 5 * 60 * 1000 // 5 minutes
+        const interval = setInterval(fetchNotifications, NOTIFICATION_FETCH_INTERVAL_MS)
 
         return () => clearInterval(interval)
     }, [isLoggedIn])
