@@ -582,8 +582,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
 
     const openAccountMenu = () => {
         openModal(AccountMenu, {
-            loggedIn,
-            isAdmin,
+            loggedIn: false,
             username,
             password,
             email,
@@ -596,20 +595,32 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         })
     }
 
+    if (loggedIn) {
+        return (
+            <Menu as="div" className="relative inline-block text-left mx-3">
+                <Menu.Button className="text-gray-400">
+                    <div className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md" role="button">{username}<span className="caret" /></div>
+                </Menu.Button>
+                <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    {[{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
+                        .map(({ name, action }) =>
+                            <Menu.Item key={name}>
+                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{name}</button>}
+                            </Menu.Item>)}
+                </Menu.Items>
+            </Menu>
+        )
+    }
+
     return (
         <button
-            className="mx-3 whitespace-nowrap py-1 px-2 rounded-md bg-gray-400 text-black"
+            className="mx-3 whitespace-nowrap py-1 px-2 rounded-md text-xs bg-white text-black hover:text-black hover:bg-gray-200"
+            style={{ height: "23px" }}
             onClick={openAccountMenu}
-            title={loggedIn ? t("accountMenu.title") : t("accountMenu.login")}
-            aria-label={loggedIn ? t("accountMenu.title") : t("accountMenu.login")}
+            title={t("accountMenu.login")}
+            aria-label={t("accountMenu.login")}
         >
-            {loggedIn
-                ? (
-                    <span>{username}<span className="caret" /></span>
-                )
-                : (
-                    <span>{t("accountMenu.login")}</span>
-                )}
+            {t("accountMenu.login")}
         </button>
     )
 }
