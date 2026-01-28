@@ -1,3 +1,8 @@
+// Inspired by https://github.com/microsoft/TypeScript/issues/14306#issuecomment-2527855530
+const globals = require("globals")
+const allowedGlobals = ["console", "document", "fetch", "module", "require", "window"]
+const restrictedGlobals = Object.keys(globals.browser).filter(key => !(allowedGlobals.includes(key) || /^[A-Z]/.test(key)))
+
 module.exports = {
     env: {
         browser: true,
@@ -56,6 +61,7 @@ module.exports = {
         }],
         "prefer-arrow-callback": ["error"],
         "linebreak-style": ["error", "unix"],
+        "no-restricted-globals": ["error", ...restrictedGlobals],
     },
     overrides: [
         {

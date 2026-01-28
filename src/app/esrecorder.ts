@@ -78,7 +78,7 @@ export async function init() {
 
     let stream
     try {
-        stream = await navigator.mediaDevices.getUserMedia(options)
+        stream = await window.navigator.mediaDevices.getUserMedia(options)
     } catch (error) {
         callbacks.micAccessBlocked(micErrorForBrowser(ESUtils.whichBrowser()))
         return
@@ -238,7 +238,7 @@ function checkInputFields() {
 
 function updateMeter() {
     meterVal = meter.volume
-    requestAnimationFrame(updateMeter)
+    window.requestAnimationFrame(updateMeter)
 }
 
 function gotBuffer(buf: Float32Array[]) {

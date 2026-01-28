@@ -12,7 +12,7 @@ const CONFETTI_PIECES = 400 // 500 is typical
 // coordinate all confetti components for a blast of fixed duration ms
 export const blastConfetti = (dur = CONFETTI_INIT_DUR_MS) => {
     store.dispatch(appState.setConfetti(true))
-    setTimeout(() => {
+    window.setTimeout(() => {
         store.dispatch(appState.setConfetti(false))
     }, dur)
 }
@@ -25,7 +25,7 @@ export const ConfettiLauncher = ({ blastOnLoad = false }: { blastOnLoad?: boolea
     if (blastOnLoad) {
         useEffect(() => {
             // fire the initial blast of confetti
-            setTimeout(() => blastConfetti(CONFETTI_INIT_DUR_MS), CONFETTI_INIT_DELAY_MS)
+            window.setTimeout(() => blastConfetti(CONFETTI_INIT_DUR_MS), CONFETTI_INIT_DELAY_MS)
         }, [])
     }
 

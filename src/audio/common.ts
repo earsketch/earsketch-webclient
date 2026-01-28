@@ -23,12 +23,12 @@ export function clearAudioGraph(projectGraph: ProjectGraph, delay = 0) {
         for (const source of track.clips) {
             if (source !== undefined) {
                 source.stop(context.currentTime + delay)
-                setTimeout(() => source.disconnect(), delay * 1000)
+                window.setTimeout(() => source.disconnect(), delay * 1000)
             }
         }
     }
     projectGraph.mix.gain.setValueAtTime(0, context.currentTime + delay)
-    setTimeout(() => {
+    window.setTimeout(() => {
         for (const track of projectGraph.tracks) {
             for (const effect of Object.values(track.effects)) {
                 effect.destroy()
