@@ -12,15 +12,13 @@ import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as user from "../user/userState"
 
-import { Collection, HeadlessMultiSelector, SearchBar } from "./Utils"
+import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { ScriptDropdownMenu } from "./ScriptsMenus"
 import { BrowserTabType } from "./BrowserTab"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { Popover, PopoverButton, PopoverPanel, Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react"
-
-import { usePopper } from "react-popper"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -79,23 +77,17 @@ export const FilterItem = ({ value, isClearItem = false, active, selected = fals
 }
 
 export const SORT_OPTIONS = [
-    { id: "date-desc", label: "Date (Newest)", attribute: "date", ascending: false },
-    { id: "date-asc", label: "Date (Oldest)", attribute: "date", ascending: true },
-    { id: "name-az", label: "A–Z", attribute: "name", ascending: true },
-    { id: "name-za", label: "Z–A", attribute: "name", ascending: false },
+    { id: "date-desc", label: "scriptBrowser.filterDropdown.DateNewest", attribute: "date", ascending: false },
+    { id: "date-asc", label: "scriptBrowser.filterDropdown.DateOldest", attribute: "date", ascending: true },
+    { id: "name-az", label: "scriptBrowser.filterDropdown.NameAZ", attribute: "name", ascending: true },
+    { id: "name-za", label: "scriptBrowser.filterDropdown.NameZA", attribute: "name", ascending: false },
 ] as const
 
 export const SortBySelector = () => {
     const theme = useSelector(appState.selectColorTheme)
     const dispatch = useDispatch()
     const sortBy = useSelector((state: any) => state.scripts.filters.sortBy)
-
-    const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null)
-    const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null)
-
-    const { styles, attributes } = usePopper(referenceElement, popperElement, {
-        modifiers: [{ name: "offset", options: { offset: [0, 6] } }],
-    })
+    const { t } = useTranslation()
 
     // Local state for the selected option
     const [selectedId, setSelectedId] = useState<string>(
@@ -125,22 +117,19 @@ export const SortBySelector = () => {
         >
             <div className="relative w-1/3 ml-2">
                 <ListboxButton
-                    ref={(el) => setReferenceElement(el as HTMLButtonElement | null)}
                     className={`flex justify-between w-full border-b-2 cursor-pointer select-none ${
                         theme === "light" ? "border-black" : "border-white"
                     }`}
-                    aria-label="Sort by"
+                    aria-label={t("scriptBrowser.filterDropdown.sortBy")}
                 >
                     <span className="truncate">
-                        Sort by
+                        {t("scriptBrowser.filterDropdown.sortBy")}
                     </span>
                     <i className="icon icon-arrow-down2 text-xs p-1" />
                 </ListboxButton>
 
                 <ListboxOptions
-                    ref={(el) => setPopperElement(el as HTMLDivElement | null)}
-                    style={styles.popper}
-                    {...attributes.popper}
+                    anchor = "bottom start"
                     className={`border p-2 z-50 focus:outline-none ${
                         theme === "light" ? "bg-white" : "bg-black"
                     }`}
@@ -153,10 +142,10 @@ export const SortBySelector = () => {
                                         active ? "bg-blue-200 dark:bg-blue-500" : ""
                                     }`}
                                 >
-                                    <div className="w-5" aria-hidden>
+                                    <div className="w-5 mr-2" aria-hidden>
                                         <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
                                     </div>
-                                    <div className="text-sm">{option.label}</div>
+                                    <div aria-label={t("scriptBrowser.filterDropdown.sortByName", { filtername: t(option.label) })} className="text-sm">{t(option.label)}</div>
                                 </div>
                             )}
                         </ListboxOption>
@@ -177,19 +166,19 @@ const Filters = () => {
         <div className="p-3">
             <div className="pb-2 text-xs">{t("filter").toLocaleUpperCase()}</div>
             <div className="flex justify-between">
-                <HeadlessMultiSelector
+                <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.owner")}
                     category="owners"
                     items={owners}
-                    aria={t("scriptBrowser.filterDropdown.owner")}
+                    aria={t("scriptBrowser.filterDropdown.filterByOwner")}
                     numSelected={numOwnersSelected}
                     position="left"
                     FilterItem={FilterItem}
                 />
-                <HeadlessMultiSelector
+                <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.fileType")}
                     category="types"
-                    aria={t("scriptBrowser.filterDropdown.fileType")}
+                    aria={t("scriptBrowser.filterDropdown.filterByFile")}
                     items={["Python", "JavaScript"]}
                     numSelected={numTypesSelected}
                     position="center"

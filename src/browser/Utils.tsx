@@ -1,7 +1,6 @@
 import React, { ChangeEventHandler, MouseEventHandler, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
-import { usePopper } from "react-popper"
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react"
 
 import * as appState from "../app/appState"
@@ -63,22 +62,13 @@ interface DropdownMultiSelectorProps {
     FilterItem: React.FC<any>
 }
 
-export const HeadlessMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
+export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const theme = useSelector(appState.selectColorTheme)
     const dispatch = useDispatch()
 
     const selectedValues = useAppSelector(
         (state) => state.scripts.filters[category]
     )
-
-    const [referenceElement, setReferenceElement] =
-    useState<HTMLButtonElement | null>(null)
-    const [popperElement, setPopperElement] =
-    useState<HTMLDivElement | null>(null)
-
-    const { styles, attributes } = usePopper(referenceElement, popperElement, {
-        modifiers: [{ name: "offset", options: { offset: [0, 6] } }],
-    })
 
     const handleChange = (newValues: string[]) => {
         if (newValues.includes("__clear__")) {
@@ -103,7 +93,6 @@ export const HeadlessMultiSelector = ({ title, category, aria, items, position, 
         <Listbox value={selectedValues} multiple onChange={handleChange}>
             <div className="relative w-1/3">
                 <ListboxButton
-                    ref={setReferenceElement}
                     className={`flex justify-between w-full border-b-2 ${margin}
             ${theme === "light" ? "border-black" : "border-white"}`}
                     aria-label={aria}
@@ -115,13 +104,11 @@ export const HeadlessMultiSelector = ({ title, category, aria, items, position, 
                 </ListboxButton>
 
                 <ListboxOptions
-                    ref={(el) => setPopperElement(el as HTMLDivElement | null)}
-                    style={styles.popper}
-                    {...attributes.popper}
+                    anchor="bottom start"
                     className={`z-50 mt-1 border p-2 focus:outline-none
             ${theme === "light" ? "bg-white" : "bg-black"}`}
                 >
-                    <ListboxOption as="button" type="button" value="__clear__">
+                    <ListboxOption as="button" type="button" value="__clear__" className="w-full text-left">
                         {({ active }) => (
                             <FilterItem
                                 isClearItem
@@ -139,7 +126,7 @@ export const HeadlessMultiSelector = ({ title, category, aria, items, position, 
                             type="button"
                             key={item}
                             value={item}
-                            className="focus:outline-none"
+                            className="w-full block text-left p-0 m-0 bg-transparent border-0 focus:outline-none"
                         >
                             {({ active, selected }) => (
                                 <FilterItem
