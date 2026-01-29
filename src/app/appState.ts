@@ -38,7 +38,7 @@ const appSlice = createSlice({
         setColorTheme(state, { payload }) {
             state.colorTheme = payload
             // For the benefit of the loading screen:
-            localStorage.setItem("colorTheme", payload)
+            window.localStorage.setItem("colorTheme", payload)
         },
         setFontSize(state, { payload }) {
             state.fontSize = payload

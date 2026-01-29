@@ -55,6 +55,7 @@ export async function getSound(name: string): Promise<Sound> {
 }
 
 async function getSoundBuffer(sound: SoundEntity) {
+    const name = sound.name
     const url = sound.standard
         ? STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
         : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
