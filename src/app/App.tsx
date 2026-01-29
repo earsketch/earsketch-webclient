@@ -40,7 +40,6 @@ import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
 import { Prompt, PromptChoice, confirm } from "../Utils"
-import * as websocket from "./websocket"
 
 import esLogo from "./ES_logo_extract.svg"
 import LanguageDetector from "i18next-browser-languagedetector"
@@ -214,8 +213,6 @@ async function postLogin(username: string) {
     } catch (error) {
         esconsole("Error loading notifications on login: " + error, ["error", "user"])
     }
-
-    websocket.login(username)
 }
 
 async function refreshScriptBrowser() {
@@ -704,7 +701,6 @@ export const App = () => {
         if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
-        websocket.logout()
         userNotification.clearHistory()
         reporter.logout()
 
