@@ -1,13 +1,15 @@
-import { createServer } from "../support/wsServer"
 import * as MockSocket from "mock-socket"
 
-describe("broadcast notification", () => {
-    const wsServer = createServer("wss://api-dev.ersktch.gatech.edu/EarSketchWS/socket/cypress/")
-
-    it("is received", () => {
+describe("Notifications", () => {
+    it("delivers broadcast on login", () => {
         cy.interceptAudioStandard()
         cy.interceptUsersToken()
         cy.interceptUsersInfo()
+        cy.interceptUsersNotifications([{
+            notification_type: "broadcast",
+            username: "user2",
+            message: { text: "Hello, EarSketch!", hyperlink: "", expiration: 7 },
+        }])
         cy.interceptAudioUser()
         cy.interceptAudioFavorites()
         cy.interceptScriptsOwned()
@@ -17,19 +19,6 @@ describe("broadcast notification", () => {
         cy.skipTour()
         cy.login()
 
-        const msgForAll = "Hello, EarSketch!"
-
-        cy.incomingWebSocketMessage(
-            wsServer,
-            {
-                notification_type: "broadcast",
-                username: "user2",
-                message: { text: msgForAll, hyperlink: "", expiration: 13 },
-            }
-        )
-
-        cy.get("[data-test='numUnreadNotifications']").contains("2")
-
-        cy.get("div").contains("From EarSketch team: " + msgForAll)
+        cy.get("[data-test='numUnreadNotifications']").contains("1")
     })
 })
