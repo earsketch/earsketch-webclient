@@ -57,7 +57,7 @@
     "js-interpreter": "^5.0.0",
     "jszip": "^3.8.0",
     "libflacjs": "^5.4.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "lunr": "^2.3.9",
     "prop-types": "^15.8.1",
     "radix-ui": "^1.4.3",
