@@ -20,6 +20,7 @@ describe("user", () => {
         ])
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
+        cy.interceptUsersNotifications()
         cy.interceptAudioUser(userAudioUploads)
         cy.interceptAudioFavorites()
         cy.interceptScriptsOwned([{
@@ -32,7 +33,7 @@ describe("user", () => {
             shareid: "1111111111111111111111",
             soft_delete: false,
             source_code: "from earsketch import *\nsetTempo(91)\n",
-            username: username,
+            username,
         }])
         cy.interceptScriptsShared([{
             created: "2022-03-03 07:08:09.0",
