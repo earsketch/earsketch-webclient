@@ -397,7 +397,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
-    const element = useRef<HTMLDivElement>(null)
+    const element = useRef<HTMLButtonElement>(null)
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -405,18 +405,24 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
             drawWaveform(element.current, waveform, width, trackHeight)
         }
     }, [clip, xScale, trackHeight])
-
-    return <div
+    return <button
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+        role = "navigation" aria-label={`${clip.filekey}} from measure ${clip.clipFamilyStart || (clip.measure + clip.start - 1)} to ${clip.clipFamilyEnd || (clip.measure + clip.end - 1)}`}
+        onClick={() => {
+            player.setPreview(clip.track)
+            player.play(clip.clipFamilyStart || (clip.measure + clip.start - 1), 0,
+                clip.clipFamilyEnd || (clip.measure + clip.end - 1))
+        }}
+
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
         </div>
-    </div>
+    </button>
 }
 
 const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName }: {
