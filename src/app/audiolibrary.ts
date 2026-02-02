@@ -198,6 +198,8 @@ function fixMetadata(metadata: SoundEntity, type: SoundType) {
         metadata.tempo = undefined
     }
     // TODO: After database update, we can unify `public` and `type`.
-    metadata.type = type
+    if (metadata.type === undefined) {
+        metadata.type = type
+    }
     return metadata
 }
