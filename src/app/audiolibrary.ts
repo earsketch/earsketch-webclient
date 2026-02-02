@@ -1,6 +1,6 @@
 // Fetch audio and metadata from the EarSketch library.
 import ctx from "../audio/context"
-import { SoundEntity } from "common"
+import { SoundEntity, SoundType } from "common"
 import esconsole from "../esconsole"
 import { getAuth } from "../request"
 
@@ -56,9 +56,9 @@ export async function getSound(name: string): Promise<Sound> {
 
 async function getSoundBuffer(sound: SoundEntity) {
     const name = sound.name
-    const url = sound.standard
-        ? STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
-        : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
+    const url = sound.type === SoundType.User
+        ? URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
+        : STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
 
     let data: ArrayBuffer
     try {
@@ -139,14 +139,14 @@ async function _getStandardSounds() {
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
         // Populate cache with standard sound metadata so that we don't fetch it again later via `getMetadata()`.
         for (const sound of sounds) {
-            fixMetadata(sound, true)
+            fixMetadata(sound, sound.public === 1 ? SoundType.Public : SoundType.Hidden)
             if (!cache.sounds[sound.name]) {
                 cache.sounds[sound.name] = { metadata: Promise.resolve(sound) }
             }
         }
         // Filter out "non-public" sounds so that they don't appear in the sound browser, autocomplete, etc.
         // Note that we still cache their metadata above; this just prevents them from appearing in the standard set.)
-        sounds = sounds.filter(sound => sound.public)
+        sounds = sounds.filter(sound => sound.type === SoundType.Public)
         return { sounds, folders }
     } catch (err: any) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
@@ -159,7 +159,7 @@ export async function getUserSounds(username: string) {
     const sounds: SoundEntity[] = await getAuth("/audio/user", { username })
     // Populate cache with user sound metadata so that we don't fetch it again later via `getMetadata()`.
     for (const sound of sounds) {
-        fixMetadata(sound, false)
+        fixMetadata(sound, SoundType.User)
         if (!cache.sounds[sound.name]) {
             cache.sounds[sound.name] = { metadata: Promise.resolve(sound) }
         }
@@ -192,15 +192,16 @@ async function _getMetadata(name: string) {
         return null
     }
 
-    fixMetadata(metadata, false)
+    fixMetadata(metadata, metadata.public === 0 ? SoundType.User : SoundType.Hidden)
     return metadata
 }
 
-function fixMetadata(metadata: SoundEntity, standard: boolean) {
+function fixMetadata(metadata: SoundEntity, type: SoundType) {
     // Server uses -1 to indicate no tempo; for type safety, we remap this to undefined.
     if (metadata.tempo === -1) {
         metadata.tempo = undefined
     }
-    metadata.standard = standard
+    // TODO: After database update, we can unify `public` and `type`.
+    metadata.type = type
     return metadata
 }

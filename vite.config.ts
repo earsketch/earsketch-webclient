@@ -60,6 +60,7 @@ export default ({ mode }: { mode: string }) => {
         resolve: {
             alias: {
                 "@lib": path.resolve(__dirname, "lib"),
+                common: path.resolve(__dirname, "src/types/common"),
             },
         },
         define: {
