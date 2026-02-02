@@ -60,21 +60,17 @@ async function getSoundBuffer(sound: SoundEntity) {
         ? URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
         : STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
 
-    let data: ArrayBuffer
+    let response: Response
     try {
-        data = await (await fetch(url)).arrayBuffer()
+        response = await fetch(url)
     } catch (err: any) {
-        esconsole("Error getting " + name + " from the server", ["error", "audiolibrary"])
-        const status = err.status
-        if (status <= 0) {
-            throw new Error(`NetworkError: Could not retreive sound file ${name} due to network error`)
-        } else if (status >= 500 && status < 600) {
-            throw new Error(`ServerError: Could not retreive sound file ${name} due to server error`)
-        } else {
-            throw err
-        }
+        throw new Error(`Could not retrieve sound file ${name} due to network error`)
+    }
+    if (!response.ok) {
+        throw new Error(`Could not retrieve sound file ${name} due to server error (status code: ${response.status})`)
     }
 
+    const data = await response.arrayBuffer()
     // Need to do this before decodeAudioData() call, as that 'detaches' the ArrayBuffer.
     const bytes = new Uint8Array(data)
     // Check for MP3 file signatures.
