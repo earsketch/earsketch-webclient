@@ -209,7 +209,16 @@ const pythonAutocomplete: CompletionSource = (context) => autocompleteEnabled ? 
 // Internal state
 let view: EditorView = null as unknown as EditorView
 let sessions: { [key: string]: EditorSession } = {}
-const keyBindings: { key: string, run: () => boolean }[] = []
+const keyBindings: { key: string, run: () => boolean }[] = [
+    {
+        key: "Ctrl-Enter",
+        run: () => {
+            const currentLine = view.state.doc.lineAt(view.state.selection.main.head)
+            jumpToDAWClip(currentLine.number)
+            return true
+        },
+    },
+]
 let resolveReady: () => void
 let droplet: any
 
@@ -391,6 +400,21 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
             return { color: p.color, pos: line.from }
         })),
     })
+}
+export function jumpToLine(lineNumber: number) {
+    const line = view.state.doc.line(lineNumber)
+    view.dispatch({
+        selection: { anchor: line.from },
+        scrollIntoView: true,
+    })
+    view.focus()
+}
+
+export function jumpToDAWClip(lineNumber: number) {
+    const clipButton = document.querySelector(`button[data-source-line="${lineNumber}"]`) as HTMLButtonElement
+    if (clipButton) {
+        clipButton.focus()
+    }
 }
 
 // Callbacks
