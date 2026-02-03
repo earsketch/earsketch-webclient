@@ -282,7 +282,7 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
                 {t("notifications.title")}
             </div>
             <div className="float-right pr-2">
-                <button className="text-sm text-blue-700 hover:text-blue-600" onClick={handleRefresh} title="Refresh notifications">
+                <button className="text-sm text-blue-700 hover:text-blue-600" onClick={handleRefresh} title={t("notifications.refresh")}>
                     <i className={`icon icon-loop2 inline-block ${isRefreshing ? "animate-spin" : ""}`} />
                 </button>
             </div>

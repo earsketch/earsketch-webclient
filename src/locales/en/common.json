@@ -144,6 +144,7 @@
     "notifications.title": "Notifications",
     "notifications.pinned": "Pinned Notifications",
     "notifications.other": "Other Notifications",
+    "notifications.refresh": "Refresh notifications",
     "notifications.viewAll": "View All",
     "notifications.markAllRead": "Mark all as read",
     "forgotPassword.title": "Forgot your password?",
