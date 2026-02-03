@@ -19,15 +19,14 @@ const Code = ({ source, language }: { source: string, language: Language }) => {
     const { light, dark } = highlight(source, language)
 
     const getAriaLabel = useMemo(() => {
-        if (language == "python") {
-            return analyzePythonCode(source);
-        }
-        else if (language == "javascript") {
-            return analyzeJavaScriptCode(source);
+        if (language === "python") {
+            return analyzePythonCode(source)
+        } else if (language === "javascript") {
+            return analyzeJavaScriptCode(source)
         } else {
-            return "Code Example";
+            return "Code Example"
         }
-    }, [source, language]);
+    }, [source, language])
 
     return <>
         <code aria-label={getAriaLabel} className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>

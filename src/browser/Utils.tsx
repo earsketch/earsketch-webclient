@@ -207,208 +207,204 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
     )
 }
 
-
 export function analyzeJavaScriptCode(source: string): string {
-    const lines = source.split("\n");
-    let readableText = "";
+    const lines = source.split("\n")
+    let readableText = ""
 
     // simple literals: numbers, strings, booleans, null, undefined
     const simpleLiteral =
-        String.raw`(?:-?\d+(?:\.\d+)?|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|true|false|null|undefined)`;
+        String.raw`(?:-?\d+(?:\.\d+)?|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|true|false|null|undefined)`
 
-    for (let rawLine of lines) {
-        const line = rawLine.trim();
-        if (!line) continue;
+    for (const rawLine of lines) {
+        const line = rawLine.trim()
+        if (!line) continue
 
         // JS single-line comment: // ...
-        const singleLineCommentMatch = line.match(/^\s*\/\/(.*)$/);
+        const singleLineCommentMatch = line.match(/^\s*\/\/(.*)$/)
 
         // JS variable declaration with optional assignment:
-        // let x = 5;  const name = "a";  var ok = true;
+        // let x = 5  const name = "a"  var ok = true
         const variableDeclarationMatch = line.match(
-            new RegExp(
-                String.raw`^\s*(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*(?:=\s*(.+?))?\s*;?\s*$`
-            )
-        );
+            /^\s*(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*(?:=\s*(.+?))?\s*?\s*$/
+        )
 
         // JS assignment (without declaration):
-        // x = something;  obj.prop = 1;  arr[i] = foo();
+        // x = something  obj.prop = 1  arr[i] = foo()
         const assignmentMatch = line.match(
-            /^\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\[[^\]]+\])*)\s*=\s*(.+?)\s*;?\s*$/
-        );
+            /^\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\[[^\]]+\])*)\s*=\s*(.+?)\s*?\s*$/
+        )
 
         // JS function call:
-        // foo(a, b);  console.log("hi");  obj.method(x);
+        // foo(a, b)  console.log("hi")  obj.method(x)
         const functionCallMatch = line.match(
-            /^\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\((.*)\)\s*;?\s*$/
-        );
+            /^\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\((.*)\)\s*?\s*$/
+        )
 
         // Variable declaration with *simple literal* assignment:
-        // const x = 10; let s = "hi"; var ok = false;
+        // const x = 10 let s = "hi" var ok = false
         const variableDeclarationLiteralMatch = line.match(
             new RegExp(
-                String.raw`^\s*(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(${simpleLiteral})\s*;?\s*$`,
+                String.raw`^\s*(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(${simpleLiteral})\s*?\s*$`,
                 "i"
             )
-        );
+        )
 
         // Comments
         if (singleLineCommentMatch) {
-            readableText += `Comment: ${singleLineCommentMatch[1].trim()}. `;
-            continue;
+            readableText += `Comment: ${singleLineCommentMatch[1].trim()}. `
+            continue
         }
 
         // Variable declaration with a simple literal
         if (variableDeclarationLiteralMatch) {
-            const varName = variableDeclarationLiteralMatch[1];
-            const varValue = variableDeclarationLiteralMatch[2];
-            readableText += `Variable declaration: ${varName} is assigned value ${varValue}. `;
-            continue;
+            const varName = variableDeclarationLiteralMatch[1]
+            const varValue = variableDeclarationLiteralMatch[2]
+            readableText += `Variable declaration: ${varName} is assigned value ${varValue}. `
+            continue
         }
 
         // Variable declaration (general)
         if (variableDeclarationMatch) {
-            const varName = variableDeclarationMatch[1];
-            const init = variableDeclarationMatch[2];
+            const varName = variableDeclarationMatch[1]
+            const init = variableDeclarationMatch[2]
 
             if (!init) {
-                readableText += `Variable declaration: ${varName} is declared. `;
-                continue;
+                readableText += `Variable declaration: ${varName} is declared. `
+                continue
             }
 
             // Function call in initializer: const x = foo(a,b)
-            const functionInDeclaration = init.trim().match(/^([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\((.*)\)\s*;?\s*$/);
+            const functionInDeclaration = init.trim().match(/^([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\((.*)\)\s*?\s*$/)
             if (functionInDeclaration) {
-                const funcName = functionInDeclaration[1];
-                const funcArgs = functionInDeclaration[2];
-                readableText += `Variable declaration: ${varName} is assigned a function call to ${funcName}. `;
-                const argsArray = funcArgs.split(",");
+                const funcName = functionInDeclaration[1]
+                const funcArgs = functionInDeclaration[2]
+                readableText += `Variable declaration: ${varName} is assigned a function call to ${funcName}. `
+                const argsArray = funcArgs.split(",")
                 argsArray.forEach((arg, index) => {
-                    readableText += `Argument ${index + 1}: ${arg}. `;
-                });
+                    readableText += `Argument ${index + 1}: ${arg}. `
+                })
             } else {
-                readableText += `Variable declaration: ${varName} is assigned value ${init.trim()}. `;
+                readableText += `Variable declaration: ${varName} is assigned value ${init.trim()}. `
             }
-            continue;
+            continue
         }
 
         // Assignment
         if (assignmentMatch) {
-            const left = assignmentMatch[1];
-            const right = assignmentMatch[2].trim();
+            const left = assignmentMatch[1]
+            const right = assignmentMatch[2].trim()
 
             const functionInAssignment = right.match(
-                /^([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\((.*)\)\s*;?\s*$/
-            );
+                /^([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\((.*)\)\s*?\s*$/
+            )
 
             if (functionInAssignment) {
-                const funcName = functionInAssignment[1];
-                const funcArgs = functionInAssignment[2];
-                readableText += `Variable assignment: ${left} is assigned a function call to ${funcName}. `;
-                const argsArray = funcArgs.split(",");
+                const funcName = functionInAssignment[1]
+                const funcArgs = functionInAssignment[2]
+                readableText += `Variable assignment: ${left} is assigned a function call to ${funcName}. `
+                const argsArray = funcArgs.split(",")
                 argsArray.forEach((arg, index) => {
-                    readableText += `Argument ${index + 1}: ${arg}. `;
-                });
+                    readableText += `Argument ${index + 1}: ${arg}. `
+                })
             } else {
-                readableText += `Variable assignment: ${left} is assigned value ${right}. `;
+                readableText += `Variable assignment: ${left} is assigned value ${right}. `
             }
-            continue;
+            continue
         }
 
         // Function call
         if (functionCallMatch) {
-            const funcName = functionCallMatch[1].replace(/\s+/g, "");
-            const funcArgs = functionCallMatch[2];
-            readableText += `Function call: ${funcName}. `;
-            const argsArray = funcArgs.split(",");
+            const funcName = functionCallMatch[1].replace(/\s+/g, "")
+            const funcArgs = functionCallMatch[2]
+            readableText += `Function call: ${funcName}. `
+            const argsArray = funcArgs.split(",")
             argsArray.forEach((arg, index) => {
-                readableText += `Argument ${index + 1}: ${arg}. `;
-            });
-            continue;
+                readableText += `Argument ${index + 1}: ${arg}. `
+            })
+            continue
         }
 
-        readableText += `Code: ${line}. `;
+        readableText += `Code: ${line}. `
     }
 
-    return readableText || "No code detected.";
+    return readableText || "No code detected."
 }
 
-
 export function analyzePythonCode(source: string): string {
-    const lines = source.split("\n");
-    let readableText = "";
+    const lines = source.split("\n")
+    let readableText = ""
 
-    for (let rawLine of lines) {
-        const line = rawLine.trim();
-        if (!line) continue;
+    for (const rawLine of lines) {
+        const line = rawLine.trim()
+        if (!line) continue
 
         // Matches a Python comment line starting with #
-        const commentMatch = line.match(/^#(.*)/);
-        
+        const commentMatch = line.match(/^#(.*)/)
+
         // Matches a general Python variable assignment
         // Example: x = 10, name = getUser()
-        const assignmentMatch = line.match(/^(\w+)\s*=\s*(.+)/);
+        const assignmentMatch = line.match(/^(\w+)\s*=\s*(.+)/)
 
         // Matches a Python function call
         // Example: print("Hello"), obj.method(a, b)
-        const functionCallMatch = line.match(/^([\w.]+)\((.*?)\)/);
+        const functionCallMatch = line.match(/^([\w.]+)\((.*?)\)/)
 
         // Matches a simple Python variable declaration with a literal value
         // Example: x = 5, name = "John", flag = True
         const variableDeclarationMatch = line.match(
             /^(\w+)\s*=\s*(\d+|".*"|'.*'|True|False|None)/
-        );
-        
+        )
+
         // Single line comment. # ...
         if (commentMatch) {
-            readableText += `Comment: ${commentMatch[1].trim()}. `;
-            continue;
+            readableText += `Comment: ${commentMatch[1].trim()}. `
+            continue
         }
 
         // Variable declaration
         if (variableDeclarationMatch) {
-            const varName = variableDeclarationMatch[1];
-            const varValue = variableDeclarationMatch[2];
-            readableText += `Variable declaration: ${varName} is assigned value ${varValue}. `;
-            continue;
+            const varName = variableDeclarationMatch[1]
+            const varValue = variableDeclarationMatch[2]
+            readableText += `Variable declaration: ${varName} is assigned value ${varValue}. `
+            continue
         }
 
         // Assignment
         if (assignmentMatch) {
-            const varName = assignmentMatch[1];
-            const assignedValue = assignmentMatch[2];
+            const varName = assignmentMatch[1]
+            const assignedValue = assignmentMatch[2]
 
-            const functionInAssignment = assignedValue.match(/^(\w+)\((.*?)\)/);
+            const functionInAssignment = assignedValue.match(/^(\w+)\((.*?)\)/)
             if (functionInAssignment) {
-                const funcName = functionInAssignment[1];
-                const funcArgs = functionInAssignment[2];
-                readableText += `Variable assignment: ${varName} is assigned a function call to ${funcName}. `;
+                const funcName = functionInAssignment[1]
+                const funcArgs = functionInAssignment[2]
+                readableText += `Variable assignment: ${varName} is assigned a function call to ${funcName}. `
 
-                const argsArray = funcArgs.split(",").map((arg) => arg.trim()).filter(Boolean);
+                const argsArray = funcArgs.split(",").map((arg) => arg.trim()).filter(Boolean)
                 argsArray.forEach((arg, index) => {
-                    readableText += `Argument ${index + 1}: ${arg}. `;
-                });
+                    readableText += `Argument ${index + 1}: ${arg}. `
+                })
             } else {
-                readableText += `Variable assignment: ${varName} is assigned value ${assignedValue}. `;
+                readableText += `Variable assignment: ${varName} is assigned value ${assignedValue}. `
             }
-            continue;
+            continue
         }
 
         // Function calll, fitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)
         if (functionCallMatch) {
-            const funcName = functionCallMatch[1];
-            const funcArgs = functionCallMatch[2];
-            readableText += `Function call: ${funcName}. `;
+            const funcName = functionCallMatch[1]
+            const funcArgs = functionCallMatch[2]
+            readableText += `Function call: ${funcName}. `
 
-            const argsArray = funcArgs.split(",").map((arg) => arg.trim()).filter(Boolean);
+            const argsArray = funcArgs.split(",").map((arg) => arg.trim()).filter(Boolean)
             argsArray.forEach((arg, index) => {
-                readableText += `Argument ${index + 1}: ${arg}. `;
-            });
-            continue;
+                readableText += `Argument ${index + 1}: ${arg}. `
+            })
+            continue
         }
 
-        readableText += `Code: ${line}. `;
+        readableText += `Code: ${line}. `
     }
 
-    return readableText || "No code detected.";
+    return readableText || "No code detected."
 }
