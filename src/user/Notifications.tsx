@@ -199,7 +199,7 @@ const Notification = ({ item, openSharedScript, close }: {
                 <div className="mr-1.5">
                     {item.pinned
                         ? <i className="icon icon-pushpin text-sm" />
-                        : <div className={item.unread ? "marker" : "empty-marker"} />}
+                        : <div className={item.unread ? "marker" : "empty-marker"} style={{ minWidth: "14px" }} />}
                 </div>
 
                 {/* contents */}
