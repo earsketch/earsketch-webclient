@@ -317,9 +317,6 @@ export const NotificationHistory = ({ openSharedScript, close }: {
     return <div id="notification-history">
         <div className="flex justify-between" style={{ padding: "1em" }}>
             <div>
-                <button onClick={() => { close() }}>
-                    <i id="back-button" className="icon icon-arrow-right22 mr-2"></i>
-                </button>
                 <span style={{ color: "grey" }}>
                     <i className="icon icon-bell" /> {t("notifications.title")}
                 </span>
