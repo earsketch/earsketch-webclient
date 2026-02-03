@@ -216,11 +216,11 @@ const Notification = ({ item, openSharedScript, close }: {
                         {/* special actions */}
                         {item.notification_type === "broadcast" && item.message.hyperlink &&
                         <div>
-                            <a href={item.message.hyperlink} target="_blank" rel="noreferrer">{t("more").toLocaleUpperCase()}</a>
+                            <a href={item.message.hyperlink} className="text-sm text-blue-700 hover:text-blue-600" target="_blank" rel="noreferrer">{t("more").toLocaleUpperCase()}</a>
                         </div>}
                         {item.notification_type === "share_script" &&
                         <div>
-                            <a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>
+                            <button className="text-sm text-blue-700 hover:text-blue-600" onClick={() => { openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</button>
                         </div>}
                     </div>
                 </div>
@@ -242,15 +242,14 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
     const FETCH_COOLDOWN_MS = 3000 // 3 seconds
     const lastClickRef = useRef(0)
 
-    const handleRefresh = async (e: React.MouseEvent<HTMLAnchorElement>) => {
-        e.preventDefault()
+    const handleRefresh = async () => {
+        // Refresh notifications from the server
 
         // Throttle clicks to once every FETCH_COOLDOWN_MS milliseconds
         const now = Date.now()
         if (now - lastClickRef.current < FETCH_COOLDOWN_MS) {
             return // too soon, ignore click
         }
-
         lastClickRef.current = now
 
         // Animate the refresh icon
@@ -283,9 +282,9 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
                 {t("notifications.title")}
             </div>
             <div className="float-right pr-2">
-                <a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={handleRefresh} title="Refresh notifications">
+                <button className="text-sm text-blue-700 hover:text-blue-600" onClick={handleRefresh} title="Refresh notifications">
                     <i className={`icon icon-loop2 inline-block ${isRefreshing ? "animate-spin" : ""}`} />
-                </a>
+                </button>
             </div>
         </div>
         <hr className="border-solid border-black border-1 my-2" />
@@ -303,7 +302,7 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
             </div>}
         {notifications.length > 0 && (
             <div className="text-center">
-                <a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
+                <button className="text-sm text-blue-700 hover:text-blue-600" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</button>
             </div>
         )}
     </div>
@@ -318,15 +317,15 @@ export const NotificationHistory = ({ openSharedScript, close }: {
     return <div id="notification-history">
         <div className="flex justify-between" style={{ padding: "1em" }}>
             <div>
-                <a href="#" onClick={e => { e.preventDefault(); close() }}>
-                    <i id="back-button" className="icon icon-arrow-right22"></i>
-                </a>
+                <button onClick={() => { close() }}>
+                    <i id="back-button" className="icon icon-arrow-right22 mr-2"></i>
+                </button>
                 <span style={{ color: "grey" }}>
                     <i className="icon icon-bell" /> {t("notifications.title")}
                 </span>
             </div>
             <div>
-                <a className="closemodal buttonmodal cursor-pointer" style={{ color: "#d04f4d" }} onClick={close}><span><i className="icon icon-cross2" /></span>{t("thing.close").toLocaleUpperCase()}</a>
+                <button className="closemodal buttonmodal cursor-pointer" style={{ color: "#d04f4d" }} onClick={close}><span><i className="icon icon-cross2" /></span>{t("thing.close").toLocaleUpperCase()}</button>
             </div>
         </div>
 
@@ -339,11 +338,11 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                     </div>
                     <div className="flex justify-between">
                         <div>
-                            <div>{item.message.text}</div>
+                            <div><MarkdownLinkMessage text={item.message.text} /></div>
                             <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.humanReadableTimeAgo(item.time)}</div>
                         </div>
                         {item.message.hyperlink && <div>
-                            <a href={item.message.hyperlink} target="_blank" className="cursor-pointer" rel="noreferrer">{t("more").toLocaleUpperCase()}</a>
+                            <a href={item.message.hyperlink} className="text-sm text-blue-700 hover:text-blue-600" target="_blank" rel="noreferrer">{t("more").toLocaleUpperCase()}</a>
                         </div>}
                     </div>
                 </div>
@@ -353,7 +352,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
 
         <div className="notification-type-header flex justify-between">
             <div>{t("notifications.other")}</div>
-            <div><a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={e => { e.preventDefault(); userNotification.markAllAsRead() }}>{t("notifications.markAllRead").toLocaleUpperCase()}</a></div>
+            <div><button className="text-sm text-blue-700 hover:text-blue-600" onClick={() => { userNotification.markAllAsRead() }}>{t("notifications.markAllRead").toLocaleUpperCase()}</button></div>
         </div>
         {notifications.map((item, index) =>
             item.notification_type !== "broadcast" && <div key={index}>
@@ -369,7 +368,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                             </div>
                         </div>
                         {item.notification_type === "share_script" && <div>
-                            <a className="text-sm text-blue-700 hover:text-blue-600" href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>
+                            <button className="text-sm text-blue-700 hover:text-blue-600" onClick={() => { openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</button>
                         </div>}
                     </div>
                 </div>
@@ -393,7 +392,7 @@ const MarkdownLinkMessage = ({ text }: { text: string }): JSX.Element => {
         } else if (index % 3 === 2) {
             const linkText = parts[index - 1]
             const linkUrl = parts[index]
-            return <a href={linkUrl} target="_blank" rel="noreferrer" key={index}>{linkText}</a>
+            return <a href={linkUrl} className="text-blue-700 hover:text-blue-600" target="_blank" rel="noreferrer" key={index}>{linkText}</a>
         } else {
             return null
         }

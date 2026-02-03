@@ -95,7 +95,7 @@ describe("shared script", () => {
 
         cy.get('button[title="Show/Hide Notifications"]').click()
 
-        cy.get('a[title="Refresh notifications"]').click();
+        cy.get('button[title="Refresh notifications"]').click();
 
         // notifications will include one new shared script, immediately imported
 
