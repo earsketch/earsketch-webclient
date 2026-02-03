@@ -123,7 +123,7 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
         textElement.current?.select()
         document.execCommand("copy")
         setCopied(true)
-        setTimeout(() => setCopied(false), 1000)
+        window.setTimeout(() => setCopied(false), 1000)
     }
 
     return <>
@@ -154,8 +154,8 @@ export const LinkTab = ({ script, close }: TabParameters) => {
     const linkElement = useRef<HTMLInputElement>(null)
     const { t } = useTranslation()
 
-    const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
-    const lockedShareLink = location.origin + location.pathname + "?sharing=" + lockedShareID
+    const sharelink = window.location.origin + window.location.pathname + "?sharing=" + script.shareid
+    const lockedShareLink = window.location.origin + window.location.pathname + "?sharing=" + lockedShareID
     const link = lock ? lockedShareLink : sharelink
 
     useEffect(() => {
@@ -233,7 +233,7 @@ export const LinkTab = ({ script, close }: TabParameters) => {
 }
 
 const EmbedTab = ({ script, close }: TabParameters) => {
-    const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
+    const sharelink = window.location.origin + window.location.pathname + "?sharing=" + script.shareid
     const [showCode, setShowCode] = useState(true)
     const [showDAW, setShowDAW] = useState(true)
     const options = "" + (showCode ? "" : "&hideCode") + (showDAW ? "" : "&hideDaw")

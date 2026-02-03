@@ -139,7 +139,7 @@ editor.bindKey("Mod-s", saveScript)
 // Timer: auto save
 let autoSaveTimer = 0
 editor.changeListeners.push(() => {
-    clearTimeout(autoSaveTimer)
+    window.clearTimeout(autoSaveTimer)
     const AUTO_SAVE_INTERVAL_MS = 5 * 60 * 1000 // 5 min
     autoSaveTimer = window.setTimeout(scriptsThunks.saveAll, AUTO_SAVE_INTERVAL_MS)
 })
@@ -317,7 +317,7 @@ async function runScript() {
 
     // asynchronously report the script complexity
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
-        setTimeout(() => {
+        window.setTimeout(() => {
             store.dispatch(caiThunks.compileCai([result, language, code]))
         })
     }

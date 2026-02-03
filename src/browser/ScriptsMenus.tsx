@@ -185,17 +185,14 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
                 )}
 
             </MenuItem>
-            {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true, highlighted }) => visible && <MenuItem key={name}>
+            {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true, highlighted }) => visible && <MenuItem key={name} disabled={disabled}>
                 {({ active }) => (
                     <button
                         className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
                                   (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
                                   (disabled ? "cursor-not-allowed" : "cursor-pointer") + " " +
                                   (highlighted ? "border-yellow-500 border-4" : "")}
-                        onClick={() => {
-                            if (disabled) return
-                            onClick()
-                        }}
+                        onClick={onClick}
                         aria-label={aria}
                         title={aria}
                     >
@@ -226,27 +223,23 @@ const ScriptContextMenu = ({ script, className, children, scriptMenuItems }: { s
                         </div>
                     </ContextMenu.Item>
                     {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible, highlighted }) => {
-                        const menuItemsClasses = classNames("flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full", {
+                        const menuItemsClasses = classNames("focus:outline-none data-[highlighted]:bg-blue-200 dark:data-[highlighted]:bg-blue-500 bg-white dark:bg-black flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full", {
                             "cursor-not-allowed": disabled,
                             "cursor-pointer": !disabled,
                             "border-yellow-500 border-4": highlighted,
                         })
-                        return visible && <ContextMenu.Item key={name} className="focus:outline-none data-[highlighted]:bg-blue-200 dark:data-[highlighted]:bg-blue-500 bg-white dark:bg-black">
-                            <button
-                                className={menuItemsClasses}
-                                onClick={() => {
-                                    if (disabled) return
-                                    onClick()
-                                }}
-                                aria-label={aria}
-                                title={aria}
-                            >
-                                <div className="flex justify-center items-center w-6">
-                                    <i className={`${icon} align-middle`} />
-                                </div>
-                                <div className={disabled ? "text-gray-500" : ""}>{name}</div>
-                            </button>
-
+                        return visible && <ContextMenu.Item
+                            key={name}
+                            className={menuItemsClasses}
+                            onSelect={onClick}
+                            disabled={disabled}
+                            aria-label={aria}
+                            title={aria}
+                        >
+                            <div className="flex justify-center items-center w-6">
+                                <i className={`${icon} align-middle`} />
+                            </div>
+                            <div className={disabled ? "text-gray-500" : ""}>{name}</div>
                         </ContextMenu.Item>
                     })}
                 </ContextMenu.Content>

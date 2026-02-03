@@ -42,7 +42,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
         }
 
         let localStorageDump = ""
-        for (const [key, value] of Object.entries(localStorage)) {
+        for (const [key, value] of Object.entries(window.localStorage)) {
             if (key === "persist:user") {
                 try {
                     const state = JSON.parse(value)
