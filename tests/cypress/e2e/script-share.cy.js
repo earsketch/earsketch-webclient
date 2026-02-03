@@ -1,10 +1,8 @@
-import { createServer } from "../support/wsServer"
 import * as MockSocket from "mock-socket"
 
 describe("shared script", () => {
     const apiHostname = "api-dev.ersktch.gatech.edu"
     const username = "cypress"
-    const wsServer = createServer(`wss://${apiHostname}/EarSketchWS/socket/${username}/`)
 
     const myScriptsShared = [{
         created: "2022-03-03 07:08:09.0",
@@ -53,27 +51,30 @@ describe("shared script", () => {
         }])
         cy.interceptScriptsShared(myScriptsShared)
 
-        cy.intercept(
-            {
-                hostname: apiHostname,
-                method: "GET",
-                path: "EarSketchWS/scripts/byid?scriptid=4444444444444444444444",
-            },
-            {
-                body: newShared,
-            }
-        ).as("script_by_id_1C0A")
+        cy.interceptUsersNotifications([{
+            created: newShared.created,
+            id: 2,
+            message: {},
+            notification_type: "share_script",
+            script_name: newShared.name,
+            sender: newShared.username,
+            shareid: newShared.shareid,
+            unread: true,
+            username: "cypress",
+        }])
+
+        cy.interceptScriptById(newShared).as("script_by_id_4444")
 
         cy.intercept(
             {
                 hostname: apiHostname,
                 method: "POST",
-                path: "EarSketchWS/scripts/saveshared",
+                path: "/EarSketchWS/scripts/saveshared",
             },
             {
                 body: newShared,
             }
-        ).as("script_by_id_1C0A")
+        ).as("script_save_shared")
 
         cy.intercept(
             { method: "POST", hostname: apiHostname, path: "/EarSketchWS/scripts/import" },
@@ -89,31 +90,18 @@ describe("shared script", () => {
         cy.skipTour()
 
         // login will include one shared script from the database
+
         cy.login(username)
 
+        cy.get('button[title="Show/Hide Notifications"]').click()
+
+        cy.get('a[title="Refresh notifications"]').click();
+
+        // notifications will include one new shared script, immediately imported
+
+        // verify
+
         cy.get("button[title='Open SCRIPTS Tab']").click()
-
-        myScriptsShared.push(newShared)
-
-        // notifications will include one shared script, not yet saved to the database
-        cy.incomingWebSocketMessage(
-            wsServer,
-            {
-                notification_type: "notifications",
-                notifications:
-                    [{
-                        created: "2022-03-28 17:56:44.0",
-                        id: 2,
-                        message: {},
-                        notification_type: "share_script",
-                        script_name: "bach_remix.py",
-                        sender: "another_user",
-                        shareid: "4444444444444444444444",
-                        unread: true,
-                        username: "cypress",
-                    }],
-            }
-        )
 
         // view shared scripts, hide my scripts
         cy.contains("div", "MY SCRIPTS (1)").click() // collapse
