@@ -403,13 +403,24 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
 }
 export function jumpToLine(lineNumber: number) {
     const line = view.state.doc.line(lineNumber)
+    const lineText = line.text
+
+    const originalLabel = view.contentDOM.getAttribute("aria-label") || "Code Editor"
+
+    console.log(originalLabel)
+
+    view.contentDOM.setAttribute("aria-label", `Line ${lineNumber}: ${lineText}`)
     view.dispatch({
         selection: { anchor: line.from },
         scrollIntoView: true,
     })
     view.focus()
-}
 
+    // eslint-disable-next-line no-restricted-globals
+    setTimeout(() => {
+        view.contentDOM.setAttribute("aria-label", originalLabel)
+    }, 1000)
+}
 export function jumpToDAWClip(lineNumber: number) {
     const clipButton = document.querySelector(`button[data-source-line="${lineNumber}"]`) as HTMLButtonElement
     if (clipButton) {
