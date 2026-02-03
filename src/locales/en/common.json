@@ -516,8 +516,8 @@
       "projectLengthDecreased": "Project length decreased from {{from}} to {{to}} measures",
       "trackAddedWithDetails": "Track {{trackNum}}: Added with {{clipCount}} measures of audio ({{filekeys}}) spanning measures {{spanStart}} to {{spanEnd}} with {{effectCount}} effect(s)",
       "trackRemoved": "Track {{trackNum}}: Removed",
-      "trackClipsAdded": "Track {{trackNum}}: Added {{measures}} measures of audio ({{filekeys}}). Track now spans measures {{spanStart}} to {{spanEnd}}",
-      "trackClipsRemoved": "Track {{trackNum}}: Removed {{measures}} measures of audio ({{filekeys}}). Track now spans measures {{spanStart}} to {{spanEnd}}",
+      "trackClipsAdded": "Track {{trackNum}}: Added audio ({{filekeys}}). Track spans measures {{spanStart}} to {{spanEnd}}",
+      "trackClipsRemoved": "Track {{trackNum}}: Removed audio ({{filekeys}}). Track spans measures {{spanStart}} to {{spanEnd}}",
       "trackEffectsAdded": "Track {{trackNum}}: Added {{count}} effect",
       "trackEffectsAdded_plural": "Track {{trackNum}}: Added {{count}} effects",
       "trackEffectsRemoved": "Track {{trackNum}}: Removed {{count}} effect",
@@ -528,9 +528,10 @@
       "trackEffectTypesRemoved_plural": "Track {{trackNum}}: Removed {{count}} effects: {{effects}}",
       "trackClipsChanged": "Track {{trackNum}}: Changed audio files ({{measures}} measures){{addedText}}{{removedText}}. Track spans measures {{spanStart}} to {{spanEnd}}",
       "trackClipsChangedNoTempo": "Track {{trackNum}}: Changed no-tempo clips ({{count}} total){{addedText}}{{removedText}}",
-      "trackClipsPositionChanged": "Track {{trackNum}}: Clip positions changed ({{measures}} measures, {{filekeys}}). Track spans measures {{spanStart}} to {{spanEnd}}",
+      "trackClipsPositionChanged": "Track {{trackNum}}: Sound positions changed ({{filekeys}}). Track spans measures {{spanStart}} to {{spanEnd}}",
       "clipFilesAdded": ". Added: {{filekeys}}",
-      "clipFilesRemoved": ". Removed: {{filekeys}}"
+      "clipFilesRemoved": ". Removed: {{filekeys}}",
+      "tempoChanged": "Project tempo changed"
     },
     "shareScript": {
       "menuDescriptions": {
