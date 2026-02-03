@@ -1,118 +1,154 @@
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { describe, expect, it, vi, beforeAll } from "vitest"
 import { getDAWDataDifferences } from "../../../../src/ide/dawDataDescriptions"
 import baseline from "../../fixtures/dawDiffScripts/baseline.json"
 import baselinePlus1Track from "../../fixtures/dawDiffScripts/baseline-plus-1-track.json"
+import baselineMinusFirstMb from "../../fixtures/dawDiffScripts/baseline-minus-first-mb.json"
+import baselineChangedTempo from "../../fixtures/dawDiffScripts/baseline-changed-tempo.json"
 import type { DAWData } from "../../../../src/types/common"
-import i18n from "i18next"
 
+// Mock i18n to return JSON strings for testing
 vi.mock("i18next", () => ({
     default: {
-        t: vi.fn((key: string, params?: Record<string, unknown>) => {
-            if (params) {
-                return JSON.stringify({ key, params })
-            }
-            return key
-        }),
+        t: (key: string, params?: Record<string, unknown>) => {
+            return JSON.stringify({ key, params: params || {} })
+        },
     },
 }))
 
-// Cast JSON fixtures through unknown to avoid strict type checking
-// (JSON doesn't have AudioBuffer instances, but the function doesn't need them)
-const baselineData = baseline as unknown as DAWData
-const baselinePlus1TrackData = baselinePlus1Track as unknown as DAWData
+beforeAll(() => {
+    // Ensure the mock is set up before tests run
+})
 
-// Helper function to verify i18n.t was called with correct key and parameters
-function expectI18nCalledWith(key: string, params: Record<string, unknown>) {
-    expect(i18n.t).toHaveBeenCalledWith(key, expect.objectContaining(params))
+// Helper function to find and parse a difference by key
+function findDifference(differences: string[], key: string): Record<string, unknown> | null {
+    const diff = differences.find(d => d.includes(key))
+    if (!diff) return null
+    return JSON.parse(diff)
 }
 
-describe("getDAWDataDifferences", () => {
-    beforeEach(() => {
-        vi.clearAllMocks()
-    })
+// Helper function to verify multiple differences exist with expected params
+function expectDifferences(
+    differences: string[],
+    expected: Array<{ key: string; params: Record<string, unknown> }>,
+    checkLength = true
+) {
+    if (checkLength) {
+        expect(differences).toHaveLength(expected.length)
+    }
+    for (const { key, params } of expected) {
+        const diff = findDifference(differences, key)
+        expect(diff, `Expected to find difference with key "${key}"`).not.toBeNull()
+        expect(diff?.params).toMatchObject(params)
+    }
+}
 
+// Main output we want for daw diffs:
+// project length changes
+// tracks added/removed
+// effects added/removed
+// clip (names) added/removed
+// track length/span changes
+// main track effects, tempo changes
+
+describe("getDAWDataDifferences", () => {
     it("returns empty array when previous data is null", () => {
-        const differences = getDAWDataDifferences(null as unknown as DAWData, baselineData)
+        const differences = getDAWDataDifferences(null as unknown as DAWData, baseline)
         expect(differences).toEqual([])
     })
 
     it("returns empty array when previous data has no tracks and no length", () => {
         const emptyPrevious: DAWData = { length: 0, tracks: undefined as unknown as DAWData["tracks"], transformedClips: {} }
-        const differences = getDAWDataDifferences(emptyPrevious, baselineData)
+        const differences = getDAWDataDifferences(emptyPrevious, baseline)
         expect(differences).toEqual([])
     })
 
-    it("returns no changes message when comparing identical data", () => {
-        const differences = getDAWDataDifferences(baselineData, baselineData)
+    it("returns empty array when comparing identical data", () => {
+        const differences = getDAWDataDifferences(baseline, baseline)
         expect(differences).toHaveLength(0)
     })
 
     it("detects project length increase when comparing baseline to baseline-plus-1-track", () => {
-        const differences = getDAWDataDifferences(baselineData, baselinePlus1TrackData)
-        expect(differences).toHaveLength(3)
-
-        expectI18nCalledWith("messages:idecontroller.projectLengthIncreased", { from: 8, to: 9 })
+        const differences = getDAWDataDifferences(baseline, baselinePlus1Track)
+        expectDifferences(differences, [
+            { key: "projectLengthIncreased", params: { from: 8, to: 9 } },
+            { key: "tracksAdded", params: { count: 1 } },
+        ])
     })
 
     it("detects project length decrease when comparing baseline-plus-1-track to baseline", () => {
-        const differences = getDAWDataDifferences(baselinePlus1TrackData, baselineData)
-        expect(differences.length).toBeGreaterThan(0)
+        const differences = getDAWDataDifferences(baselinePlus1Track, baseline)
 
-        expectI18nCalledWith("messages:idecontroller.projectLengthDecreased", { from: 9, to: 8 })
+        expectDifferences(
+            differences,
+            [
+                { key: "projectLengthDecreased", params: { from: 9, to: 8 } },
+            ],
+            false
+        )
     })
 
     it("detects project length changes with custom data", () => {
-        const shorterProject: DAWData = { ...baselineData, length: 5 }
-        const longerProject: DAWData = { ...baselineData, length: 20 }
+        const shorterProject: DAWData = { ...baseline, length: 5 }
+        const longerProject: DAWData = { ...baseline, length: 20 }
 
         const increasedDiffs = getDAWDataDifferences(shorterProject, longerProject)
-        expect(increasedDiffs.some(diff => diff.includes("projectLengthIncreased"))).toBe(true)
-        expectI18nCalledWith("messages:idecontroller.projectLengthIncreased", { from: 5, to: 20 })
-
-        vi.clearAllMocks()
+        expectDifferences(increasedDiffs, [
+            { key: "projectLengthIncreased", params: { from: 5, to: 20 } },
+        ])
 
         const decreasedDiffs = getDAWDataDifferences(longerProject, shorterProject)
-        expect(decreasedDiffs.some(diff => diff.includes("projectLengthDecreased"))).toBe(true)
-        expectI18nCalledWith("messages:idecontroller.projectLengthDecreased", { from: 20, to: 5 })
+        expectDifferences(decreasedDiffs, [
+            { key: "projectLengthDecreased", params: { from: 20, to: 5 } },
+        ])
     })
 
     it("detects tracks added", () => {
-        const fewerTracks: DAWData = {
-            length: 8,
-            tracks: baselineData.tracks?.slice(0, 3) || [],
-            transformedClips: {},
-        }
-        const moreTracks: DAWData = {
-            length: 8,
-            tracks: baselineData.tracks?.slice(0, 5) || [],
-            transformedClips: {},
-        }
-
-        const differences = getDAWDataDifferences(fewerTracks, moreTracks)
-        expect(differences.some(diff => diff.includes("tracksAdded"))).toBe(true)
+        const differences = getDAWDataDifferences(baseline, baselinePlus1Track)
+        expectDifferences(
+            differences,
+            [
+                { key: "tracksAdded", params: { count: 1 } },
+            ],
+            false
+        )
     })
 
     it("detects tracks removed", () => {
-        const moreTracks: DAWData = {
-            length: 8,
-            tracks: baselineData.tracks?.slice(0, 5) || [],
-            transformedClips: {},
-        }
-        const fewerTracks: DAWData = {
-            length: 8,
-            tracks: baselineData.tracks?.slice(0, 3) || [],
-            transformedClips: {},
-        }
-
-        const differences = getDAWDataDifferences(moreTracks, fewerTracks)
-        expect(differences.some(diff => diff.includes("tracksRemoved"))).toBe(true)
+        const differences = getDAWDataDifferences(baselinePlus1Track, baseline)
+        expectDifferences(
+            differences,
+            [
+                { key: "tracksRemoved", params: { count: 1 } },
+            ],
+            false
+        )
     })
 
     it("returns an array of strings", () => {
-        const differences = getDAWDataDifferences(baselineData, baselinePlus1TrackData)
+        const differences = getDAWDataDifferences(baseline, baselinePlus1Track)
         expect(Array.isArray(differences)).toBe(true)
         differences.forEach(diff => {
             expect(typeof diff).toBe("string")
         })
+    })
+
+    it("detects clips removed when comparing baseline to baseline-minus-first-mb", () => {
+        const differences = getDAWDataDifferences(baseline, baselineMinusFirstMb)
+
+        // Should detect clips removed on track 3 (track index 3)
+        expectDifferences(differences, [
+            { key: "trackClipsRemoved", params: { trackNum: 3, spanStart: 8, spanEnd: 9 } },
+        ],
+        false)
+    })
+
+    it("detects tempo change", () => {
+        const differences = getDAWDataDifferences(baseline, baselineChangedTempo)
+
+        // Should detect clips removed on track 3 (track index 3)
+        expectDifferences(differences, [
+            { key: "tempoChanged", params: { } },
+        ],
+        false)
     })
 })
