@@ -31,7 +31,7 @@ const initialState: caiState = {
     activeProject: "",
     highlight: { zone: null },
     project: {},
-    wizard: location.href.includes("wizard"),
+    wizard: window.location.href.includes("wizard"),
     curriculumView: "",
     hasSwitchedToCurriculum: false,
     hasSwitchedToCai: false,

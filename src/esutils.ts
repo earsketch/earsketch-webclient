@@ -86,13 +86,13 @@ export const whichBrowser = () => {
 }
 
 export const whichOS = () => {
-    if (navigator.appVersion.includes("Win")) {
+    if (window.navigator.appVersion.includes("Win")) {
         return "Windows"
-    } else if (navigator.appVersion.includes("Mac")) {
+    } else if (window.navigator.appVersion.includes("Mac")) {
         return "MacOS"
-    } else if (navigator.appVersion.includes("X11")) {
+    } else if (window.navigator.appVersion.includes("X11")) {
         return "UNIX"
-    } else if (navigator.appVersion.includes("Linux")) {
+    } else if (window.navigator.appVersion.includes("Linux")) {
         return "Linux"
     }
     return "Unknown OS"
