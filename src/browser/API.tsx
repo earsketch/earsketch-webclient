@@ -17,16 +17,16 @@ import { Language } from "common"
 
 const Code = ({ source, language }: { source: string, language: Language }) => {
     const { light, dark } = highlight(source, language)
-
+    const { t } = useTranslation()
     const getAriaLabel = useMemo(() => {
         if (language === "python") {
-            return analyzePythonCode(source)
+            return analyzePythonCode(source, t)
         } else if (language === "javascript") {
-            return analyzeJavaScriptCode(source)
+            return analyzeJavaScriptCode(source, t)
         } else {
             return "Code Example"
         }
-    }, [source, language])
+    }, [source, language, t])
 
     return <>
         <code aria-label={getAriaLabel} className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>

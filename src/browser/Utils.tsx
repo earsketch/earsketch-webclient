@@ -7,6 +7,7 @@ import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as caiState from "../cai/caiState"
 import * as student from "../cai/dialogue/student"
+import { TFunction } from "i18next"
 
 interface SearchBarProps {
     searchText: string
@@ -207,7 +208,7 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
     )
 }
 
-export function analyzeJavaScriptCode(source: string): string {
+export function analyzeJavaScriptCode(source: string, t: TFunction): string {
     const lines = source.split("\n")
     let readableText = ""
 
@@ -251,7 +252,7 @@ export function analyzeJavaScriptCode(source: string): string {
 
         // Comments
         if (singleLineCommentMatch) {
-            readableText += `Comment: ${singleLineCommentMatch[1].trim()}. `
+            readableText += t("ariaDescriptors:api.code.comment", { text: singleLineCommentMatch[1].trim() }) + " "
             continue
         }
 
@@ -259,7 +260,7 @@ export function analyzeJavaScriptCode(source: string): string {
         if (variableDeclarationLiteralMatch) {
             const varName = variableDeclarationLiteralMatch[1]
             const varValue = variableDeclarationLiteralMatch[2]
-            readableText += `Variable declaration: ${varName} is assigned value ${varValue}. `
+            readableText += t("ariaDescriptors:api.code.varDeclValue", { varName, varValue }) + " "
             continue
         }
 
@@ -269,7 +270,7 @@ export function analyzeJavaScriptCode(source: string): string {
             const init = variableDeclarationMatch[2]
 
             if (!init) {
-                readableText += `Variable declaration: ${varName} is declared. `
+                readableText += t("ariaDescriptors:api.code.varDeclDeclared", { varName }) + " "
                 continue
             }
 
@@ -278,13 +279,13 @@ export function analyzeJavaScriptCode(source: string): string {
             if (functionInDeclaration) {
                 const funcName = functionInDeclaration[1]
                 const funcArgs = functionInDeclaration[2]
-                readableText += `Variable declaration: ${varName} is assigned a function call to ${funcName}. `
+                readableText += t("ariaDescriptors:api.code.varDeclFuncAssign", { varName, funcName }) + " "
                 const argsArray = funcArgs.split(",")
                 argsArray.forEach((arg, index) => {
-                    readableText += `Argument ${index + 1}: ${arg}. `
+                    readableText += t("ariaDescriptors:api.code.argument", { index: index + 1, arg }) + " "
                 })
             } else {
-                readableText += `Variable declaration: ${varName} is assigned value ${init.trim()}. `
+                readableText += t("ariaDescriptors:api.code.varDeclValue", { varName, varValue: init.trim() }) + " "
             }
             continue
         }
@@ -301,13 +302,13 @@ export function analyzeJavaScriptCode(source: string): string {
             if (functionInAssignment) {
                 const funcName = functionInAssignment[1]
                 const funcArgs = functionInAssignment[2]
-                readableText += `Variable assignment: ${left} is assigned a function call to ${funcName}. `
+                readableText += t("ariaDescriptors:api.code.varAssignFunc", { left, funcName }) + " "
                 const argsArray = funcArgs.split(",")
                 argsArray.forEach((arg, index) => {
-                    readableText += `Argument ${index + 1}: ${arg}. `
+                    readableText += t("ariaDescriptors:api.code.argument", { index: index + 1, arg }) + " "
                 })
             } else {
-                readableText += `Variable assignment: ${left} is assigned value ${right}. `
+                readableText += t("ariaDescriptors:api.code.varAssignValue", { left, right }) + " "
             }
             continue
         }
@@ -316,21 +317,21 @@ export function analyzeJavaScriptCode(source: string): string {
         if (functionCallMatch) {
             const funcName = functionCallMatch[1].replace(/\s+/g, "")
             const funcArgs = functionCallMatch[2]
-            readableText += `Function call: ${funcName}. `
+            readableText += t("ariaDescriptors:api.code.funcCall", { funcName }) + " "
             const argsArray = funcArgs.split(",")
             argsArray.forEach((arg, index) => {
-                readableText += `Argument ${index + 1}: ${arg}. `
+                readableText += t("ariaDescriptors:api.code.argument", { index: index + 1, arg }) + " "
             })
             continue
         }
 
-        readableText += `Code: ${line}. `
+        readableText += t("ariaDescriptors:api.code.codeLine", { line }) + " "
     }
 
-    return readableText || "No code detected."
+    return readableText.trim() || t("ariaDescriptors:api.code.noCode")
 }
 
-export function analyzePythonCode(source: string): string {
+export function analyzePythonCode(source: string, t: TFunction): string {
     const lines = source.split("\n")
     let readableText = ""
 
@@ -357,7 +358,7 @@ export function analyzePythonCode(source: string): string {
 
         // Single line comment. # ...
         if (commentMatch) {
-            readableText += `Comment: ${commentMatch[1].trim()}. `
+            readableText += t("ariaDescriptors:api.code.comment", { text: commentMatch[1].trim() }) + " "
             continue
         }
 
@@ -365,7 +366,7 @@ export function analyzePythonCode(source: string): string {
         if (variableDeclarationMatch) {
             const varName = variableDeclarationMatch[1]
             const varValue = variableDeclarationMatch[2]
-            readableText += `Variable declaration: ${varName} is assigned value ${varValue}. `
+            readableText += t("ariaDescriptors:api.code.varDeclValue", { varName, varValue }) + " "
             continue
         }
 
@@ -378,14 +379,14 @@ export function analyzePythonCode(source: string): string {
             if (functionInAssignment) {
                 const funcName = functionInAssignment[1]
                 const funcArgs = functionInAssignment[2]
-                readableText += `Variable assignment: ${varName} is assigned a function call to ${funcName}. `
+                readableText += t("ariaDescriptors:api.code.varAssignFunc", { left: varName, funcName }) + " "
 
                 const argsArray = funcArgs.split(",").map((arg) => arg.trim()).filter(Boolean)
                 argsArray.forEach((arg, index) => {
-                    readableText += `Argument ${index + 1}: ${arg}. `
+                    readableText += t("ariaDescriptors:api.code.argument", { index: index + 1, arg }) + " "
                 })
             } else {
-                readableText += `Variable assignment: ${varName} is assigned value ${assignedValue}. `
+                readableText += t("ariaDescriptors:api.code.varAssignValue", { left: varName, right: assignedValue }) + " "
             }
             continue
         }
@@ -394,17 +395,17 @@ export function analyzePythonCode(source: string): string {
         if (functionCallMatch) {
             const funcName = functionCallMatch[1]
             const funcArgs = functionCallMatch[2]
-            readableText += `Function call: ${funcName}. `
+            readableText += t("ariaDescriptors:api.code.funcCall", { funcName }) + " "
 
             const argsArray = funcArgs.split(",").map((arg) => arg.trim()).filter(Boolean)
             argsArray.forEach((arg, index) => {
-                readableText += `Argument ${index + 1}: ${arg}. `
+                readableText += t("ariaDescriptors:api.code.argument", { index: index + 1, arg }) + " "
             })
             continue
         }
 
-        readableText += `Code: ${line}. `
+        readableText += t("ariaDescriptors:api.code.codeLine", { line }) + " "
     }
 
-    return readableText || "No code detected."
+    return readableText.trim() || t("ariaDescriptors:api.code.noCode")
 }
