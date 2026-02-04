@@ -114,10 +114,11 @@ const Details = ({ obj }: { obj: APIItem }) => {
                 {Object.entries(obj.parameters).map(([param, paramVal]) => (
                     <div key={param}>
                         <div className="ml-3 mt-2">
-                            <div aria-label={t("ariaDescriptors:api.parameterHeading", { parameterName: param, parameterType: t(paramVal.typeKey) })}>
-                                <span aria-hidden={true} className="font-bold text-sm">{t("api:heading", { headingName: param })}</span>
-                                <span aria-hidden={true} className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
-                            </div>
+                            <h4 className="sr-only">
+                                {t("ariaDescriptors:api.parameterHeading", { parameterName: param, parameterType: t(paramVal.typeKey) })}
+                            </h4> 
+                            <span aria-hidden={true} className="font-bold text-sm">{t("api:heading", { headingName: param })}</span>
+                            <span aria-hidden={true} className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
                             <div className="text-xs"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
@@ -133,10 +134,12 @@ const Details = ({ obj }: { obj: APIItem }) => {
             </div>}
             {obj.returns &&
             <div className="mt-4">
-                <h3 aria-label={t("ariaDescriptors:api.returnHeading", { headingName: t("api:returnValue"), headingType: t(obj.returns.typeKey) })}>
-                    <span aria-hidden={true} className="font-bold">{t("api:heading", { headingName: t("api:returnValue") })}</span>
-                    <span aria-hidden={true} className="text-gray-600">{t(obj.returns.typeKey)}</span>
+                <h3 className="sr-only" aria-label={t("ariaDescriptors:api.returnHeading", { headingName: t("api:returnValue"), headingType: t(obj.returns.typeKey) })}>
+                    {t("ariaDescriptors:api.returnHeading", { headingName: t("api:returnValue"), headingType: t(obj.returns.typeKey) })}
                 </h3>
+
+                <span aria-hidden={true} className="font-bold">{t("api:heading", { headingName: t("api:returnValue") })}</span>
+                <span aria-hidden={true} className="text-gray-600">{t(obj.returns.typeKey)}</span>
                 <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
             </div>}
             <div className="mt-4">
