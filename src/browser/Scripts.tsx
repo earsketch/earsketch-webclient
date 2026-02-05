@@ -130,9 +130,8 @@ export const SortBySelector = () => {
 
                 <ListboxOptions
                     anchor = "bottom start"
-                    className={`border p-2 z-50 focus:outline-none ${
-                        theme === "light" ? "bg-white" : "bg-black"
-                    }`}
+            className={`border p-2 z-50 [--anchor-gap:4px] focus:outline-none
+                      bg-white text-black dark:bg-black dark:text-white border-black`}
                 >
                     {SORT_OPTIONS.map((option) => (
                         <ListboxOption key={option.id} value={option.id} as={Fragment}>
