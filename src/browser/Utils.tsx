@@ -103,7 +103,8 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
 
                 <ListboxOptions
                     anchor="bottom start"
-                    className={`z-50 [--anchor-max-height:24rem] overflow-y-auto mt-1 border p-2 focus:outline-none bg-white text-black dark:bg-black dark:text-white`}
+          className={`z-50 [--anchor-max-height:24rem] [--anchor-gap:4px] overflow-y-auto border pt-1 p-2 focus:outline-none
+                      bg-white text-black dark:bg-black dark:text-white border-black`}
                 >
                     <ListboxOption as="button" type="button" value="__clear__" className="w-full text-left">
                         {({ active }) => (
