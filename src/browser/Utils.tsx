@@ -63,7 +63,6 @@ interface DropdownMultiSelectorProps {
 }
 
 export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
-    const theme = useSelector(appState.selectColorTheme)
     const dispatch = useDispatch()
 
     const selectedValues = useAppSelector(
@@ -89,12 +88,11 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
         ? "mr-2"
         : position === "right" ? "ml-2" : "mx-1"
 
-    return (
+  return (
         <Listbox value={selectedValues} multiple onChange={handleChange}>
             <div className="relative w-1/3">
                 <ListboxButton
-                    className={`flex justify-between w-full border-b-2 ${margin}
-            ${theme === "light" ? "border-black" : "border-white"}`}
+                    className={`flex justify-between w-full border-b-2 ${margin} border-black dark:border-white`}
                     aria-label={aria}
                 >
                     <span className="truncate">
@@ -105,8 +103,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
 
                 <ListboxOptions
                     anchor="bottom start"
-                    className={`z-50 mt-1 border p-2 focus:outline-none
-            ${theme === "light" ? "bg-white" : "bg-black"}`}
+                    className={`z-50 [--anchor-max-height:24rem] overflow-y-auto mt-1 border p-2 focus:outline-none bg-white text-black dark:bg-black dark:text-white`}
                 >
                     <ListboxOption as="button" type="button" value="__clear__" className="w-full text-left">
                         {({ active }) => (
