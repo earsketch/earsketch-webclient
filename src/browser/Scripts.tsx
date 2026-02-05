@@ -134,10 +134,10 @@ export const SortBySelector = () => {
                       bg-white text-black dark:bg-black dark:text-white border-black`}
                 >
                     {SORT_OPTIONS.map((option) => (
-                        <ListboxOption key={option.id} value={option.id} as={Fragment}>
+                        <ListboxOption key={option.id} value={option.id} as="button" type="button" className="w-full block">
                             {({ active, selected }) => (
                                 <div
-                                    className={`flex items-center px-2 py-1 cursor-pointer select-none ${
+                                    className={`flex items-center px-2 py-1 ${
                                         active ? "bg-blue-200 dark:bg-blue-500" : ""
                                     }`}
                                 >
