@@ -370,7 +370,7 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = 
                                 className={index % 2 === 0
                                     ? "bg-white dark:bg-gray-900"
                                     : "bg-gray-300 dark:bg-gray-800" +
-                  " hover:bg-blue-200 dark:hover:bg-blue-500"}>
+                                    " hover:bg-blue-200 dark:hover:bg-blue-500"}>
                                 <ScriptEntry key={ID} script={entities[ID]} type={type} />
                             </div>
                         )
