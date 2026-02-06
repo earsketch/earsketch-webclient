@@ -22,9 +22,9 @@ import { Popover, PopoverButton, PopoverPanel, Listbox, ListboxButton, ListboxOp
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
-    create: () => {},
-    share: (_: Script) => {},
-    download: (_: Script) => {},
+    create: () => { },
+    share: (_: Script) => { },
+    download: (_: Script) => { },
 }
 
 const CreateScriptButton = () => {
@@ -117,8 +117,7 @@ export const SortBySelector = () => {
         >
             <div className="relative w-1/3 ml-2">
                 <ListboxButton
-                    className={`flex justify-between w-full border-b-2 cursor-pointer select-none ${
-                        theme === "light" ? "border-black" : "border-white"
+                    className={`flex justify-between w-full border-b-2 cursor-pointer select-none ${theme === "light" ? "border-black" : "border-white"
                     }`}
                     aria-label={t("scriptBrowser.filterDropdown.sortBy")}
                 >
@@ -129,16 +128,15 @@ export const SortBySelector = () => {
                 </ListboxButton>
 
                 <ListboxOptions
-                    anchor = "bottom start"
-            className={`border p-2 z-50 [--anchor-gap:4px] focus:outline-none
+                    anchor="bottom start"
+                    className={`border p-2 z-50 [--anchor-gap:4px] focus:outline-none
                       bg-white text-black dark:bg-black dark:text-white border-black`}
                 >
                     {SORT_OPTIONS.map((option) => (
                         <ListboxOption key={option.id} value={option.id} as="button" type="button" className="w-full block">
                             {({ active, selected }) => (
                                 <div
-                                    className={`flex items-center px-2 py-1 ${
-                                        active ? "bg-blue-200 dark:bg-blue-500" : ""
+                                    className={`flex items-center px-2 py-1 ${active ? "bg-blue-200 dark:bg-blue-500" : ""
                                     }`}
                                 >
                                     <div className="w-5 mr-2" aria-hidden>
@@ -183,7 +181,7 @@ const Filters = () => {
                     position="center"
                     FilterItem={FilterItem}
                 />
-                <SortBySelector/>
+                <SortBySelector />
             </div>
         </div>
     )
@@ -331,7 +329,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                         {type === "regular" && <DownloadButton script={script} />}
                         {type === "regular" && loggedIn && (<ShareButton script={script} />)}
                         {type === "shared" && <SharedScriptInfoButton script={script} />}
-                        <ScriptDropdownMenu script={script} scriptType={type} menuType="buttonmenu"/>
+                        <ScriptDropdownMenu script={script} scriptType={type} menuType="buttonmenu" />
                     </div>}
 
                     <div className={`${type === "deleted" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
@@ -372,7 +370,7 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = 
                                 className={index % 2 === 0
                                     ? "bg-white dark:bg-gray-900"
                                     : "bg-gray-300 dark:bg-gray-800" +
-                                    " hover:bg-blue-200 dark:hover:bg-blue-500"}>
+                  " hover:bg-blue-200 dark:hover:bg-blue-500"}>
                                 <ScriptEntry key={ID} script={entities[ID]} type={type} />
                             </div>
                         )

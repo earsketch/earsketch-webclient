@@ -88,7 +88,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
         ? "mr-2"
         : position === "right" ? "ml-2" : "mx-1"
 
-  return (
+    return (
         <Listbox value={selectedValues} multiple onChange={handleChange}>
             <div className="relative w-1/3">
                 <ListboxButton
@@ -103,7 +103,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
 
                 <ListboxOptions
                     anchor="bottom start"
-          className={`z-50 [--anchor-max-height:24rem] [--anchor-gap:4px] overflow-y-auto border pt-1 p-2 focus:outline-none
+                    className={`z-50 [--anchor-max-height:24rem] [--anchor-gap:4px] overflow-y-auto border pt-1 p-2 focus:outline-none
                       bg-white text-black dark:bg-black dark:text-white border-black`}
                 >
                     <ListboxOption as="button" type="button" value="__clear__" className="w-full text-left">
