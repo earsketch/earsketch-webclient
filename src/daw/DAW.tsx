@@ -572,8 +572,7 @@ const Measureline = () => {
         let n = 1
 
         // create d3 axis
-        const measureline = d3.axisBottom()
-            .scale(xScale) // scale ticks according to zoom
+        const measureline = d3.axisBottom(xScale) // scale ticks according to zoom
             .tickValues(d3.range(1, playLength + 1, intervals.tickInterval))
             .tickSize(15)
             .tickFormat((d: any) => {
@@ -986,13 +985,12 @@ export const DAW = () => {
         const timer = useRef(0)
         const up = (event: MouseEvent) => {
             if (event.button !== 0) return
-            clearInterval(timer.current)
+            window.clearInterval(timer.current)
             document.removeEventListener("mouseup", up)
         }
         const down = (event: React.MouseEvent<HTMLButtonElement>) => {
             // Only respond to left-click. (Right-click does weird things in some browsers, maybe because of the context menu.)
             if (event.button !== 0) return
-            // NOTE: The `window.` is so TypeScript doesn't get confused by NodeJS.setInterval. :-/
             timer.current = window.setInterval(action, interval)
             action()
             // NOTE: We bind this to the document (instead of the same element `down` gets bound to)
@@ -1085,10 +1083,10 @@ export const DAW = () => {
 
     useEffect(() => {
         if (playing) {
-            const interval = setInterval(updatePlayPositionAndScroll, 60)
+            const interval = window.setInterval(updatePlayPositionAndScroll, 60)
             return () => {
                 setDAWPlayingLines([])
-                clearInterval(interval)
+                window.clearInterval(interval)
             }
         }
     }, [playing, xScale, autoScroll])

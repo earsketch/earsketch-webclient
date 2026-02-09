@@ -2,6 +2,7 @@
 import ctx from "../audio/context"
 import { SoundEntity } from "common"
 import esconsole from "../esconsole"
+import { getAuth } from "../request"
 
 const STATIC_AUDIO_URL_DOMAIN = URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
     ? "https://earsketch.gatech.edu/backend-static"
@@ -54,6 +55,7 @@ export async function getSound(name: string): Promise<Sound> {
 }
 
 async function getSoundBuffer(sound: SoundEntity) {
+    const name = sound.name
     const url = sound.standard
         ? STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
         : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
@@ -127,7 +129,7 @@ export function getStandardSounds() {
 async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
-        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard.json"
+        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard_1.json"
         const response = await fetch(url)
         if (!response.ok) {
             throw Object.assign(new Error(`Failed to fetch standard sounds (code ${response.status}).`), { code: response.status })
@@ -153,8 +155,8 @@ async function _getStandardSounds() {
 }
 
 export async function getUserSounds(username: string) {
-    const response = await fetch(URL_DOMAIN + "/audio/user?" + new URLSearchParams({ username }))
-    const sounds: SoundEntity[] = await response.json()
+    // The /audio/user depricated query parameter `username` is maintained, for now, until the backend is updated.
+    const sounds: SoundEntity[] = await getAuth("/audio/user", { username })
     // Populate cache with user sound metadata so that we don't fetch it again later via `getMetadata()`.
     for (const sound of sounds) {
         fixMetadata(sound, false)

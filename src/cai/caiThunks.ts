@@ -1,12 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import { DAWData, Language, Script } from "common"
-import { chatListeners, sendChatMessage } from "../app/collaboration"
-import { selectRegularScripts } from "../browser/scriptsState"
+import * as app from "../app/appState"
+import * as scripts from "../browser/scriptsState"
+import * as tabs from "../ide/tabState"
 import { parseLanguage } from "../esutils"
-import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
-import { elaborate } from "../ide/console"
-import { selectActiveTabScript } from "../ide/tabState"
+import { changeListeners } from "../ide/Editor"
 import store, { ThunkAPI } from "../reducers"
 import { selectUserName } from "../user/userState"
 import { analyzeCode, analyzeMusic } from "./analysis"
@@ -26,7 +25,6 @@ import {
     selectResponseOptions,
     selectWizard,
     setActiveProject,
-    setCurriculumView,
     setDropupLabel,
     setErrorOptions,
     setHighlight,
@@ -56,7 +54,7 @@ if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
                 addToNodeHistory(["Begin Code Edit", firstEdit])
             }
 
-            clearTimeout(caiTimer)
+            window.clearTimeout(caiTimer)
             caiTimer = window.setTimeout(() => {
                 store.dispatch(checkForCodeUpdates())
                 const lastEdit = Date.now()
@@ -77,32 +75,6 @@ if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
         })
     }
 }
-
-// Listen for chat messages.
-chatListeners.push(message => {
-    const outputMessage = message.caiMessage!
-
-    switch (message.caiMessageType) {
-        case "cai":
-            outputMessage.sender = "CAI"
-            store.dispatch(addCaiMessage([outputMessage, { remote: true }]))
-            break
-        case "cai suggestion":
-            outputMessage.sender = "CAI"
-            store.dispatch(addCaiMessage([outputMessage, { remote: true, suggestion: true }]))
-            break
-        case "wizard":
-            outputMessage.sender = "CAI"
-            store.dispatch(addCaiMessage([outputMessage, { remote: true, wizard: true }]))
-            break
-        case "user":
-            store.dispatch(addCaiMessage([outputMessage, { remote: true }]))
-            break
-        case "curriculum":
-            store.dispatch(setCurriculumView(message.sender + " is viewing " + outputMessage.text[0][1][0]))
-            break
-    }
-})
 
 // TODO: Avoid DOM manipulation.
 export const newCaiMessage = () => {
@@ -154,7 +126,6 @@ const addCaiMessage = createAsyncThunk<void, [CaiMessage, MessageParameters], Th
         } else {
             // Messages from CAI: save as suggestion and send to wizard.
             addToNodeHistory(["chat", [combineMessageText(message), "CAI Suggestion"]])
-            sendChatMessage(message, "cai suggestion")
         }
     }
 )
@@ -209,7 +180,8 @@ const introduceCai = createAsyncThunk<void, string, ThunkAPI>(
 export const sendCaiMessage = createAsyncThunk<void, [CaiButton, boolean], ThunkAPI>(
     "cai/sendCaiMessage",
     async ([input, isDirect], { getState, dispatch }) => {
-        const activeProject = selectActiveProject(getState())
+        const state = getState()
+        const activeProject = selectActiveProject(state)
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
@@ -220,7 +192,7 @@ export const sendCaiMessage = createAsyncThunk<void, [CaiButton, boolean], Thunk
             sender: selectUserName(getState()),
         } as CaiMessage
 
-        const text = getContents()
+        const text = tabs.selectActiveTabScript(state)!.source_code
 
         dialogue.setCodeObj(text)
         dispatch(addToMessageList({ message }))
@@ -262,7 +234,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                     numberToRun = 10
                 }
 
-                for (const script of Object.values(selectRegularScripts(store.getState()))) {
+                for (const script of Object.values(scripts.selectRegularScripts(store.getState()))) {
                     if (!savedNames.includes(script.name)) {
                         savedNames.push(script.name)
                         savedScripts.push(script)
@@ -288,10 +260,6 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(setActiveProject(activeProject))
             dialogue.setActiveProject(activeProject)
 
-            if (selectWizard(getState()) && selectActiveTabScript(getState()).collaborative) {
-                setReadOnly(true)
-            }
-
             if (!selectMessageList(getState()).length) {
                 dispatch(setMessageList([]))
                 if (ES_WEB_SHOW_CAI && !selectWizard(getState())) {
@@ -313,16 +281,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 export const compileCai = createAsyncThunk<void, [DAWData, Language, string], ThunkAPI>(
     "cai/compileCai",
     async (data, { getState, dispatch }) => {
-        if (ES_WEB_SHOW_CAI && ES_WEB_SHOW_CHAT) {
-            if (!selectWizard(getState())) {
-                const message = {
-                    text: [["plaintext", ["Compiled the script!"]]],
-                    date: Date.now(),
-                    sender: selectUserName(getState()),
-                } as CaiMessage
-                sendChatMessage(message, "user")
-            }
-        } else if (dialogueState[selectActiveProject(getState())].isDone) {
+        if (dialogueState[selectActiveProject(getState())].isDone) {
             return
         }
 
@@ -371,17 +330,12 @@ export const compileCai = createAsyncThunk<void, [DAWData, Language, string], Th
 export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
-        const errorReturn = dialogue.handleError(data, getContents())
-        const activeProject = selectActiveProject(getState())
-        errorHandlingState[activeProject].errorMessage = storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
-        if (ES_WEB_SHOW_CAI && ES_WEB_SHOW_CHAT && !selectWizard(getState())) {
-            const message = {
-                text: [["plaintext", ["Compiled the script with error: " + elaborate(data)]]],
-                date: Date.now(),
-                sender: selectUserName(getState()),
-            } as CaiMessage
-            sendChatMessage(message, "user")
-        } else if (dialogueState[activeProject].isDone) {
+        const state = getState()
+        const contents = tabs.selectActiveTabScript(state)!.source_code
+        const errorReturn = dialogue.handleError(data, contents)
+        const activeProject = selectActiveProject(state)
+        errorHandlingState[activeProject].errorMessage = storeErrorInfo(data, contents, app.selectScriptLanguage(state))
+        if (dialogueState[activeProject].isDone) {
             return
         }
 
@@ -402,14 +356,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
 
 export const closeCurriculum = createAsyncThunk<void, void, ThunkAPI>(
     "cai/closeCurriculum",
-    (_, { getState }) => {
-        if (ES_WEB_SHOW_CAI && ES_WEB_SHOW_CHAT && !selectWizard(store.getState())) {
-            sendChatMessage({
-                text: [["plaintext", ["the CAI Window"]]],
-                sender: selectUserName(getState()),
-                date: Date.now(),
-            } as CaiMessage, "curriculum")
-        }
+    () => {
         addToNodeHistory(["curriculum", "CAI window"])
     }
 )
@@ -419,7 +366,7 @@ export const autoScrollCai = createAsyncThunk<void, void, ThunkAPI>(
     () => {
         // Auto scroll to the bottom (set on a timer to happen after message updates).
         const caiBody = document.getElementById("cai-body")
-        setTimeout(() => {
+        window.setTimeout(() => {
             if (caiBody) {
                 caiBody.scrollTop = caiBody.scrollHeight
             }
@@ -429,26 +376,15 @@ export const autoScrollCai = createAsyncThunk<void, void, ThunkAPI>(
 
 export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkAPI>(
     "cai/curriculumPage",
-    ([location, title], { getState }) => {
+    ([location, _]) => {
         dialogue.addCurriculumPageToHistory(location)
-        const east = getState().layout.east
-        if (!(east.open && east.kind === "CAI")) {
-            if (ES_WEB_SHOW_CAI && ES_WEB_SHOW_CHAT && !selectWizard(getState())) {
-                const page = title || location as unknown as string
-                sendChatMessage({
-                    text: [["plaintext", ["Curriculum Page " + page]]],
-                    sender: selectUserName(getState()),
-                    date: Date.now(),
-                } as CaiMessage, "curriculum")
-            }
-        }
     }
 )
 
 const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
-    () => {
-        dialogue.checkForCodeUpdates(getContents())
+    (_, { getState }) => {
+        dialogue.checkForCodeUpdates(tabs.selectActiveTabScript(getState())!.source_code)
     }
 )
 

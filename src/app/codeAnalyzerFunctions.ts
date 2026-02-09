@@ -20,6 +20,7 @@ export interface Reports {
     OVERVIEW: AnalyzerReport
     COUNTS: FunctionCounts
     "CODE INDICATOR": reader.CodeFeatures
+    "CODE INDICATOR TOTAL": AnalyzerReport
     "CODE COMPLEXITY": AnalyzerReport
     MEASUREVIEW: MeasureView
     SOUNDPROFILE: SoundProfile
@@ -39,6 +40,7 @@ export interface ReportOptions {
     OVERVIEW: boolean
     COUNTS: boolean
     "CODE INDICATOR": boolean
+    "CODE INDICATOR TOTAL": boolean
     "CODE COMPLEXITY": boolean
     MEASUREVIEW: boolean
     SOUNDPROFILE: boolean
@@ -119,6 +121,7 @@ export const runScript = async (script: Script, version?: number, timeOnTaskPerc
     }
 
     const codeIndicator = reader.analyze(parseLanguage(script.name), script.source_code)
+    const codeIndicatorTotal = { total: reader.total(codeIndicator) }
     const complexityOutput = analyzeCode(parseLanguage(script.name), script.source_code)
     for (const [feature, value] of Object.entries(complexityOutput.codeFeatures)) {
         codeComplexity[feature] = value
@@ -131,6 +134,7 @@ export const runScript = async (script: Script, version?: number, timeOnTaskPerc
         OVERVIEW: analyzerReport.OVERVIEW,
         COUNTS: complexityOutput.counts,
         "CODE INDICATOR": codeIndicator,
+        "CODE INDICATOR TOTAL": codeIndicatorTotal,
         "CODE COMPLEXITY": codeComplexity,
         MEASUREVIEW: analyzerReport.MEASUREVIEW,
         SOUNDPROFILE: analyzerReport.SOUNDPROFILE,

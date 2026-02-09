@@ -1,5 +1,6 @@
 import { loadEnv, splitVendorChunkPlugin } from "vite"
 import { defineConfig } from "vitest/config"
+import { adapter, analyzer } from "vite-bundle-analyzer"
 import react from "@vitejs/plugin-react-swc"
 import path from "path"
 
@@ -31,7 +32,7 @@ export default ({ mode }: { mode: string }) => {
     const env = loadEnv(mode, process.cwd(), ["ES_WEB_"])
     return defineConfig({
         base: baseURL,
-        plugins: [splitVendorChunkPlugin(), react()],
+        plugins: [splitVendorChunkPlugin(), react(), adapter(analyzer({ analyzerMode: "static" }))],
         // https://vite.dev/guide/dep-pre-bundling.html#monorepos-and-linked-dependencies
         optimizeDeps: {
             include: ["droplet", "skulpt"],
@@ -39,6 +40,12 @@ export default ({ mode }: { mode: string }) => {
         build: {
             commonjsOptions: {
                 include: [/droplet/, /skulpt/, /node_modules/],
+            },
+            rollupOptions: {
+                input: {
+                    main: path.resolve(__dirname, "index.html"),
+                    autograder: path.resolve(__dirname, "autograder/index.html"),
+                },
             },
         },
         test: {

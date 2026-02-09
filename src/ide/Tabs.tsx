@@ -5,12 +5,11 @@ import { useTranslation } from "react-i18next"
 import { Menu } from "@headlessui/react"
 
 import * as appState from "../app/appState"
-import * as editor from "./ideState"
-import { DropdownContextMenuCaller } from "../browser/ScriptsMenus"
 import * as scripts from "../browser/scriptsState"
 import * as tabs from "./tabState"
 import * as tabThunks from "./tabThunks"
 import * as layout from "../ide/layoutState"
+import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 
 const CreateScriptButton = ({ create }: { create: () => void }) => {
     const { t } = useTranslation()
@@ -40,14 +39,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
     const scriptType = (script.isShared && "shared") || (script.readonly && "readonly") || "regular"
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const active = activeTabID === scriptID
-    const collaborators = script.collaborators as string[]
     const { t } = useTranslation()
-
-    useEffect(() => {
-        if (active && script.collaborative) {
-            dispatch(editor.setBlocksMode(false))
-        }
-    }, [activeTabID])
 
     const tabDivClass = classNames("shrink-0 cursor-pointer border text-sm",
         {
@@ -88,19 +80,17 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             title={script.name}
             aria-label={script.name}
         >
-            <DropdownContextMenuCaller
+            <ScriptDropdownMenu
                 className="flex justify-between items-center truncate p-2 pr-6 w-full"
                 script={script}
-                type={scriptType}
+                scriptType={scriptType}
+                menuType="contextmenu"
             >
                 <div className="flex items-center space-x-1.5 truncate">
-                    {(script.isShared && !script.collaborative) &&
-                        <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`}/>}
-                    {script.collaborative &&
-                        <i className="icon-users4 align-middle" title={`Shared with ${collaborators.join(", ")}`}/>}
+                    {script.isShared && <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`}/>}
                     <div className="truncate select-none align-middle">{scriptName}</div>
                 </div>
-            </DropdownContextMenuCaller>
+            </ScriptDropdownMenu>
             {active && (<div className="w-full border-b-4 border-amber absolute bottom-0"/>)}
         </button>
         <div className="flex items-center absolute top-0 bottom-0 right-0 my-auto mr-2">
@@ -127,7 +117,7 @@ const CloseAllTab = ({ closeAll }: { closeAll: () => void }) => {
         className={`
             shrink-0 h-8 p-1.5 cursor-pointer
             flex items-center
-            text-white bg-gray-800 border border-gray-800    
+            text-white bg-gray-800 border border-gray-800
         `}
         onClick={closeAll}
     >

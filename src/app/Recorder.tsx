@@ -25,10 +25,10 @@ export const LevelMeter = () => {
             const val = (db - dbMin) / (-dbMin)
             const rVal = Math.max(0, (1 - val * 1.3))
             setWidth((WIDTH - STROKE_WIDTH * 2) * rVal)
-            handle = requestAnimationFrame(draw)
+            handle = window.requestAnimationFrame(draw)
         }
-        let handle = requestAnimationFrame(draw)
-        return () => cancelAnimationFrame(handle)
+        let handle = window.requestAnimationFrame(draw)
+        return () => window.cancelAnimationFrame(handle)
     }, [])
 
     return <svg width={WIDTH} height={HEIGHT}>
@@ -65,18 +65,34 @@ export const Metronome = ({ beat, hasBuffer, useMetro, startRecording }: { beat:
             if (useMetro) {
                 return measure > 0 ? <span className="text-5xl">{measure}</span> : <span className="font-bold">{t("soundUploader.record.getReady")}</span>
             } else {
-                return <i className="cursor-pointer text-3xl icon icon-recording blink recording" onClick={() => { recorder.stopRecording(); setState("") }} />
+                return <button className="text-3xl"
+                    onClick={() => { recorder.stopRecording(); setState("") }}
+                    aria-label={t("ariaDescriptors.recorder.stopRecording")}>
+                    <i className="icon icon-recording blink recording" />
+                </button>
             }
         } else if (state === "preview") {
-            return <i className="cursor-pointer text-3xl block icon icon-stop2" onClick={() => { recorder.stopPreview(); setState("") }} />
+            return <button className="text-3xl"
+                onClick={() => { recorder.stopPreview(); setState("") }}
+                aria-label={t("ariaDescriptors.recorder.stopPreview")}>
+                <i className="icon icon-stop2" />
+            </button>
         } else if (hasBuffer) {
-            return <i className="cursor-pointer text-3xl block icon icon-play4" onClick={() => { recorder.startPreview(() => setState("")); setState("preview") }} />
+            return <button className="text-3xl"
+                onClick={() => { recorder.startPreview(() => setState("")); setState("preview") }}
+                aria-label={t("ariaDescriptors.recorder.startPreview")}>
+                <i className="icon icon-play4" />
+            </button>
         } else {
-            return <i className="cursor-pointer text-3xl icon icon-recording" onClick={() => { startRecording(); setState("record") }} />
+            return <button className="text-3xl"
+                onClick={() => { startRecording(); setState("record") }}
+                aria-label={t("ariaDescriptors.recorder.startRecording")}>
+                <i className="icon icon-recording" />
+            </button>
         }
     }
 
-    return <div className="flex items-center">
+    return <div className="flex items-center select-none">
         <div className="text-center z-10" style={{ marginLeft: "10px", width: "60px" }}><IndicatorButton /></div>
         <div className={"fixed counter-meter " + (useMetro ? BEAT_POSITIONS[((beat % 4) + 4) % 4] : "hide-metronome")} />
     </div>
@@ -141,14 +157,14 @@ export const Waveform = ({ buffer }: { buffer: AudioBuffer | null }) => {
         if (!canvas.current) return
         const context = canvas.current!.getContext("2d")!
         if (buffer) {
-            cancelAnimationFrame(handle.current)
+            window.cancelAnimationFrame(handle.current)
             handle.current = 0
             drawWaveform(context, buffer.getChannelData(0), HEIGHT / 2)
         } else if (!handle.current) {
             context.clearRect(0, 0, WIDTH, HEIGHT)
             const loop = () => {
                 drawSpectrogram(context)
-                handle.current = requestAnimationFrame(loop)
+                handle.current = window.requestAnimationFrame(loop)
             }
             loop()
         }

@@ -11,7 +11,6 @@ import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as caiThunks from "../cai/caiThunks"
 import { Chat } from "../cai/Chat"
-import * as collaboration from "../app/collaboration"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
@@ -23,6 +22,7 @@ import * as ESUtils from "../esutils"
 import { ExtensionHost } from "../extensions/ExtensionHost"
 import { setReady } from "../bubble/bubbleState"
 import { dismiss } from "../bubble/bubbleThunks"
+import { callbacks as bubbleCallbacks } from "../bubble/Bubble"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
 import { openModal } from "../app/modal"
@@ -59,9 +59,9 @@ export async function createScript() {
     }
 
     reporter.createScript()
-    const filename = await openModal(ScriptCreator)
-    if (filename) {
-        const action = scriptsThunks.saveScript({ name: filename, source: i18n.t(`templates:${ESUtils.parseLanguage(filename)}`) })
+    const result = await openModal(ScriptCreator)
+    if (result) {
+        const action = scriptsThunks.saveScript({ name: result.filename, source: i18n.t(`templates:${result.template}`) })
         const script = await store.dispatch(action).unwrap()
         store.dispatch(setActiveTabAndEditor(script.shareid))
     }
@@ -73,10 +73,7 @@ function saveActiveScriptWithRunStatus(status: number) {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
     const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
-    if (script?.collaborative) {
-        script && collaboration.saveScript(script.shareid)
-        isWaitingForServerResponse = false
-    } else if (script && !script.readonly && !script.isShared && !script.saved) {
+    if (script && !script.readonly && !script.isShared && !script.saved) {
         // save the script on a successful run
         store.dispatch(scriptsThunks.saveScript({
             name: script.name,
@@ -108,8 +105,6 @@ function saveScript() {
         store.dispatch(saveScriptIfModified(activeTabID)).unwrap().catch(() => {
             userNotification.show(i18n.t("messages:idecontroller.savefailed"), "failure1")
         })
-    } else if (script?.collaborative) {
-        collaboration.saveScript()
     }
 }
 
@@ -145,7 +140,7 @@ editor.bindKey("Mod-s", saveScript)
 // Timer: auto save
 let autoSaveTimer = 0
 editor.changeListeners.push(() => {
-    clearTimeout(autoSaveTimer)
+    window.clearTimeout(autoSaveTimer)
     const AUTO_SAVE_INTERVAL_MS = 5 * 60 * 1000 // 5 min
     autoSaveTimer = window.setTimeout(scriptsThunks.saveAll, AUTO_SAVE_INTERVAL_MS)
 })
@@ -270,12 +265,10 @@ async function runScript() {
 
     setLoading(true)
 
-    const code = editor.getContents()
-
     const startTime = Date.now()
     const state = store.getState()
     const hideEditor = appState.selectHideEditor(state)
-    const scriptName = (hideEditor ? appState.selectEmbeddedScriptName(state) : tabs.selectActiveTabScript(state).name)!
+    const scriptName = (hideEditor ? appState.selectEmbeddedScriptName(state) : tabs.selectActiveTabScript(state)!.name)!
     const language = ESUtils.parseLanguage(scriptName)
 
     editor.clearErrors()
@@ -283,11 +276,13 @@ async function runScript() {
     ideConsole.status(i18n.t("messages:idecontroller.running"))
 
     const scriptID = tabs.selectActiveTabID(state)
+    const script = scriptsState.selectAllScripts(store.getState())[scriptID!]
+    const code = script.source_code
     store.dispatch(tabs.removeModifiedScript(scriptID))
 
     let result: DAWData
     try {
-        result = await runner.run(language, editor.getContents())
+        result = await runner.run(language, code)
     } catch (error: any) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
@@ -317,15 +312,13 @@ async function runScript() {
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
+    ideConsole.status(i18n.t("messages:idecontroller.success"))
     store.dispatch(ide.setScriptMatchesDAW(true))
     saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
 
-    // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
-    setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
-
     // asynchronously report the script complexity
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
-        setTimeout(() => {
+        window.setTimeout(() => {
             store.dispatch(caiThunks.compileCai([result, language, code]))
         })
     }
@@ -337,6 +330,7 @@ async function runScript() {
 }
 
 dawCallbacks.runScript = runScript
+bubbleCallbacks.runScript = runScript
 
 export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }: {
     closeAllTabs: () => void, importScript: (s: Script) => void, shareScript: (s: Script) => void, downloadScript: (s: Script) => void

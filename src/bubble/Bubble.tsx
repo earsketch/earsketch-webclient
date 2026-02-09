@@ -11,6 +11,11 @@ import { pages } from "./bubbleData"
 import * as bubble from "./bubbleState"
 import { proceed, dismiss } from "./bubbleThunks"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
+import classNames from "classnames"
+
+export const callbacks = {
+    runScript: () => {},
+}
 
 const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolean, name: string, pref?: Ref<HTMLButtonElement> }) => {
     const dispatch = useDispatch()
@@ -22,7 +27,7 @@ const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolea
 
     return (
         <button
-            className={`text-sm border-2 ${borderColor} rounded-full p-2 px-4 mx-2 ${backgroundColor} ${pointer}`}
+            className={`text-sm border-2 ${borderColor} rounded-full p-2 px-4 mx-1 sm:mx-2 ${backgroundColor} ${pointer} flex-shrink-0`}
             onClick={() => dispatch(action())}
             ref={pref}
         >
@@ -37,15 +42,30 @@ const MessageFooter = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
 
+    // Prevent stacking on page 1 to avoid overflow past viewport top
+    const isCodeEditorPage = currentPage === 1
+
     let buttons
     if (currentPage === 0) {
         buttons = <>
             <NavButton name={t("bubble:buttons.skip")} tag="dismiss" />
             <NavButton name={t("bubble:buttons.start")} tag="proceed" primary />
         </>
+    } else if (currentPage === 2) {
+        buttons = <>
+            <NavButton name={t("bubble:buttons.skipTour")} tag="dismiss" />
+            <NavButton name={t("bubble:buttons.next")} tag="proceed" primary />
+            <button className="animate-shake absolute top-[-2.8rem] right-[4.2rem] flex rounded-full px-2.5 text-white items-center whitespace-nowrap bg-green-700"
+                onClick={() => callbacks.runScript()}>
+                <div className="flex bg-white rounded-full text-xs mr-1 p-0.5">
+                    <i className="icon-arrow-right22 font-bold text-green-600" />
+                </div>
+                {t("editor.run").toLocaleUpperCase()}
+            </button>
+        </>
     } else if (currentPage === 9) {
         buttons = <>
-            <div className="w-40" />
+            <div className="hidden lg:block w-40" />
             <NavButton name={t("bubble:buttons.close")} tag="dismiss" primary />
         </>
     } else {
@@ -55,14 +75,28 @@ const MessageFooter = () => {
         </>
     }
 
+    const containerClass = classNames("flex mt-5 gap-4", {
+        "flex-row justify-between": isCodeEditorPage,
+        "flex-col lg:flex-row lg:justify-between": !isCodeEditorPage,
+    })
+
+    const bubbleClass = classNames("flex gap-4 items-end", {
+        "flex-row": isCodeEditorPage,
+        "flex-col sm:flex-row": !isCodeEditorPage,
+    })
+    const buttonContainerClass = classNames("flex gap-2", {
+        "flex-row justify-evenly": isCodeEditorPage,
+        "flex-col sm:flex-row justify-center lg:justify-evenly": !isCodeEditorPage,
+    })
+
     return (
-        <div className="flex justify-between mt-5">
-            <div className="w-2/3 flex">
+        <div className={containerClass}>
+            <div className={bubbleClass}>
                 {currentPage === 0 && <>
-                    <div className="mr-4">
+                    <div className="flex-1">
                         <div className="text-xs">{t("bubble:userLanguage")}</div>
                         <select
-                            className="border-0 border-b-2 border-black outline-none text-sm"
+                            className="border-0 border-b-2 border-black outline-none text-sm w-full"
                             onChange={e => {
                                 dispatch(app.setLocaleCode(e.currentTarget.value))
                             }}
@@ -73,10 +107,10 @@ const MessageFooter = () => {
                         </select>
                     </div>
 
-                    <div>
+                    <div className="flex-1">
                         <div className="text-xs">{t("bubble:defaultProgrammingLanguage")}</div>
                         <select
-                            className="border-0 border-b-2 border-black outline-none text-sm"
+                            className="border-0 border-b-2 border-black outline-none text-sm w-full"
                             onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                             id="language"
                             aria-label={t("bubble:selectLanguage")}
@@ -88,7 +122,7 @@ const MessageFooter = () => {
                     </div>
                 </>}
             </div>
-            <div className="w-1/3 flex justify-evenly">
+            <div className={buttonContainerClass}>
                 {buttons}
             </div>
         </div>
@@ -203,17 +237,15 @@ export const Bubble = () => {
         update?.()
     }, [currentPage])
 
-    // Close on escape. Perhaps someday we can avoid reimplementing this.
-    // See https://github.com/tailwindlabs/headlessui/issues/621; unfortunately the solution there (from June 23, 2021) no longer works.
-    useEffect(() => {
-        const escape = (e: KeyboardEvent) => e.key === "Escape" && dispatch(bubble.suspend())
-        window.addEventListener("keydown", escape)
-        return () => window.removeEventListener("keydown", escape)
+    // Prevent panel from being too tall on the code editor page
+    const isCodeEditorPage = currentPage === 1
+    const panelClass = classNames("absolute z-40 w-1/3 bg-white p-5 shadow-xl", {
+        "min-w-[400px]": isCodeEditorPage,
     })
 
     return <Dialog
         open={active}
-        onClose={() => { /* Disabled so user can click on highlighted elements outside the modal. */ }}
+        onClose={() => dispatch(bubble.suspend())}
         className="absolute top-0 w-full h-full"
     >
         <Dialog.Panel className="h-full flex justify-center items-center">
@@ -221,7 +253,7 @@ export const Bubble = () => {
             {/* Backdrop. Reimplements close-on-outside-click, see above comments for details. */}
             <div className="fixed inset-0 bg-black/30" aria-hidden="true" onClick={() => dispatch(bubble.suspend())} />
             <div
-                className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
+                className={panelClass}
                 ref={setPopperElement as LegacyRef<HTMLDivElement>}
                 style={pages[currentPage].ref === null ? {} : styles.popper}
                 {...attributes.popper}

@@ -26,9 +26,9 @@ const appSlice = createSlice({
         hideEditor,
         eastContent: "curriculum", // as "curriculum" | "extension"
         doNotDisturb: false,
-        embeddedScriptName: null,
-        embeddedScriptUsername: null,
-        embeddedShareID: null,
+        embeddedScriptName: null as string | null,
+        embeddedScriptUsername: null as string | null,
+        embeddedShareID: null as string | null,
         modal: null as { Modal: Modal, resolve: (_: any) => void } | null,
         confetti: false,
     },
@@ -39,7 +39,7 @@ const appSlice = createSlice({
         setColorTheme(state, { payload }) {
             state.colorTheme = payload
             // For the benefit of the loading screen:
-            localStorage.setItem("colorTheme", payload)
+            window.localStorage.setItem("colorTheme", payload)
         },
         setFontSize(state, { payload }) {
             state.fontSize = payload
