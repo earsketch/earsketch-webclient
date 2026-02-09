@@ -114,10 +114,10 @@ const Details = ({ obj }: { obj: APIItem }) => {
                 {Object.entries(obj.parameters).map(([param, paramVal]) => (
                     <div key={param}>
                         <div className="ml-3 mt-2">
-                            <div aria-label={t("ariaDescriptors:api.parameterHeading", { parameterName: param, parameterType: t(paramVal.typeKey) })}>
+                            <h4 aria-label={t("ariaDescriptors:api.parameterHeading", { parameterName: param, parameterType: t(paramVal.typeKey) })}>
                                 <span aria-hidden={true} className="font-bold text-sm">{t("api:heading", { headingName: param })}</span>
                                 <span aria-hidden={true} className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
-                            </div>
+                            </h4>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
                             <div className="text-xs"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
