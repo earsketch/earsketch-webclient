@@ -1,4 +1,4 @@
-import { createSlice, createSelector } from "@reduxjs/toolkit"
+import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit"
 import { createTransform, persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 
@@ -11,7 +11,7 @@ export interface Scripts {
     [scriptID: string]: Script
 }
 
-export type SortByAttribute = "Date" | "A-Z";
+export type SortByAttribute = "date" | "name";
 
 export interface Filters {
     owners: string[]
@@ -26,6 +26,10 @@ interface AllFilters extends Filters {
         ascending: boolean
     }
 }
+
+export type MultiSelectFilterKey = {
+    [K in keyof AllFilters]: AllFilters[K] extends string[] ? K : never
+}[keyof AllFilters]
 
 interface ScriptsState {
     // TODO: Rename to clarify: are regularScripts all scripts owned by user (including shared scripts)?
@@ -52,7 +56,7 @@ const scriptsSlice = createSlice({
             owners: [],
             types: [],
             sortBy: {
-                attribute: "Date",
+                attribute: "date",
                 ascending: false,
             },
         },
@@ -99,12 +103,18 @@ const scriptsSlice = createSlice({
         resetFilter(state, { payload }) {
             state.filters[payload as keyof Filters] = []
         },
+        setFilter: (state, action: PayloadAction<{ category: keyof Filters; values: string[] }>) => {
+            state.filters[action.payload.category] = action.payload.values
+        },
+        setSortBy(state, action: PayloadAction<{ attribute: SortByAttribute; ascending: boolean }>) {
+            state.filters.sortBy = action.payload
+        },
         setSorter(state, { payload }) {
             if (state.filters.sortBy.attribute === payload) {
                 state.filters.sortBy.ascending = !state.filters.sortBy.ascending
             } else {
                 state.filters.sortBy.attribute = payload
-                state.filters.sortBy.ascending = payload === "A-Z"
+                state.filters.sortBy.ascending = payload === "name"
             }
         },
         setFeatureSharedScript(state, { payload }) {
@@ -175,6 +185,8 @@ export const {
     addFilterItem,
     removeFilterItem,
     resetFilter,
+    setFilter,
+    setSortBy,
     setSorter,
     setFeatureSharedScript,
     setSharedScriptInfo,
@@ -296,7 +308,7 @@ const sortScriptIDs = (scripts: Scripts, sortBy: SortByAttribute, ascending: boo
     }
     return Object.values(scripts).sort((a, b) => {
         let c: any, d: any
-        if (sortBy === "A-Z") {
+        if (sortBy === "name") {
             c = a.name
             d = b.name
 
