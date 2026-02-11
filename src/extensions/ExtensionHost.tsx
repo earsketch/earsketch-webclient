@@ -7,6 +7,9 @@ import * as editor from "../ide/Editor"
 import { Log, selectLogs } from "../ide/ideState"
 import { Track } from "../types/common"
 import { selectColorTheme } from "../app/appState"
+import * as tabState from "../ide/tabState"
+import * as scriptsState from "../browser/scriptsState"
+import store from "../reducers"
 
 export const ExtensionHost = () => {
     const [extensionUrl, setExtensionUrl] = useState<string>("")
@@ -37,10 +40,9 @@ export const ExtensionHost = () => {
 
     const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
         getEditorContents() {
-            // TODO use instead:
-            // const script = scriptsState.selectAllScripts(store.getState())[scriptID!]
-            // const code = script.source_code
-            return editor.getContents()
+            const activeTab = tabState.selectActiveTabID(store.getState())
+            const script = scriptsState.selectAllScripts(store.getState())[activeTab!]
+            return script.source_code
         },
         getScriptExecutionResult() {
             const currentLogs = logsRef.current
