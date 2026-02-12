@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <div>Hello, from the LLM extension!</div>
 <button>Communicate to LLM</button>
 <div id="output" />
@@ -6,108 +6,178 @@
 <!-- The earsketch dev team will provide this block in the future -->
 <script>
     // Setup code we can provide in the form of a module or external script
-    let resolver = null
+    let resolver = null;
 
     const earsketch = {
         getEditorContents() {
-            window.parent.postMessage(JSON.stringify({
-                fn: 'getEditorContents',
-            }), '*')
-            return new Promise(resolve => { resolver = resolve })
+            window.parent.postMessage(
+                JSON.stringify({
+                    fn: "getEditorContents",
+                }),
+                "*",
+            );
+            return new Promise((resolve) => {
+                resolver = resolve;
+            });
         },
         getScriptExecutionResult() {
-            window.parent.postMessage(JSON.stringify({
-                fn: 'getScriptExecutionResult',
-            }), '*')
-            return new Promise(resolve => { resolver = resolve })
+            window.parent.postMessage(
+                JSON.stringify({
+                    fn: "getScriptExecutionResult",
+                }),
+                "*",
+            );
+            return new Promise((resolve) => {
+                resolver = resolve;
+            });
         },
         getDawState() {
-            window.parent.postMessage(JSON.stringify({
-                fn: 'getDawState',
-            }), '*')
-            return new Promise(resolve => { resolver = resolve })
+            window.parent.postMessage(
+                JSON.stringify({
+                    fn: "getDawState",
+                }),
+                "*",
+            );
+            return new Promise((resolve) => {
+                resolver = resolve;
+            });
         },
         getColorTheme() {
-            window.parent.postMessage(JSON.stringify({
-                fn: 'getColorTheme',
-            }), '*')
-            return new Promise(resolve => { resolver = resolve })
+            window.parent.postMessage(
+                JSON.stringify({
+                    fn: "getColorTheme",
+                }),
+                "*",
+            );
+            return new Promise((resolve) => {
+                resolver = resolve;
+            });
         },
-    }
+        getCurrentUser() {
+            window.parent.postMessage(
+                JSON.stringify({
+                    fn: "getCurrentUser",
+                }),
+                "*",
+            );
+            return new Promise((resolve) => {
+                resolver = resolve;
+            });
+        },
+    };
 
     window.addEventListener("message", (event) => {
         // console.log("[EXTENSION] Received message from host:", event.data)
 
-        if (event.data === 'init') {
-            const sendElement = document.createElement("pre")
-            sendElement.textContent = "Connecting to host app\n\n---"
-            document.querySelector("#output").appendChild(sendElement)
+        if (event.data === "init") {
+            const sendElement = document.createElement("pre");
+            sendElement.textContent = "Connecting to host app\n\n---";
+            document.querySelector("#output").appendChild(sendElement);
 
-            earsketch.onload()
+            earsketch.onload();
         } else if (resolver) {
-            console.log("[EXTENSION] Resolving promise...")
-            resolver(JSON.parse(event.data))
-            resolver = null
+            console.log("[EXTENSION] Resolving promise...");
+            resolver(JSON.parse(event.data));
+            resolver = null;
         } else if (event.data) {
-          try {
-            const eventData = JSON.parse(event.data)
-            if (eventData?.messageType === "colorThemeChanged") {
-              console.log("[EXTENSION] Color theme changed:", eventData.colorTheme)
+            try {
+                const eventData = JSON.parse(event.data);
+                if (eventData?.messageType === "colorThemeChanged") {
+                    console.log(
+                        "[EXTENSION] Color theme changed:",
+                        eventData.colorTheme,
+                    );
 
-              applyTheme(eventData.colorTheme)
+                    applyTheme(eventData.colorTheme);
+                } else if (eventData?.messageType === "currentUserChanged") {
+                    console.log(
+                        "[EXTENSION] Current user changed:",
+                        eventData.currentUser,
+                    );
+                    const userElement = document.createElement("pre");
+                    userElement.textContent = `Current user: ${JSON.stringify(eventData.currentUser)}\n\n---`;
+                    document.querySelector("#output").appendChild(userElement);
+                }
+            } catch (e) {
+                console.log(
+                    "[EXTENSION] Failed to unpack message from host... {0}",
+                    e.message,
+                );
             }
-          } catch (e) {
-            console.log("[EXTENSION] Failed to unpack message from host... {0}", e.message)
-          }
         }
-    })
+    });
 </script>
 
 <!-- Here's what the extension writer will actually code -->
 <script>
     const applyTheme = (colorTheme) => {
-      console.log("hello from applyTheme")
+        console.log("hello from applyTheme");
         if (colorTheme === "light") {
-            document.body.style.backgroundColor = "white"
-            document.body.style.color = "black"
+            document.body.style.backgroundColor = "white";
+            document.body.style.color = "black";
         } else if (colorTheme === "dark") {
-            document.body.style.backgroundColor = "black"
-            document.body.style.color = "white"
+            document.body.style.backgroundColor = "black";
+            document.body.style.color = "white";
         }
-    }
+    };
 
     earsketch.onload = async () => {
         document.querySelector("button").addEventListener("click", async () => {
             // Configure the button to simulate a chat message to a remote LLM
-            console.log("[EXTENSION] Button clicked, fetching editor contents...")
-            const contents = await earsketch.getEditorContents()
+            console.log(
+                "[EXTENSION] Button clicked, fetching editor contents...",
+            );
+            const contents = await earsketch.getEditorContents();
 
-            console.log("[EXTENSION] ...fetching script run result...")
-            const scriptResult = await earsketch.getScriptExecutionResult()
-            const dawState = await earsketch.getDawState()
+            console.log("[EXTENSION] ...fetching script run result...");
+            const scriptResult = await earsketch.getScriptExecutionResult();
+            const dawState = await earsketch.getDawState();
 
-            let sendElement = document.createElement("pre")
-            const contentsPretty = contents.slice(0, 20)
-            sendElement.textContent = "Sending to code to LLM (mock):\n" + contentsPretty + "...\n\n---"
-            document.querySelector("#output").appendChild(sendElement)
+            let sendElement = document.createElement("pre");
+            const contentsPretty = contents.slice(0, 20);
+            sendElement.textContent =
+                "Sending to code to LLM (mock):\n" +
+                contentsPretty +
+                "...\n\n---";
+            document.querySelector("#output").appendChild(sendElement);
 
-            sendElement = document.createElement("pre")
-            const scriptResultPretty = JSON.stringify(JSON.parse(scriptResult), null, 2)
-            sendElement.textContent = "Sending run result to LLM (mock):\n" + scriptResultPretty + "\n\n---"
-            document.querySelector("#output").appendChild(sendElement)
+            sendElement = document.createElement("pre");
+            const scriptResultPretty = JSON.stringify(
+                JSON.parse(scriptResult),
+                null,
+                2,
+            );
+            sendElement.textContent =
+                "Sending run result to LLM (mock):\n" +
+                scriptResultPretty +
+                "\n\n---";
+            document.querySelector("#output").appendChild(sendElement);
 
-            sendElement = document.createElement("pre")
-            const dawStatePretty = JSON.stringify(JSON.parse(dawState), null, 2)
-            sendElement.textContent = "Sending daw state to LLM (mock):\n" + dawStatePretty + "\n\n---"
-            document.querySelector("#output").appendChild(sendElement)
+            sendElement = document.createElement("pre");
+            const dawStatePretty = JSON.stringify(
+                JSON.parse(dawState),
+                null,
+                2,
+            );
+            sendElement.textContent =
+                "Sending daw state to LLM (mock):\n" +
+                dawStatePretty +
+                "\n\n---";
+            document.querySelector("#output").appendChild(sendElement);
 
             setTimeout(() => {
-                const respElement = document.createElement("pre")
-                respElement.textContent = "Response from LLM (mock):\nThank you!\n\n---"
-                document.querySelector("#output").appendChild(respElement)
-            }, 1000)
-        })
-        const colorTheme = await earsketch.getColorTheme()
-        applyTheme(colorTheme)
-    }
+                const respElement = document.createElement("pre");
+                respElement.textContent =
+                    "Response from LLM (mock):\nThank you!\n\n---";
+                document.querySelector("#output").appendChild(respElement);
+            }, 1000);
+        });
+        const colorTheme = await earsketch.getColorTheme();
+        applyTheme(colorTheme);
+
+        const currentUser = await earsketch.getCurrentUser();
+        const userElement = document.createElement("pre");
+        userElement.textContent = `Current user: ${JSON.stringify(currentUser)}\n\n---`;
+        document.querySelector("#output").appendChild(userElement);
+    };
 </script>

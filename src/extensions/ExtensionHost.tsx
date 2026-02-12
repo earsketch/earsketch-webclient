@@ -3,13 +3,13 @@ import { useEffect, useRef, useState } from "react"
 import { TitleBar } from "../browser/Curriculum"
 import { selectTracks } from "../daw/dawState"
 import { useAppSelector as useSelector } from "../hooks"
-import * as editor from "../ide/Editor"
 import { Log, selectLogs } from "../ide/ideState"
 import { Track } from "../types/common"
 import { selectColorTheme } from "../app/appState"
 import * as tabState from "../ide/tabState"
 import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
+import * as userState from "../user/userState"
 
 export const ExtensionHost = () => {
     const [extensionUrl, setExtensionUrl] = useState<string>("")
@@ -18,10 +18,12 @@ export const ExtensionHost = () => {
     const logs: Log[] = useSelector(selectLogs)
     const tracks: Track[] = useSelector(selectTracks)
     const colorTheme = useSelector(selectColorTheme)
+    const currentUser = useSelector(userState.selectUserName)
 
     const logsRef = useRef(logs)
     const tracksRef = useRef(tracks)
     const colorThemeRef = useRef(colorTheme)
+    const currentUserRef = useRef(currentUser)
 
     useEffect(() => { logsRef.current = logs }, [logs])
     useEffect(() => { tracksRef.current = tracks }, [tracks])
@@ -37,6 +39,16 @@ export const ExtensionHost = () => {
             }
         }
     }, [colorTheme])
+    useEffect(() => {
+        currentUserRef.current = currentUser || "" // TODO add a test for this being "" when currentUser is null
+        if (iframeRef.current?.contentWindow) {
+            const message = {
+                messageType: "currentUserChanged",
+                currentUser: currentUserRef.current,
+            }
+            iframeRef.current.contentWindow.postMessage(JSON.stringify(message), "*")
+        }
+    }, [currentUser])
 
     const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
         getEditorContents() {
@@ -58,6 +70,14 @@ export const ExtensionHost = () => {
         getColorTheme() {
             const currentColorTheme = colorThemeRef.current
             return currentColorTheme
+        },
+        getCurrentUser() {
+            if (!userState.selectLoggedIn(store.getState())) {
+                return ""
+            } else {
+                const currentUser = userState.selectUserName(store.getState())
+                return currentUser
+            }
         },
     }
 
