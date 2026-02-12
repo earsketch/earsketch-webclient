@@ -87,7 +87,7 @@ export const ExtensionHost = () => {
         <TitleBar />
         <div>
             <button
-                style={{ margin: "3px 10px", padding: "1px 10px", borderRadius: "5px", color: "black", fontSize: "0.7rem", border: "1px solid black" }}
+                className="mx-2.5 my-1 px-2.5 py-px rounded-md text-black text-xs border border-black"
                 onClick={() => {
                     const url = "myExtension.html"
                     const element = document.getElementById("extension-url-input") as HTMLInputElement
@@ -98,29 +98,25 @@ export const ExtensionHost = () => {
                 id="extension-url-input"
                 type="text"
                 placeholder="Extension URL"
-                style={{ width: "300px", margin: "10px", padding: "10px", borderRadius: "5px", border: "1px solid #ccc", fontSize: "0.7rem" }} />
+                className="w-72 m-2.5 p-2.5 rounded-md border border-gray-300 text-xs" />
         </div><div>
             <button
-                style={{ margin: "10px", padding: "10px", borderRadius: "5px", color: "black", fontSize: "0.7rem", border: "1px solid black" }}
+                className="m-2.5 p-2.5 rounded-md text-black text-xs border border-black"
                 onClick={() => {
                     setExtensionUrl((document.getElementById("extension-url-input") as HTMLInputElement).value)
                 }}>LOAD</button>
             <button
-                style={{ margin: "10px", padding: "10px", borderRadius: "5px", color: "black", fontSize: "0.7rem", border: "1px solid black" }}
+                className="m-2.5 p-2.5 rounded-md text-black text-xs border border-black"
                 onClick={() => {
                     setExtensionUrl("")
                 }}>UNLOAD</button>
         </div>
-        <div style={{ padding: "10px" }}>{extensionUrl}</div>
+        <div className="p-2.5">{extensionUrl}</div>
         <iframe
             ref={iframeRef}
             src={extensionUrl}
             onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOrigin) }}
-            style={{
-                width: "100%",
-                height: "400px",
-                border: "1px solid #ccc",
-            }}
+            className="w-full h-96 border border-gray-300"
             title="EarSketch Extension"
         />
     </>)
