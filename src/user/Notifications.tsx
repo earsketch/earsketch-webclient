@@ -374,6 +374,16 @@ export const NotificationHistory = ({ openSharedScript, close }: {
     </div>
 }
 
+function sanitizeHttpUrl(raw: string): string | undefined {
+  try {
+    const url = new URL(raw.trimEnd())
+    if (url.protocol === "https:") { return url.toString() }
+    return undefined
+  } catch {
+    return undefined
+  }
+}
+
 // Converts text containing a markdown-style link into a React element with `<a>` tags.
 // For example:
 // "This is a [link](https://www.example.com) in Markdown format."
@@ -389,7 +399,8 @@ const MarkdownLinkMessage = ({ text }: { text: string }): JSX.Element => {
         } else if (index % 3 === 2) {
             const linkText = parts[index - 1]
             const linkUrl = parts[index]
-            return <a href={linkUrl} className="text-blue-700 hover:text-blue-600" target="_blank" rel="noreferrer" key={index}>{linkText}</a>
+            const safeUrl = sanitizeHttpUrl(linkUrl)
+            return <a href={safeUrl} className="text-blue-700 hover:text-blue-600" target="_blank" rel="noreferrer" key={index}>{linkText}</a>
         } else {
             return null
         }
