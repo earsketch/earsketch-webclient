@@ -129,7 +129,7 @@ const useNotificationLongPolling = () => {
 
         const stopPolling = () => {
             if (intervalId == null) return
-            clearInterval(intervalId)
+            window.clearInterval(intervalId)
             intervalId = null
         }
 
