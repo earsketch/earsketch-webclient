@@ -6,7 +6,6 @@ import * as ESUtils from "../esutils"
 import type { RootState } from "../reducers"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import { Language } from "common"
-import { set } from "lodash"
 
 // TODO: Remove `& any` and fix up type magic in `modal.ts`
 export type Modal = (props: { [key: string]: any, close: (payload?: any) => void } & any) => JSX.Element
