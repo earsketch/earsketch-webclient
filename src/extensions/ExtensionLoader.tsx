@@ -6,7 +6,6 @@ import { setExtensionUrl } from "../app/appState"
 import store from "../reducers"
 
 export const ExtensionLoader = ({ close }: { close: () => void }) => {
-    const { t } = useTranslation()
     const [url, setUrl] = useState("")
 
     const loadExtension = () => {
