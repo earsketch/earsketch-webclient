@@ -47,6 +47,7 @@ import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
+import { ExtensionLoader } from "../extensions/ExtensionLoader"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -290,6 +291,10 @@ function reportError() {
     openModal(ErrorForm, { email })
 }
 
+function loadExtension() {
+    openModal(ExtensionLoader)
+}
+
 function forgotPass() {
     openModal(ForgotPassword)
 }
@@ -387,6 +392,7 @@ const MiscActionMenu = () => {
     const actions = [
         { nameKey: "startQuickTour", action: resumeQuickTour },
         { nameKey: "reportError", action: reportError },
+        { nameKey: "loadExtension", action: loadExtension },
     ]
 
     const links = [
