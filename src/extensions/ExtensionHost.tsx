@@ -1,18 +1,18 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 
 import { TitleBar } from "../browser/Curriculum"
 import { selectTracks } from "../daw/dawState"
 import { useAppSelector as useSelector } from "../hooks"
 import { Log, selectLogs } from "../ide/ideState"
 import { Track } from "../types/common"
-import { selectColorTheme } from "../app/appState"
+import { selectColorTheme, selectExtensionUrl } from "../app/appState"
 import * as tabState from "../ide/tabState"
 import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
 import * as userState from "../user/userState"
 
 export const ExtensionHost = () => {
-    const [extensionUrl, setExtensionUrl] = useState<string>("")
+    const extensionUrl = useSelector(selectExtensionUrl)
     const extensionTargetOrigin = new URL(extensionUrl, window.location.href).origin
     const iframeRef = useRef<HTMLIFrameElement>(null)
     const logs: Log[] = useSelector(selectLogs)
@@ -105,32 +105,7 @@ export const ExtensionHost = () => {
 
     return (<>
         <TitleBar />
-        <div>
-            <button
-                className="mx-2.5 my-1 px-2.5 py-px rounded-md text-black text-xs border border-black"
-                onClick={() => {
-                    const url = "myExtension.html"
-                    const element = document.getElementById("extension-url-input") as HTMLInputElement
-                    element.value = url
-                }}>PASTE DEMO URL</button>
-        </div><div>
-            <input
-                id="extension-url-input"
-                type="text"
-                placeholder="Extension URL"
-                className="w-72 m-2.5 p-2.5 rounded-md border border-gray-300 text-xs" />
-        </div><div>
-            <button
-                className="m-2.5 p-2.5 rounded-md text-black text-xs border border-black"
-                onClick={() => {
-                    setExtensionUrl((document.getElementById("extension-url-input") as HTMLInputElement).value)
-                }}>LOAD</button>
-            <button
-                className="m-2.5 p-2.5 rounded-md text-black text-xs border border-black"
-                onClick={() => {
-                    setExtensionUrl("")
-                }}>UNLOAD</button>
-        </div>
+
         <div className="p-2.5">{extensionUrl}</div>
         <iframe
             ref={iframeRef}

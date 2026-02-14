@@ -21,6 +21,7 @@
     "switchThemeLight": "Switch to dark color theme",
     "switchThemeDark": "Switch to light color theme",
     "reportError": "Report Error",
+    "loadExtension": "Load Extension",
     "whatsNew": "What's New",
     "leave": "Leave",
     "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",

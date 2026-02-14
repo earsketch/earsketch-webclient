@@ -6,6 +6,7 @@ import * as ESUtils from "../esutils"
 import type { RootState } from "../reducers"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import { Language } from "common"
+import { set } from "lodash"
 
 // TODO: Remove `& any` and fix up type magic in `modal.ts`
 export type Modal = (props: { [key: string]: any, close: (payload?: any) => void } & any) => JSX.Element
@@ -31,6 +32,7 @@ const appSlice = createSlice({
         embeddedShareID: null as string | null,
         modal: null as { Modal: Modal, resolve: (_: any) => void } | null,
         confetti: false,
+        extensionUrl: "",
     },
     reducers: {
         setScriptLanguage(state, { payload }) {
@@ -78,6 +80,9 @@ const appSlice = createSlice({
         setConfetti(state, { payload }) {
             state.confetti = payload
         },
+        setExtensionUrl(state, { payload }) {
+            state.extensionUrl = payload
+        },
     },
 })
 
@@ -103,6 +108,7 @@ export const {
     setLocaleCode,
     setModal,
     setConfetti,
+    setExtensionUrl,
 } = appSlice.actions
 
 export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage
@@ -120,6 +126,7 @@ export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedSha
 export const selectLocaleCode = (state: RootState) => state.app.locale
 export const selectModal = (state: RootState) => state.app.modal
 export const selectConfetti = (state: RootState) => state.app.confetti
+export const selectExtensionUrl = (state: RootState) => state.app.extensionUrl
 
 export const selectLocale = createSelector(
     [selectLocaleCode],
