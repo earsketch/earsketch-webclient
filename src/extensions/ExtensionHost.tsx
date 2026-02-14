@@ -136,7 +136,7 @@ export const ExtensionHost = () => {
             ref={iframeRef}
             src={extensionUrl}
             onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOrigin) }}
-            className="w-full h-96 border border-gray-300"
+            className="w-full h-full border border-gray-300"
             title="EarSketch Extension"
         />
     </>)

@@ -490,7 +490,5 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
 
 const EastPane = () => {
     const eastContent = useSelector(appState.selectEastContent)
-    return <div>
-        {eastContent === "curriculum" ? <Curriculum /> : <ExtensionHost />}
-    </div>
+    return eastContent === "curriculum" ? <Curriculum /> : <ExtensionHost />
 }
