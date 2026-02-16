@@ -548,7 +548,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                     return (
                                         <div style={style}>
                                             <div className="flex flex-row justify-start top-0 bg-inherit">
-                                                <h3 className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 text-white bg-blue dark:bg-gray-800">
+                                                <h3 className="flex grow pl-2 p-0.5 border-b border-r border-blue dark:border-blue text-white bg-blue dark:bg-blue">
                                                     {t("soundBrowser.filterHeader")}
                                                 </h3>
                                             </div>
@@ -558,7 +558,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                                 setFilterHeight={setFilterHeight}
                                             />
                                             <div className="flex flex-row justify-start top-0 bg-inherit">
-                                                <h3 className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 text-white bg-blue dark:bg-gray-800">
+                                                <h3 className="flex grow pl-2 p-0.5 border-b border-r border-blue dark:border-blue text-white bg-blue dark:bg-blue">
                                                     {t("soundBrowser.soundHeader")}
                                                 </h3>
                                             </div>
