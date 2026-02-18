@@ -5,7 +5,7 @@
   "ESVersion": 627,
   "description": "",
   "engines": {
-    "node": ">=20.0.0 <21.0.0"
+    "node": ">=24.0.0 <25.0.0"
   },
   "directories": {
     "doc": "doc",
@@ -101,13 +101,13 @@
     "@typescript-eslint/parser": "^5.12.0",
     "autoprefixer": "^10.4.2",
     "axe-core": "^4.10.2",
-    "cypress": "^14.4.0",
-    "cypress-axe": "^1.6.0",
+    "cypress": "^15.10.0",
+    "cypress-axe": "^1.7.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-mochawesome-reporter": "^3.1.0",
     "cypress-multi-reporters": "^1.6.0",
     "cypress-network-idle": "^1.14.2",
-    "cypress-real-events": "^1.14.0",
+    "cypress-real-events": "^1.15.0",
     "eslint": "^8.9.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-cypress": "^3.6.0",
@@ -120,7 +120,9 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "globals": "^17.2.0",
     "identity-obj-proxy": "^3.0.0",
+    "jsdom": "^28.1.0",
     "junit-report-merger": "^3.0.5",
+    "less": "^4.5.1",
     "mock-socket": "^9.1.2",
     "react-refresh": "^0.14.2",
     "react-refresh-typescript": "^2.0.9",
