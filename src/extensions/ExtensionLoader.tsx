@@ -36,7 +36,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
                     <input
                         id="extension-url-input"
                         type="text"
-                        placeholder="Extension URL"
+                        placeholder="Enter extension URL"
                         className="form-input w-full dark:bg-transparent placeholder:text-gray-300"
                         value={url}
                         onChange={e => setUrl(e.target.value)}
@@ -45,7 +45,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
                     />
                 </div>
             </ModalBody>
-            <ModalFooter submit="Load" ready={url !== ""} close={close} />
+            <ModalFooter submit="loadExtension" ready={url !== ""} close={close} />
         </form>
     </>
 }
