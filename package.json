@@ -120,6 +120,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "globals": "^17.2.0",
     "identity-obj-proxy": "^3.0.0",
+    "jsdom": "^28.1.0",
     "junit-report-merger": "^3.0.5",
     "less": "^4.5.1",
     "mock-socket": "^9.1.2",
