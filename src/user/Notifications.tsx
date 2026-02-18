@@ -254,7 +254,7 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
 
         // Animate the refresh icon
         setIsRefreshing(true)
-        setTimeout(() => setIsRefreshing(false), 500)
+        window.setTimeout(() => setIsRefreshing(false), 500)
 
         // Fetch the latest notifications and immediately update the state
         try {
@@ -375,13 +375,13 @@ export const NotificationHistory = ({ openSharedScript, close }: {
 }
 
 function sanitizeHttpUrl(raw: string): string | undefined {
-  try {
-    const url = new URL(raw.trimEnd())
-    if (url.protocol === "https:") { return url.toString() }
-    return undefined
-  } catch {
-    return undefined
-  }
+    try {
+        const url = new URL(raw.trimEnd())
+        if (url.protocol === "https:") { return url.toString() }
+        return undefined
+    } catch {
+        return undefined
+    }
 }
 
 // Converts text containing a markdown-style link into a React element with `<a>` tags.
