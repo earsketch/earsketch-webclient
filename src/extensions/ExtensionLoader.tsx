@@ -1,7 +1,7 @@
 import { useState } from "react"
 
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
-import { setExtensionUrl } from "../app/appState"
+import { setExtensionUrl, setEastContent } from "../app/appState"
 import store from "../reducers"
 
 export const ExtensionLoader = ({ close }: { close: () => void }) => {
@@ -9,6 +9,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
 
     const loadExtension = () => {
         store.dispatch(setExtensionUrl(url))
+        store.dispatch(setEastContent("extension"))
         close()
     }
 
