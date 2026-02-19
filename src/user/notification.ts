@@ -1,7 +1,6 @@
 import store from "../reducers"
 import * as request from "../request"
 import { Notification, pushNotification, selectNotifications, setNotifications } from "./userState"
-import * as websocket from "../app/websocket"
 
 export const user = { isAdmin: false, loginTime: Date.now() }
 
@@ -13,7 +12,7 @@ export const callbacks = {
 }
 
 // TODO: Clarify usage of temporary (popup) and "permanent" (history/list) notifications.
-export function show(text: string, type: string = "", duration: number | undefined = undefined) {
+export function show(text: string, type: string = "", _duration: number | undefined = undefined) {
     // check type for registering to the notification history
     // TODO: handle with proper message types defined
     if (["bell", "popup", "history"].includes(type)) { // temporary tags for bell-icon dropdown notifications
@@ -33,15 +32,14 @@ export function show(text: string, type: string = "", duration: number | undefin
             pinned: false,
         }))
     } else {
-        // showCallback.apply(this, arguments)
+        callbacks.popup(text, type, _duration)
     }
-    callbacks.popup(text, type, duration)
 }
 
 export const showBanner = (text: string, type: string = "") => callbacks.show(text, type)
 
 // Fill the history array at initialization from webservice call as well as localStorage. Sorting might be needed.
-function loadHistory(notifications: Notification[]) {
+export function loadHistory(notifications: Notification[]) {
     let text = ""
     let needRefresh = false
 
@@ -83,11 +81,7 @@ function loadHistory(notifications: Notification[]) {
 
         v.time = Date.parse(v.created!)
 
-        // hack around only receiving notification history (collection) but not individual messages
-        // TODO: always send individual notification from server
-        if (v.unread && (v.time - user.loginTime) > 0) {
-            show(v.message.text, "popup", 6)
-        }
+        // Popups removed - notifications only appear in the list
 
         return v
     })
@@ -131,11 +125,3 @@ export function markAllAsRead() {
     }
     store.dispatch(setNotifications(newNotifications))
 }
-
-websocket.subscribe(data => {
-    if (data.notification_type === "notifications") {
-        loadHistory(data.notifications)
-    } else if (data.notification_type === "broadcast") {
-        handleBroadcast(data)
-    }
-})

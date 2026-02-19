@@ -75,6 +75,7 @@ jobs:
           VALIDATE_TYPESCRIPT_STANDARD: false
           VALIDATE_TSX: false
           VALIDATE_JAVASCRIPT_PRETTIER: false
+          VALIDATE_TYPESCRIPT_PRETTIER: false
           VALIDATE_JSX: false
           VALIDATE_JSON: false
           VALIDATE_MARKDOWN: false

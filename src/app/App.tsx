@@ -23,7 +23,7 @@ import { IDE, openShare } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
 import { chooseDetectedLanguage, LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
-import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
+import { NotificationBar, NotificationMenu } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameSound } from "./Rename"
 import reporter from "./reporter"
@@ -40,7 +40,6 @@ import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
 import { Prompt, PromptChoice, confirm } from "../Utils"
-import * as websocket from "./websocket"
 
 import esLogo from "./ES_logo_extract.svg"
 import LanguageDetector from "i18next-browser-languagedetector"
@@ -204,7 +203,16 @@ async function postLogin(username: string) {
     await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
     // Wait to receive websocket notifications until *after* we have the list of existing shared scripts.
     // This prevents us from re-adding shared scripts when we get a bunch of unread share notifications.
-    websocket.login(username)
+
+    // Load notifications on login
+    try {
+        const notifications = await request.getAuth("/users/notifications")
+        if (notifications && Array.isArray(notifications)) {
+            userNotification.loadHistory(notifications)
+        }
+    } catch (error) {
+        esconsole("Error loading notifications on login: " + error, ["error", "user"])
+    }
 }
 
 async function refreshScriptBrowser() {
@@ -424,34 +432,6 @@ const MiscActionMenu = () => {
             </Menu.Item>
         </Menu.Items>
     </Menu>
-}
-
-const NotificationMenu = () => {
-    const notifications = useSelector(user.selectNotifications)
-    const numUnread = notifications.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
-    const { t } = useTranslation()
-
-    const [showHistory, setShowHistory] = useState(false)
-
-    return <>
-        {showHistory && <NotificationHistory openSharedScript={openSharedScript} close={() => setShowHistory(false)} />}
-        <Popover>
-            <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-3 relative" title={t("ariaDescriptors:header.toggleNotifications")}>
-                <i className="icon icon-bell" />
-                {numUnread > 0 && <div role="status" aria-label={t("ariaDescriptors:header.unreadNotifications", { numUnread })} className="text-sm w-4 h-4 text-white bg-red-600 rounded-full absolute top-0 -right-1 leading-none" data-test="numUnreadNotifications">{numUnread}</div>}
-            </Popover.Button>
-            <div className="relative right-1">
-                <NotificationPopup />
-            </div>
-            <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-3/4">
-                {({ close }) => <NotificationList
-                    openSharedScript={openSharedScript}
-                    showHistory={setShowHistory}
-                    close={close}
-                />}
-            </Popover.Panel>
-        </Popover>
-    </>
 }
 
 type LoginState = "logged-out" | "logging-in" | "logged-in"
@@ -688,7 +668,7 @@ export const App = () => {
             esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
             setLoginState("logged-in")
-            userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
+            userNotification.show(i18n.t("messages:general.loginsuccess"), "normal", 0.5)
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
             succeeded = true
@@ -721,7 +701,6 @@ export const App = () => {
         if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
-        websocket.logout()
         userNotification.clearHistory()
         reporter.logout()
 
@@ -826,7 +805,7 @@ export const App = () => {
                     <FontSizeMenu />
                     <SwitchThemeButton />
                     <MiscActionMenu />
-                    <NotificationMenu />
+                    <NotificationMenu openSharedScript={openSharedScript} />
                     <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
             </header>}
