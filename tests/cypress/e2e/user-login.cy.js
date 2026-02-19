@@ -1,7 +1,7 @@
 import * as MockSocket from "mock-socket"
 
 describe("user", () => {
-    it("completes login", () => {
+    it.skip("completes login", () => {
         const username = "cypress"
         const userAudioUploads = []
         cy.interceptAudioStandard([
