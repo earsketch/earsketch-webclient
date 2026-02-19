@@ -5,10 +5,10 @@ import { Notification, pushNotification, selectNotifications, setNotifications }
 export const user = { isAdmin: false, loginTime: Date.now() }
 
 export const callbacks = {
-    show: (() => { }) as (text: string, type?: string, duration?: number) => void,
-    popup: (() => { }) as (text: string, type?: string, duration?: number) => void,
-    addSharedScript: (() => { }) as (shareID: string) => Promise<void> | undefined,
-    getSharedScripts: () => { },
+    show: (() => {}) as (text: string, type?: string, duration?: number) => void,
+    popup: (() => {}) as (text: string, type?: string, duration?: number) => void,
+    addSharedScript: (() => {}) as (shareID: string) => Promise<void> | undefined,
+    getSharedScripts: () => {},
 }
 
 // TODO: Clarify usage of temporary (popup) and "permanent" (history/list) notifications.
