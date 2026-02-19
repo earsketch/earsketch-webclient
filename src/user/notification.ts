@@ -125,12 +125,3 @@ export function markAllAsRead() {
     }
     store.dispatch(setNotifications(newNotifications))
 }
-
-// Disabled: notifications should only update when refresh button is clicked, not via websocket
-// websocket.subscribe(data => {
-//     if (data.notification_type === "notifications") {
-//         loadHistory(data.notifications)
-//     } else if (data.notification_type === "broadcast") {
-//         handleBroadcast(data)
-//     }
-// })
