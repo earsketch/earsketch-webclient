@@ -3,6 +3,7 @@ import i18n from "i18next"
 
 import * as editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
+import * as appState from "../app/appState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import { sampleScript } from "./bubbleData"
@@ -73,6 +74,7 @@ export const proceed = createAsyncThunk(
                 break
             case 7:
                 await dispatch(layout.setEast({ open: true }))
+                await dispatch(appState.setEastContent("curriculum"))
                 break
             case 8:
                 await dispatch(setEditorReadOnly(false))
