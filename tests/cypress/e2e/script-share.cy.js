@@ -1,6 +1,6 @@
 import * as MockSocket from "mock-socket"
 
-describe("shared script", () => {
+describe("shared scripts", () => {
     const apiHostname = "api-dev.ersktch.gatech.edu"
     const username = "cypress"
 
@@ -31,7 +31,7 @@ describe("shared script", () => {
         username: "another_user",
     }
 
-    it.skip("imports a shared script with a name conflict", () => {
+    it("imports a shared script with a name conflict", () => {
         cy.interceptAudioStandard()
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
@@ -86,24 +86,19 @@ describe("shared script", () => {
             { body: { ...newShared, creator: "another_user" } }
         ).as("script_rename")
 
+        // login will include one shared script from the database
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
         cy.skipTour()
-
-        // login will include one shared script from the database
-
         cy.login(username)
 
+        // notifications will include one new shared script, immediately imported
         cy.get('button[title="Show/Hide Notifications"]').click()
-
         cy.get('button[title="Refresh notifications"]').click()
 
-        // notifications will include one new shared script, immediately imported
-
-        // verify
-
+        // verify script browser
         cy.get("button[title='Open SCRIPTS Tab']").click()
 
-        // view shared scripts, hide my scripts
+        // view shared scripts
         cy.contains("div", "MY SCRIPTS (1)").click() // collapse
         cy.contains("div", "SHARED SCRIPTS (2)").click() // expand
 
@@ -112,7 +107,7 @@ describe("shared script", () => {
         cy.contains("span", "IMPORT TO EDIT").click()
         cy.get("input[value=RENAME]").click()
 
-        // verify
+        // verify successful import, and name conflict handling
         cy.contains("div", "MY SCRIPTS (2)").click() // expand
         cy.contains("div", "SHARED SCRIPTS (1)").click() // collapse
         cy.contains("div", "mondays_1.py")

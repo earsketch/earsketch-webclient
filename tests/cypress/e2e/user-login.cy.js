@@ -1,9 +1,8 @@
 import * as MockSocket from "mock-socket"
 
 describe("user", () => {
-    it.skip("completes login", () => {
+    it("can login and logout", () => {
         const username = "cypress"
-        const userAudioUploads = []
         cy.interceptAudioStandard([
             {
                 artist: "RICHARD DEVINE",
@@ -21,7 +20,7 @@ describe("user", () => {
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
         cy.interceptUsersNotifications()
-        cy.interceptAudioUser(userAudioUploads)
+        cy.interceptAudioUser()
         cy.interceptAudioFavorites()
         cy.interceptScriptsOwned([{
             created: "2022-01-02 16:20:00.0",

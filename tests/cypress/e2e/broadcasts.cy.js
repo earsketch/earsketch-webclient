@@ -15,10 +15,12 @@ describe("Notifications", () => {
         cy.interceptScriptsOwned()
         cy.interceptScriptsShared()
 
+        // login
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
         cy.skipTour()
         cy.login()
 
+        // verify notification badge is showing 1 unread notification
         cy.get("[data-test='numUnreadNotifications']").contains("1")
     })
 })
