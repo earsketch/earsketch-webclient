@@ -330,7 +330,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
-                    <span className="text-sm truncate pl-2">{name}</span>
+                    <h5 className="text-sm truncate pl-2">{name}</h5>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -421,7 +421,7 @@ const Folder = ({ folder, names }: FolderProps) => {
                 className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
                 title={folder}
             >
-                <div className="text-sm truncate">{folder}</div>
+                <h4 className="text-sm truncate">{folder}</h4>
             </div>
         </div>
         <ClipList names={names} />
@@ -491,7 +491,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         const folderHeight = 25
         const clipHeight = 30
         if (index === 0) {
-            return filterHeight
+            return filterHeight + 67
         } else if (index === folders.length) {
             // add extra space for the last folder to scroll above the scroll to top button
             return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length) + (clipHeight * 2)
@@ -532,7 +532,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                 </button>
                 <NumberOfSounds/>
             </div>
-
             <div className={soundListClassnames}>
                 <AutoSizer>
                     {({ height, width }: { height: number, width: number }) => (
@@ -548,11 +547,21 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                 if (index === 0) {
                                     return (
                                         <div style={style}>
+                                            <div className="flex flex-row justify-start top-0 bg-inherit">
+                                                <h3 className="flex grow pl-2 p-0.5 border-b border-r border-blue dark:border-blue text-white bg-blue dark:bg-blue">
+                                                    {t("soundBrowser.filterHeader")}
+                                                </h3>
+                                            </div>
                                             <SoundFilters
                                                 currentFilterTab={currentFilterTab}
                                                 setCurrentFilterTab={setCurrentFilterTab}
                                                 setFilterHeight={setFilterHeight}
                                             />
+                                            <div className="flex flex-row justify-start top-0 bg-inherit">
+                                                <h3 className="flex grow pl-2 p-0.5 border-b border-r border-blue dark:border-blue text-white bg-blue dark:bg-blue">
+                                                    {t("soundBrowser.soundHeader")}
+                                                </h3>
+                                            </div>
                                         </div>
                                     )
                                 } else {
