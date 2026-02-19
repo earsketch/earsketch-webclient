@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
-import { setExtensionUrl, setEastContent } from "../app/appState"
+import { setExtensionUrl, setEastContent, setExtensionName, setExtensionPermissions, setExtensionIcon32 } from "../app/appState"
 import store from "../reducers"
 
 interface ExtensionManifest {
@@ -11,6 +11,7 @@ interface ExtensionManifest {
     version: string
     description: string
     icons?: {
+        "32"?: string
         "128"?: string
     }
     side_panel?: {
@@ -35,7 +36,16 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
         // Construct the full extension URL using URL constructor
         const extensionUrl = new URL(manifest.side_panel.default_path, url).href
 
+        // Construct the 32px icon URL if available
+        const icon32Url = manifest.icons?.["32"]
+            ? new URL(manifest.icons["32"], url).href
+            : ""
+
+        // Dispatch all extension metadata to Redux
         store.dispatch(setExtensionUrl(extensionUrl))
+        store.dispatch(setExtensionName(manifest.name))
+        store.dispatch(setExtensionPermissions(manifest.permissions || []))
+        store.dispatch(setExtensionIcon32(icon32Url))
         store.dispatch(setEastContent("extension"))
         close()
     }

@@ -32,6 +32,9 @@ const appSlice = createSlice({
         modal: null as { Modal: Modal, resolve: (_: any) => void } | null,
         confetti: false,
         extensionUrl: "",
+        extensionName: "",
+        extensionPermissions: [] as string[],
+        extensionIcon32: "",
     },
     reducers: {
         setScriptLanguage(state, { payload }) {
@@ -82,6 +85,15 @@ const appSlice = createSlice({
         setExtensionUrl(state, { payload }) {
             state.extensionUrl = payload
         },
+        setExtensionName(state, { payload }) {
+            state.extensionName = payload
+        },
+        setExtensionPermissions(state, { payload }) {
+            state.extensionPermissions = payload
+        },
+        setExtensionIcon32(state, { payload }) {
+            state.extensionIcon32 = payload
+        },
     },
 })
 
@@ -108,6 +120,9 @@ export const {
     setModal,
     setConfetti,
     setExtensionUrl,
+    setExtensionName,
+    setExtensionPermissions,
+    setExtensionIcon32,
 } = appSlice.actions
 
 export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage
@@ -126,6 +141,9 @@ export const selectLocaleCode = (state: RootState) => state.app.locale
 export const selectModal = (state: RootState) => state.app.modal
 export const selectConfetti = (state: RootState) => state.app.confetti
 export const selectExtensionUrl = (state: RootState) => state.app.extensionUrl
+export const selectExtensionName = (state: RootState) => state.app.extensionName
+export const selectExtensionPermissions = (state: RootState) => state.app.extensionPermissions
+export const selectExtensionIcon32 = (state: RootState) => state.app.extensionIcon32
 
 export const selectLocale = createSelector(
     [selectLocaleCode],
