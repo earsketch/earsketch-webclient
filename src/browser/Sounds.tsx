@@ -26,6 +26,7 @@ export const callbacks = {
     rename: (_: SoundEntity) => {},
     delete: (_: SoundEntity) => {},
     upload: () => {},
+    preview: () => {},
 }
 
 const SoundSearchBar = () => {
@@ -179,7 +180,7 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
     )
 }
 
-const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>> }) => {
+export const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>> }) => {
     const { t } = useTranslation()
     const [showMajMinPageOne, setShowMajMinPageOne] = useState(true)
     const artists = useSelector(sounds.selectFilteredArtists)
@@ -253,7 +254,7 @@ const NumberOfSounds = () => {
     </div>
 }
 
-const ShowOnlyFavorites = () => {
+export const ShowOnlyFavorites = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const filterByFavorites = useSelector(sounds.selectFilterByFavorites)
@@ -294,6 +295,22 @@ const AddSound = () => {
             <i className="icon icon-plus2 text-xs mr-1" />
             <div className="text-sm">
                 {t("soundBrowser.button.addSound")}
+            </div>
+        </button>
+    )
+}
+
+const PreviewSound = () => {
+    const tooltip = "preview sound"
+
+    return (
+        <button
+            className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer"
+            onClick={callbacks.preview}
+            title={tooltip}
+        >
+            <div className="text-sm">
+                Preview Sound
             </div>
         </button>
     )
@@ -428,7 +445,7 @@ const Folder = ({ folder, names }: FolderProps) => {
     </>)
 }
 
-interface SoundSearchAndFiltersProps {
+export interface SoundSearchAndFiltersProps {
     currentFilterTab: keyof sounds.Filters,
     setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
     setFilterHeight: React.Dispatch<React.SetStateAction<number>>
@@ -450,6 +467,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
             </div>
             <div className="flex justify-between px-1.5 py-1 mb-0.5">
                 <ShowOnlyFavorites />
+                <PreviewSound />
                 <AddSound />
             </div>
         </div>

@@ -47,6 +47,7 @@ import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
+import { SoundPreviewer } from "./SoundPreviewer"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -89,9 +90,14 @@ function openUploadWindow() {
     }
 }
 
+function openSoundPreviewWindow() {
+    openModal(SoundPreviewer)
+}
+
 sounds.callbacks.rename = renameSound
 sounds.callbacks.delete = deleteSound
 sounds.callbacks.upload = openUploadWindow
+sounds.callbacks.preview = openSoundPreviewWindow
 
 function loadLocalScripts() {
     // Migration code: if any anonymous users have saved scripts from before PR #198, bring them in to Redux state.
