@@ -5,11 +5,14 @@ import { selectTracks } from "../daw/dawState"
 import { useAppSelector as useSelector } from "../hooks"
 import { Log, selectLogs } from "../ide/ideState"
 import { Track } from "../types/common"
-import { selectColorTheme, selectExtensionUrl } from "../app/appState"
+import { selectColorTheme, selectExtensionUrl, selectLocale, selectExtensionName, selectExtensionIcon32 } from "../app/appState"
 import * as tabState from "../ide/tabState"
 import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
 import * as userState from "../user/userState"
+import * as layout from "../ide/layoutState"
+import { Collapsed } from "../browser/Utils"
+import { useTranslation } from "react-i18next"
 
 export const ExtensionHost = () => {
     const extensionUrl = useSelector(selectExtensionUrl)
@@ -19,6 +22,11 @@ export const ExtensionHost = () => {
     const tracks: Track[] = useSelector(selectTracks)
     const colorTheme = useSelector(selectColorTheme)
     const currentUser = useSelector(userState.selectUserName)
+    const currentLocale = useSelector(selectLocale)
+    const extensionName = useSelector(selectExtensionName)
+    const extensionIcon32 = useSelector(selectExtensionIcon32)
+    const paneIsOpen = useSelector(layout.isEastOpen)
+    const { t } = useTranslation()
 
     const logsRef = useRef(logs)
     const tracksRef = useRef(tracks)
@@ -103,10 +111,15 @@ export const ExtensionHost = () => {
         return () => { window.removeEventListener("message", onMessage) }
     }, [])
 
-    return (<>
+    return (<><div dir={currentLocale.direction} className={`h-full ${paneIsOpen ? "" : "hidden"}`}>
         <TitleBar />
+        <div className="w-full flex justify-between items-stretch select-none text-white bg-blue">
+            <div className="flex items-center gap-2 p-2.5 text-amber">
+                {extensionIcon32 && <img src={extensionIcon32} alt="" className="w-5 h-5 border border-gray-300 dark:border-gray-400 rounded" />}
+                <span>{extensionName.toLocaleUpperCase()}</span>
+            </div>
+        </div>
 
-        <div className="p-2.5">{extensionUrl}</div>
         <iframe
             ref={iframeRef}
             src={extensionUrl}
@@ -114,6 +127,9 @@ export const ExtensionHost = () => {
             className="w-full h-full border border-gray-300"
             title="EarSketch Extension"
         />
+    </div>
+        {!paneIsOpen &&
+        <Collapsed title={t("extension.collapsedTitle", { extensionName }).toLocaleUpperCase()} position="east" />}
     </>)
 }
 

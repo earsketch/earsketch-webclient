@@ -193,18 +193,16 @@ const CurriculumSearchResults = () => {
 }
 
 export const TitleBar = () => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
-    const currentLocale = useSelector(appState.selectLocale)
     const location = useSelector(curriculum.selectCurrentLocation)
     const pageTitle = useSelector(curriculum.selectPageTitle)
-    const paneTitle = useSelector(appState.selectEastContent)
-    const { t } = useTranslation()
-
-    // TODO remove this temporary dev code
-    useEffect(() => {
-        dispatch(layout.setEast({ open: true }))
-    }, [dispatch])
+    const eastContent = useSelector(appState.selectEastContent)
+    const isCurriculumPane = eastContent === "curriculum"
+    const extensionIcon32 = useSelector(appState.selectExtensionIcon32)
+    const extensionName = useSelector(appState.selectExtensionName)
+    const paneTitle = isCurriculumPane ? t("curriculum.title") : t("extension")
 
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         useEffect(() => {
@@ -222,28 +220,35 @@ export const TitleBar = () => {
             <div>
                 <button
                     className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
-                    // onClick={() => dispatch(layout.setEast({ open: false }))}
+                    onClick={() => dispatch(layout.setEast({ open: false }))}
                     title={t("curriculum.close")}
                     aria-label={t("curriculum.close")}
                 >
                     <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
                 </button>
             </div>
-            {/* TODO: upgrade to tailwind 3 for rtl modifiers to remove ternary operator */}
-            <div className={currentLocale.direction === "rtl" ? "mr-auto" : "ml-auto"}>
-                <button className="px-2 -my-1 align-middle text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
-                    <i className="icon icon-link" />
-                </button>
-                <button className="border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-text-bottom"
-                    title="Show curriculum pane"
-                    onClick={() => { dispatch(appState.setEastContent("curriculum")) }}>
-                    CURR
-                </button>
-                <button className="border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-text-bottom"
-                    title="Show extension pane"
-                    onClick={() => { dispatch(appState.setEastContent("extension")) }}>
-                    EXTENSION
-                </button>
+            <div className="ltr:ml-auto rtl:mr-auto">
+                {isCurriculumPane && <>
+                    <button className="px-2 -my-1 text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
+                        <i className="icon icon-link" />
+                    </button>
+                    {extensionIcon32 && (
+                        <button
+                            className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
+                            title={t("extension.switchToExtension", { extensionName })}
+                            onClick={() => { dispatch(appState.setEastContent("extension")) }}>
+                            <img src={extensionIcon32} alt="" className="w-5 h-5" />
+                        </button>
+                    )}
+                </>}
+                {!isCurriculumPane && (
+                    <button
+                        className="inline-flex items-center px-3 py-1 text-xs font-semibold rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700 ml-2"
+                        title={t("curriculum.title")}
+                        onClick={() => { dispatch(appState.setEastContent("curriculum")) }}>
+                        {t("curriculum.title").toLocaleUpperCase()}
+                    </button>
+                )}
             </div>
         </div>
     )
@@ -322,7 +327,7 @@ const CurriculumPane = () => {
     )
 }
 
-export const NavigationBar = () => {
+const NavigationBar = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const location = useSelector(curriculum.selectCurrentLocation)
