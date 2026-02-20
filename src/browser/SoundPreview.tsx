@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
+import React, { createRef, useEffect, useLayoutEffect, useRef, useState } from "react"
 import classNames from "classnames"
 import { useTranslation } from "react-i18next"
 
@@ -12,6 +12,8 @@ import { AudioWaveform } from "../app/AudioWaveForm"
 
 import store from "../reducers"
 import { Filters, ShowOnlyFavorites, SoundSearchAndFiltersProps } from "./Sounds"
+
+import { recommend } from "../app/recommender"
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
@@ -51,9 +53,13 @@ export const SoundPreview = () => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
 
+    const [recommendationMode, setRecommendationMode] = useState(0)
+
     // folder-structured filtered data
     const folders = useSelector(sounds.selectFilteredRegularFolders)
     const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+
+    const filters = useSelector(sounds.selectFilters)
 
     // preview state
     const preview = useSelector(sounds.selectPreview)
@@ -63,14 +69,25 @@ export const SoundPreview = () => {
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
 
     // Build a folder-first queue: [{folder, name}, ...]
-    const queue = useMemo(() => {
-        const out: Array<{ folder: string; name: string }> = []
-        for (const folder of folders) {
-            const names: string[] = namesByFolders?.[folder] ?? []
-            for (const name of names) out.push({ folder, name })
-        }
-        return out
-    }, [folders, namesByFolders])
+    const [queue, setQueue] = useState<Array<{ folder: string; name: string }>>([])
+
+    useEffect(() => {
+        (async () => {
+            setQueue([])
+            const out: Array<{ folder: string; name: string }> = []
+            if (recommendationMode) {
+                console.log(filters.artists)
+                const recommendations = await recommend([], 1, 1, filters.genres, filters.instruments, [], 100, filters.keys, filters.artists)
+                for (const name of recommendations) out.push({ folder: "", name })
+            } else {
+                for (const folder of folders) {
+                    const names: string[] = namesByFolders?.[folder] ?? []
+                    for (const name of names) out.push({ folder, name })
+                }
+            }
+            setQueue(out)
+        })()
+    }, [folders, namesByFolders, recommendationMode, filters])
 
     const [index, setIndex] = useState(0)
 
@@ -158,6 +175,9 @@ export const SoundPreview = () => {
             id={"panel-" + BrowserTabType.Sound}
             aria-label="Sound browser"
         >
+            <button style={{ height: "20px", background: "black", color: "white" }} title="Preview Mode" onClick={() => setRecommendationMode(1 - recommendationMode)}>
+                {recommendationMode ? "Recommendation" : "Normal"}
+            </button>
             <SoundSearchBar />
 
             <SoundFilters
