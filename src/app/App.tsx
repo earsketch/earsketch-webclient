@@ -827,7 +827,7 @@ export const App = () => {
                             </i>
                         </button>}
 
-                    {ES_WEB_SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
+                    <LocaleSelector handleSelection={changeLanguage}/>
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />
