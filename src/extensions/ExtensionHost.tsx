@@ -40,7 +40,7 @@ export const ExtensionHost = () => {
     useEffect(() => { extensionPermissionsRef.current = extensionPermissions }, [extensionPermissions])
     useEffect(() => {
         colorThemeRef.current = colorTheme
-        if (iframeRef.current?.contentWindow) {
+        if (iframeRef.current?.contentWindow && extensionPermissions.includes("colorTheme")) {
             const message = {
                 messageType: "colorThemeChanged",
                 colorTheme: colorThemeRef.current,
@@ -49,17 +49,17 @@ export const ExtensionHost = () => {
                 iframeRef.current.contentWindow.postMessage(JSON.stringify(message), "*") // TODO extensionTargetOrigin isn't working for remote html
             }
         }
-    }, [colorTheme])
+    }, [colorTheme, extensionPermissions])
     useEffect(() => {
         currentUserRef.current = currentUser || "" // TODO add a test for this being "" when currentUser is null
-        if (iframeRef.current?.contentWindow) {
+        if (iframeRef.current?.contentWindow && extensionPermissions.includes("currentUser")) {
             const message = {
                 messageType: "currentUserChanged",
                 currentUser: currentUserRef.current,
             }
             iframeRef.current.contentWindow.postMessage(JSON.stringify(message), "*")
         }
-    }, [currentUser])
+    }, [currentUser, extensionPermissions])
 
     const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
         getEditorContents() {
