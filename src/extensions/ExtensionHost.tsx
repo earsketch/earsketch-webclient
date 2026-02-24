@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next"
 
 export const ExtensionHost = () => {
     const extensionUrl = useSelector(selectExtensionUrl)
-    const extensionTargetOrigin = new URL(extensionUrl).origin
+    const extensionTargetOrigin = extensionUrl ? new URL(extensionUrl).origin : ""
     const iframeRef = useRef<HTMLIFrameElement>(null)
     const logs: Log[] = useSelector(selectLogs)
     const tracks: Track[] = useSelector(selectTracks)
