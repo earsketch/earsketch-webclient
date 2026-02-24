@@ -111,26 +111,29 @@ export const ExtensionHost = () => {
         return () => { window.removeEventListener("message", onMessage) }
     }, [])
 
-    return (<><div dir={currentLocale.direction} className={`h-full ${paneIsOpen ? "" : "hidden"}`}>
-        <TitleBar />
-        <div className="w-full flex justify-between items-stretch select-none text-white bg-blue">
-            <div className="flex items-center gap-2 p-2.5 text-amber">
-                {extensionIcon32 && <img src={extensionIcon32} alt="" className="w-5 h-5 border border-gray-300 dark:border-gray-400 rounded" />}
-                <span>{extensionName.toLocaleUpperCase()}</span>
-            </div>
-        </div>
+    return (
+        <>
+            <div dir={currentLocale.direction} className={`h-full ${paneIsOpen ? "" : "hidden"}`}>
+                <TitleBar />
+                <div className="w-full flex justify-between items-stretch select-none text-white bg-blue">
+                    <div className="flex items-center gap-2 p-2.5 text-amber">
+                        {extensionIcon32 && <img src={extensionIcon32} alt="" className="w-5 h-5 border border-gray-300 dark:border-gray-400 rounded" />}
+                        <span>{extensionName.toLocaleUpperCase()}</span>
+                    </div>
+                </div>
 
-        <iframe
-            ref={iframeRef}
-            src={extensionUrl}
-            onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOrigin) }}
-            className="w-full h-full border border-gray-300"
-            title="EarSketch Extension"
-        />
-    </div>
-        {!paneIsOpen &&
-        <Collapsed title={t("extension.collapsedTitle", { extensionName }).toLocaleUpperCase()} position="east" />}
-    </>)
+                <iframe
+                    ref={iframeRef}
+                    src={extensionUrl}
+                    onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOrigin) }}
+                    className="w-full h-full border border-gray-300"
+                    title="EarSketch Extension"
+                />
+            </div>
+            {!paneIsOpen &&
+              <Collapsed title={t("extension.collapsedTitle", { extensionName }).toLocaleUpperCase()} position="east"
+            />}
+        </>)
 }
 
 export default ExtensionHost
