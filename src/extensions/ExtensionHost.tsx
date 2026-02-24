@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next"
 
 export const ExtensionHost = () => {
     const extensionUrl = useSelector(selectExtensionUrl)
-    const extensionTargetOrigin = new URL(extensionUrl, window.location.href).origin
+    const extensionTargetOrigin = new URL(extensionUrl).origin
     const iframeRef = useRef<HTMLIFrameElement>(null)
     const logs: Log[] = useSelector(selectLogs)
     const tracks: Track[] = useSelector(selectTracks)
@@ -46,7 +46,7 @@ export const ExtensionHost = () => {
                 colorTheme: colorThemeRef.current,
             }
             if (iframeRef.current?.contentWindow) {
-                iframeRef.current.contentWindow.postMessage(JSON.stringify(message), "*") // TODO extensionTargetOrigin isn't working for remote html
+                iframeRef.current.contentWindow.postMessage(JSON.stringify(message), window.location.href) // TODO extensionTargetOrigin isn't working for remote html
             }
         }
     }, [colorTheme, extensionPermissions])
@@ -57,7 +57,7 @@ export const ExtensionHost = () => {
                 messageType: "currentUserChanged",
                 currentUser: currentUserRef.current,
             }
-            iframeRef.current.contentWindow.postMessage(JSON.stringify(message), "*")
+            iframeRef.current.contentWindow.postMessage(JSON.stringify(message), window.location.href)
         }
     }, [currentUser, extensionPermissions])
 
@@ -149,9 +149,8 @@ export const ExtensionHost = () => {
                         result = { error: `Unknown function: ${data.fn}` }
                 }
 
-                // event.source!.postMessage(JSON.stringify(result), event.origin) // TODO this works but typscript is complaining about the event.origin type
                 if (iframeRef.current?.contentWindow) {
-                    iframeRef.current.contentWindow.postMessage(JSON.stringify(result), "*") // TODO extensionTargetOrigin isn't working for remote html
+                    iframeRef.current.contentWindow.postMessage(JSON.stringify(result), extensionTargetOrigin)
                 } else {
                     console.warn("iframe contentWindow is not available")
                 }

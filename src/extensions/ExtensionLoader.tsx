@@ -65,7 +65,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
             // Construct the manifest URL using URL constructor
             const manifestUrl = new URL("es-ext.json", url).href
 
-            const response = await fetch(manifestUrl)
+            const response = await fetch(manifestUrl, { method: "GET", headers: { "ngrok-skip-browser-warning": "1" } })
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
