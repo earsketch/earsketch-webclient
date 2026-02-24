@@ -5,7 +5,7 @@ import { selectTracks } from "../daw/dawState"
 import { useAppSelector as useSelector } from "../hooks"
 import { Log, selectLogs } from "../ide/ideState"
 import { Track } from "../types/common"
-import { selectColorTheme, selectExtensionUrl, selectLocale, selectExtensionName, selectExtensionIcon32 } from "../app/appState"
+import { selectColorTheme, selectExtensionUrl, selectLocale, selectExtensionName, selectExtensionIcon32, selectExtensionPermissions } from "../app/appState"
 import * as tabState from "../ide/tabState"
 import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
@@ -25,6 +25,7 @@ export const ExtensionHost = () => {
     const currentLocale = useSelector(selectLocale)
     const extensionName = useSelector(selectExtensionName)
     const extensionIcon32 = useSelector(selectExtensionIcon32)
+    const extensionPermissions = useSelector(selectExtensionPermissions)
     const paneIsOpen = useSelector(layout.isEastOpen)
     const { t } = useTranslation()
 
@@ -32,9 +33,11 @@ export const ExtensionHost = () => {
     const tracksRef = useRef(tracks)
     const colorThemeRef = useRef(colorTheme)
     const currentUserRef = useRef(currentUser)
+    const extensionPermissionsRef = useRef(extensionPermissions)
 
     useEffect(() => { logsRef.current = logs }, [logs])
     useEffect(() => { tracksRef.current = tracks }, [tracks])
+    useEffect(() => { extensionPermissionsRef.current = extensionPermissions }, [extensionPermissions])
     useEffect(() => {
         colorThemeRef.current = colorTheme
         if (iframeRef.current?.contentWindow) {
@@ -97,7 +100,54 @@ export const ExtensionHost = () => {
             if (isFromLocalOriginIframe || isFromRemoteOriginIframe) {
                 console.log("Received message from iframe:", event.data)
                 const data = JSON.parse(event.data)
-                const result = extensionFunctions[data.fn](...(data.args ?? []))
+
+                let result: any
+                const permissions = extensionPermissionsRef.current
+
+                switch (data.fn) {
+                    case "getEditorContents":
+                        if (!permissions.includes("getEditorContents")) {
+                            result = { error: "Permission denied: getEditorContents" }
+                            break
+                        }
+                        result = extensionFunctions.getEditorContents()
+                        break
+
+                    case "getScriptExecutionResult":
+                        if (!permissions.includes("getScriptExecutionResult")) {
+                            result = { error: "Permission denied: getScriptExecutionResult" }
+                            break
+                        }
+                        result = extensionFunctions.getScriptExecutionResult()
+                        break
+
+                    case "getDawState":
+                        if (!permissions.includes("getDawState")) {
+                            result = { error: "Permission denied: getDawState" }
+                            break
+                        }
+                        result = extensionFunctions.getDawState()
+                        break
+
+                    case "getColorTheme":
+                        if (!permissions.includes("getColorTheme")) {
+                            result = { error: "Permission denied: getColorTheme" }
+                            break
+                        }
+                        result = extensionFunctions.getColorTheme()
+                        break
+
+                    case "getCurrentUser":
+                        if (!permissions.includes("getCurrentUser")) {
+                            result = { error: "Permission denied: getCurrentUser" }
+                            break
+                        }
+                        result = extensionFunctions.getCurrentUser()
+                        break
+
+                    default:
+                        result = { error: `Unknown function: ${data.fn}` }
+                }
 
                 // event.source!.postMessage(JSON.stringify(result), event.origin) // TODO this works but typscript is complaining about the event.origin type
                 if (iframeRef.current?.contentWindow) {
@@ -131,7 +181,7 @@ export const ExtensionHost = () => {
                 />
             </div>
             {!paneIsOpen &&
-              <Collapsed title={t("extension.collapsedTitle", { extensionName }).toLocaleUpperCase()} position="east"
+            <Collapsed title={t("extension.collapsedTitle", { extensionName }).toLocaleUpperCase()} position="east"
             />}
         </>)
 }
