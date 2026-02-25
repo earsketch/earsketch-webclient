@@ -23,6 +23,8 @@
     "reportError": "Report Error",
     "extension": "Extension",
     "extensions": "Extensions",
+    "extensions.description": "Extensions",
+    "extensionLoad.description": "EarSketch extensions enable developers to add features that extend the capabilities of EarSketch. If you are interested in developing your own extension, please <a class='text-blue-600' href='https://earsketch.gatech.edu/landing/#/contact' target='_blank'>contact us.</a>",
     "loadExtension": "Load Extension",
     "extension.switchToExtension": "Switch to Extension: {{extensionName}}",
     "extension.collapsedTitle": "Extension: {{extensionName}}",

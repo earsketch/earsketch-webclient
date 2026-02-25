@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
+import parse from "html-react-parser"
 import { setEastContent } from "../app/appState"
 import store from "../reducers"
 import { useAppSelector } from "../hooks"
@@ -184,12 +185,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
                     </div>
                 )}
                 <div className="mb-3">
-                    <button
-                        type="button"
-                        className="mx-2.5 my-1 px-2.5 py-px rounded-md text-black dark:text-white text-xs border border-black dark:border-white hover:bg-gray-100 dark:hover:bg-gray-800"
-                        onClick={pasteDemoUrl}>
-                        PASTE DEMO URL
-                    </button>
+                    {parse(t("extensionLoad.description"))}
                 </div>
                 <label htmlFor="extension-url-input" className="text-sm">
                     {t("extension.urlLabel")}
