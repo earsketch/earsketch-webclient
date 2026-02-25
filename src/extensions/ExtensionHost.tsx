@@ -174,7 +174,7 @@ export const ExtensionHost = () => {
 
                 <iframe
                     ref={iframeRef}
-                    src={extensionUrl}
+                    src={extensionPermissions.includes("sidePanel") ? extensionUrl : undefined}
                     onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOrigin) }}
                     className="w-full h-full border border-gray-300"
                     title="EarSketch Extension"

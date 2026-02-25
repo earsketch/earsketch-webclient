@@ -91,6 +91,10 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
             }
 
             const data = await response.json()
+            if (!data.permissions?.includes("sidePanel")) {
+                setError(t("extension.noValidExtension"))
+                return
+            }
             setManifest(data)
         } catch (err) {
             console.error("Failed to fetch extension manifest:", err)
