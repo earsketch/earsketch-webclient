@@ -113,7 +113,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
     }
 
     return <>
-        <ModalHeader>{t("loadExtension")}</ModalHeader>
+        <ModalHeader>{t("extensions")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); loadExtension() }}>
             <ModalBody>
                 {currentExtensionUrl && (

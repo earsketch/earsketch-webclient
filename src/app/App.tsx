@@ -392,7 +392,7 @@ const MiscActionMenu = () => {
     const actions = [
         { nameKey: "startQuickTour", action: resumeQuickTour },
         { nameKey: "reportError", action: reportError },
-        { nameKey: "loadExtension", action: loadExtension },
+        { nameKey: "extensions", action: loadExtension },
     ]
 
     const links = [
