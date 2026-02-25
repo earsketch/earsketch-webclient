@@ -77,7 +77,6 @@ jobs:
           VALIDATE_JAVASCRIPT_PRETTIER: false
           VALIDATE_JSX: false
           VALIDATE_JSON: false
-          VALIDATE_JAVASCRIPT_PRETTIER: false
           VALIDATE_MARKDOWN: false
           FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*|.*tests/cypress/component/.*.results.js|.*tests/cypress/fixtures/.*|.*node_modules/.*)
 
