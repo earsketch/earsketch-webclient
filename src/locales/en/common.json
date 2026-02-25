@@ -22,7 +22,7 @@
     "switchThemeDark": "Switch to light color theme",
     "reportError": "Report Error",
     "extension": "Extension",
-    "loadExtension": "Load Extension",
+    "loadExtension": "Extensions",
     "extension.switchToExtension": "Switch to Extension: {{extensionName}}",
     "extension.collapsedTitle": "Extension: {{extensionName}}",
     "extension.preview": "Preview",

@@ -265,7 +265,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
                     </div>
                 )}
             </ModalBody>
-            <ModalFooter submit="loadExtension" ready={manifest !== null} close={close} />
+            <ModalFooter submit="loadExtension" ready={manifest !== null} close={close} cancel="thing.close" />
         </form>
     </>
 }
