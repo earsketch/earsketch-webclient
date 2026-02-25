@@ -151,10 +151,11 @@ const TableOfContents = () => {
 
 const CurriculumHeader = () => {
     const dispatch = useDispatch()
+    // CurriculumHeader is always rendered in the curriculum pane
 
     return (
         <div id="curriculum-header" style={{ position: "relative" }}>
-            <TitleBar />
+            <TitleBar isCurriculumPane={true} />
             <NavigationBar />
 
             <div onFocus={() => dispatch(curriculum.showResults(true))}
@@ -193,14 +194,12 @@ const CurriculumSearchResults = () => {
         : null
 }
 
-export const TitleBar = () => {
+export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
     const location = useSelector(curriculum.selectCurrentLocation)
     const pageTitle = useSelector(curriculum.selectPageTitle)
-    const eastContent = useSelector(appState.selectEastContent)
-    const isCurriculumPane = eastContent === "curriculum"
     const extensionIcon32 = useSelector(selectExtensionIcon32)
     const extensionName = useSelector(selectExtensionName)
     const paneTitle = isCurriculumPane ? t("curriculum.title") : t("extension")
@@ -232,6 +231,14 @@ export const TitleBar = () => {
                 {isCurriculumPane && <>
                     <button className="px-2 -my-1 text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
                         <i className="icon icon-link" />
+                    </button>
+                    <button className="border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-text-bottom"
+                        title={t("ariaDescriptors:curriculum.switchScriptLanguage", { language: language === "python" ? "javascript" : "python" })}
+                        onClick={() => {
+                            const newLanguage = (language === "python" ? "javascript" : "python")
+                            dispatch(appState.setScriptLanguage(newLanguage))
+                        }}>
+                        {language === "python" ? "PY" : "JS"}
                     </button>
                     {extensionIcon32 && (
                         <button
