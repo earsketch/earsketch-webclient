@@ -24,7 +24,7 @@ const appSlice = createSlice({
         embedMode,
         hideDAW,
         hideEditor,
-        eastContent: "curriculum", // as "curriculum" | "extension"
+        eastContent: "curriculum" as "curriculum" | "extension",
         doNotDisturb: false,
         embeddedScriptName: null as string | null,
         embeddedScriptUsername: null as string | null,

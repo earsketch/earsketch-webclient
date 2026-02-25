@@ -48,6 +48,7 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
 import { ExtensionLoader } from "../extensions/ExtensionLoader"
+import { clearExtension } from "../extensions/extensionState"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -756,6 +757,8 @@ export const App = () => {
         dispatch(soundsState.resetUserSounds())
         dispatch(soundsState.resetFavorites())
         dispatch(soundsState.resetAllFilters())
+        dispatch(clearExtension())
+        dispatch(appState.setEastContent("curriculum"))
 
         // Clear out all the values set at login.
         setUsername("")
