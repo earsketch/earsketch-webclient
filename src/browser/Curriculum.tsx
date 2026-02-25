@@ -203,6 +203,7 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
     const extensionIcon32 = useSelector(selectExtensionIcon32)
     const extensionName = useSelector(selectExtensionName)
     const paneTitle = isCurriculumPane ? t("curriculum.title") : t("extension")
+    const closeButtonTitle = isCurriculumPane ? t("curriculum.close") : t("extension.close")
 
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         useEffect(() => {
@@ -221,8 +222,8 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
                 <button
                     className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                     onClick={() => dispatch(layout.setEast({ open: false }))}
-                    title={t("curriculum.close")}
-                    aria-label={t("curriculum.close")}
+                    title={closeButtonTitle}
+                    aria-label={closeButtonTitle}
                 >
                     <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
                 </button>
