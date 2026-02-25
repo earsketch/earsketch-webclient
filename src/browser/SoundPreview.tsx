@@ -205,13 +205,11 @@ export const SoundPreview = () => {
                         aria-label="Previous sound"
                         title="Previous sound (Left Arrow)"
                         className={classNames(
-                            "shrink-0 w-20 h-20 rounded-lg border flex items-center justify-center",
+                            "shrink-0 w-10 h-10 rounded-lg border flex items-center justify-center",
                             canPrev ? "bg-black text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"
                         )}
                     >
-                        <span className="text-3xl" aria-hidden="true">
-                            ◀
-                        </span>
+                        <i className="icon icon-arrow-left2"></i>
                     </button>
 
                     <div className="grow flex flex-col items-center">
@@ -226,13 +224,11 @@ export const SoundPreview = () => {
                         aria-label="Next sound"
                         title="Next sound (Right Arrow)"
                         className={classNames(
-                            "shrink-0 w-20 h-20 rounded-lg border flex items-center justify-center",
+                            "shrink-0 w-10 h-10 rounded-lg border flex items-center justify-center",
                             canNext ? "bg-black text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"
                         )}
                     >
-                        <span className="text-3xl" aria-hidden="true">
-                            ▶
-                        </span>
+                        <i className="icon icon-arrow-right2"></i>
                     </button>
                 </div>
                 {currentName && (
@@ -240,13 +236,13 @@ export const SoundPreview = () => {
                         onClick={() => {
                             dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
                         }}
-                        className="mt-4 w-16 h-16 rounded-lg bg-black text-white flex items-center justify-center"
+                        className="mt-4 w-10 h-10 rounded-lg bg-black text-white flex items-center justify-center"
                         aria-label={preview?.kind === "sound" && preview.name === currentName ? "Stop sound" : "Play sound"}
                         title={preview?.kind === "sound" && preview.name === currentName ? "Stop" : "Play"}>
 
                         {preview?.kind === "sound" && preview.name === currentName
-                            ? (previewNodes ? (<span className="text-xl">Stop</span>) : (<div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />))
-                            : (<span className="text-xl">Play</span>
+                            ? (previewNodes ? (<i className="icon icon-stop2"></i>) : (<div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />))
+                            : (<i className="icon icon-play4"></i>
                             )}
                     </button>
                 )}
