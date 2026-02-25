@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { Language } from "common"
+import { selectExtensionIcon32, selectExtensionName } from "../extensions/extensionState"
 
 const SECTION_URL_CHARACTER = ":"
 
@@ -200,8 +201,8 @@ export const TitleBar = () => {
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const eastContent = useSelector(appState.selectEastContent)
     const isCurriculumPane = eastContent === "curriculum"
-    const extensionIcon32 = useSelector(appState.selectExtensionIcon32)
-    const extensionName = useSelector(appState.selectExtensionName)
+    const extensionIcon32 = useSelector(selectExtensionIcon32)
+    const extensionName = useSelector(selectExtensionName)
     const paneTitle = isCurriculumPane ? t("curriculum.title") : t("extension")
 
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {

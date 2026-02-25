@@ -2,9 +2,10 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
-import { setExtensionUrl, setEastContent, setExtensionName, setExtensionVersion, setExtensionDescription, setExtensionPermissions, setExtensionIcon32, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon32 } from "../app/appState"
+import { setEastContent } from "../app/appState"
 import store from "../reducers"
 import { useAppSelector } from "../hooks"
+import { setExtension, clearExtension, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon32 } from "./extensionState"
 
 interface ExtensionManifest {
     manifest_version: number
@@ -50,24 +51,21 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
             ? new URL(manifest.icons["32"], url).href
             : ""
 
-        // Dispatch all extension metadata to Redux
-        store.dispatch(setExtensionUrl(extensionUrl))
-        store.dispatch(setExtensionName(manifest.name))
-        store.dispatch(setExtensionVersion(manifest.version))
-        store.dispatch(setExtensionDescription(manifest.description))
-        store.dispatch(setExtensionPermissions(manifest.permissions || []))
-        store.dispatch(setExtensionIcon32(icon32Url))
+        // Dispatch all extension metadata to Redux in a single action
+        store.dispatch(setExtension({
+            url: extensionUrl,
+            name: manifest.name,
+            version: manifest.version,
+            description: manifest.description,
+            permissions: manifest.permissions || [],
+            icon32: icon32Url,
+        }))
         store.dispatch(setEastContent("extension"))
         close()
     }
 
     const removeExtension = () => {
-        store.dispatch(setExtensionUrl(""))
-        store.dispatch(setExtensionName(""))
-        store.dispatch(setExtensionVersion(""))
-        store.dispatch(setExtensionDescription(""))
-        store.dispatch(setExtensionPermissions([]))
-        store.dispatch(setExtensionIcon32(""))
+        store.dispatch(clearExtension())
         store.dispatch(setEastContent("curriculum"))
     }
 

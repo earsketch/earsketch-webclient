@@ -31,12 +31,6 @@ const appSlice = createSlice({
         embeddedShareID: null as string | null,
         modal: null as { Modal: Modal, resolve: (_: any) => void } | null,
         confetti: false,
-        extensionUrl: "",
-        extensionName: "",
-        extensionVersion: "",
-        extensionDescription: "",
-        extensionPermissions: [] as string[],
-        extensionIcon32: "",
     },
     reducers: {
         setScriptLanguage(state, { payload }) {
@@ -84,24 +78,6 @@ const appSlice = createSlice({
         setConfetti(state, { payload }) {
             state.confetti = payload
         },
-        setExtensionUrl(state, { payload }) {
-            state.extensionUrl = payload
-        },
-        setExtensionName(state, { payload }) {
-            state.extensionName = payload
-        },
-        setExtensionVersion(state, { payload }) {
-            state.extensionVersion = payload
-        },
-        setExtensionDescription(state, { payload }) {
-            state.extensionDescription = payload
-        },
-        setExtensionPermissions(state, { payload }) {
-            state.extensionPermissions = payload
-        },
-        setExtensionIcon32(state, { payload }) {
-            state.extensionIcon32 = payload
-        },
     },
 })
 
@@ -127,12 +103,6 @@ export const {
     setLocaleCode,
     setModal,
     setConfetti,
-    setExtensionUrl,
-    setExtensionName,
-    setExtensionVersion,
-    setExtensionDescription,
-    setExtensionPermissions,
-    setExtensionIcon32,
 } = appSlice.actions
 
 export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage
@@ -150,12 +120,6 @@ export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedSha
 export const selectLocaleCode = (state: RootState) => state.app.locale
 export const selectModal = (state: RootState) => state.app.modal
 export const selectConfetti = (state: RootState) => state.app.confetti
-export const selectExtensionUrl = (state: RootState) => state.app.extensionUrl
-export const selectExtensionName = (state: RootState) => state.app.extensionName
-export const selectExtensionVersion = (state: RootState) => state.app.extensionVersion
-export const selectExtensionDescription = (state: RootState) => state.app.extensionDescription
-export const selectExtensionPermissions = (state: RootState) => state.app.extensionPermissions
-export const selectExtensionIcon32 = (state: RootState) => state.app.extensionIcon32
 
 export const selectLocale = createSelector(
     [selectLocaleCode],
