@@ -35,5 +35,6 @@ describe("Edit User Profile", () => {
         cy.get("input[name='newPassword']").type(changedPassword)
         cy.get("input[name='confirmPassword']").type(changedPassword)
         cy.get("input[value='UPDATE']").click()
+        cy.get("span").contains("Your user profile was updated!").should("exist")
     })
 })
