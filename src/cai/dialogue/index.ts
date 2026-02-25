@@ -125,7 +125,7 @@ export function addCurriculumPageToHistory(page: number [] | string) {
 export function handleError(error: string | Error, code: string) {
     student.addCompileError(error)
     if (firstEdit) {
-        setTimeout(() => {
+        window.setTimeout(() => {
             addToNodeHistory(["Compilation With Error", String(error)])
         }, 1000)
     } else {
@@ -186,7 +186,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         errorHandlingState[activeProject].errorText = ""
         state[activeProject].complexity = Object.assign({}, complexityResults)
         if (firstEdit) {
-            setTimeout(() => {
+            window.setTimeout(() => {
                 addToNodeHistory(["Successful Compilation"])
             }, 1000)
         } else {

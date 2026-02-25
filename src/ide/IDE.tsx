@@ -21,6 +21,7 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { setReady } from "../bubble/bubbleState"
 import { dismiss } from "../bubble/bubbleThunks"
+import { callbacks as bubbleCallbacks } from "../bubble/Bubble"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
 import { openModal } from "../app/modal"
@@ -57,9 +58,9 @@ export async function createScript() {
     }
 
     reporter.createScript()
-    const filename = await openModal(ScriptCreator)
-    if (filename) {
-        const action = scriptsThunks.saveScript({ name: filename, source: i18n.t(`templates:${ESUtils.parseLanguage(filename)}`) })
+    const result = await openModal(ScriptCreator)
+    if (result) {
+        const action = scriptsThunks.saveScript({ name: result.filename, source: i18n.t(`templates:${result.template}`) })
         const script = await store.dispatch(action).unwrap()
         store.dispatch(setActiveTabAndEditor(script.shareid))
     }
@@ -138,7 +139,7 @@ editor.bindKey("Mod-s", saveScript)
 // Timer: auto save
 let autoSaveTimer = 0
 editor.changeListeners.push(() => {
-    clearTimeout(autoSaveTimer)
+    window.clearTimeout(autoSaveTimer)
     const AUTO_SAVE_INTERVAL_MS = 5 * 60 * 1000 // 5 min
     autoSaveTimer = window.setTimeout(scriptsThunks.saveAll, AUTO_SAVE_INTERVAL_MS)
 })
@@ -316,7 +317,7 @@ async function runScript() {
 
     // asynchronously report the script complexity
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
-        setTimeout(() => {
+        window.setTimeout(() => {
             store.dispatch(caiThunks.compileCai([result, language, code]))
         })
     }
@@ -328,6 +329,7 @@ async function runScript() {
 }
 
 dawCallbacks.runScript = runScript
+bubbleCallbacks.runScript = runScript
 
 export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }: {
     closeAllTabs: () => void, importScript: (s: Script) => void, shareScript: (s: Script) => void, downloadScript: (s: Script) => void
