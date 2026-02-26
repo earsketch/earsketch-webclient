@@ -70,10 +70,6 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
         store.dispatch(setEastContent("curriculum"))
     }
 
-    const pasteDemoUrl = () => {
-        setUrl(window.location.href)
-    }
-
     const previewExtension = async () => {
         if (!url) return
 
