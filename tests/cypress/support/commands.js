@@ -47,7 +47,7 @@ Cypress.Commands.add("incomingWebSocketMessage", (wsServer, message) => {
  * @returns Chainable
  */
 Cypress.Commands.add("waitForHeadlessDialog", () => {
-    cy.get("div[id^='headlessui-dialog-']", { timeout: 10000 }).should("not.exist")
+    cy.get("div#root", { timeout: 10000 }).should("not.have.attr", "inert")
 })
 
 /**
