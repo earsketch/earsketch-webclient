@@ -92,7 +92,7 @@
     "newScript": "New script",
     "editor.title": "Code Editor",
     "editor.blocksMode": "Blocks Mode",
-    "editor.autocomplete":  "Autocomplete",
+    "editor.autocomplete": "Autocomplete",
     "editor.playArrows": "Playback Arrows",
     "editor.showBeatStringAnnotations": "Beat String Annotations",
     "editor.blocksMode.tooltip-enable": "Enable blocks mode",
@@ -313,14 +313,14 @@
     "hardware.tab": "Tab",
     "errorReport.header": "Report an error"
   },
-  "ariaDescriptors" : {
+  "ariaDescriptors": {
     "api.closeFunctionDetails": "Close {{functionName}} function details",
     "api.openFunctionDetails": "Open {{functionName}} function details",
     "api.code.comment": "Comment: {{text}}.",
     "api.code.varDeclValue": "Variable declaration: {{varName}} is assigned value {{varValue}}.",
     "api.code.varDeclDeclared": "Variable declaration: {{varName}} is declared.",
-    "api.code.varDeclFuncAssign": "Variable declaration: {{varName}} is assigned a function call to {{funcName}}.",
-    "api.code.varAssignFunc": "Variable assignment: {{left}} is assigned a function call to {{funcName}}.",
+    "api.code.varDeclFuncAssign": "Variable declaration: {{varName}} is assigned return value of function call {{funcName}}.",
+    "api.code.varAssignFunc": "Variable assignment: {{left}} is assigned return value of function call {{funcName}}.",
     "api.code.varAssignValue": "Variable assignment: {{left}} is assigned value {{right}}.",
     "api.code.funcCall": "Function call: {{funcName}}.",
     "api.code.argument": "Argument {{index}}: {{arg}}.",
@@ -451,7 +451,7 @@
       "emptyerror": "Song is empty!",
       "rendererror": "There was a problem rendering the script."
     },
-    "changepassword" : {
+    "changepassword": {
       "pwdauth": "Old password wrong. Password could not be changed.",
       "pwdfail": "Your password confirmation is not the same as your password.",
       "pwdlength": "Your password is too short. Passwords must be at least 5 characters long.",
@@ -463,13 +463,13 @@
       "servertimeout": "The was some problem at our end. Please try again.",
       "unexpectederror": "Unexpected error. Please try again or report error from the options menu."
     },
-    "forgotpassword" : {
+    "forgotpassword": {
       "fail": "The email address you entered is not valid or is not associated with an EarSketch account.",
       "success": "Please check your e-mail for a message from EarSketch to reset your password."
     },
-    "uploadcontroller" : {
+    "uploadcontroller": {
       "freesoundSelection": "Please select a sound from the Freesound search results...",
-      "userAuth" : "Not authenticated User ...",
+      "userAuth": "Not authenticated User ...",
       "wavsel": "Please select a valid audio file ...",
       "invalidfile": " is not a valid audio file ...",
       "undefinedconstant": "Undefined is not a valid constant...",
@@ -486,7 +486,7 @@
       "ff_mic_noaccess": "You have blocked access to your microphone. To enable recording, click the microphone icon in your browser's address bar to share your microphone with EarSketch. Then, try again.",
       "mic_noaccess": "You have blocked access to your microphone. To enable recording, unblock mic access in your browser's settings. Then, try again."
     },
-    "createaccount" : {
+    "createaccount": {
       "pwdfail": "Your password confirmation is not the same as your password.",
       "useralreadyexists": "Provided username or email already exists. Please try 'Forgot Password' feature if you cannot access your account.",
       "commerror": "Communication error ...",
@@ -515,7 +515,7 @@
       "savefailed": "Script could not be saved to the cloud. Please save your script offline to avoid losing changes.",
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "Some scripts could not be saved to the cloud. Please save your changes offline to avoid losing them.",
-      "closealltabs":"This will close all open tabs. Are you sure you want to proceed?"
+      "closealltabs": "This will close all open tabs. Are you sure you want to proceed?"
     },
     "shareScript": {
       "menuDescriptions": {
@@ -526,7 +526,7 @@
       "sharedViewOnly": "Shared {{scriptName}} as view-only with "
     }
   },
-  "api" : {
+  "api": {
     "noparams": "No Parameters",
     "parameters": "Parameters",
     "returnValue": "Return Value",
@@ -799,7 +799,6 @@
         "javascript": "// Add a sound on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5);"
       }
     },
-
 
     "insertMediaSection": {
       "description": "Inserts a part of a sound on a specified track at a specified location.",
