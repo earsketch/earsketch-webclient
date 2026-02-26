@@ -121,12 +121,14 @@ const Details = ({ obj }: { obj: APIItem }) => {
             <span dangerouslySetInnerHTML={{ __html: t(obj.descriptionKey) }} />
             {obj.parameters &&
             <div className="mt-4">
-                <div className="font-bold">{t("api:parameters")}</div>
+                <h3 className="font-bold">{t("api:parameters")}</h3>
                 {Object.entries(obj.parameters).map(([param, paramVal]) => (
                     <div key={param}>
                         <div className="ml-3 mt-2">
-                            <span className="font-bold text-sm">{param}</span>:&nbsp;
-                            <span className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
+                            <h4 aria-label={t("ariaDescriptors:api.parameterHeading", { parameterName: param, parameterType: t(paramVal.typeKey) })}>
+                                <span aria-hidden={true} className="font-bold text-sm">{t("api:heading", { headingName: param })}</span>
+                                <span aria-hidden={true} className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
+                            </h4>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
                             <div className="text-xs"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
@@ -142,11 +144,14 @@ const Details = ({ obj }: { obj: APIItem }) => {
             </div>}
             {obj.returns &&
             <div className="mt-4">
-                <span className="font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
+                <h3 aria-label={t("ariaDescriptors:api.returnHeading", { headingName: t("api:returnValue"), headingType: t(obj.returns.typeKey) })}>
+                    <span aria-hidden={true} className="font-bold">{t("api:heading", { headingName: t("api:returnValue") })}</span>
+                    <span aria-hidden={true} className="text-gray-600">{t(obj.returns.typeKey)}</span>
+                </h3>
                 <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
             </div>}
             <div className="mt-4">
-                <div className="font-bold mb-1">{t("api:example")}</div>
+                <h3 aria-label={t("ariaDescriptors:api.codeExample")} className="font-bold mb-1">{t("api:example")}</h3>
                 <div>
                     {/* note: don't indent the tags inside pre's! it will affect the styling */}
                     {language === "python"
