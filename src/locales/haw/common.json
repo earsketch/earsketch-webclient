@@ -50,6 +50,10 @@
     "scriptBrowser.filterDropdown.filterByOwner": "Filter By Owner",
     "scriptBrowser.filterDropdown.sortBy": "Sort By",
     "scriptBrowser.filterDropdown.sortByName": "Sort By {{filtername}}",
+    "scriptBrowser.filterDropdown.NameAZ": "A to Z",
+    "scriptBrowser.filterDropdown.NameZA": "Z to A",
+    "scriptBrowser.filterDropdown.DateNewest": "Date (Newest)",
+    "scriptBrowser.filterDropdown.DateOldest": "Date (Oldest)",
     "scriptBrowser.showDeleted": "Show deleted",
     "scriptBrowser.deletedscripts": "Deleted Scripts",
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
@@ -316,6 +320,16 @@
   "ariaDescriptors": {
     "api.closeFunctionDetails": "Close {{functionName}} function details",
     "api.openFunctionDetails": "Open {{functionName}} function details",
+    "api.code.comment": "Comment: {{text}}.",
+    "api.code.varDeclValue": "Variable declaration: {{varName}} is assigned value {{varValue}}.",
+    "api.code.varDeclDeclared": "Variable declaration: {{varName}} is declared.",
+    "api.code.varDeclFuncAssign": "Variable declaration: {{varName}} is assigned return value of function call {{funcName}}.",
+    "api.code.varAssignFunc": "Variable assignment: {{left}} is assigned return value of function call {{funcName}}.",
+    "api.code.varAssignValue": "Variable assignment: {{left}} is assigned value {{right}}.",
+    "api.code.funcCall": "Function call: {{funcName}}.",
+    "api.code.argument": "Argument {{index}}: {{arg}}.",
+    "api.code.codeLine": "Code: {{line}}.",
+    "api.code.noCode": "No code detected.",
     "contentManager.close": "Close Content Manager",
     "contentManager.scriptName": "Script Name",
     "curriculum.switchScriptLanguage": "Switch script language to {{language}}",
@@ -358,7 +372,11 @@
     "sounds.artistFilter": "Select one or more artists to filter by",
     "sounds.genreFilter": "Select one or more genres to filter by",
     "sounds.instrumentFilter": "Select one or more instruments to filter by",
-    "sounds.keyFilter": "Select one or more key signatures to filter by"
+    "sounds.keyFilter": "Select one or more key signatures to filter by",
+    "recorder.stopRecording": "Stop recording",
+    "recorder.stopPreview": "Stop preview",
+    "recorder.startPreview": "Start preview",
+    "recorder.startRecording": "Start recording"
   },
   "bubble": {
     "userLanguage": "Language",
@@ -1190,6 +1208,7 @@
   },
   "templates": {
     "python": "# description: \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "python3": "# description: \nfrom __future__ import python3\nfrom earsketch import *\n\nsetTempo(120)\n",
     "javascript": "// description: \nsetTempo(120);\n"
   },
   "console": {

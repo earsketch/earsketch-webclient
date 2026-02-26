@@ -50,6 +50,10 @@
     "scriptBrowser.filterDropdown.filterByOwner": "Egasi Bo'yicha Filtrla",
     "scriptBrowser.filterDropdown.sortBy": "Saralash",
     "scriptBrowser.filterDropdown.sortByName": "{{filtername}} Bo'yicha Sarala",
+    "scriptBrowser.filterDropdown.NameAZ": "A to Z",
+    "scriptBrowser.filterDropdown.NameZA": "Z to A",
+    "scriptBrowser.filterDropdown.DateNewest": "Date (Newest)",
+    "scriptBrowser.filterDropdown.DateOldest": "Date (Oldest)",
     "scriptBrowser.showDeleted": "O'chirilganlarni ko'rsatish",
     "scriptBrowser.deletedscripts": "O'chirilgan Skriptlar",
     "scriptBrowser.openInEditor": "{{name}}ni Kod Redaktorida Och",
@@ -316,6 +320,16 @@
   "ariaDescriptors": {
     "api.closeFunctionDetails": "{{functionName}} funksiyasi xaqida detallarni yopish",
     "api.openFunctionDetails": "{{functionName}} funksiyasi xaqida detallarni ochish",
+    "api.code.comment": "Comment: {{text}}.",
+    "api.code.varDeclValue": "Variable declaration: {{varName}} is assigned value {{varValue}}.",
+    "api.code.varDeclDeclared": "Variable declaration: {{varName}} is declared.",
+    "api.code.varDeclFuncAssign": "Variable declaration: {{varName}} is assigned return value of function call {{funcName}}.",
+    "api.code.varAssignFunc": "Variable assignment: {{left}} is assigned return value of function call {{funcName}}.",
+    "api.code.varAssignValue": "Variable assignment: {{left}} is assigned value {{right}}.",
+    "api.code.funcCall": "Function call: {{funcName}}.",
+    "api.code.argument": "Argument {{index}}: {{arg}}.",
+    "api.code.codeLine": "Code: {{line}}.",
+    "api.code.noCode": "No code detected.",
     "contentManager.close": "Kontent boshaqruvchini yop",
     "contentManager.scriptName": "Skript nomi",
     "curriculum.switchScriptLanguage": "Skript tilini {{language}} tiliga o'zgartirish",
@@ -358,7 +372,11 @@
     "sounds.artistFilter": "Filtrlash uchun bir yoki undan ortiq bastakor tanlang",
     "sounds.genreFilter": "Filtrlash uchun bir yoki undan ortiq janr tanlang",
     "sounds.instrumentFilter": "Filtrlash uchun bir yoki undan ortiq instrument tanlang",
-    "sounds.keyFilter": "Filtrlash uchun bir yoki undan ortiq musiqa kalitini tanlang"
+    "sounds.keyFilter": "Filtrlash uchun bir yoki undan ortiq musiqa kalitini tanlang",
+    "recorder.stopRecording": "Stop recording",
+    "recorder.stopPreview": "Stop preview",
+    "recorder.startPreview": "Start preview",
+    "recorder.startRecording": "Start recording"
   },
   "bubble": {
     "userLanguage": "Til",
@@ -497,7 +515,7 @@
       "success": "Skript muvaffaqiyatli ishga tushdi",
       "overwrite": "Bu nom allaqachon mavjud. Iltimos, noyob nom bering yoki avval mavjud skript nomini o'zgartiring.",
       "overwriteDeleted": "Bu nom o'chirilgan skriptlarda mavjud. Iltimos, noyob nom tanlang yoki o'chirilgan skriptni qayta tiklab uning nomini o'zgartiring.",
-      "illegalname": "Fayl nomlashda faqat kichik harflar, raqamlar yoki _ dan foydalaning.",
+      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
       "savefailed": "Skriptni bulutli zaxiraga saqlab bo‘lmadi. O'zgarishlarni yo'qotmaslik uchun skriptingizni oflayn rejimda saqlang.",
       "blocksError": "{{error}} Blok rejimiga kira olmadik",
       "saveallfailed": "Ayrim skriptlarni bulutli zaxiraga saqlab bo‘lmadi. Iltimos, o'zgartirishlarni yo'qotmaslik uchun oflayn rejimda saqlang.",
@@ -1190,6 +1208,7 @@
   },
   "templates": {
     "python": "# ta'rif: \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "python3": "# description: \nfrom __future__ import python3\nfrom earsketch import *\n\nsetTempo(120)\n",
     "javascript": "// ta'rif: \nsetTempo(120);\n"
   },
   "console": {

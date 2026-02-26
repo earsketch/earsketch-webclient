@@ -50,6 +50,10 @@
     "scriptBrowser.filterDropdown.filterByOwner": "Nach Besitzer filtern",
     "scriptBrowser.filterDropdown.sortBy": "Sortieren nach",
     "scriptBrowser.filterDropdown.sortByName": "Nach {{filtername}} sortieren",
+    "scriptBrowser.filterDropdown.NameAZ": "A to Z",
+    "scriptBrowser.filterDropdown.NameZA": "Z to A",
+    "scriptBrowser.filterDropdown.DateNewest": "Date (Newest)",
+    "scriptBrowser.filterDropdown.DateOldest": "Date (Oldest)",
     "scriptBrowser.showDeleted": "Gelöschte anzeigen",
     "scriptBrowser.deletedscripts": "Gelöschte Skripte",
     "scriptBrowser.openInEditor": "{{name}} im Code Editor öffnen",
@@ -316,6 +320,16 @@
   "ariaDescriptors": {
     "api.closeFunctionDetails": "{{functionName}} Funktionsdetails schließen",
     "api.openFunctionDetails": "{{functionName}} Funktionsdetails öffnen",
+    "api.code.comment": "Comment: {{text}}.",
+    "api.code.varDeclValue": "Variable declaration: {{varName}} is assigned value {{varValue}}.",
+    "api.code.varDeclDeclared": "Variable declaration: {{varName}} is declared.",
+    "api.code.varDeclFuncAssign": "Variable declaration: {{varName}} is assigned return value of function call {{funcName}}.",
+    "api.code.varAssignFunc": "Variable assignment: {{left}} is assigned return value of function call {{funcName}}.",
+    "api.code.varAssignValue": "Variable assignment: {{left}} is assigned value {{right}}.",
+    "api.code.funcCall": "Function call: {{funcName}}.",
+    "api.code.argument": "Argument {{index}}: {{arg}}.",
+    "api.code.codeLine": "Code: {{line}}.",
+    "api.code.noCode": "No code detected.",
     "contentManager.close": "Content-Manager schließen",
     "contentManager.scriptName": "Skriptname",
     "curriculum.switchScriptLanguage": "Skriptsprache zu {{language}} wechseln",
@@ -358,7 +372,11 @@
     "sounds.artistFilter": "Wähle einen oder mehrere Artists zum Filtern aus",
     "sounds.genreFilter": "Wähle einen oder mehrere Genres zum Filtern aus",
     "sounds.instrumentFilter": "Wähle einen oder mehrere Instrumente zum Filtern aus",
-    "sounds.keyFilter": "Wähle einen oder mehrere Schlüsselsignaturen zum Filtern aus"
+    "sounds.keyFilter": "Wähle einen oder mehrere Schlüsselsignaturen zum Filtern aus",
+    "recorder.stopRecording": "Stop recording",
+    "recorder.stopPreview": "Stop preview",
+    "recorder.startPreview": "Start preview",
+    "recorder.startRecording": "Start recording"
   },
   "bubble": {
     "userLanguage": "Sprache",
@@ -497,7 +515,7 @@
       "success": "Skript erfolgreich ausgeführt",
       "overwrite": "Dieser Name existiert bereits. Bitte gib einen eindeutigen Namen ein oder benenne zuerst das vorhandene Skript um.",
       "overwriteDeleted": "Dieser Name existiert bereits in deinen gelöschten Skripten. Bitte gebe einen eindeutigen Namen ein oder stelle das gelöschte Skript wieder her und benenne es um.",
-      "illegalname": "Bitte verwende in Dateinamen nur reguläre Zeichen, Zahlen oder „_“ (Unterstrich).",
+      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
       "savefailed": "Das Skript konnte nicht in der Cloud gespeichert werden. Bitte speichere dein Skript offline, um den Verlust von Änderungen zu vermeiden.",
       "blocksError": "Konnte den Block-Modus nicht betreten: {{error}}",
       "saveallfailed": "Einige Skripte konnten nicht in der Cloud gespeichert werden. Bitte speichere deine Änderungen offline, damit sie nicht verloren gehen.",
@@ -1190,6 +1208,7 @@
   },
   "templates": {
     "python": "# Beschreibung: \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "python3": "# description: \nfrom __future__ import python3\nfrom earsketch import *\n\nsetTempo(120)\n",
     "javascript": "// Beschreibung: \nsetTempo(120);\n"
   },
   "console": {
