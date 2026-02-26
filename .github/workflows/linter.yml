@@ -74,10 +74,13 @@ jobs:
           VALIDATE_TYPESCRIPT_ES: false
           VALIDATE_TYPESCRIPT_STANDARD: false
           VALIDATE_TSX: false
-          VALIDATE_JAVASCRIPT_PRETTIER: false
           VALIDATE_JSX: false
           VALIDATE_JSON: false
           VALIDATE_MARKDOWN: false
+          VALIDATE_HTML_PRETTIER: false
+          VALIDATE_MARKDOWN_PRETTIER: false
+          VALIDATE_TYPESCRIPT_PRETTIER: false
+          VALIDATE_JAVASCRIPT_PRETTIER: false
           FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*|.*tests/cypress/component/.*.results.js|.*tests/cypress/fixtures/.*|.*node_modules/.*)
 
       - name: Run ESLint
