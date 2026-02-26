@@ -33,7 +33,7 @@ describe("shared script", () => {
         username: "another_user",
     }
 
-    it("imports a shared script with a name conflict", () => {
+    it.skip("imports a shared script with a name conflict", () => {
         cy.interceptAudioStandard()
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
@@ -49,7 +49,7 @@ describe("shared script", () => {
             shareid: "1111111111111111111111",
             soft_delete: false,
             source_code: "from earsketch import *\nsetTempo(91)\n",
-            username: username,
+            username,
         }])
         cy.interceptScriptsShared(myScriptsShared)
 

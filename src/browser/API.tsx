@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react"
+import { useState, ChangeEvent, useMemo } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -7,7 +7,7 @@ import * as api from "./apiState"
 import type { APIItem, APIParameter } from "../api/api"
 import { selectScriptLanguage } from "../app/appState"
 
-import { SearchBar } from "./Utils"
+import { SearchBar, analyzeJavaScriptCode, analyzePythonCode } from "./Utils"
 import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
 import * as cai from "../cai/caiState"
@@ -17,11 +17,22 @@ import { Language } from "common"
 
 const Code = ({ source, language }: { source: string, language: Language }) => {
     const { light, dark } = highlight(source, language)
+    const { t } = useTranslation()
+    const getAriaLabel = useMemo(() => {
+        if (language === "python") {
+            return analyzePythonCode(source, t)
+        } else if (language === "javascript") {
+            return analyzeJavaScriptCode(source, t)
+        } else {
+            return "Code Example"
+        }
+    }, [source, language, t])
+
     return <>
-        <code className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>
+        <code aria-label={getAriaLabel} className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>
             {light}
         </code>
-        <code className={language + " whitespace-pre overflow-x-auto hidden dark:block"}>
+        <code aria-label={getAriaLabel} className={language + " whitespace-pre overflow-x-auto hidden dark:block"}>
             {dark}
         </code>
     </>
