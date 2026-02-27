@@ -291,7 +291,7 @@ async function runScript() {
     ideConsole.clear()
     // The following setTimeout is needed to ensure that the console is cleared before the script is run,
     // so that screen readers will announce all messages in the console, regardless of if they were present in the previous run.
-    await new Promise<void>(resolve => setTimeout(resolve, 0))
+    await new Promise<void>(resolve => window.setTimeout(resolve, 0))
     ideConsole.status(i18n.t("messages:idecontroller.running"))
 
     const scriptID = tabs.selectActiveTabID(state)
