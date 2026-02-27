@@ -406,7 +406,6 @@ export function jumpToLine(lineNumber: number) {
     const lineText = line.text
     const originalLabel = view.contentDOM.getAttribute("aria-label") || "Code Editor"
 
-
     view.contentDOM.setAttribute("aria-label", `Line ${lineNumber}: ${lineText}`)
     view.dispatch({
         selection: { anchor: line.from },
