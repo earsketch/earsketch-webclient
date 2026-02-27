@@ -102,7 +102,7 @@ export function getDAWDataDifferences(previous: DAWData, current: DAWData): stri
                         trackNum,
                         filekeys: addedFilekeys.join(", "),
                         spanStart: currentSpanStart,
-                        spanEnd: currentSpanEnd
+                        spanEnd: currentSpanEnd,
                     }))
                 } else if (removedFilekeys.length > 0 && addedFilekeys.length === 0) {
                     // Only removals - use current span to show where the track is now
@@ -110,7 +110,7 @@ export function getDAWDataDifferences(previous: DAWData, current: DAWData): stri
                         trackNum,
                         filekeys: removedFilekeys.join(", "),
                         spanStart: currentSpanStart,
-                        spanEnd: currentSpanEnd
+                        spanEnd: currentSpanEnd,
                     }))
                 } else {
                     // Both added and removed - use current span
@@ -173,14 +173,14 @@ export function getDAWDataDifferences(previous: DAWData, current: DAWData): stri
                     differences.push(i18n.t("messages:idecontroller.trackEffectTypesAdded", {
                         trackNum,
                         count: addedEffectTypes.length,
-                        effects: addedEffectTypes.join(", ")
+                        effects: addedEffectTypes.join(", "),
                     }))
                 }
                 if (removedEffectTypes.length > 0) {
                     differences.push(i18n.t("messages:idecontroller.trackEffectTypesRemoved", {
                         trackNum,
                         count: removedEffectTypes.length,
-                        effects: removedEffectTypes.join(", ")
+                        effects: removedEffectTypes.join(", "),
                     }))
                 }
             }
