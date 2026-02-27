@@ -81,7 +81,7 @@ jobs:
           VALIDATE_MARKDOWN_PRETTIER: false
           VALIDATE_TYPESCRIPT_PRETTIER: false
           VALIDATE_JAVASCRIPT_PRETTIER: false
-          FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*|.*tests/cypress/component/.*.results.js|.*tests/cypress/fixtures/.*|.*node_modules/.*)
+          FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*|.*tests/cypress/component/.*.results.js|.*tests/cypress/fixtures/.*|.*node_modules/.*|tests/vitest/fixtures/.*)
 
       - name: Run ESLint
         run: npm run lint:report
