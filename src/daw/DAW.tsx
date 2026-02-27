@@ -15,7 +15,7 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
-import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
+import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines, jumpToLine } from "../ide/Editor"
 import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
@@ -407,14 +407,19 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     }, [clip, xScale, trackHeight])
     return <button
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
+        data-source-line={clip.sourceLine}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
-        role = "navigation" aria-label={`${clip.filekey} from measure ${clip.clipFamilyStart || (clip.measure + clip.start - 1)} to ${clip.clipFamilyEnd || (clip.measure + clip.end - 1)}`}
-        onClick={() => {
-            player.setPreview(clip.track)
-            player.play(clip.clipFamilyStart || (clip.measure + clip.start - 1), 0,
-                clip.clipFamilyEnd || (clip.measure + clip.end - 1))
+        aria-label={`on track ${clip.track} from measure ${clip.clipFamilyStart || (clip.measure + clip.start - 1)} to ${clip.clipFamilyEnd || (clip.measure + clip.end - 1)} ${clip.filekey} `}
+        onClick={(e: React.MouseEvent) => {
+            if (e.ctrlKey || e.metaKey) {
+                jumpToLine(clip.sourceLine)
+            } else {
+                player.setPreview(clip.track)
+                player.play(clip.clipFamilyStart || (clip.measure + clip.start - 1), 0,
+                    clip.clipFamilyEnd || (clip.measure + clip.end - 1))
+            }
         }}
 
     >
