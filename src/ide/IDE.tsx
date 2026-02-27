@@ -289,9 +289,10 @@ async function runScript() {
 
     editor.clearErrors()
     ideConsole.clear()
+    // The following setTimeout is needed to ensure that the console is cleared before the script is run,
+    // so that screen readers will announce all messages in the console, regardless of if they were present in the previous run.
     await new Promise<void>(resolve => setTimeout(resolve, 0))
     ideConsole.status(i18n.t("messages:idecontroller.running"))
-    // await new Promise<void>(resolve => setTimeout(resolve, 2000))
 
     const scriptID = tabs.selectActiveTabID(state)
     const script = scriptsState.selectAllScripts(store.getState())[scriptID!]
@@ -305,6 +306,7 @@ async function runScript() {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
         setLoading(false)
+        ideConsole.status(i18n.t("messages:interpreter.runFailed"))
         ideConsole.error(error)
         editor.highlightError(error)
 
