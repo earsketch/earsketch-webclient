@@ -17,7 +17,7 @@ import { gutter, GutterMarker, keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setPreview, previewPlugin, setAppLocale, setShowBeatStringAnnotation } from "./EditorWidgets"
-
+import { playEarcon } from "../audio/earcon"
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
@@ -209,7 +209,16 @@ const pythonAutocomplete: CompletionSource = (context) => autocompleteEnabled ? 
 // Internal state
 let view: EditorView = null as unknown as EditorView
 let sessions: { [key: string]: EditorSession } = {}
-const keyBindings: { key: string, run: () => boolean }[] = []
+const keyBindings: { key: string, run: () => boolean }[] = [
+    {
+        key: "Ctrl-Enter",
+        run: () => {
+            const currentLine = view.state.doc.lineAt(view.state.selection.main.head)
+            jumpToDAWClip(currentLine.number)
+            return true
+        },
+    },
+]
 let resolveReady: () => void
 let droplet: any
 
@@ -391,6 +400,35 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
             return { color: p.color, pos: line.from }
         })),
     })
+}
+export function jumpToLine(lineNumber: number) {
+    const line = view.state.doc.line(lineNumber)
+    const lineText = line.text
+    const originalLabel = view.contentDOM.getAttribute("aria-label") || "Code Editor"
+
+    view.contentDOM.setAttribute("aria-label", `Line ${lineNumber}: ${lineText}`)
+    view.dispatch({
+        selection: { anchor: line.from },
+        scrollIntoView: true,
+    })
+    view.focus()
+
+    // eslint-disable-next-line no-restricted-globals
+    setTimeout(() => {
+        view.contentDOM.setAttribute("aria-label", originalLabel)
+    }, 1000)
+}
+function jumpToDAWClip(lineNumber: number) {
+    const clipButton = document.querySelector(`button[data-source-line="${lineNumber}"]`) as HTMLButtonElement
+    if (clipButton) {
+        const currentLabel = clipButton.getAttribute("aria-label") || ""
+        if (!currentLabel.startsWith("Focus shifted to DAW")) {
+            clipButton.setAttribute("aria-label", `Focus shifted to DAW, ${currentLabel}`)
+        }
+        clipButton.focus()
+    } else {
+        playEarcon("/earcon/sine_bump.wav", 0.3)
+    }
 }
 
 // Callbacks
