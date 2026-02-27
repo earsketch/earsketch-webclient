@@ -434,7 +434,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
         const startShaking = () => {
             setShaking(false)
-            setTimeout(() => setShaking(true), 0)
+            window.setTimeout(() => setShaking(true), 0)
         }
 
         if (!view) {

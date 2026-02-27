@@ -54,7 +54,7 @@ if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
                 addToNodeHistory(["Begin Code Edit", firstEdit])
             }
 
-            clearTimeout(caiTimer)
+            window.clearTimeout(caiTimer)
             caiTimer = window.setTimeout(() => {
                 store.dispatch(checkForCodeUpdates())
                 const lastEdit = Date.now()
@@ -366,7 +366,7 @@ export const autoScrollCai = createAsyncThunk<void, void, ThunkAPI>(
     () => {
         // Auto scroll to the bottom (set on a timer to happen after message updates).
         const caiBody = document.getElementById("cai-body")
-        setTimeout(() => {
+        window.setTimeout(() => {
             if (caiBody) {
                 caiBody.scrollTop = caiBody.scrollHeight
             }

@@ -162,7 +162,7 @@ async function runPython(code: string) {
             }
         }
         // Use `setTimeout` to give the event loop the chance to run other tasks.
-        setTimeout(() => {
+        window.setTimeout(() => {
             try {
                 resolve(susp.resume())
             } catch (e) {
@@ -249,7 +249,7 @@ async function runJavaScript(code: string) {
 }
 
 function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise(resolve => window.setTimeout(resolve, ms))
 }
 
 // This is a helper function for running JS-Interpreter to allow for script

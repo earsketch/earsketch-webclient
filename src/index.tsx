@@ -36,12 +36,12 @@ import jsWorkerUrl from "ace-builds/src-noconflict/worker-javascript?url"
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
 if (ESUtils.isMobileBrowser()) {
-    alert("It appears you are using a mobile browser. EarSketch is not equipped for mobile use.")
+    window.alert("It appears you are using a mobile browser. EarSketch is not equipped for mobile use.")
 }
 
 // Check for IE <= 10. This excludes 11, which returns appName as "Netscape" (like every other browser).
 if (window.navigator.appName === "Microsoft Internet Explorer") {
-    if (/MSIE ([0-9]{1,}[.0-9]{0,})/.exec(navigator.userAgent) !== null) {
+    if (/MSIE ([0-9]{1,}[.0-9]{0,})/.exec(window.navigator.userAgent) !== null) {
         if (!Number.isNaN(parseFloat(RegExp.$1))) {
             window.location.replace("sorry.html")
         }
@@ -51,14 +51,14 @@ if (window.navigator.appName === "Microsoft Internet Explorer") {
 // Check for minimum version of Chrome/Firefox. TODO: Update?
 const M = ESUtils.whichBrowser().split(" ")
 if ((M[0] === "Chrome" && +M[1] < 43) || (M[0] === "Firefox" && +M[1] < 36) || (M[0] === "Safari" && +M[1] < 14.1)) {
-    alert("It appears you are using version " + M[1] + " of " + M[0] + ". Please upgrade your browser so that EarSketch functions properly.")
+    window.alert("It appears you are using version " + M[1] + " of " + M[0] + ". Please upgrade your browser so that EarSketch functions properly.")
 }
 
 // Load the normal React app.
 let Content
-if (/\/autograder\w*\/?$/.test(location.href)) {
+if (/\/autograder\w*\/?$/.test(window.location.href)) {
     Content = Autograder
-} else if (/\/codeAnalyzer\w*\/?$/.test(location.href)) {
+} else if (/\/codeAnalyzer\w*\/?$/.test(window.location.href)) {
     Content = CodeAnalyzer
 } else {
     Content = App
