@@ -301,6 +301,7 @@
     "shortcuts.zoomVertical": "Zoom (Vertical)",
     "shortcuts.escapeEditor": "Escape editor focus",
     "shortcuts.playPause": "Play / Pause",
+    "shortcuts.jumpToCodeDaw": "Jump To Daw/ Jump to Code",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
