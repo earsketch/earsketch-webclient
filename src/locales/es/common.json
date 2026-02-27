@@ -89,6 +89,8 @@
     "daw.tooltip.toggleEffects": "Aplicar/quitar todos los efectos",
     "daw.bypass": "Bypass",
     "daw.needsSync": "Run the script to sync the DAW",
+    "daw.mix": "spMix",
+    "daw.mixTrack": "spMix Track",
     "newScript": "Nuevo script",
     "editor.title": "Editor de código",
     "editor.blocksMode": "Modo de bloque",

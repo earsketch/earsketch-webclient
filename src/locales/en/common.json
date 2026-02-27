@@ -93,6 +93,8 @@
     "daw.tooltip.toggleEffects": "Toggle All Effects",
     "daw.bypass": "Bypass",
     "daw.needsSync": "Run the script to sync the DAW",
+    "daw.mix": "Mix",
+    "daw.mixTrack": "Mix Track",
     "newScript": "New script",
     "editor.title": "Code Editor",
     "editor.blocksMode": "Blocks Mode",
