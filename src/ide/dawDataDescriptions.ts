@@ -24,6 +24,12 @@ export function roundToDecimalPlaces(num: number, places: number) {
     return Math.round(num * factor) / factor
 }
 
+// Helper function to check if two arrays are identical (order-sensitive)
+function arraysAreIdentical<T>(arr1: T[], arr2: T[]): boolean {
+    if (arr1.length !== arr2.length) return false
+    return arr1.every((value, index) => value === arr2[index])
+}
+
 // Function to compare two DAWData objects and return human-readable differences
 export function getDAWDataDifferences(previous: DAWData, current: DAWData): string[] {
     if (!previous || (!previous.tracks && !previous.length)) {
@@ -63,7 +69,31 @@ export function getDAWDataDifferences(previous: DAWData, current: DAWData): stri
         }
     }
 
-    // Compare tracks in detail (skip first track which is metronome)
+    // Compare mix track (index 0) for effects only
+    const prevMixTrack = previous.tracks?.[0]
+    const currentMixTrack = current.tracks?.[0]
+    if (prevMixTrack && currentMixTrack) {
+        const prevMixEffectKeys = new Set(Object.keys(prevMixTrack.effects || {}))
+        const currentMixEffectKeys = new Set(Object.keys(currentMixTrack.effects || {}))
+
+        const addedMixEffectTypes = [...currentMixEffectKeys].filter(key => !prevMixEffectKeys.has(key))
+        const removedMixEffectTypes = [...prevMixEffectKeys].filter(key => !currentMixEffectKeys.has(key))
+
+        if (addedMixEffectTypes.length > 0) {
+            differences.push(i18n.t("messages:idecontroller.mixTrackEffectTypesAdded", {
+                count: addedMixEffectTypes.length,
+                effects: addedMixEffectTypes.join(", "),
+            }))
+        }
+        if (removedMixEffectTypes.length > 0) {
+            differences.push(i18n.t("messages:idecontroller.mixTrackEffectTypesRemoved", {
+                count: removedMixEffectTypes.length,
+                effects: removedMixEffectTypes.join(", "),
+            }))
+        }
+    }
+
+    // Compare regular tracks in detail (skip first track which is mix track)
     const maxTracks = Math.max((previous.tracks?.length || 0), (current.tracks?.length || 0))
     for (let trackIndex = 1; trackIndex < maxTracks; trackIndex++) {
         const prevTrack = previous.tracks?.[trackIndex]
@@ -132,7 +162,10 @@ export function getDAWDataDifferences(previous: DAWData, current: DAWData): stri
                 const prevPositionSet = new Set(prevClipPositions)
                 const currentPositionSet = new Set(currentClipPositions)
 
-                if (prevClipPositions.sort().join(",") !== currentClipPositions.sort().join(",")) {
+                const sortedPrev = prevClipPositions.sort()
+                const sortedCurrent = currentClipPositions.sort()
+
+                if (!arraysAreIdentical(sortedPrev, sortedCurrent)) {
                     // Find filekeys whose positions changed
                     const changedFilekeys = new Set<string>()
 
