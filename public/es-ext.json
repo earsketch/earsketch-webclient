@@ -1,0 +1,23 @@
+{
+  "manifest_version": 1,
+  "name": "Side panel extension",
+  "version": "1.0",
+  "description": "Extension with a default side panel.",
+  "icons": {
+    "32": "earsktch_extension_icon_32.png",
+    "128": "earsktch_extension_icon_128.png"
+  },
+  "side_panel": {
+    "default_path": "myExtension.html"
+  },
+  "permissions": [
+    "sidePanel",
+    "colorTheme",
+    "currentUser",
+    "getEditorContents",
+    "getScriptExecutionResult",
+    "getDawState",
+    "getColorTheme",
+    "getCurrentUser"
+  ]
+}
