@@ -420,7 +420,7 @@ export function jumpToLine(lineNumber: number) {
         view.contentDOM.setAttribute("aria-label", originalLabel)
     }, 1000)
 }
-export function jumpToDAWClip(lineNumber: number) {
+function jumpToDAWClip(lineNumber: number) {
     const clipButton = document.querySelector(`button[data-source-line="${lineNumber}"]`) as HTMLButtonElement
     if (clipButton) {
         const currentLabel = clipButton.getAttribute("aria-label") || ""
