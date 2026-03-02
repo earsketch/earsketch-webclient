@@ -26,6 +26,8 @@
     "soundBrowser.expandSoundFolder": "Soundordner erweitern {{folder}}",
     "soundBrowser.expandFilters": "Sound-Browser-Filter-Taste aufklappen",
     "soundBrowser.collapseFilters": "Sound-Browser-Filter-Taste einklappen",
+    "soundBrowser.filterHeader": "Filter",
+    "soundBrowser.soundHeader": "Sound Library",
     "soundBrowser.clearFilters": "Filter zurücksetzen",
     "soundBrowser.filterDropdown.artists": "Artists",
     "soundBrowser.filterDropdown.genres": "Genres",
