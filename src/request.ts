@@ -57,7 +57,7 @@ export async function getAuth(endpoint: string, params?: { [key: string]: string
 }
 
 export async function getBasicAuth(endpoint: string, username: string, password: string, params?: { [key: string]: string; }) {
-    return get(endpoint, params, { Authorization: "Basic " + btoa(username + ":" + password) })
+    return get(endpoint, params, { Authorization: "Basic " + window.btoa(username + ":" + password) })
 }
 // Expects form data, returns JSON or a string depending on response content type.
 
@@ -74,7 +74,7 @@ export async function postAuth(endpoint: string, data: { [key: string]: string; 
 }
 
 export async function postBasicAuth(endpoint: string, username: string, password: string, data: { [key: string]: string; } = {}) {
-    return post(endpoint, data, { Authorization: "Basic " + btoa(username + ":" + password) })
+    return post(endpoint, data, { Authorization: "Basic " + window.btoa(username + ":" + password) })
 }
 
 export async function postForm(endpoint: string, data: { [key: string]: string | Blob; }) {

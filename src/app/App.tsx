@@ -1,6 +1,6 @@
 import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
@@ -14,28 +14,21 @@ import { ConfettiLauncher } from "./Confetti"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { Script, SoundEntity } from "common"
-import { CompetitionSubmission } from "./CompetitionSubmission"
 import * as curriculum from "../browser/curriculumState"
-import { Download } from "./Download"
 import { ErrorForm } from "./ErrorForm"
 import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
-import * as Editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
 import { chooseDetectedLanguage, LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
-import { RenameScript, RenameSound } from "./Rename"
+import { RenameSound } from "./Rename"
 import reporter from "./reporter"
-import { ScriptAnalysis } from "./ScriptAnalysis"
-import { ScriptHistory } from "./ScriptHistory"
-import { ScriptShare } from "./ScriptShare"
 import * as scriptsState from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
-import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/Sounds"
 import * as soundsState from "../browser/soundsState"
 import * as soundsThunks from "../browser/soundsThunks"
@@ -46,13 +39,14 @@ import * as tabThunks from "../ide/tabThunks"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
-import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice } from "../Utils"
+import { Prompt, PromptChoice, confirm } from "../Utils"
 import * as websocket from "./websocket"
 
 import esLogo from "./ES_logo_extract.svg"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
+import { downloadScript, shareScript } from "./scriptActions"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -102,11 +96,11 @@ sounds.callbacks.upload = openUploadWindow
 function loadLocalScripts() {
     // Migration code: if any anonymous users have saved scripts from before PR #198, bring them in to Redux state.
     const LS_SCRIPTS_KEY = "scripts_v1"
-    const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
+    const scriptData = window.localStorage.getItem(LS_SCRIPTS_KEY)
     if (scriptData !== null) {
         const scripts = JSON.parse(scriptData) as { [key: string]: Script }
         store.dispatch(scriptsState.setRegularScripts(Object.assign({}, scriptsState.selectRegularScripts(store.getState()), scripts)))
-        localStorage.removeItem(LS_SCRIPTS_KEY)
+        window.localStorage.removeItem(LS_SCRIPTS_KEY)
     }
 
     // Back up active tab. (See comment below re. setActiveTabAndEditor.)
@@ -155,41 +149,46 @@ async function postLogin(username: string) {
         store.dispatch(caiState.resetState())
     }
 
-    // Copy scripts local storage to the web service.
-    // TODO: Break out into separate function?
-    const saved = scriptsState.selectRegularScripts(store.getState())
-    await refreshCodeBrowser()
-    if (Object.keys(saved).length > 0) {
-        const promises = []
-        for (const script of Object.values(saved)) {
-            if (!script.soft_delete) {
-                if (script.creator !== undefined && script.creator !== username && script.creator !== "earsketch") {
-                    if (script.original_id !== undefined) {
-                        promises.push(scriptsThunks.importSharedScript(script.original_id))
-                    }
-                } else {
-                    const tabEditorSession = Editor.getSession(script.shareid)
-                    if (tabEditorSession) {
-                        promises.push(store.dispatch(scriptsThunks.saveScript({
-                            name: script.name,
-                            source: Editor.getContents(Editor.getSession(script.shareid)),
-                            overwrite: false,
-                            ...(script.creator === "earsketch" && { creator: "earsketch" }),
-                        })).unwrap())
-                    }
-                }
-            }
-        }
+    // Migrate scripts created or imported while logged out to the user's account.
+    const state = store.getState()
+    const saved = scriptsState.selectRegularScripts(state)
+    const openTabs = tabs.selectOpenTabs(state)
 
+    // Fetch the user's scripts now that they're logged in.
+    // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
+    await refreshScriptBrowser()
+
+    const promises = []
+    for (const script of Object.values(saved)) {
+        if (script.soft_delete) {
+            // Don't migrate scripts the user deleted while logged out.
+            continue
+        }
+        let promise
+        if (script.original_id !== undefined) {
+            promise = scriptsThunks.importSharedScript(script.original_id)
+        } else {
+            promise = store.dispatch(scriptsThunks.saveScript({
+                name: script.name,
+                source: script.source_code,
+                overwrite: false,
+                ...(script.creator === "earsketch" && { creator: "earsketch" }),
+            })).unwrap()
+        }
+        const reopen = openTabs.includes(script.shareid)
+        promise = promise.then(script => ({ script, reopen }))
+        promises.push(promise)
+    }
+
+    if (promises.length > 0) {
         store.dispatch(tabThunks.resetTabs())
 
-        const savedScripts = await Promise.all(promises)
-
-        await refreshCodeBrowser()
-        // once all scripts have been saved open them
-        for (const savedScript of savedScripts) {
-            if (savedScript) {
-                store.dispatch(tabThunks.setActiveTabAndEditor(savedScript.shareid))
+        const results = await Promise.all(promises)
+        // Re-open scripts that were opened before login (which now have new IDs).
+        // TODO: Ideally, we would preserve the order of the open tabs.
+        for (const { script, reopen } of results) {
+            if (reopen) {
+                store.dispatch(tabThunks.setActiveTabAndEditor(script.shareid))
             }
         }
     }
@@ -208,7 +207,7 @@ async function postLogin(username: string) {
     websocket.login(username)
 }
 
-async function refreshCodeBrowser() {
+async function refreshScriptBrowser() {
     if (user.selectLoggedIn(store.getState())) {
         const fetchedScripts: Script[] = await request.getAuth("/scripts/owned")
 
@@ -228,118 +227,13 @@ async function refreshCodeBrowser() {
     }
 }
 
-export async function renameScript(script: Script) {
-    const name = await openModal(RenameScript, { script })
-    if (!name) return
-    try {
-        // exception occurs below if api call fails
-        await scriptsThunks.renameScript(script, name)
-    } catch {
-        userNotification.show(i18n.t("messages:createaccount.commerror"), "failure1")
-        return
-    }
-    reporter.renameScript()
-}
-
-export function downloadScript(script: Script) {
-    openModal(Download, { script })
-}
-
-export async function openScriptHistory(script: Script, allowRevert: boolean) {
-    if (!script.isShared) {
-        // saveScript() saves regular scripts - if called for shared scripts, it will create a local copy (#2663).
-        await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
-    }
-    store.dispatch(tabs.removeModifiedScript(script.shareid))
-    openModal(ScriptHistory, { script, allowRevert })
-    reporter.openHistory()
-}
-
-export function openCodeIndicator(script: Script) {
-    openModal(ScriptAnalysis, { script })
-}
-
 export function openAdminWindow() {
     openModal(AdminWindow)
 }
 
-const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
-    const { t } = useTranslation()
-    return <>
-        <ModalHeader>{t("confirm")}</ModalHeader>
-        <form onSubmit={e => { e.preventDefault(); close(true) }}>
-            <ModalBody>
-                {textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div>}
-            </ModalBody>
-            <ModalFooter submit={okKey ?? "ok"} cancel={cancelKey} type={type} close={() => close(false)} />
-        </form>
-    </>
-}
-
-function confirm({ textKey, textReplacements, okKey, cancelKey, type }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string }) {
-    return openModal(Confirm, { textKey, textReplacements, okKey, cancelKey, type })
-}
-
-async function deleteScriptHelper(scriptid: string) {
-    if (user.selectLoggedIn(store.getState())) {
-        // User is logged in so make a call to the web service
-        try {
-            const script = await request.postAuth("/scripts/delete", { scriptid })
-            esconsole("Deleted script: " + scriptid, "debug")
-
-            const scripts = scriptsState.selectRegularScripts(store.getState())
-            if (scripts[scriptid]) {
-                script.modified = Date.now()
-                store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
-            } else {
-                // script doesn't exist
-            }
-        } catch (err) {
-            esconsole("Could not delete script: " + scriptid, "debug")
-            esconsole(err, ["user", "error"])
-        }
-    } else {
-        // User is not logged in so alter local storage
-        const scripts = scriptsState.selectRegularScripts(store.getState())
-        const script = { ...scripts[scriptid], soft_delete: true }
-        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
-    }
-}
-
-async function deleteScript(script: Script) {
-    if (await confirm({ textKey: "messages:confirm.deletescript", okKey: "script.delete", type: "danger" })) {
-        await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
-        await deleteScriptHelper(script.shareid)
-        reporter.deleteScript()
-
-        store.dispatch(tabThunks.closeDeletedScript(script.shareid))
-        store.dispatch(tabs.removeModifiedScript(script.shareid))
-    }
-}
-
-export async function deleteSharedScript(script: Script) {
-    if (await confirm({ textKey: "messages:confirm.deleteSharedScript", textReplacements: { scriptName: script.name }, okKey: "script.delete", type: "danger" })) {
-        if (user.selectLoggedIn(store.getState())) {
-            await request.postAuth("/scripts/deleteshared", { scriptid: script.shareid })
-            esconsole("Deleted shared script: " + script.shareid, "debug")
-        }
-        const { [script.shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
-        store.dispatch(scriptsState.setSharedScripts(sharedScripts))
-        store.dispatch(tabThunks.closeDeletedScript(script.shareid))
-        store.dispatch(tabs.removeModifiedScript(script.shareid))
-    }
-}
-
-export async function submitToCompetition(script: Script) {
-    await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
-    store.dispatch(tabs.removeModifiedScript(script.shareid))
-    const shareID = await scriptsThunks.getLockedSharedScriptId(script.shareid)
-    openModal(CompetitionSubmission, { name: script.name, shareID })
-}
-
 export async function importScript(script: Script) {
     if (!script) {
-        script = tabs.selectActiveTabScript(store.getState())
+        script = tabs.selectActiveTabScript(store.getState())!
     }
 
     let imported
@@ -373,13 +267,6 @@ export async function closeAllTabs() {
             userNotification.show(i18n.t("messages:idecontroller.saveallfailed"), "failure1")
         }
     }
-}
-
-export async function shareScript(script: Script) {
-    script = Object.assign({}, script) // copy to avoid mutating original
-    await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
-    store.dispatch(tabs.removeModifiedScript(script.shareid))
-    openModal(ScriptShare, { script })
 }
 
 export function openSharedScript(shareID: string) {
@@ -567,10 +454,12 @@ const NotificationMenu = () => {
     </>
 }
 
-const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }: {
-    loggedIn: boolean, isAdmin: boolean, username: string, password: string,
+type LoginState = "logged-out" | "logging-in" | "logged-in"
+
+const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }: {
+    loginState: LoginState, isAdmin: boolean, username: string, password: string,
     setUsername: (u: string) => void, setPassword: (p: string) => void,
-    login: (u: string, p: string) => void, logout: () => void,
+    login: (i: { username: string, password: string }) => void, logout: () => void,
 }) => {
     const { t } = useTranslation()
 
@@ -578,7 +467,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         const result = await openModal(AccountCreator)
         if (result) {
             setUsername(result.username)
-            login(result.username, result.password)
+            login(result)
         }
     }
 
@@ -589,12 +478,17 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         }
     }
 
+    const loggedIn = loginState === "logged-in"
+    const loggingIn = loginState === "logging-in"
+
     return <>
         {!loggedIn &&
-        <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-            <input type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">GO <i className="icon icon-arrow-right" /></button>
+        <form className="flex items-center" onSubmit={e => { e.preventDefault(); login({ username, password }) }}>
+            <input disabled={loggingIn} type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
+            <input disabled={loggingIn} type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
+            <button disabled={loggingIn} type="submit" className="disabled:bg-gray-400 whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">
+                GO <i className="icon icon-arrow-right" />
+            </button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400">
@@ -645,7 +539,7 @@ let email = ""
 
 // Defunct localStorage key that contained username and password
 const USER_STATE_KEY = "userstate"
-const userstate = localStorage.getItem(USER_STATE_KEY)
+const userstate = window.localStorage.getItem(USER_STATE_KEY)
 const savedLoginInfo = userstate === null ? undefined : JSON.parse(userstate)
 
 export const App = () => {
@@ -659,7 +553,8 @@ export const App = () => {
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
     const [isAdmin, setIsAdmin] = useState(false)
-    const [loggedIn, setLoggedIn] = useState(false)
+    const [loginState, setLoginState] = useState<LoginState>("logged-out")
+    const loginLock = useRef(false)
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
@@ -683,12 +578,12 @@ export const App = () => {
 
             // Attempt to load userdata from a previous session.
             if (savedLoginInfo) {
-                await login(username, password).then(() => {
+                await login({ username, password }).then(() => {
                     // Remove defunct localStorage key
-                    localStorage.removeItem(USER_STATE_KEY)
+                    window.localStorage.removeItem(USER_STATE_KEY)
                 }).catch((error: Error) => {
                     if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
-                        localStorage.clear()
+                        window.localStorage.clear()
                         window.location.reload()
                         esconsole(error, ["error"])
                         reporter.exception("Auto-login failed. Clearing localStorage.")
@@ -697,7 +592,7 @@ export const App = () => {
             } else {
                 const token = user.selectToken(store.getState())
                 if (token !== null) {
-                    await relogin(token)
+                    await login({ token })
                 }
             }
 
@@ -741,53 +636,69 @@ export const App = () => {
         }
     }, [currentLocale])
 
-    const login = async (username: string, password: string) => {
+    const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
+        if (loginLock.current) {
+            // Prevent duplicate login processes
+            return
+        }
+        loginLock.current = true
+        setLoginState("logging-in")
         esconsole("Logging in", ["DEBUG", "MAIN"])
-        scriptsThunks.saveAll()
+        let succeeded = false
 
-        let token
         try {
-            token = await request.getBasicAuth("/users/token", username, password)
-        } catch (error) {
-            userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
-            esconsole(error, ["main", "login"])
-            return
-        }
+            scriptsThunks.saveAll()
 
-        await relogin(token)
-    }
+            // Obtain token from username/password if necessary.
+            let token
+            if (loginInfo.token !== undefined) {
+                token = loginInfo.token
+            } else {
+                try {
+                    token = await request.getBasicAuth("/users/token", loginInfo.username, loginInfo.password)
+                } catch (error) {
+                    userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
+                    esconsole(error, ["main", "login"])
+                    return
+                }
+            }
 
-    const relogin = async (token: string) => {
-        let userInfo
-        try {
-            userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
-        } catch {
-            userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
-            dispatch(user.logout())
-            return
-        }
-        const username = userInfo.username
+            let userInfo
+            try {
+                userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
+            } catch {
+                userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
+                return
+            }
+            const username = userInfo.username
 
-        store.dispatch(user.login({ username, token }))
+            store.dispatch(user.login({ username, token }))
 
-        store.dispatch(soundsThunks.getUserSounds(username))
-        store.dispatch(soundsThunks.getFavorites(token))
+            store.dispatch(soundsThunks.getUserSounds(username))
+            store.dispatch(soundsThunks.getFavorites(token))
 
-        // Always override with the returned username in case the letter cases mismatch.
-        setUsername(username)
-        setIsAdmin(userInfo.isAdmin)
-        email = userInfo.email
-        userNotification.user.isAdmin = userInfo.isAdmin
+            // Always override with the returned username in case the letter cases mismatch.
+            setUsername(username)
+            setIsAdmin(userInfo.isAdmin)
+            email = userInfo.email
+            userNotification.user.isAdmin = userInfo.isAdmin
 
-        // Retrieve the user scripts.
-        await postLogin(username)
-        esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
+            // Retrieve the user scripts.
+            await postLogin(username)
+            esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
-        if (!loggedIn) {
-            setLoggedIn(true)
+            setLoginState("logged-in")
             userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+            succeeded = true
+        } catch (err) {
+            userNotification.show("Login failed due to network error.", "failure1", 3.5)
+        } finally {
+            if (!succeeded) {
+                loginLock.current = false
+                setLoginState("logged-out")
+            }
         }
     }
 
@@ -806,7 +717,7 @@ export const App = () => {
             }
         }
 
-        localStorage.clear()
+        window.localStorage.clear()
         if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
@@ -843,7 +754,8 @@ export const App = () => {
         // Clear out all the values set at login.
         setUsername("")
         setPassword("")
-        setLoggedIn(false)
+        loginLock.current = false
+        setLoginState("logged-out")
 
         // User data
         email = ""
@@ -915,22 +827,12 @@ export const App = () => {
                     <SwitchThemeButton />
                     <MiscActionMenu />
                     <NotificationMenu />
-                    <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
+                    <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
             </header>}
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
         </div>
         <Bubble />
-        <ScriptDropdownMenu
-            delete={deleteScript}
-            deleteShared={deleteSharedScript}
-            download={downloadScript}
-            openIndicator={openCodeIndicator}
-            openHistory={openScriptHistory}
-            rename={renameScript}
-            share={shareScript}
-            submit={submitToCompetition}
-        />
         <ModalContainer />
     </>
 }
@@ -948,8 +850,8 @@ export const ModalContainer = () => {
 
     const close = () => {
         setClosing(true)
-        resolve(undefined) // This has no effect if the modal already resolved with a payload.
-        setTimeout(() => {
+        resolve(undefined)
+        window.setTimeout(() => {
             if (modalData === appState.selectModal(store.getState())) {
                 dispatch(appState.setModal(null))
                 setClosing(false)
@@ -973,7 +875,7 @@ export const ModalContainer = () => {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40" />
+                    <div className="fixed inset-0 bg-black bg-opacity-40"></div>
                 </Transition.Child>
 
                 <Transition.Child

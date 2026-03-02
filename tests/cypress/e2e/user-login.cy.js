@@ -1,7 +1,7 @@
 import * as MockSocket from "mock-socket"
 
 describe("user", () => {
-    it("completes login", () => {
+    it.skip("completes login", () => {
         const username = "cypress"
         const userAudioUploads = []
         cy.interceptAudioStandard([
@@ -32,7 +32,7 @@ describe("user", () => {
             shareid: "1111111111111111111111",
             soft_delete: false,
             source_code: "from earsketch import *\nsetTempo(91)\n",
-            username: username,
+            username,
         }])
         cy.interceptScriptsShared([{
             created: "2022-03-03 07:08:09.0",

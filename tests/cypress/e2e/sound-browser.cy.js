@@ -24,7 +24,7 @@ describe("preview sound", () => {
         cy.skipTour()
 
         // wait for all audio library api calls to finish
-        cy.waitForNetworkIdle("/backend-static/audio-standard.json", 2000)
+        cy.waitForNetworkIdle("/backend-static/audio-standard_1.json", 2000)
         // preview sound
         cy.get("i.icon.icon-play4") // confirms audio is not playing
         cy.get("button[title='Preview sound']").realClick()

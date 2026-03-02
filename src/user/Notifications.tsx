@@ -90,7 +90,7 @@ export const NotificationPopup = () => {
                 <MarkdownLinkMessage text={message.text} />
             </span>
             <span style={{ float: "right", cursor: "pointer", color: "indianred" }} onClick={() => {
-                clearTimeout(popupTimeout)
+                window.clearTimeout(popupTimeout)
                 popupTimeout = 0
                 setMessage(null)
             }}>X</span>
@@ -259,7 +259,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                         </div>}
                     </div>
                 </div>
-                {index < history.length - 1 && <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} />}
+                {index < notifications.length - 1 && <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} />}
             </div>)}
     </div>
 }

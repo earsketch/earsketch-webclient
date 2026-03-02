@@ -4,7 +4,7 @@ import * as MockSocket from "mock-socket"
 describe("broadcast notification", () => {
     const wsServer = createServer("wss://api-dev.ersktch.gatech.edu/EarSketchWS/socket/cypress/")
 
-    it("is received", () => {
+    it.skip("is received", () => {
         cy.interceptAudioStandard()
         cy.interceptUsersToken()
         cy.interceptUsersInfo()

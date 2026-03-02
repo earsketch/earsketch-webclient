@@ -27,7 +27,7 @@ const setEditorReadOnly = createAsyncThunk(
     async (payload: boolean) => {
         return new Promise(resolve => {
             editor.setReadOnly(payload)
-            setTimeout(resolve, 100)
+            window.setTimeout(resolve, 100)
         })
     }
 )

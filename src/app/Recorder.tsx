@@ -25,10 +25,10 @@ export const LevelMeter = () => {
             const val = (db - dbMin) / (-dbMin)
             const rVal = Math.max(0, (1 - val * 1.3))
             setWidth((WIDTH - STROKE_WIDTH * 2) * rVal)
-            handle = requestAnimationFrame(draw)
+            handle = window.requestAnimationFrame(draw)
         }
-        let handle = requestAnimationFrame(draw)
-        return () => cancelAnimationFrame(handle)
+        let handle = window.requestAnimationFrame(draw)
+        return () => window.cancelAnimationFrame(handle)
     }, [])
 
     return <svg width={WIDTH} height={HEIGHT}>
@@ -157,14 +157,14 @@ export const Waveform = ({ buffer }: { buffer: AudioBuffer | null }) => {
         if (!canvas.current) return
         const context = canvas.current!.getContext("2d")!
         if (buffer) {
-            cancelAnimationFrame(handle.current)
+            window.cancelAnimationFrame(handle.current)
             handle.current = 0
             drawWaveform(context, buffer.getChannelData(0), HEIGHT / 2)
         } else if (!handle.current) {
             context.clearRect(0, 0, WIDTH, HEIGHT)
             const loop = () => {
                 drawSpectrogram(context)
-                handle.current = requestAnimationFrame(loop)
+                handle.current = window.requestAnimationFrame(loop)
             }
             loop()
         }

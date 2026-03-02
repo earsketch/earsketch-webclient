@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next"
 import UAParser from "ua-parser-js"
 
 import * as app from "../app/appState"
+import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
-import * as editor from "../ide/Editor"
 import { REPORT_LOG } from "../esconsole"
 import * as userNotification from "../user/notification"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
@@ -42,7 +42,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
         }
 
         let localStorageDump = ""
-        for (const [key, value] of Object.entries(localStorage)) {
+        for (const [key, value] of Object.entries(window.localStorage)) {
             if (key === "persist:user") {
                 try {
                     const state = JSON.parse(value)
@@ -76,7 +76,11 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
             body += `\r\n**Error Description:** ${description}\r\n`
         }
 
-        body += "\r\n**SOURCE CODE:**\r\n```" + language + "\r\n" + editor.getContents() + "\r\n```"
+        const script = tabs.selectActiveTabScript(store.getState())
+        if (script !== null) {
+            body += "\r\n**SOURCE CODE:**\r\n```" + language + "\r\n" + script.source_code + "\r\n```"
+        }
+
         body += "\r\n**TRACE LOG:**<details><summary>Click to expand</summary>\r\n\r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```\r\n</details>\r\n"
         body += "\r\n**REDUX STATE:**<details><summary>Click to expand</summary>\r\n\r\n```json\r\n" + reduxDump + "\r\n```\r\n</details>\r\n"
         body += "\r\n**LOCAL STORAGE:**\r\n```\r\n" + localStorageDump + "\r\n```"

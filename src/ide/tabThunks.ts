@@ -2,13 +2,14 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import * as app from "../app/appState"
 import * as editor from "./ideState"
+import * as ESUtils from "../esutils"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import type { ThunkAPI } from "../reducers"
 import { addTabSwitch } from "../cai/dialogue/student"
 import reporter from "../app/reporter"
 import { selectActiveTabID, selectOpenTabs, selectModifiedScripts, openAndActivateTab, closeTab as pureCloseTab, removeModifiedScript, resetModifiedScripts, resetTabs as pureResetTabs } from "./tabState"
-import { createSession, getSession, deleteSession, deleteAllSessions, getContents, setActiveSession, setReadOnly } from "./Editor"
+import { createSession, getSession, deleteSession, deleteAllSessions, setActiveSession, setReadOnly } from "./Editor"
 
 // Wrap side-effect-free reducers from `tabState` to also update mutable state.
 export const closeTab = createAsyncThunk<void, string, ThunkAPI>(
@@ -36,7 +37,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         if (!script) return
 
         let editSession
-        const language = script.name.slice(-2) === "py" ? "python" : "javascript"
+        const language = ESUtils.parseLanguage(script.name)
 
         const restoredSession = getSession(scriptID)
         if (restoredSession) {
@@ -120,15 +121,11 @@ export const closeAllTabs = createAsyncThunk<void, void, ThunkAPI>(
 export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
     "tabs/saveScriptIfModified",
     async (scriptID, { getState, dispatch }) => {
-        const modified = selectModifiedScripts(getState()).includes(scriptID)
+        const state = getState()
+        const modified = selectModifiedScripts(state).includes(scriptID)
         if (modified) {
-            const restoredSession = getSession(scriptID)
-
-            if (restoredSession) {
-                const script = scripts.selectAllScripts(getState())[scriptID]
-                await dispatch(scriptsThunks.saveScript({ name: script.name, source: getContents(restoredSession) })).unwrap()
-            }
-
+            const script = scripts.selectAllScripts(state)[scriptID]
+            await dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
             dispatch(removeModifiedScript(scriptID))
         }
     }
