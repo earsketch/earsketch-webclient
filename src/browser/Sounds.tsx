@@ -547,7 +547,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                 if (index === 0) {
                                     return (
                                         <div style={style}>
-                                            
+
                                             <h3 className="sr-only">
                                                 {t("soundBrowser.filterHeader")}
                                             </h3>
@@ -560,7 +560,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                                 {t("soundBrowser.soundHeader")}
                                             </h3>
                                         </div>
-                                        
+
                                     )
                                 } else {
                                     const names = namesByFolders[folders[index - 1]]
