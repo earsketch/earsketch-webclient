@@ -320,6 +320,9 @@
   "ariaDescriptors": {
     "api.closeFunctionDetails": "{{functionName}} funksiyasi xaqida detallarni yopish",
     "api.openFunctionDetails": "{{functionName}} funksiyasi xaqida detallarni ochish",
+    "api.returnHeading": "{{headingName}}: has type of {{headingType}}",
+    "api.codeExample": "Code example",
+    "api.parameterHeading": "Parameter {{parameterName}}: has type of {{parameterType}}",
     "api.code.comment": "Comment: {{text}}.",
     "api.code.varDeclValue": "Variable declaration: {{varName}} is assigned value {{varValue}}.",
     "api.code.varDeclDeclared": "Variable declaration: {{varName}} is declared.",
@@ -539,6 +542,7 @@
     "defaultValue": "Standart Qiymat",
     "open": "Ochish",
     "close": "Yopish",
+    "heading": "{{headingName}}: ",
     "types": {
       "soundConstant": "Tovush Konstantasi",
       "analysisConstant": "Tahlil Konstantasi",
