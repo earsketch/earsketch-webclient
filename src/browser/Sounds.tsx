@@ -491,7 +491,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         const folderHeight = 25
         const clipHeight = 30
         if (index === 0) {
-            return filterHeight + 67
+            return filterHeight
         } else if (index === folders.length) {
             // add extra space for the last folder to scroll above the scroll to top button
             return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length) + (clipHeight * 2)
@@ -547,22 +547,20 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                 if (index === 0) {
                                     return (
                                         <div style={style}>
-                                            <div className="flex flex-row justify-start top-0 bg-inherit">
-                                                <h3 className="flex grow pl-2 p-0.5 border-b border-r border-blue dark:border-blue text-white bg-blue dark:bg-blue">
-                                                    {t("soundBrowser.filterHeader")}
-                                                </h3>
-                                            </div>
+                                            
+                                            <h3 className="sr-only">
+                                                {t("soundBrowser.filterHeader")}
+                                            </h3>
                                             <SoundFilters
                                                 currentFilterTab={currentFilterTab}
                                                 setCurrentFilterTab={setCurrentFilterTab}
                                                 setFilterHeight={setFilterHeight}
                                             />
-                                            <div className="flex flex-row justify-start top-0 bg-inherit">
-                                                <h3 className="flex grow pl-2 p-0.5 border-b border-r border-blue dark:border-blue text-white bg-blue dark:bg-blue">
-                                                    {t("soundBrowser.soundHeader")}
-                                                </h3>
-                                            </div>
+                                            <h3 className="sr-only">
+                                                {t("soundBrowser.soundHeader")}
+                                            </h3>
                                         </div>
+                                        
                                     )
                                 } else {
                                     const names = namesByFolders[folders[index - 1]]
