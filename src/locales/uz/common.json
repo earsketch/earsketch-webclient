@@ -26,6 +26,8 @@
     "soundBrowser.expandSoundFolder": "{{folder}} ovoz jildini kengaytirish ",
     "soundBrowser.expandFilters": "Ovoz brauzeri filter tugmasini kengaytirish",
     "soundBrowser.collapseFilters": "Ovoz brauzer filterlar tugma panelini kichraytirish",
+    "soundBrowser.filterHeader": "Filter",
+    "soundBrowser.soundHeader": "Sound Library",
     "soundBrowser.clearFilters": "Filtrlarni olib tashla",
     "soundBrowser.filterDropdown.artists": "Ijrochilar",
     "soundBrowser.filterDropdown.genres": "Janrlar",
