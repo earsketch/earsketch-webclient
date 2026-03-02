@@ -53,6 +53,7 @@ export default ({ mode }: { mode: string }) => {
         },
         server: {
             port,
+            allowedHosts: ["everleigh-tribeless-transculturally.ngrok-free.dev"],
         },
         preview: {
             port,
