@@ -26,6 +26,8 @@
     "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",
     "soundBrowser.expandFilters": "Expand sound browser filter button panel",
     "soundBrowser.collapseFilters": "Collapse sound browser filter button panel",
+    "soundBrowser.filterHeader": "Filter",
+    "soundBrowser.soundHeader": "Sound Library",
     "soundBrowser.clearFilters": "Clear filters",
     "soundBrowser.filterDropdown.artists": "Artists",
     "soundBrowser.filterDropdown.genres": "Genres",
