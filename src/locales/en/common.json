@@ -320,6 +320,9 @@
   "ariaDescriptors": {
     "api.closeFunctionDetails": "Close {{functionName}} function details",
     "api.openFunctionDetails": "Open {{functionName}} function details",
+    "api.returnHeading": "{{headingName}}: has type of {{headingType}}",
+    "api.codeExample": "Code example",
+    "api.parameterHeading": "Parameter {{parameterName}}: has type of {{parameterType}}",
     "api.code.comment": "Comment: {{text}}.",
     "api.code.varDeclValue": "Variable declaration: {{varName}} is assigned value {{varValue}}.",
     "api.code.varDeclDeclared": "Variable declaration: {{varName}} is declared.",
@@ -539,6 +542,7 @@
     "defaultValue": "Default Value",
     "open": "Open",
     "close": "Close",
+    "heading": "{{headingName}}: ",
     "types": {
       "soundConstant": "Sound Constant",
       "analysisConstant": "Analysis Constant",
