@@ -468,7 +468,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
-                    <span className="text-sm truncate pl-2">{name}</span>
+                    <h5 className="text-sm truncate pl-2">{name}</h5>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -559,7 +559,7 @@ const Folder = ({ folder, names }: FolderProps) => {
                 className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
                 title={folder}
             >
-                <div className="text-sm truncate">{folder}</div>
+                <h4 className="text-sm truncate">{folder}</h4>
             </div>
         </div>
         <ClipList names={names} />
@@ -622,12 +622,16 @@ const SoundFiltersContext = React.createContext<SoundFiltersContextValue | null>
 const SoundListInner = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
     ({ children, ...rest }, ref) => {
         const ctx = useContext(SoundFiltersContext)!
+        const { t}  = useTranslation()
         return (
             <div
                 ref={ref}
                 style={{ ...rest.style, paddingTop: ctx.filterHeight }}
                 {...rest}
             >
+                <h3 className="sr-only">
+                    {t("soundBrowser.filterHeader")}
+                </h3>
                 <div style={{ position: "absolute", top: 0, left: 0, right: 0 }}>
                     <SoundFilters
                         currentFilterTab={ctx.currentFilterTab}
@@ -635,6 +639,9 @@ const SoundListInner = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
                         setFilterHeight={ctx.setFilterHeight}
                     />
                 </div>
+                <h3 className="sr-only">
+                    {t("soundBrowser.soundHeader")}
+                </h3>
                 {children}
             </div>
         )

@@ -26,6 +26,8 @@
     "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",
     "soundBrowser.expandFilters": "Expand sound browser filter button panel",
     "soundBrowser.collapseFilters": "Collapse sound browser filter button panel",
+    "soundBrowser.filterHeader": "Filter",
+    "soundBrowser.soundHeader": "Sound Library",
     "soundBrowser.clearFilters": "Clear filters",
     "soundBrowser.filterDropdown.artists": "Artists",
     "soundBrowser.filterDropdown.genres": "Genres",
@@ -320,6 +322,9 @@
   "ariaDescriptors": {
     "api.closeFunctionDetails": "Close {{functionName}} function details",
     "api.openFunctionDetails": "Open {{functionName}} function details",
+    "api.returnHeading": "{{headingName}}: has type of {{headingType}}",
+    "api.codeExample": "Code example",
+    "api.parameterHeading": "Parameter {{parameterName}}: has type of {{parameterType}}",
     "api.code.comment": "Comment: {{text}}.",
     "api.code.varDeclValue": "Variable declaration: {{varName}} is assigned value {{varValue}}.",
     "api.code.varDeclDeclared": "Variable declaration: {{varName}} is declared.",
@@ -539,6 +544,7 @@
     "defaultValue": "Default Value",
     "open": "Open",
     "close": "Close",
+    "heading": "{{headingName}}: ",
     "types": {
       "soundConstant": "Sound Constant",
       "analysisConstant": "Analysis Constant",
