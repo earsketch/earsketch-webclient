@@ -229,7 +229,7 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
     </div>
 }
 
-const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab, userExpandedTab, onOpen, tabButtonRef }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters, userExpandedTab: keyof sounds.Filters | null, onOpen: (viaKeyboard: boolean) => void, tabButtonRef: React.RefObject<HTMLButtonElement> }) => {
+const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab, userExpandedTab, onOpen, tabButtonRef }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters, userExpandedTab: keyof sounds.Filters | null, onOpen: () => void, tabButtonRef: React.RefObject<HTMLButtonElement> }) => {
     const { t } = useTranslation()
     const isCurrentTab = currentFilterTab === soundFilterKey
     const isExpanded = userExpandedTab === soundFilterKey
@@ -252,14 +252,11 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
                     className={tabClass}
                     onClick={() => {
                         setCurrentFilterTab(soundFilterKey)
-                        onOpen(false)
+                        onOpen()
                     }}
                     onKeyDown={(e) => {
-                        if (e.key === " " || e.key === "Enter") {
-                            if (e.key === " ") e.preventDefault()
-                            // Let the click fire naturally; flag keyboard open so focus moves into the panel.
-                            onOpen(true)
-                        }
+                        // Prevent Space from scrolling the virtual list. The click still fires on keyup.
+                        if (e.key === " ") e.preventDefault()
                     }}
                 >
                     {t(`soundBrowser.filterDropdown.${soundFilterKey}`)}
@@ -294,18 +291,16 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
     const keys = useSelector(sounds.selectFilteredKeys)
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
 
-    const handleOpen = (key: keyof sounds.Filters, viaKeyboard: boolean) => {
+    const handleOpen = (key: keyof sounds.Filters) => {
         setCurrentFilterTab(key)
         setUserExpandedTab(key)
-        if (viaKeyboard) {
-            if (currentFilterTab === key) {
-                // Panel is already mounted — call focus imperatively right now.
-                focusFirstOptionRef.current?.()
-            } else {
-                // Panel will remount. Set the flag so the mount effect in
-                // ButtonFilterList picks it up and calls focus after mounting.
-                pendingKeyboardFocusRef.current = true
-            }
+        if (currentFilterTab === key) {
+            // Panel is already mounted — call focus imperatively right now.
+            focusFirstOptionRef.current?.()
+        } else {
+            // Panel will remount. Set the flag so the mount effect in
+            // ButtonFilterList picks it up and calls focus after mounting.
+            pendingKeyboardFocusRef.current = true
         }
     }
 
@@ -320,7 +315,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                         setCurrentFilterTab={setCurrentFilterTab}
                         currentFilterTab={currentFilterTab}
                         userExpandedTab={userExpandedTab}
-                        onOpen={(viaKeyboard) => handleOpen(name as keyof sounds.Filters, viaKeyboard)}
+                        onOpen={() => handleOpen(name as keyof sounds.Filters)}
                         tabButtonRef={activeTabButtonRef} />
                 })}
             </div>
