@@ -328,7 +328,6 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 })}
             </div>
 
-            {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
             {currentFilterTab === "artists" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.artists")}
                 category="artists"
