@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, ChangeEvent, useState, createRef, useLayoutEffect } from "react"
+import React, { useRef, useEffect, ChangeEvent, useState, useLayoutEffect, useContext } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 
@@ -19,7 +19,6 @@ import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
-import { CheckboxButton } from "../Utils"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -42,23 +41,49 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
     const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
 
-    return <CheckboxButton
-        label={label}
-        onClick={() => {
-            if (selected) dispatch(sounds.removeFilterItem({ category, value }))
-            else dispatch(sounds.addFilterItem({ category, value }))
-            addUIClick("filter: " + label + (selected ? " off" : " on"))
-        }}
-        selected={selected}
-        selectedColor="green"
-        fullWidth={fullWidth}
-    />
+    const handleToggle = () => {
+        if (selected) dispatch(sounds.removeFilterItem({ category, value }))
+        else dispatch(sounds.addFilterItem({ category, value }))
+        addUIClick("filter: " + label + (selected ? " off" : " on"))
+    }
+
+    const classnames = classNames({
+        "rounded cursor-pointer p-1 mt-1 mr-2": true,
+        "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
+        "text-gray-500 border border-gray-500": !selected,
+        "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
+        "w-full": fullWidth,
+    })
+
+    return (
+        <div
+            role="option"
+            aria-selected={selected}
+            tabIndex={0}
+            className={classnames}
+            onClick={handleToggle}
+            onKeyDown={(e) => {
+                if (e.key === " " || e.key === "Enter") {
+                    e.preventDefault()
+                    handleToggle()
+                }
+            }}
+        >
+            <div className="flex flex-row gap-x-1">
+                <span className="rounded-full inline-flex w-1 mr-2">
+                    <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} aria-hidden="true" />
+                </span>
+                <div className="text-xs select-none mr-4">
+                    {label}
+                </div>
+            </div>
+        </div>
+    )
 }
 
 interface ButtonFilterProps {
     title: string
     category: keyof sounds.Filters
-    ariaTabPanel: string
     ariaListBox: string
     items: string[]
     position: "center" | "left" | "right"
@@ -67,21 +92,67 @@ interface ButtonFilterProps {
     setShowMajMinPageOne?: Function
 }
 
-const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, showMajMinPageOne = true, setShowMajMinPageOne = () => {} }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, ariaListBox, items, justification, showMajMinPageOne = true, setShowMajMinPageOne = () => {}, focusFirstOptionRef, pendingKeyboardFocusRef, tabButtonRef }: ButtonFilterProps & { focusFirstOptionRef?: React.MutableRefObject<(() => void) | null>, pendingKeyboardFocusRef?: React.MutableRefObject<boolean>, tabButtonRef?: React.RefObject<HTMLButtonElement> }) => {
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
     })
+    const panelRef = useRef<HTMLDivElement>(null)
+
+    // On mount: register the imperative focus callback, and immediately call it
+    // if the parent flagged that this panel was opened via keyboard.
+    useEffect(() => {
+        const focusFirst = () => {
+            const firstOption = panelRef.current?.querySelector<HTMLElement>('[role="option"]')
+            firstOption?.focus()
+        }
+        if (focusFirstOptionRef) {
+            focusFirstOptionRef.current = focusFirst
+        }
+        if (pendingKeyboardFocusRef?.current) {
+            pendingKeyboardFocusRef.current = false
+            focusFirst()
+        }
+        return () => {
+            if (focusFirstOptionRef) focusFirstOptionRef.current = null
+        }
+    }, []) // eslint-disable-line
 
     return (
-        <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
+        <div
+            id={`sound-filter-panel-${category}`}
+            ref={panelRef}
+            className="relative px-1.5"
+            onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                    e.preventDefault()
+                    tabButtonRef?.current?.focus()
+                } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    e.preventDefault()
+                    const options = Array.from(
+                        panelRef.current?.querySelectorAll<HTMLElement>('[role="option"]') ?? []
+                    )
+                    const currentIndex = options.indexOf(document.activeElement as HTMLElement)
+                    if (currentIndex === -1) return
+                    const nextIndex = e.key === "ArrowDown"
+                        ? Math.min(currentIndex + 1, options.length - 1)
+                        : Math.max(currentIndex - 1, 0)
+                    options[nextIndex]?.focus()
+                }
+            }}
+        >
             {justification === "keySignatureGrid" &&
             <MajMinRadioButtons
                 chooseMaj={() => setShowMajMinPageOne(true)}
                 chooseMin={() => setShowMajMinPageOne(false)}
                 showMajMinPageOne={showMajMinPageOne}
             />}
-            <div role="listbox" aria-label={ariaListBox} className={classes}>
+            <div
+                role="listbox"
+                aria-multiselectable="true"
+                aria-label={ariaListBox}
+                className={classes}
+            >
                 {justification === "keySignatureGrid" &&
                 <KeySignatureFilterList items={items} category={category} showMajMinPageOne={showMajMinPageOne} />}
                 {justification === "flex" &&
@@ -94,12 +165,11 @@ const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justific
 const FlexButtonFilterList = ({ items, category }: { items: string[], category: keyof sounds.Filters }) => {
     return <>
         {items.map((item, index) =>
-            <div key={index}>
-                <FilterButton
-                    value={item}
-                    category={category}
-                />
-            </div>
+            <FilterButton
+                key={index}
+                value={item}
+                category={category}
+            />
         )}
     </>
 }
@@ -127,7 +197,7 @@ const KeySignatureFilterList = ({ items, category, showMajMinPageOne }: KeySigna
                     category={category}
                     fullWidth={true}
                 />
-                : <div className="h-8" >{" "}</div>}
+                : <div className="h-8" aria-hidden="true">{" "}</div>}
         </div>)}
     </>
 }
@@ -150,29 +220,57 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
         "bg-slate-200 dark:bg-slate-600 border-slate-400 border-l": !showMajMinPageOne,
     })
     return <div className="flex items-center justify-center mb-1">
-        <div className="inline-flex" role="tablist">
-            <button role="tab" className={majorButtonClass} onClick={chooseMaj}>Major</button>
-            <button role="tab" className={minorButtonClass} onClick={chooseMin}>Minor</button>
+        <div className="inline-flex" role="radiogroup" aria-label="Key type">
+            <button
+                role="radio"
+                aria-checked={showMajMinPageOne}
+                className={majorButtonClass}
+                onClick={chooseMaj}
+            >Major</button>
+            <button
+                role="radio"
+                aria-checked={!showMajMinPageOne}
+                className={minorButtonClass}
+                onClick={chooseMin}
+            >Minor</button>
         </div>
     </div>
 }
 
-const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters }) => {
+const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab, userExpandedTab, onOpen, tabButtonRef }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters, userExpandedTab: keyof sounds.Filters | null, onOpen: () => void, tabButtonRef: React.RefObject<HTMLButtonElement> }) => {
     const { t } = useTranslation()
+    const isCurrentTab = currentFilterTab === soundFilterKey
+    const isExpanded = userExpandedTab === soundFilterKey
     const tabClass = classNames({
-        "text-xs uppercase rounded p-1 min-w-1/5 max-w-1/4 text-black bg-gray-200 aria-selected:bg-amber": true,
+        "text-xs uppercase rounded p-1 min-w-1/5 max-w-1/4 text-black bg-gray-200": true,
+        "bg-amber": isCurrentTab,
     })
     const spanClass = "absolute -top-[0.6rem] right-[-8px] inline-flex items-center justify-center px-1 py-0.5 z-10 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
 
     return (
         <div className="flex flex-row flex-wrap">
             <div className="relative inline-block">
-                {numItemsSelected > 0 ? <div className={spanClass}>{numItemsSelected}</div> : null}
-                <button role="tab"
-                    aria-selected={currentFilterTab === soundFilterKey}
+                {numItemsSelected > 0
+                    ? <div className={spanClass} aria-hidden="true">{numItemsSelected}</div>
+                    : null}
+                <button
+                    ref={isCurrentTab ? tabButtonRef : undefined}
+                    aria-expanded={isExpanded}
+                    aria-controls={`sound-filter-panel-${soundFilterKey}`}
                     className={tabClass}
-                    onClick={() => setCurrentFilterTab(soundFilterKey)}>
+                    onClick={() => {
+                        setCurrentFilterTab(soundFilterKey)
+                        onOpen()
+                    }}
+                    onKeyDown={(e) => {
+                        // Prevent Space from scrolling the virtual list. The click still fires on keyup.
+                        if (e.key === " ") e.preventDefault()
+                    }}
+                >
                     {t(`soundBrowser.filterDropdown.${soundFilterKey}`)}
+                    {numItemsSelected > 0
+                        ? <span className="sr-only">, {numItemsSelected} selected</span>
+                        : null}
                 </button>
             </div>
         </div>
@@ -182,63 +280,99 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
 const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>> }) => {
     const { t } = useTranslation()
     const [showMajMinPageOne, setShowMajMinPageOne] = useState(true)
+    // Tracks which tab the user has explicitly opened (via click or keyboard).
+    // Starts null so all tabs report aria-expanded="false" on initial render,
+    // even though the artists panel is visible by default.
+    const [userExpandedTab, setUserExpandedTab] = useState<keyof sounds.Filters | null>(null)
+    // Ref to the panel's "focus first option" imperative callback, so we can
+    // call it directly rather than relying on mount timing.
+    const focusFirstOptionRef = useRef<(() => void) | null>(null)
+    // Set to true when a tab is opened via keyboard and we still need to move
+    // focus into the panel. ButtonFilterList clears this after calling focus.
+    const pendingKeyboardFocusRef = useRef(false)
+    // Points to the currently-visible SoundFilterTab button so that
+    // Escape in the ButtonFilterList can return focus to it.
+    const activeTabButtonRef = useRef<HTMLButtonElement>(null)
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
     const keys = useSelector(sounds.selectFilteredKeys)
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
 
+    const handleOpen = (key: keyof sounds.Filters) => {
+        setCurrentFilterTab(key)
+        setUserExpandedTab(key)
+        if (currentFilterTab === key) {
+            // Panel is already mounted — call focus imperatively right now.
+            focusFirstOptionRef.current?.()
+        } else {
+            // Panel will remount. Set the flag so the mount effect in
+            // ButtonFilterList picks it up and calls focus after mounting.
+            pendingKeyboardFocusRef.current = true
+        }
+    }
+
     return (
         <div>
-            <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2.5 mr-2">
+            <div className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2.5 mr-2">
                 {Object.entries(numItemsSelected).map(([name, num]: [string, number]) => {
                     return <SoundFilterTab
                         key={name}
                         soundFilterKey={name as keyof sounds.Filters}
                         numItemsSelected={num}
                         setCurrentFilterTab={setCurrentFilterTab}
-                        currentFilterTab={currentFilterTab} />
+                        currentFilterTab={currentFilterTab}
+                        userExpandedTab={userExpandedTab}
+                        onOpen={() => handleOpen(name as keyof sounds.Filters)}
+                        tabButtonRef={activeTabButtonRef} />
                 })}
             </div>
 
-            {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
             {currentFilterTab === "artists" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.artists")}
                 category="artists"
-                ariaTabPanel={t("soundBrowser.clip.tooltip.artist")}
                 ariaListBox={t("ariaDescriptors:sounds.artistFilter")}
                 items={artists}
                 position="center"
                 justification="flex"
+                focusFirstOptionRef={focusFirstOptionRef}
+                pendingKeyboardFocusRef={pendingKeyboardFocusRef}
+                tabButtonRef={activeTabButtonRef}
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
                 category="genres"
-                ariaTabPanel={t("soundBrowser.clip.tooltip.genre")}
                 ariaListBox={t("ariaDescriptors:sounds.genreFilter")}
                 items={genres}
                 position="center"
                 justification="flex"
+                focusFirstOptionRef={focusFirstOptionRef}
+                pendingKeyboardFocusRef={pendingKeyboardFocusRef}
+                tabButtonRef={activeTabButtonRef}
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
                 category="instruments"
-                ariaTabPanel={t("soundBrowser.clip.tooltip.instrument")}
                 ariaListBox={t("ariaDescriptors:sounds.instrumentFilter")}
                 items={instruments}
                 position="center"
                 justification="flex"
+                focusFirstOptionRef={focusFirstOptionRef}
+                pendingKeyboardFocusRef={pendingKeyboardFocusRef}
+                tabButtonRef={activeTabButtonRef}
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
                 category="keys"
-                ariaTabPanel={t("soundBrowser.clip.tooltip.key")}
                 ariaListBox={t("ariaDescriptors:sounds.keyFilter")}
                 items={keys}
                 position="center"
                 justification="keySignatureGrid"
                 showMajMinPageOne={showMajMinPageOne}
                 setShowMajMinPageOne={setShowMajMinPageOne}
+                focusFirstOptionRef={focusFirstOptionRef}
+                pendingKeyboardFocusRef={pendingKeyboardFocusRef}
+                tabButtonRef={activeTabButtonRef}
             />}
         </div>
     )
@@ -435,11 +569,20 @@ interface SoundSearchAndFiltersProps {
 }
 
 const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
-    const filterRef: React.RefObject<HTMLDivElement> = createRef()
+    const filterRef = useRef<HTMLDivElement>(null)
     useLayoutEffect(() => {
-        const soundFilterHeight = filterRef.current?.offsetHeight || 0
-        setFilterHeight(soundFilterHeight)
-    })
+        const el = filterRef.current
+        if (!el) return
+        // Seed the initial height immediately.
+        setFilterHeight(el.offsetHeight)
+        // Only call setFilterHeight again when the height actually changes,
+        // so we don't trigger a parent re-render (and steal focus) on every render.
+        const observer = new ResizeObserver(() => {
+            setFilterHeight(el.offsetHeight)
+        })
+        observer.observe(el)
+        return () => observer.disconnect()
+    }, [])
 
     return (
         <div ref={filterRef} className="pb-1">
@@ -455,6 +598,52 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
         </div>
     )
 }
+
+// Context to pass SoundFilters props into the stable innerElementType without
+// recreating it (which would cause react-window to remount).
+interface SoundFiltersContextValue {
+    currentFilterTab: keyof sounds.Filters
+    setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
+    setFilterHeight: React.Dispatch<React.SetStateAction<number>>
+    filterHeight: number
+}
+const SoundFiltersContext = React.createContext<SoundFiltersContextValue | null>(null)
+
+// Defined once at module scope so its identity is always stable.
+// react-window's innerElementType wraps the absolutely-positioned item slots.
+// We render SoundFilters here in normal flow, then add padding-top equal to
+// filterHeight so that react-window's absolute-positioned items are pushed down
+// to start below the filters. SoundFilters is never touched by react-window so
+// focus inside it is completely stable.
+const SoundListInner = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+    ({ children, ...rest }, ref) => {
+        const ctx = useContext(SoundFiltersContext)!
+        const { t } = useTranslation()
+        return (
+            <div
+                ref={ref}
+                style={{ ...rest.style, paddingTop: ctx.filterHeight }}
+                {...rest}
+            >
+                <h3 className="sr-only">
+                    {t("soundBrowser.filterHeader")}
+                </h3>
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0 }}>
+                    <SoundFilters
+                        currentFilterTab={ctx.currentFilterTab}
+                        setCurrentFilterTab={ctx.setCurrentFilterTab}
+                        setFilterHeight={ctx.setFilterHeight}
+                    />
+                </div>
+                <h3 className="sr-only">
+                    {t("soundBrowser.soundHeader")}
+                </h3>
+                {children}
+            </div>
+        )
+    }
+)
+SoundListInner.displayName = "SoundListInner"
 
 const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
     title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
@@ -473,6 +662,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const listRef = useRef<List>(null)
     const scrollToTopRef = useRef<HTMLDivElement>(null)
     const [filterHeight, setFilterHeight] = useState(0)
+
     const soundListClassnames = "grow"
     const extraFilterControlsClassnames = "sticky top-0 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
     const scrolltoTopClassnames = "absolute bottom-4 right-4 z-10 opacity-0 transform translate-y-full transition-all duration-300 pointer-events-none"
@@ -490,19 +680,17 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const getItemSize = (index: number) => {
         const folderHeight = 25
         const clipHeight = 30
-        if (index === 0) {
-            return filterHeight
-        } else if (index === folders.length) {
+        if (index === folders.length - 1) {
             // add extra space for the last folder to scroll above the scroll to top button
-            return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length) + (clipHeight * 2)
+            return folderHeight + (clipHeight * namesByFolders[folders[index]].length) + (clipHeight * 2)
         } else {
-            return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length)
+            return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
         }
     }
 
     const handleScroll = ({ scrollOffset }: { scrollOffset: number }) => {
         if (scrollToTopRef.current) {
-            if (scrollOffset > filterHeight) { // Show button after scrolling past filters
+            if (scrollOffset > 0) {
                 scrollToTopRef.current.style.opacity = "1"
                 scrollToTopRef.current.style.transform = "translateY(0)"
                 scrollToTopRef.current.style.pointerEvents = "auto"
@@ -532,58 +720,41 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                 </button>
                 <NumberOfSounds/>
             </div>
-            <div className={soundListClassnames}>
-                <AutoSizer>
-                    {({ height, width }: { height: number, width: number }) => (
-                        <List
-                            ref={listRef}
-                            height={height}
-                            width={width}
-                            itemCount={folders.length + 1}
-                            itemSize={getItemSize}
-                            onScroll={handleScroll}
-                        >
-                            {({ index, style }) => {
-                                if (index === 0) {
-                                    return (
-                                        <div style={style}>
 
-                                            <h3 className="sr-only">
-                                                {t("soundBrowser.filterHeader")}
-                                            </h3>
-                                            <SoundFilters
-                                                currentFilterTab={currentFilterTab}
-                                                setCurrentFilterTab={setCurrentFilterTab}
-                                                setFilterHeight={setFilterHeight}
-                                            />
-                                            <h3 className="sr-only">
-                                                {t("soundBrowser.soundHeader")}
-                                            </h3>
-                                        </div>
-
-                                    )
-                                } else {
-                                    const names = namesByFolders[folders[index - 1]]
+            <SoundFiltersContext.Provider value={{ currentFilterTab, setCurrentFilterTab, setFilterHeight, filterHeight }}>
+                <div className={soundListClassnames}>
+                    <AutoSizer>
+                        {({ height, width }: { height: number, width: number }) => (
+                            <List
+                                ref={listRef}
+                                innerElementType={SoundListInner}
+                                height={height}
+                                width={width}
+                                itemCount={folders.length}
+                                itemSize={getItemSize}
+                                onScroll={handleScroll}
+                            >
+                                {({ index, style }) => {
+                                    const names = namesByFolders[folders[index]]
                                     return (
-                                        <div style={style}>
+                                        <div style={{ ...style, top: (style.top as number) + filterHeight }}>
                                             <Folder
-                                                folder={folders[index - 1]}
+                                                folder={folders[index]}
                                                 names={names}
-                                                index={index - 1}
+                                                index={index}
                                                 listRef={listRef}
                                             />
                                         </div>
                                     )
-                                }
-                            }}
-                        </List>
-                    )}
-                </AutoSizer>
-
-            </div>
+                                }}
+                            </List>
+                        )}
+                    </AutoSizer>
+                </div>
+            </SoundFiltersContext.Provider>
             <div ref={scrollToTopRef} className={scrolltoTopClassnames}>
                 <button className="px-3 py-2 rounded text-white bg-blue text-sm  shadow-lg transition-all duration-200 hover:text-amber hover:shadow-xl"
-                    onClick={() => listRef.current!.scrollToItem(0)} title={t("soundBrowser.button.backToTop")}>
+                    onClick={() => listRef.current?.scrollToItem(0)} title={t("soundBrowser.button.backToTop")}>
                     <i className="icon icon-arrow-up3"></i>
                 </button>
             </div>
