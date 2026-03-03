@@ -622,7 +622,7 @@ const SoundFiltersContext = React.createContext<SoundFiltersContextValue | null>
 const SoundListInner = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
     ({ children, ...rest }, ref) => {
         const ctx = useContext(SoundFiltersContext)!
-        const { t}  = useTranslation()
+        const { t } = useTranslation()
         return (
             <div
                 ref={ref}
