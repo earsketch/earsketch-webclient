@@ -128,6 +128,17 @@ const ButtonFilterList = ({ category, ariaListBox, items, justification, showMaj
                 if (e.key === "Escape") {
                     e.preventDefault()
                     tabButtonRef?.current?.focus()
+                } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    e.preventDefault()
+                    const options = Array.from(
+                        panelRef.current?.querySelectorAll<HTMLElement>('[role="option"]') ?? []
+                    )
+                    const currentIndex = options.indexOf(document.activeElement as HTMLElement)
+                    if (currentIndex === -1) return
+                    const nextIndex = e.key === "ArrowDown"
+                        ? Math.min(currentIndex + 1, options.length - 1)
+                        : Math.max(currentIndex - 1, 0)
+                    options[nextIndex]?.focus()
                 }
             }}
         >
