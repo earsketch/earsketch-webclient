@@ -37,7 +37,7 @@ const SoundSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterButton = ({ category, value, label = value, fullWidth = false, id }: { category: keyof sounds.Filters, value: string, label?: string, fullWidth?: boolean, id?: string }) => {
+const FilterButton = ({ category, value, label = value, fullWidth = false }: { category: keyof sounds.Filters, value: string, label?: string, fullWidth?: boolean }) => {
     const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
 
@@ -58,7 +58,6 @@ const FilterButton = ({ category, value, label = value, fullWidth = false, id }:
     return (
         <div
             role="option"
-            id={id}
             aria-selected={selected}
             tabIndex={0}
             className={classnames}
@@ -168,7 +167,6 @@ const FlexButtonFilterList = ({ items, category }: { items: string[], category: 
         {items.map((item, index) =>
             <FilterButton
                 key={index}
-                id={`filter-option-${category}-${item.replace(/\W+/g, "-")}`}
                 value={item}
                 category={category}
             />
@@ -194,7 +192,6 @@ const KeySignatureFilterList = ({ items, category, showMajMinPageOne }: KeySigna
         {visibleKeySignatures.map((item, index) => <div key={index}>
             {items.includes(item)
                 ? <FilterButton
-                    id={`filter-option-${category}-${item.replace(/\W+/g, "-")}`}
                     value={item}
                     label={item.replace(" major", "").replace(" minor", "")}
                     category={category}
