@@ -13,6 +13,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:no-tour": "ES_WEB_DISABLE_QUICK_TOUR=true vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

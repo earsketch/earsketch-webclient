@@ -606,8 +606,8 @@ export const App = () => {
                         store.dispatch(tabThunks.closeAndSwitchTab(scriptID))
                     }
                 }
-                // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !ES_WEB_SHOW_CAI && !ES_WEB_SHOW_CHAT) {
+                // Show bubble tutorial when not opening a share link, in a CAI study mode, or if the quick tour is disabled.
+                if (ES_WEB_DISABLE_QUICK_TOUR !== true && Object.keys(allScripts).length === 0 && !sharedScriptID && !ES_WEB_SHOW_CAI && !ES_WEB_SHOW_CHAT) {
                     store.dispatch(bubble.resume())
                 }
             }

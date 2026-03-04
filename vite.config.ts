@@ -70,6 +70,7 @@ export default ({ mode }: { mode: string }) => {
             SITE_BASE_URI: JSON.stringify(SITE_BASE_URI),
             "import.meta.env.ES_NEWRELIC_CONFIG": nrConfig,
             ...env,
+            ES_WEB_DISABLE_QUICK_TOUR: env.ES_WEB_DISABLE_QUICK_TOUR ?? "false",
         },
     })
 }
