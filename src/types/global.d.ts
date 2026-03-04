@@ -16,6 +16,7 @@ declare const ES_WEB_SHOW_CAI: boolean
 declare const ES_WEB_UPLOAD_CAI_HISTORY: boolean
 declare const ES_WEB_SHOW_CHAT: boolean
 declare const ES_WEB_SHOW_LOCALE_SWITCHER: boolean
+declare const ES_WEB_DISABLE_QUICK_TOUR: boolean
 
 declare const Kali: any
 

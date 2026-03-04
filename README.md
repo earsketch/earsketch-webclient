@@ -30,6 +30,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for details about the project structure a
 
 - `npm run dev` - Run the app in the development mode
 
+- `npm run dev:no-tour` - Run the app in development mode, preventing the quick tour from appearing
+
 - `npm run serve-local` - Build for local serving from the `dist` folder
 
 - `npm run build` - Build the app for production to the `dist` folder
