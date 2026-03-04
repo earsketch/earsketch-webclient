@@ -19,6 +19,7 @@ import * as editor from "./Editor"
 import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
+import { ExtensionHost } from "../extensions/ExtensionHost"
 import { setReady } from "../bubble/bubbleState"
 import { dismiss } from "../bubble/bubbleThunks"
 import { callbacks as bubbleCallbacks } from "../bubble/Bubble"
@@ -371,6 +372,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
     const gutterSize = hideEditor ? 0 : 9
     const isWestOpen = useSelector(layout.isWestOpen)
     const isEastOpen = useSelector(layout.isEastOpen)
+    const eastContent = useSelector(appState.selectEastContent)
     const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
     const maxWidths = embedMode ? [0, Infinity, 0] : [isWestOpen ? Infinity : layout.COLLAPSED_WIDTH, Infinity, isEastOpen ? Infinity : layout.COLLAPSED_WIDTH]
     const minHeights = embedMode ? [layout.MIN_DAW_HEIGHT, 0, 0] : [layout.MIN_DAW_HEIGHT, layout.MIN_EDITOR_HEIGHT, layout.MIN_DAW_HEIGHT]
@@ -479,7 +481,8 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                 : <CAI />)}
                         </div>)}
                     <div className={showCai ? "h-full hidden" : "h-full"}>
-                        <Curriculum />
+                        <div className={eastContent !== "curriculum" ? "hidden" : "h-full"}><Curriculum /></div>
+                        <div className={eastContent === "curriculum" ? "hidden" : "h-full"}><ExtensionHost /></div>
                     </div>
                 </div>
             </Split>

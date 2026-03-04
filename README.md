@@ -38,9 +38,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for details about the project structure a
 
 - `npm run test-vitest` - Run component tests
 
-- `npm run test-cypress` - Run e2e tests
+- `npm run test-cypress` - Run end-to-end tests
 
-- `npm run test-cypress-gui` - Run e2e tests in a GUI
+- `npm run test-cypress-gui` - Run end-to-end tests in a GUI
 
 ## Deployment
 
