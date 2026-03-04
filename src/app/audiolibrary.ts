@@ -3,6 +3,7 @@ import ctx from "../audio/context"
 import { SoundEntity } from "common"
 import esconsole from "../esconsole"
 import { getAuth } from "../request"
+import * as localSoundStorage from "../audio/localSoundStorage"
 
 const STATIC_AUDIO_URL_DOMAIN = URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
     ? "https://earsketch.gatech.edu/backend-static"
@@ -56,6 +57,16 @@ export async function getSound(name: string): Promise<Sound> {
 
 async function getSoundBuffer(sound: SoundEntity) {
     const name = sound.name
+
+    // For non-standard sounds, check IndexedDB first (for logged-out users with locally-stored sounds).
+    if (!sound.standard) {
+        const local = await localSoundStorage.getAudioData(name)
+        if (local) {
+            esconsole(`Decoding local ${name} buffer`, ["debug", "audiolibrary"])
+            return ctx.decodeAudioData(local.slice(0))
+        }
+    }
+
     const url = sound.standard
         ? STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
         : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })

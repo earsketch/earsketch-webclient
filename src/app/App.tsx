@@ -47,6 +47,9 @@ import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
+import { BackupBanner } from "./BackupBanner"
+import { ImportModal } from "./ImportModal"
+import * as backup from "./backup"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -82,11 +85,7 @@ async function deleteSound(sound: SoundEntity) {
 }
 
 function openUploadWindow() {
-    if (user.selectLoggedIn(store.getState())) {
-        openModal(SoundUploader)
-    } else {
-        userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
-    }
+    openModal(SoundUploader)
 }
 
 sounds.callbacks.rename = renameSound
@@ -576,6 +575,9 @@ export const App = () => {
         (async () => {
             document.getElementById("loading-screen")!.style.display = "none"
 
+            // Load local sounds for logged-out users before login attempt.
+            await store.dispatch(soundsThunks.getLocalUserSounds())
+
             // Attempt to load userdata from a previous session.
             if (savedLoginInfo) {
                 await login({ username, password }).then(() => {
@@ -611,6 +613,22 @@ export const App = () => {
                     store.dispatch(bubble.resume())
                 }
             }
+
+            // App-level drag-and-drop for .earsketch backup files.
+            const onDrop = async (e: DragEvent) => {
+                e.preventDefault()
+                const file = [...(e.dataTransfer?.files ?? [])].find(f => f.name.endsWith(".earsketch"))
+                if (file) {
+                    try {
+                        const parsed = await backup.parseBackup(file)
+                        openModal(ImportModal, { parsed })
+                    } catch (err: any) {
+                        userNotification.show(err.message ?? "Failed to load backup", "failure1")
+                    }
+                }
+            }
+            document.addEventListener("dragover", e => e.preventDefault())
+            document.addEventListener("drop", onDrop)
         })()
     }, [])
 
@@ -826,6 +844,7 @@ export const App = () => {
                     <FontSizeMenu />
                     <SwitchThemeButton />
                     <MiscActionMenu />
+                    <BackupBanner />
                     <NotificationMenu />
                     <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
@@ -905,6 +924,12 @@ window.onbeforeunload = () => {
         const promise = scriptsThunks.saveAll()
         if (promise) {
             promise.then(() => userNotification.show(i18n.t("messages:user.allscriptscloud"), "success"))
+            return ""
+        }
+    } else {
+        const hasData = Object.keys(scriptsState.selectActiveScripts(store.getState())).length > 0
+        if (hasData && !backup.hasExportedThisSession()) {
+            persistor.flush()
             return ""
         }
     }

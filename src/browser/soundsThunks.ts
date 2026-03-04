@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import context from "../audio/context"
 import * as audioLibrary from "../app/audiolibrary"
+import * as localSoundStorage from "../audio/localSoundStorage"
 import { volumeSliderGain } from "../audio/player"
 import { SoundEntity } from "common"
 import { fillDict } from "../app/recommender"
@@ -87,12 +88,28 @@ export const markFavorite = createAsyncThunk<void, { name: string; isFavorite: b
     }
 )
 
+export const getLocalUserSounds = createAsyncThunk<void, void, ThunkAPI>(
+    "sounds/getLocalUserSounds",
+    async (_, { dispatch }) => {
+        const records = await localSoundStorage.getAllSounds()
+        if (records.length === 0) return
+        const entities = Object.fromEntries(records.map(r => [r.name, r.metadata]))
+        const names = records.map(r => r.name)
+        dispatch(setUserSounds({ entities, names }))
+        for (const r of records) {
+            audioLibrary.cache.sounds[r.name] = { metadata: Promise.resolve(r.metadata) }
+        }
+    }
+)
+
 export const deleteLocalUserSound = createAsyncThunk<void, string, ThunkAPI>(
     "sounds/deleteLocalUserSound",
-    (payload, { getState, dispatch }) => {
+    async (payload, { getState, dispatch }) => {
         const userSounds = getState().sounds.userSounds
         if (userSounds.names.includes(payload)) {
             dispatch(deleteUserSound(payload))
+            // Also remove from IndexedDB if stored there
+            await localSoundStorage.deleteSound(payload).catch(() => { /* ignore if not found */ })
         }
     }
 )
@@ -164,9 +181,23 @@ export const togglePreview = createAsyncThunk<void | null, Preview, ThunkAPI>(
 export const renameSound = createAsyncThunk<void, { oldName: string; newName: string; }, ThunkAPI>(
     "sounds/rename",
     async ({ oldName, newName }, { getState, dispatch }) => {
-        // call api to rename sound
-        await postAuth("/audio/rename", { name: oldName, newName })
-        audioLibrary.clearCache() // TODO: This is probably overkill.
+        const state = getState()
+        if (state.user.loggedIn) {
+            // call api to rename sound
+            await postAuth("/audio/rename", { name: oldName, newName })
+            audioLibrary.clearCache() // TODO: This is probably overkill.
+        } else {
+            // For local sounds: copy with new name, delete old
+            const data = await localSoundStorage.getAudioData(oldName)
+            const oldMetadata = state.sounds.userSounds.entities[oldName]
+            if (data && oldMetadata) {
+                const newMetadata = { ...oldMetadata, name: newName }
+                await localSoundStorage.storeSound(newName, data, newMetadata)
+                await localSoundStorage.deleteSound(oldName)
+                audioLibrary.cache.sounds[newName] = { metadata: Promise.resolve(newMetadata) }
+                delete audioLibrary.cache.sounds[oldName]
+            }
+        }
 
         // update local sounds store
         const userSounds = getState().sounds.userSounds
@@ -174,11 +205,13 @@ export const renameSound = createAsyncThunk<void, { oldName: string; newName: st
             dispatch(renameUserSound({ oldName, newName })) // updates soundState
         }
 
-        // refresh favorites, if needed
-        const favorites = getState().sounds.filters.favorites
-        const token = getState().user.token
-        if (favorites.includes(oldName) && token) {
-            dispatch(getFavorites(token))
+        if (state.user.loggedIn) {
+            // refresh favorites, if needed
+            const favorites = getState().sounds.filters.favorites
+            const token = getState().user.token
+            if (favorites.includes(oldName) && token) {
+                dispatch(getFavorites(token))
+            }
         }
     }
 )
