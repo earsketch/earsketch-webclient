@@ -8,7 +8,7 @@ import type { RootState, ThunkAPI, AppDispatch } from "../reducers"
 import { BrowserTabType } from "./BrowserTab"
 import { highlight } from "../ide/highlight"
 
-const CURRICULUM_DIR = "../curriculum"
+let CURRICULUM_DIR = "../curriculum"
 
 // TODO: Make these selectors instead.
 let locationToPage: { [location: string]: number } = {}
@@ -39,14 +39,24 @@ function generatePages(toc: TOCItem[]) {
     return pages
 }
 
-export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
+export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url, customRoot }, { dispatch, getState }) => {
+    console.log("fetchLocale", customRoot)
     dispatch(curriculumSlice.actions.setContentCache({}))
-    const locale = getState().app.locale
-    // don't request json data if locale is null
-    if (!locale) return
+    let root: string
+    if (customRoot !== undefined) {
+        // TODO: move the processing stuff to its own function, and move this out of `fetchLocale`
+        root = customRoot
+        // TODO TEMP
+        CURRICULUM_DIR = customRoot
+    } else {
+        const locale = getState().app.locale
+        // don't request json data if locale is null
+        if (!locale) return
+        root = `${CURRICULUM_DIR}/${locale}`
+    }
 
     const [tocData, searchData] = await Promise.all(["toc", "searchdoc"].map(
-        async res => (await fetch(`${CURRICULUM_DIR}/${locale}/curr_${res}.json`)).json()))
+        async res => (await fetch(`${root}/curr_${res}.json`)).json()))
 
     const pagesData = generatePages(tocData)
 
@@ -94,23 +104,40 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
 export const fetchContent = createAsyncThunk<{ [key: string]: any }, { location?: number[], url?: string }, ThunkAPI>(
     "curriculum/fetchContent",
     async ({ location, url }, { dispatch, getState }) => {
+        console.log("fetchContent", { location: JSON.stringify(location), url })
         const state = getState()
         // check that locale is loaded
         if (state.curriculum.tableOfContents.length === 0) {
             dispatch(fetchLocale({ location, url }))
             return
         }
+
+        // TODO
+        if (url?.startsWith("http")) {
+            console.log("fetching", url)
+            const response = await fetch(url)
+            // Add artificial latency; useful for testing:
+            // await new Promise(r => setTimeout(r, 1000))
+            const text = await response.text()
+            console.log(text)
+            const map = processContent([0], text, dispatch)
+            console.log(map)
+            return map
+        }
+
         const { href: _url, loc: _location } = fixLocation(state.curriculum.tableOfContents, url, location)
+        console.log({ _location: JSON.stringify(_location), _url })
         dispatch(setFocus([_location[0], _location.length > 1 ? _location[1] : null]))
         dispatch(loadChapter({ location: _location }))
         // Check cache before fetching.
         if (state.curriculum.contentCache[_location.join(",")] !== undefined) {
-            esconsole(`${_location} is in the cache, nothing else to do.`, "debug")
+            console.log(`${_location} is in the cache, nothing else to do.`, "debug")
             return {}
         }
 
         const urlWithoutAnchor = _url.split("#", 1)[0]
-        esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
+        // const urlWithoutAnchor = "https://ijc8.me/2019/12/27/why-programming/"
+        console.log(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
         const response = await fetch(urlWithoutAnchor)
         // Add artificial latency; useful for testing:
         // await new Promise(r => window.setTimeout(r, 1000))

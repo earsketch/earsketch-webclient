@@ -342,7 +342,7 @@ const NavigationBar = () => {
 
     return (
         <>
-            <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none text-white bg-blue hover:bg-gray-700">
+            <div id="curriculum-navigation" className={"w-full flex justify-between items-stretch cursor-pointer select-none text-white " + (ESUtils.getURLParameter("customCurriculum") ? "bg-amber" : "bg-blue hover:bg-gray-700")}>
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
                     : <button aria-label={t("curriculum.previousPage")} className="p-1.5" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(tocPages, location, -1) }))} title={t("curriculum.previousPage")}>
@@ -380,9 +380,12 @@ export const Curriculum = () => {
 
     if (!initialized) {
         // Handle URL parameters.
+        const customCurriculum = ESUtils.getURLParameter("customCurriculum")
         const curriculumParam = ESUtils.getURLParameter("curriculum")
 
-        if (curriculumParam !== null) {
+        if (customCurriculum !== null) {
+            dispatch(curriculum.fetchLocale({ customRoot: customCurriculum, url: curriculumParam ?? undefined }))
+        } else if (curriculumParam !== null) {
             // check if this value exists in our old locations file first
             const url = checkLegacyURLs(curriculumParam)
             if (url !== undefined) {
