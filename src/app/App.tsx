@@ -95,11 +95,11 @@ sounds.callbacks.upload = openUploadWindow
 function loadLocalScripts() {
     // Migration code: if any anonymous users have saved scripts from before PR #198, bring them in to Redux state.
     const LS_SCRIPTS_KEY = "scripts_v1"
-    const scriptData = window.localStorage.getItem(LS_SCRIPTS_KEY)
+    const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
     if (scriptData !== null) {
         const scripts = JSON.parse(scriptData) as { [key: string]: Script }
         store.dispatch(scriptsState.setRegularScripts(Object.assign({}, scriptsState.selectRegularScripts(store.getState()), scripts)))
-        window.localStorage.removeItem(LS_SCRIPTS_KEY)
+        localStorage.removeItem(LS_SCRIPTS_KEY)
     }
 
     // Back up active tab. (See comment below re. setActiveTabAndEditor.)
@@ -538,7 +538,7 @@ let email = ""
 
 // Defunct localStorage key that contained username and password
 const USER_STATE_KEY = "userstate"
-const userstate = window.localStorage.getItem(USER_STATE_KEY)
+const userstate = localStorage.getItem(USER_STATE_KEY)
 const savedLoginInfo = userstate === null ? undefined : JSON.parse(userstate)
 
 export const App = () => {
@@ -582,10 +582,10 @@ export const App = () => {
             if (savedLoginInfo) {
                 await login({ username, password }).then(() => {
                     // Remove defunct localStorage key
-                    window.localStorage.removeItem(USER_STATE_KEY)
+                    localStorage.removeItem(USER_STATE_KEY)
                 }).catch((error: Error) => {
                     if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
-                        window.localStorage.clear()
+                        localStorage.clear()
                         window.location.reload()
                         esconsole(error, ["error"])
                         reporter.exception("Auto-login failed. Clearing localStorage.")
@@ -735,7 +735,7 @@ export const App = () => {
             }
         }
 
-        window.localStorage.clear()
+        localStorage.clear()
         if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }

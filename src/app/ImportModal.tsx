@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { useAppSelector as useSelector } from "../hooks"
 import * as backup from "./backup"
 import type { ParsedBackup } from "./backup"
+import * as scriptsState from "../browser/scriptsState"
 import * as userNotification from "../user/notification"
 import { ModalHeader, ModalBody, Alert } from "../Utils"
 
@@ -15,10 +17,18 @@ export const ImportModal = ({ parsed, close }: Props) => {
     const [error, setError] = useState("")
     const [importing, setImporting] = useState(false)
 
-    const scriptNames = parsed.scripts.map(s => s.manifest.name)
+    // Only track scripts whose names actually conflict with existing ones
+    const existingScripts = useSelector(scriptsState.selectActiveScripts)
+    const existingNames = new Set(Object.values(existingScripts).map(s => s.name))
+    const conflictingNames = parsed.scripts
+        .map(s => s.manifest.name)
+        .filter(name => existingNames.has(name))
+
     const [conflicts, setConflicts] = useState<{ [name: string]: "rename" | "skip" }>(
-        () => Object.fromEntries(scriptNames.map(name => [name, "rename"]))
+        () => Object.fromEntries(conflictingNames.map(name => [name, "rename"]))
     )
+
+    const numConflicts = conflictingNames.length
 
     const doImport = async () => {
         setImporting(true)
@@ -40,9 +50,9 @@ export const ImportModal = ({ parsed, close }: Props) => {
         <ModalBody>
             <Alert message={error} />
             <p className="mb-3">{t("backup.importBody", { scriptCount: parsed.scripts.length, soundCount: parsed.sounds.length })}</p>
-            {Object.keys(conflicts).length > 0 && (
+            {numConflicts > 0 && (
                 <div className="mt-3">
-                    <p className="mb-2 font-medium">{t("backup.importConflict", { count: parsed.scripts.length })}</p>
+                    <p className="mb-2 font-medium">{t("backup.importConflict", { count: numConflicts })}</p>
                     <table className="w-full text-sm border border-gray-300">
                         <thead>
                             <tr className="bg-gray-100 dark:bg-gray-800">

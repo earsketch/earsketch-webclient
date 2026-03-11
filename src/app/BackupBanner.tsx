@@ -41,21 +41,23 @@ export const BackupBanner = () => {
     }
 
     const lastBackupText = lastExport
-        ? t("backup.lastBackup", { timeAgo: timeAgo(lastExport) })
+        ? timeAgo(lastExport)
         : t("backup.lastBackupNever")
 
     return (
-        <div className="flex items-center gap-2 text-xs text-gray-300 mr-2">
-            <span className="hidden sm:inline">{t("backup.savedToBrowser")} · {lastBackupText}</span>
+        <div className="flex items-center gap-1.5 whitespace-nowrap mx-2 shrink-0">
+            <span className="hidden lg:inline text-xs text-gray-400" title={t("backup.savedToBrowser")}>
+                {lastBackupText}
+            </span>
             <button
-                className="whitespace-nowrap py-0.5 px-2 text-xs bg-amber-500 text-black hover:bg-amber-400 rounded"
+                className="py-0.5 px-2 text-xs bg-amber-500 text-black hover:bg-amber-400 rounded"
                 onClick={handleExport}
-                title={t("backup.saveButton")}
+                title={t("backup.savedToBrowser") + " · " + lastBackupText}
             >
                 {t("backup.saveButton")}
             </button>
             <label
-                className="whitespace-nowrap py-0.5 px-2 text-xs bg-white text-black hover:bg-gray-200 rounded cursor-pointer"
+                className="py-0.5 px-2 text-xs bg-white text-black hover:bg-gray-200 rounded cursor-pointer"
                 title={t("backup.loadBackup")}
             >
                 {t("backup.loadBackup")}

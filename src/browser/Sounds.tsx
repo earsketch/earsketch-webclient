@@ -281,15 +281,12 @@ const ShowOnlyFavorites = () => {
 
 const AddSound = () => {
     const { t } = useTranslation()
-    const loggedIn = useSelector(user.selectLoggedIn)
-    const tooltip = `${loggedIn ? t("soundBrowser.button.addSound") : "Log in to add sounds"}`
 
     return (
         <button
-            className={`flex items-center rounded-full px-2 ${loggedIn ? "bg-black text-white cursor-pointer" : "text-gray-200 border-gray-200"}`}
+            className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer"
             onClick={callbacks.upload}
-            disabled={!loggedIn}
-            title={tooltip}
+            title={t("soundBrowser.button.addSound")}
         >
             <i className="icon icon-plus2 text-xs mr-1" />
             <div className="text-sm">
