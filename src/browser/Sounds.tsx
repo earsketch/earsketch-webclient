@@ -319,7 +319,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const loggedIn = useSelector(user.selectLoggedIn)
     const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(name)
     const userName = useSelector(user.selectUserName) as string
-    const isUserOwned = loggedIn && clip.folder === userName.toUpperCase()
+    const isUserOwned = loggedIn ? clip.folder === userName.toUpperCase() : !clip.standard
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
 
     return (
@@ -363,7 +363,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                                 <i className="icon icon-paste2" />
                             </button>
                         )}
-                    {(loggedIn && isUserOwned) &&
+                    {isUserOwned &&
                         (
                             <>
                                 <button

@@ -32,7 +32,8 @@ import * as scriptsThunks from "../browser/scriptsThunks"
 import * as sounds from "../browser/Sounds"
 import * as soundsState from "../browser/soundsState"
 import * as soundsThunks from "../browser/soundsThunks"
-import { SoundUploader } from "./SoundUploader"
+import { SoundUploader, LOCAL_SOUND_PREFIX } from "./SoundUploader"
+import * as localSoundStorage from "../audio/localSoundStorage"
 import store, { persistor } from "../reducers"
 import * as tabs from "../ide/tabState"
 import * as tabThunks from "../ide/tabThunks"
@@ -73,11 +74,13 @@ function renameSound(sound: SoundEntity) {
 
 async function deleteSound(sound: SoundEntity) {
     if (await confirm({ textKey: "messages:confirm.deleteSound", textReplacements: { soundName: sound.name }, okKey: "script.delete", type: "danger" })) {
-        try {
-            await request.postAuth("/audio/delete", { name: sound.name })
-            esconsole("Deleted sound: " + sound.name, ["debug", "user"])
-        } catch (err) {
-            esconsole(err, ["error", "userproject"])
+        if (user.selectLoggedIn(store.getState())) {
+            try {
+                await request.postAuth("/audio/delete", { name: sound.name })
+                esconsole("Deleted sound: " + sound.name, ["debug", "user"])
+            } catch (err) {
+                esconsole(err, ["error", "userproject"])
+            }
         }
         store.dispatch(soundsThunks.deleteLocalUserSound(sound.name))
         audioLibrary.clearCache() // TODO: This is probably overkill.
@@ -153,6 +156,17 @@ async function postLogin(username: string) {
     const saved = scriptsState.selectRegularScripts(state)
     const openTabs = tabs.selectOpenTabs(state)
 
+    // Migrate local sounds: build a rename map (USER_X → USERNAME_X) so we can rewrite script references.
+    const localSounds = await localSoundStorage.getAllSounds()
+    const userPrefix = username.toUpperCase() + "_"
+    const soundRenameMap: { [oldName: string]: string } = {}
+    for (const sound of localSounds) {
+        if (sound.name.startsWith(LOCAL_SOUND_PREFIX)) {
+            const suffix = sound.name.slice(LOCAL_SOUND_PREFIX.length)
+            soundRenameMap[sound.name] = userPrefix + suffix
+        }
+    }
+
     // Fetch the user's scripts now that they're logged in.
     // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
     await refreshScriptBrowser()
@@ -163,13 +177,20 @@ async function postLogin(username: string) {
             // Don't migrate scripts the user deleted while logged out.
             continue
         }
+
+        // Rewrite USER_X sound references to USERNAME_X in script source.
+        let source = script.source_code
+        for (const [oldName, newName] of Object.entries(soundRenameMap)) {
+            source = source.replaceAll(oldName, newName)
+        }
+
         let promise
         if (script.original_id !== undefined) {
             promise = scriptsThunks.importSharedScript(script.original_id)
         } else {
             promise = store.dispatch(scriptsThunks.saveScript({
                 name: script.name,
-                source: script.source_code,
+                source,
                 overwrite: false,
                 ...(script.creator === "earsketch" && { creator: "earsketch" }),
             })).unwrap()
@@ -190,6 +211,34 @@ async function postLogin(username: string) {
                 store.dispatch(tabThunks.setActiveTabAndEditor(script.shareid))
             }
         }
+    }
+
+    // Upload local sounds to the server now that the user is logged in.
+    for (const sound of localSounds) {
+        const suffix = sound.name.startsWith(LOCAL_SOUND_PREFIX) ? sound.name.slice(LOCAL_SOUND_PREFIX.length) : sound.name
+        try {
+            const blob = new Blob([sound.audioData])
+            const data = request.form({
+                file: blob,
+                name: suffix,
+                filename: `${suffix}.flac`,
+                tempo: String(sound.metadata.tempo ?? -1),
+            })
+            const token = user.selectToken(store.getState())
+            await fetch(URL_DOMAIN + "/audio/upload", {
+                method: "POST",
+                headers: { Authorization: "Bearer " + token },
+                body: data,
+            })
+        } catch (err) {
+            esconsole("Failed to upload local sound " + sound.name + ": " + err, ["error", "user"])
+        }
+    }
+    // Clear IndexedDB after successful migration.
+    if (localSounds.length > 0) {
+        await localSoundStorage.clear()
+        audioLibrary.clearCache()
+        store.dispatch(soundsThunks.getUserSounds(username))
     }
 
     const shareID = ESUtils.getURLParameter("sharing")

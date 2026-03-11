@@ -38,11 +38,14 @@ function validateUpload(username: string | null, name: string, tempo: number) {
     }
 }
 
+export const LOCAL_SOUND_PREFIX = "USER_"
+
 function validateLocalUpload(name: string, tempo: number) {
     if (!name) throw new Error(i18n.t("messages:uploadcontroller.userAuth"))
-    const names = sounds.selectAllNames(store.getState())
-    if (names.some(k => k === name)) {
-        throw new Error(`${name}${i18n.t("messages:uploadcontroller.alreadyused")}`)
+    const fullName = LOCAL_SOUND_PREFIX + name
+    const allNames = sounds.selectAllNames(store.getState())
+    if (allNames.some(k => k === fullName)) {
+        throw new Error(`${fullName}${i18n.t("messages:uploadcontroller.alreadyused")}`)
     } else if (tempo > 220 || (tempo > -1 && tempo < 45)) {
         throw new Error(i18n.t("messages:esaudio.tempoRange"))
     }
@@ -50,6 +53,7 @@ function validateLocalUpload(name: string, tempo: number) {
 
 async function storeLocalSound(name: string, file: Blob, tempo: number, onProgress: (frac: number) => void): Promise<void> {
     validateLocalUpload(name, tempo)
+    const fullName = LOCAL_SOUND_PREFIX + name
 
     if (file.size > 10 * 1024 * 1024) {
         throw new Error(i18n.t("messages:uploadcontroller.toobig"))
@@ -77,16 +81,19 @@ async function storeLocalSound(name: string, file: Blob, tempo: number, onProgre
     }
 
     const metadata = {
-        name,
+        name: fullName,
         standard: false,
         path: "",
-        folder: "",
+        folder: LOCAL_SOUND_PREFIX.slice(0, -1),
+        artist: LOCAL_SOUND_PREFIX.slice(0, -1),
+        genre: "",
+        instrument: "",
         tempo: tempo === -1 ? undefined : tempo,
         public: true,
     } as any
 
-    await localSoundStorage.storeSound(name, audioData, metadata)
-    audioLibrary.cache.sounds[name] = { metadata: Promise.resolve(metadata) }
+    await localSoundStorage.storeSound(fullName, audioData, metadata)
+    audioLibrary.cache.sounds[fullName] = { metadata: Promise.resolve(metadata) }
     store.dispatch(getLocalUserSounds())
     onProgress(1)
     userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
