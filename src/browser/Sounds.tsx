@@ -1,9 +1,8 @@
-import React, { useRef, useEffect, ChangeEvent, useState, createRef, useLayoutEffect } from "react"
+import React, { useRef, useEffect, ChangeEvent, useState, createRef } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
-
-import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
+import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
 import classNames from "classnames"
 
 import { addUIClick } from "../cai/dialogue/student"
@@ -410,7 +409,7 @@ const ClipList = ({ names }: { names: string[] }) => {
     const theme = useSelector(appState.selectColorTheme)
 
     return (
-        <div className="flex flex-col mb-4">
+        <div className="flex flex-col mb-2">
             {names?.map((v: string) =>
                 entities[v] && <Clip
                     key={v} clip={entities[v]}
@@ -425,37 +424,34 @@ interface FolderProps {
     folder: string,
     names: string[],
     index: number,
-    listRef: React.RefObject<any>
 }
 
 const Folder = ({ folder, names }: FolderProps) => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
-    return (<>
-        <div className="flex flex-row justify-start sticky top-0 bg-inherit">
-            <div
-                className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
-                title={folder}
-            >
-                <h4 className="truncate" style={{ fontSize: `${0.875 * scalar}rem` }}>{folder}</h4>
+    return (
+        <div>
+            <div className="flex flex-row justify-start sticky top-0 bg-inherit">
+                <div
+                    className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
+                    title={folder}
+                >
+                    <h4 className="truncate" style={{ fontSize: `${0.875 * scalar}rem` }}>{folder}</h4>
+                </div>
             </div>
+            <ClipList names={names} />
         </div>
-        <ClipList names={names} />
-    </>)
+    )
 }
 
 interface SoundSearchAndFiltersProps {
     currentFilterTab: keyof sounds.Filters,
     setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
-    setFilterHeight: React.Dispatch<React.SetStateAction<number>>
+    setFilterHeight?: React.Dispatch<React.SetStateAction<number>>
 }
 
-const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
+const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndFiltersProps) => {
     const filterRef: React.RefObject<HTMLDivElement> = createRef()
-    useLayoutEffect(() => {
-        const soundFilterHeight = filterRef.current?.offsetHeight || 0
-        setFilterHeight(soundFilterHeight)
-    })
 
     return (
         <div ref={filterRef} className="pb-1">
@@ -475,7 +471,6 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
 const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
     title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }) => {
-    const fontSize = useSelector(appState.selectFontSize)
     const { t } = useTranslation()
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
@@ -487,56 +482,12 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
         "text-gray-200 border-gray-200": !clearButtonEnabled,
     })
-    const listRef = useRef<List>(null)
     const scrollToTopRef = useRef<HTMLDivElement>(null)
-    const [filterHeight, setFilterHeight] = useState(0)
     const soundListClassnames = "grow"
     const extraFilterControlsClassnames = "sticky top-0 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
     const scrolltoTopClassnames = "absolute bottom-4 right-4 z-10 opacity-0 transform translate-y-full transition-all duration-300 pointer-events-none"
 
-    const scalar = fontSize / 14
-
-    useEffect(() => {
-        if (listRef?.current) {
-            listRef.current.resetAfterIndex(0)
-        }
-    }, [folders, namesByFolders])
-
-    useLayoutEffect(() => {
-        listRef.current?.resetAfterIndex(0)
-    }, [filterHeight])
-
-    useEffect(() => {
-        listRef.current?.resetAfterIndex(0)
-    }, [scalar])
-
-    const folderHeight = Math.round(fontSize * 2.2)
-    const clipHeight = Math.round(fontSize * 2.1)
-
-    const getItemSize = (index: number) => {
-        if (index === 0) {
-            return filterHeight
-        } else if (index === folders.length) {
-            // add extra space for the last folder to scroll above the scroll to top button
-            return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length) + (clipHeight * 2)
-        } else {
-            return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length)
-        }
-    }
-
-    const handleScroll = ({ scrollOffset }: { scrollOffset: number }) => {
-        if (scrollToTopRef.current) {
-            if (scrollOffset > filterHeight) { // Show button after scrolling past filters
-                scrollToTopRef.current.style.opacity = "1"
-                scrollToTopRef.current.style.transform = "translateY(0)"
-                scrollToTopRef.current.style.pointerEvents = "auto"
-            } else {
-                scrollToTopRef.current.style.opacity = "0"
-                scrollToTopRef.current.style.transform = "translateY(100%)"
-                scrollToTopRef.current.style.pointerEvents = "none"
-            }
-        }
-    }
+    const virtuosoRef = useRef<VirtuosoHandle>(null)
 
     return (
         <div className="flex flex-col grow relative">
@@ -559,61 +510,63 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
             <div className={soundListClassnames}>
                 <AutoSizer>
                     {({ height, width }: { height: number, width: number }) => (
-                        <List
-                            ref={listRef}
-                            height={height}
-                            width={width}
-                            itemCount={folders.length + 1}
-                            itemSize={getItemSize}
-                            onScroll={handleScroll}
-                        >
-                            {({ index, style }) => {
-                                if (index === 0) {
-                                    return (
-                                        <div style={style}>
-
-                                            <h3 className="sr-only">
-                                                {t("soundBrowser.filterHeader")}
-                                            </h3>
-                                            <SoundFilters
-                                                currentFilterTab={currentFilterTab}
-                                                setCurrentFilterTab={setCurrentFilterTab}
-                                                setFilterHeight={setFilterHeight}
-                                            />
-                                            <h3 className="sr-only">
-                                                {t("soundBrowser.soundHeader")}
-                                            </h3>
-                                        </div>
-
-                                    )
-                                } else {
-                                    const names = namesByFolders[folders[index - 1]]
-                                    return (
-                                        <div style={style}>
-                                            <Folder
-                                                folder={folders[index - 1]}
-                                                names={names}
-                                                index={index - 1}
-                                                listRef={listRef}
-                                            />
-                                        </div>
-                                    )
+                        <Virtuoso
+                            ref={virtuosoRef}
+                            style={{ height, width }}
+                            overscan={2500}
+                            increaseViewportBy={{ top: 3500, bottom: 3501 }}
+                            data={folders}
+                            onScroll={(e) => {
+                                const scrollOffset = (e.target as HTMLElement).scrollTop
+                                if (scrollToTopRef.current) {
+                                    if (scrollOffset > 0) {
+                                        scrollToTopRef.current.style.opacity = "1"
+                                        scrollToTopRef.current.style.transform = "translateY(0)"
+                                        scrollToTopRef.current.style.pointerEvents = "auto"
+                                    } else {
+                                        scrollToTopRef.current.style.opacity = "0"
+                                        scrollToTopRef.current.style.transform = "translateY(100%)"
+                                        scrollToTopRef.current.style.pointerEvents = "none"
+                                    }
                                 }
                             }}
-                        </List>
+                            components={{
+                                Header: () => (
+                                    <>
+                                        <h3 className="sr-only">
+                                            {t("soundBrowser.filterHeader")}
+                                        </h3>
+                                        <SoundFilters
+                                            currentFilterTab={currentFilterTab}
+                                            setCurrentFilterTab={setCurrentFilterTab}
+                                        />
+                                        <h3 className="sr-only">
+                                            {t("soundBrowser.soundHeader")}
+                                        </h3>
+                                    </>
+                                )
+                            }}
+                            itemContent={(index, folder) => (
+                                <Folder
+                                    folder={folder}
+                                    names={namesByFolders[folder]}
+                                    index={index}
+                                />
+                            )}
+                        />
                     )}
                 </AutoSizer>
 
-            </div>
-            <div ref={scrollToTopRef} className={scrolltoTopClassnames}>
-                <button className="px-3 py-2 rounded text-white bg-blue text-sm  shadow-lg transition-all duration-200 hover:text-amber hover:shadow-xl"
-                    onClick={() => listRef.current!.scrollToItem(0)} title={t("soundBrowser.button.backToTop")}>
-                    <i className="icon icon-arrow-up3"></i>
-                </button>
-            </div>
-        </div>
-    )
-}
+                            </div>
+                            <div ref={scrollToTopRef} className={scrolltoTopClassnames}>
+                                <button className="px-3 py-2 rounded text-white bg-blue text-sm  shadow-lg transition-all duration-200 hover:text-amber hover:shadow-xl"
+                                    onClick={() => virtuosoRef.current?.scrollToIndex({ index: 0, behavior: 'smooth' })} title={t("soundBrowser.button.backToTop")}>
+                                    <i className="icon icon-arrow-up3"></i>
+                                </button>
+                            </div>
+                        </div>
+                    )
+                }
 
 const DefaultSoundCollection = () => {
     const { t } = useTranslation()
