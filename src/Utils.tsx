@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next"
 import classNames from "classnames"
 import { DialogTitle } from "@headlessui/react"
 import { openModal } from "./app/modal"
+import * as appState from "./app/appState"
+import { useAppSelector as useSelector } from "./hooks"
 
 // Useful for preventing absolute-positioned elements from exceeding window height.
 export const useHeightLimiter = (show: boolean, marginBottom: string|null = null): [MutableRefObject<HTMLDivElement|null>, React.CSSProperties] => {
@@ -86,6 +88,8 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
 }
 
 export const CheckboxButton = ({ value = 0, label = value.toString(), fullWidth = false, onClick, selected = false, submitOnClick = true, selectedColor = "amber" }: { value?: number, label?: string, fullWidth?: boolean, onClick: (input: number) => void, selected?: boolean, submitOnClick?: boolean, selectedColor?: "amber" | "green" }) => {
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     const classnames = classNames({
         "rounded cursor-pointer p-1 mt-1 mr-2": true,
         "hover:bg-amber-50 dark:hover:bg-amber-900 hover:text-black dark:text-white": selectedColor === "amber",
@@ -109,7 +113,7 @@ export const CheckboxButton = ({ value = 0, label = value.toString(), fullWidth 
             <span className="rounded-full inline-flex w-1 mr-2">
                 <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
             </span>
-            <div className="text-xs select-none mr-4">
+            <div className="select-none mr-4" style={{ fontSize: `${0.75 * scalar}rem` }}>
                 {label}
             </div>
         </div>

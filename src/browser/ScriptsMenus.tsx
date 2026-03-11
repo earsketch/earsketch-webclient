@@ -216,7 +216,7 @@ const ScriptContextMenu = ({ script, className, children, scriptMenuItems }: { s
             <ContextMenu.Portal>
                 <ContextMenu.Content className="focus:outline-none border border-black p-2 z-50 bg-white dark:bg-black">
                     <ContextMenu.Item className="" disabled>
-                        <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
+                        <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-black border-black dark:text-white dark:border-white">
                             <div className="truncate">
                                 {script?.name}
                             </div>

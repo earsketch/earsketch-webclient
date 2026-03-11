@@ -282,6 +282,8 @@ const SharedScriptInfoButton = ({ script }: { script: Script }) => {
 }
 
 const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => {
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     const dispatch = useDispatch()
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid)
     const active = useSelector(tabs.selectActiveTabID) === script.shareid
@@ -313,11 +315,11 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
         >
             <div className={`h-auto border-l-4 ${tabIndicator}`} />
             <div
-                className="flex grow truncate px-2 text-sm"
+                className="flex grow truncate px-2" style={{ fontSize: `${0.875 * scalar}rem` }}
             >
                 <div className="h-11 flex grow items-center truncate justify-between">
                     <div className="flex justify-start items-center truncate font-medium space-x-2">
-                        <div className="truncate">
+                        <div className="truncate" style={{ fontSize: `${0.875 * scalar}rem` }}>
                             {script.name}
                         </div>
                         <div className="pr-4 space-x-2">

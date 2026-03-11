@@ -139,28 +139,33 @@ interface MajMinRadioButtonsProps {
 }
 
 const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinRadioButtonsProps) => {
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
+
     const majorButtonClass = classNames({
-        "py-1.5 px-2 text-xs border-y border-l rounded-l": true,
+        "py-1.5 px-2 border-y border-l rounded-l": true,
         "bg-slate-200 dark:bg-slate-600 border-slate-400 border-r": showMajMinPageOne,
         "border-slate-200": !showMajMinPageOne,
     })
     const minorButtonClass = classNames({
-        "py-1.5 px-2 text-xs border-y border-r rounded-r": true,
+        "py-1.5 px-2 border-y border-r rounded-r": true,
         "border-slate-200": showMajMinPageOne,
         "bg-slate-200 dark:bg-slate-600 border-slate-400 border-l": !showMajMinPageOne,
     })
     return <div className="flex items-center justify-center mb-1">
         <div className="inline-flex" role="tablist">
-            <button role="tab" className={majorButtonClass} onClick={chooseMaj}>Major</button>
-            <button role="tab" className={minorButtonClass} onClick={chooseMin}>Minor</button>
+            <button role="tab" className={majorButtonClass} style={{ fontSize: `${0.75 * scalar}rem` }} onClick={chooseMaj}>Major</button>
+            <button role="tab" className={minorButtonClass} style={{ fontSize: `${0.75 * scalar}rem` }} onClick={chooseMin}>Minor</button>
         </div>
     </div>
 }
 
 const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters }) => {
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scale = fontSize / 14
     const tabClass = classNames({
-        "text-xs uppercase rounded p-1 min-w-1/5 max-w-1/4 text-black bg-gray-200 aria-selected:bg-amber": true,
+        "uppercase rounded p-1 min-w-1/5 max-w-1/4 text-black bg-gray-200 aria-selected:bg-amber": true,
     })
     const spanClass = "absolute -top-[0.6rem] right-[-8px] inline-flex items-center justify-center px-1 py-0.5 z-10 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
 
@@ -171,6 +176,7 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
                 <button role="tab"
                     aria-selected={currentFilterTab === soundFilterKey}
                     className={tabClass}
+                    style={{ fontSize: `${0.75 * scale}rem` }}
                     onClick={() => setCurrentFilterTab(soundFilterKey)}>
                     {t(`soundBrowser.filterDropdown.${soundFilterKey}`)}
                 </button>
@@ -246,14 +252,18 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
 
 const NumberOfSounds = () => {
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
 
-    return <div className="flex items-center text-xs">
+    return <div className="flex items-center" style={{ fontSize: `${0.75 * scalar}rem` }}>
         {t("numSounds", { count: numFiltered })}
     </div>
 }
 
 const ShowOnlyFavorites = () => {
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const filterByFavorites = useSelector(sounds.selectFilterByFavorites)
@@ -271,7 +281,7 @@ const ShowOnlyFavorites = () => {
                 role="checkbox"
                 checked={filterByFavorites}
             />
-            <span className="text-sm">
+            <span style={{ fontSize: `${0.875 * scalar}rem` }}>
                 {t("soundBrowser.button.showOnlyStars")}
                 <i className="icon icon-star-full2 text-orange-600 ml-1" />
             </span>
@@ -280,6 +290,8 @@ const ShowOnlyFavorites = () => {
 }
 
 const AddSound = () => {
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     const { t } = useTranslation()
     const loggedIn = useSelector(user.selectLoggedIn)
     const tooltip = `${loggedIn ? t("soundBrowser.button.addSound") : "Log in to add sounds"}`
@@ -291,8 +303,8 @@ const AddSound = () => {
             disabled={!loggedIn}
             title={tooltip}
         >
-            <i className="icon icon-plus2 text-xs mr-1" />
-            <div className="text-sm">
+            <i className="icon icon-plus2 mr-1" style={{ fontSize: `${0.75 * scalar}rem` }} />
+            <div style={{ fontSize: `${0.875 * scalar}rem` }}>
                 {t("soundBrowser.button.addSound")}
             </div>
         </button>
@@ -306,6 +318,8 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const name = clip.name
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
 
     let tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
     ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
@@ -330,7 +344,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
-                    <h5 className="text-sm truncate pl-2">{name}</h5>
+                    <h5 className="truncate pl-2" style={{ fontSize: `${0.875 * scalar}rem` }}>{name}</h5>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -415,13 +429,15 @@ interface FolderProps {
 }
 
 const Folder = ({ folder, names }: FolderProps) => {
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     return (<>
         <div className="flex flex-row justify-start sticky top-0 bg-inherit">
             <div
                 className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
                 title={folder}
             >
-                <h4 className="text-sm truncate">{folder}</h4>
+                <h4 className="truncate" style={{ fontSize: `${0.875 * scalar}rem` }}>{folder}</h4>
             </div>
         </div>
         <ClipList names={names} />
@@ -459,6 +475,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
 const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
     title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }) => {
+    const fontSize = useSelector(appState.selectFontSize)
     const { t } = useTranslation()
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
@@ -477,6 +494,8 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const extraFilterControlsClassnames = "sticky top-0 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
     const scrolltoTopClassnames = "absolute bottom-4 right-4 z-10 opacity-0 transform translate-y-full transition-all duration-300 pointer-events-none"
 
+    const scalar = fontSize / 14
+
     useEffect(() => {
         if (listRef?.current) {
             listRef.current.resetAfterIndex(0)
@@ -487,9 +506,14 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         listRef.current?.resetAfterIndex(0)
     }, [filterHeight])
 
+    useEffect(() => {
+        listRef.current?.resetAfterIndex(0)
+    }, [scalar])
+
+    const folderHeight = Math.round(fontSize * 2.2)
+    const clipHeight = Math.round(fontSize * 2.1)
+
     const getItemSize = (index: number) => {
-        const folderHeight = 25
-        const clipHeight = 30
         if (index === 0) {
             return filterHeight
         } else if (index === folders.length) {
