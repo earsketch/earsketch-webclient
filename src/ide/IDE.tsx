@@ -39,6 +39,7 @@ import { saveScriptIfModified, setActiveTabAndEditor } from "./tabThunks"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
+import * as backup from "../app/backup"
 import type { DAWData } from "common"
 import classNames from "classnames"
 
@@ -63,6 +64,15 @@ export async function createScript() {
         const action = scriptsThunks.saveScript({ name: result.filename, source: i18n.t(`templates:${result.template}`) })
         const script = await store.dispatch(action).unwrap()
         store.dispatch(setActiveTabAndEditor(script.shareid))
+
+        // Show first-visit backup notice for logged-out users who have never been warned.
+        const NOTICE_KEY = "earsketch_backup_notice_shown"
+        if (!user.selectLoggedIn(store.getState()) && !localStorage.getItem(NOTICE_KEY)) {
+            localStorage.setItem(NOTICE_KEY, "1")
+            if (backup.getLastExportTime() === null) {
+                userNotification.show(i18n.t("backup.firstVisitNotice"), "", 8)
+            }
+        }
     }
 }
 

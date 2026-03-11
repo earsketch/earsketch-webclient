@@ -32,7 +32,8 @@ import * as scriptsThunks from "../browser/scriptsThunks"
 import * as sounds from "../browser/Sounds"
 import * as soundsState from "../browser/soundsState"
 import * as soundsThunks from "../browser/soundsThunks"
-import { SoundUploader } from "./SoundUploader"
+import { SoundUploader, LOCAL_SOUND_PREFIX } from "./SoundUploader"
+import * as localSoundStorage from "../audio/localSoundStorage"
 import store, { persistor } from "../reducers"
 import * as tabs from "../ide/tabState"
 import * as tabThunks from "../ide/tabThunks"
@@ -47,6 +48,9 @@ import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
+import { BackupBanner } from "./BackupBanner"
+import { ImportModal } from "./ImportModal"
+import * as backup from "./backup"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -70,11 +74,13 @@ function renameSound(sound: SoundEntity) {
 
 async function deleteSound(sound: SoundEntity) {
     if (await confirm({ textKey: "messages:confirm.deleteSound", textReplacements: { soundName: sound.name }, okKey: "script.delete", type: "danger" })) {
-        try {
-            await request.postAuth("/audio/delete", { name: sound.name })
-            esconsole("Deleted sound: " + sound.name, ["debug", "user"])
-        } catch (err) {
-            esconsole(err, ["error", "userproject"])
+        if (user.selectLoggedIn(store.getState())) {
+            try {
+                await request.postAuth("/audio/delete", { name: sound.name })
+                esconsole("Deleted sound: " + sound.name, ["debug", "user"])
+            } catch (err) {
+                esconsole(err, ["error", "userproject"])
+            }
         }
         store.dispatch(soundsThunks.deleteLocalUserSound(sound.name))
         audioLibrary.clearCache() // TODO: This is probably overkill.
@@ -82,11 +88,7 @@ async function deleteSound(sound: SoundEntity) {
 }
 
 function openUploadWindow() {
-    if (user.selectLoggedIn(store.getState())) {
-        openModal(SoundUploader)
-    } else {
-        userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
-    }
+    openModal(SoundUploader)
 }
 
 sounds.callbacks.rename = renameSound
@@ -96,11 +98,11 @@ sounds.callbacks.upload = openUploadWindow
 function loadLocalScripts() {
     // Migration code: if any anonymous users have saved scripts from before PR #198, bring them in to Redux state.
     const LS_SCRIPTS_KEY = "scripts_v1"
-    const scriptData = window.localStorage.getItem(LS_SCRIPTS_KEY)
+    const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
     if (scriptData !== null) {
         const scripts = JSON.parse(scriptData) as { [key: string]: Script }
         store.dispatch(scriptsState.setRegularScripts(Object.assign({}, scriptsState.selectRegularScripts(store.getState()), scripts)))
-        window.localStorage.removeItem(LS_SCRIPTS_KEY)
+        localStorage.removeItem(LS_SCRIPTS_KEY)
     }
 
     // Back up active tab. (See comment below re. setActiveTabAndEditor.)
@@ -154,6 +156,17 @@ async function postLogin(username: string) {
     const saved = scriptsState.selectRegularScripts(state)
     const openTabs = tabs.selectOpenTabs(state)
 
+    // Migrate local sounds: build a rename map (USER_X → USERNAME_X) so we can rewrite script references.
+    const localSounds = await localSoundStorage.getAllSounds()
+    const userPrefix = username.toUpperCase() + "_"
+    const soundRenameMap: { [oldName: string]: string } = {}
+    for (const sound of localSounds) {
+        if (sound.name.startsWith(LOCAL_SOUND_PREFIX)) {
+            const suffix = sound.name.slice(LOCAL_SOUND_PREFIX.length)
+            soundRenameMap[sound.name] = userPrefix + suffix
+        }
+    }
+
     // Fetch the user's scripts now that they're logged in.
     // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
     await refreshScriptBrowser()
@@ -164,13 +177,20 @@ async function postLogin(username: string) {
             // Don't migrate scripts the user deleted while logged out.
             continue
         }
+
+        // Rewrite USER_X sound references to USERNAME_X in script source.
+        let source = script.source_code
+        for (const [oldName, newName] of Object.entries(soundRenameMap)) {
+            source = source.replaceAll(oldName, newName)
+        }
+
         let promise
         if (script.original_id !== undefined) {
             promise = scriptsThunks.importSharedScript(script.original_id)
         } else {
             promise = store.dispatch(scriptsThunks.saveScript({
                 name: script.name,
-                source: script.source_code,
+                source,
                 overwrite: false,
                 ...(script.creator === "earsketch" && { creator: "earsketch" }),
             })).unwrap()
@@ -191,6 +211,34 @@ async function postLogin(username: string) {
                 store.dispatch(tabThunks.setActiveTabAndEditor(script.shareid))
             }
         }
+    }
+
+    // Upload local sounds to the server now that the user is logged in.
+    for (const sound of localSounds) {
+        const suffix = sound.name.startsWith(LOCAL_SOUND_PREFIX) ? sound.name.slice(LOCAL_SOUND_PREFIX.length) : sound.name
+        try {
+            const blob = new Blob([sound.audioData])
+            const data = request.form({
+                file: blob,
+                name: suffix,
+                filename: `${suffix}.flac`,
+                tempo: String(sound.metadata.tempo ?? -1),
+            })
+            const token = user.selectToken(store.getState())
+            await fetch(URL_DOMAIN + "/audio/upload", {
+                method: "POST",
+                headers: { Authorization: "Bearer " + token },
+                body: data,
+            })
+        } catch (err) {
+            esconsole("Failed to upload local sound " + sound.name + ": " + err, ["error", "user"])
+        }
+    }
+    // Clear IndexedDB after successful migration.
+    if (localSounds.length > 0) {
+        await localSoundStorage.clear()
+        audioLibrary.clearCache()
+        store.dispatch(soundsThunks.getUserSounds(username))
     }
 
     const shareID = ESUtils.getURLParameter("sharing")
@@ -539,7 +587,7 @@ let email = ""
 
 // Defunct localStorage key that contained username and password
 const USER_STATE_KEY = "userstate"
-const userstate = window.localStorage.getItem(USER_STATE_KEY)
+const userstate = localStorage.getItem(USER_STATE_KEY)
 const savedLoginInfo = userstate === null ? undefined : JSON.parse(userstate)
 
 export const App = () => {
@@ -576,14 +624,17 @@ export const App = () => {
         (async () => {
             document.getElementById("loading-screen")!.style.display = "none"
 
+            // Load local sounds for logged-out users before login attempt.
+            await store.dispatch(soundsThunks.getLocalUserSounds())
+
             // Attempt to load userdata from a previous session.
             if (savedLoginInfo) {
                 await login({ username, password }).then(() => {
                     // Remove defunct localStorage key
-                    window.localStorage.removeItem(USER_STATE_KEY)
+                    localStorage.removeItem(USER_STATE_KEY)
                 }).catch((error: Error) => {
                     if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
-                        window.localStorage.clear()
+                        localStorage.clear()
                         window.location.reload()
                         esconsole(error, ["error"])
                         reporter.exception("Auto-login failed. Clearing localStorage.")
@@ -611,6 +662,22 @@ export const App = () => {
                     store.dispatch(bubble.resume())
                 }
             }
+
+            // App-level drag-and-drop for .earsketch backup files.
+            const onDrop = async (e: DragEvent) => {
+                e.preventDefault()
+                const file = [...(e.dataTransfer?.files ?? [])].find(f => f.name.endsWith(".earsketch"))
+                if (file) {
+                    try {
+                        const parsed = await backup.parseBackup(file)
+                        openModal(ImportModal, { parsed })
+                    } catch (err: any) {
+                        userNotification.show(err.message ?? "Failed to load backup", "failure1")
+                    }
+                }
+            }
+            document.addEventListener("dragover", e => e.preventDefault())
+            document.addEventListener("drop", onDrop)
         })()
     }, [])
 
@@ -717,7 +784,7 @@ export const App = () => {
             }
         }
 
-        window.localStorage.clear()
+        localStorage.clear()
         if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
@@ -826,6 +893,7 @@ export const App = () => {
                     <FontSizeMenu />
                     <SwitchThemeButton />
                     <MiscActionMenu />
+                    <BackupBanner />
                     <NotificationMenu />
                     <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
@@ -905,6 +973,12 @@ window.onbeforeunload = () => {
         const promise = scriptsThunks.saveAll()
         if (promise) {
             promise.then(() => userNotification.show(i18n.t("messages:user.allscriptscloud"), "success"))
+            return ""
+        }
+    } else {
+        const hasData = Object.keys(scriptsState.selectActiveScripts(store.getState())).length > 0
+        if (hasData && !backup.hasExportedThisSession()) {
+            persistor.flush()
             return ""
         }
     }

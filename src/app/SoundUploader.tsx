@@ -12,7 +12,8 @@ import * as recorder from "./esrecorder"
 import { LevelMeter, Metronome, Waveform } from "./Recorder"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
-import { getUserSounds } from "../browser/soundsThunks"
+import { getUserSounds, getLocalUserSounds } from "../browser/soundsThunks"
+import * as localSoundStorage from "../audio/localSoundStorage"
 import { encodeFLAC } from "../audio/renderer"
 import * as userConsole from "../ide/console"
 import * as userNotification from "../user/notification"
@@ -35,6 +36,67 @@ function validateUpload(username: string | null, name: string, tempo: number) {
     } else if (tempo > 220 || (tempo > -1 && tempo < 45)) {
         throw new Error(i18n.t("messages:esaudio.tempoRange"))
     }
+}
+
+export const LOCAL_SOUND_PREFIX = "USER_"
+
+function validateLocalUpload(name: string, tempo: number) {
+    if (!name) throw new Error(i18n.t("messages:uploadcontroller.userAuth"))
+    const fullName = LOCAL_SOUND_PREFIX + name
+    const allNames = sounds.selectAllNames(store.getState())
+    if (allNames.some(k => k === fullName)) {
+        throw new Error(`${fullName}${i18n.t("messages:uploadcontroller.alreadyused")}`)
+    } else if (tempo > 220 || (tempo > -1 && tempo < 45)) {
+        throw new Error(i18n.t("messages:esaudio.tempoRange"))
+    }
+}
+
+async function storeLocalSound(name: string, file: Blob, tempo: number, onProgress: (frac: number) => void): Promise<void> {
+    validateLocalUpload(name, tempo)
+    const fullName = LOCAL_SOUND_PREFIX + name
+
+    if (file.size > 10 * 1024 * 1024) {
+        throw new Error(i18n.t("messages:uploadcontroller.toobig"))
+    }
+
+    const type = await fileTypeFromBlob(file)
+    if (!AUDIO_FORMATS.map(f => `audio/${f.mime}`).includes(type?.mime!)) {
+        throw new Error(i18n.t("messages:uploadcontroller.wavsel"))
+    }
+
+    onProgress(0)
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = await audioContext.decodeAudioData(arrayBuffer.slice(0))
+    if (buffer.duration > 30) {
+        throw new Error(i18n.t("messages:uploadcontroller.toolong"))
+    }
+
+    let audioData: ArrayBuffer
+    if (type!.mime === "audio/wav") {
+        const channels = [...new Array(buffer.numberOfChannels)].map((_, i) => buffer.getChannelData(i))
+        const flac = encodeFLAC(channels, buffer.sampleRate, buffer.numberOfChannels)
+        audioData = await flac.arrayBuffer()
+    } else {
+        audioData = await file.arrayBuffer()
+    }
+
+    const metadata = {
+        name: fullName,
+        standard: false,
+        path: "",
+        folder: LOCAL_SOUND_PREFIX.slice(0, -1),
+        artist: LOCAL_SOUND_PREFIX.slice(0, -1),
+        genre: "",
+        instrument: "",
+        tempo: tempo === -1 ? undefined : tempo,
+        public: true,
+    } as any
+
+    await localSoundStorage.storeSound(fullName, audioData, metadata)
+    audioLibrary.cache.sounds[fullName] = { metadata: Promise.resolve(metadata) }
+    store.dispatch(getLocalUserSounds())
+    onProgress(1)
+    userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
 }
 
 const AUDIO_FORMATS = [
@@ -117,6 +179,7 @@ async function uploadFile(username: string | null, file: Blob, name: string, ext
 
 const FileTab = ({ close }: { close: () => void }) => {
     const username = useSelector(user.selectUserName)
+    const loggedIn = useSelector(user.selectLoggedIn)
     const [file, setFile] = useState(null as File | null)
     const [name, setName] = useState("")
     const [tempo, setTempo] = useState("")
@@ -132,7 +195,11 @@ const FileTab = ({ close }: { close: () => void }) => {
 
     const submit = async () => {
         try {
-            await uploadFile(username, file!, name, extension, tempo === "" ? -1 : +tempo, setProgress)
+            if (loggedIn) {
+                await uploadFile(username, file!, name, extension, tempo === "" ? -1 : +tempo, setProgress)
+            } else {
+                await storeLocalSound(name, file!, tempo === "" ? -1 : +tempo, setProgress)
+            }
             close()
         } catch (error: any) {
             setError(error.message)
@@ -176,6 +243,7 @@ const FileTab = ({ close }: { close: () => void }) => {
 
 const RecordTab = ({ close }: { close: () => void }) => {
     const username = useSelector(user.selectUserName)
+    const loggedIn = useSelector(user.selectLoggedIn)
     const { t } = useTranslation()
     const isMacFirefox = ESUtils.whichBrowser().includes("Firefox") && ESUtils.whichOS() === "MacOS"
     const [name, setName] = useState("")
@@ -209,7 +277,11 @@ const RecordTab = ({ close }: { close: () => void }) => {
     const submit = async () => {
         try {
             const blob = encodeFLAC(buffer!.getChannelData(0), audioContext.sampleRate, 1)
-            await uploadFile(username, blob, name, ".flac", metronome ? tempo : 120, setProgress)
+            if (loggedIn) {
+                await uploadFile(username, blob, name, ".flac", metronome ? tempo : 120, setProgress)
+            } else {
+                await storeLocalSound(name, blob, metronome ? tempo : 120, setProgress)
+            }
             close()
         } catch (error: any) {
             setError(error.message)
@@ -398,13 +470,15 @@ const Tabs = [
 
 export const SoundUploader = ({ close }: { close: () => void }) => {
     const [activeTab, setActiveTab] = useState(0)
-    const TabBody = Tabs[activeTab].component
+    const loggedIn = useSelector(user.selectLoggedIn)
+    const visibleTabs = loggedIn ? Tabs : Tabs.filter(tab => tab.titleKey !== "FREESOUND")
+    const TabBody = visibleTabs[activeTab]?.component ?? visibleTabs[0].component
     const { t } = useTranslation()
 
     return <>
         <ModalHeader>{t("soundUploader.title")}</ModalHeader>
         <div className="mb-2 bg-blue flex">
-            {Tabs.map(({ titleKey, icon }, index) =>
+            {visibleTabs.map(({ titleKey, icon }, index) =>
                 <button key={index} onClick={e => { e.preventDefault(); setActiveTab(index) }} className={"text-sm h-full flex justify-center items-center grow px-1 py-2 w-1/4 cursor-pointer border-b-4 " + (activeTab === index ? "border-b-amber text-amber" : "border-transparent text-white")} style={{ textDecoration: "none" }}>
                     <i className={`icon icon-${icon} mr-3`}></i>{t(titleKey).toLocaleUpperCase()}
                 </button>
