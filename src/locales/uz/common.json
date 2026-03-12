@@ -150,6 +150,7 @@
     "notifications.title": "Xabarnomalar",
     "notifications.pinned": "Biriktirilgan Xabarnomalar",
     "notifications.other": "Boshqa Xabarnomalar",
+    "notifications.refresh": "Refresh notifications",
     "notifications.viewAll": "Barchasini Ko'rish",
     "notifications.markAllRead": "Barchasini o'qilgan deb tanla",
     "forgotPassword.title": "Parolni unutdingizmi?",
