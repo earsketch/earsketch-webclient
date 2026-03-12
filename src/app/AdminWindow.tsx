@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
 import esconsole from "../esconsole"
 import * as user from "../user/userState"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
-import * as websocket from "./websocket"
 import store from "../reducers"
 import { get, getAuth, postAuth } from "../request"
 import type { Notification } from "../user/userState"
@@ -56,7 +54,7 @@ async function setPasswordForUser(username: string, password: string, adminPassp
         password,
     }
     await postAuth("/users/modifypwdadmin", data)
-    notification.show("Successfully set a new password for " + username, "history", 3)
+    notification.show("Successfully set a new password for " + username, "normal", 3)
 }
 
 // Expires a broadcast using its ID
@@ -163,7 +161,6 @@ const AdminSendBroadcast = () => {
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
     const [broadcasts, setBroadcasts] = useState([] as Notification[])
-    const username = useSelector(user.selectUserName)!
 
     useEffect(() => {
         getBroadcasts().then((res: Notification[]) => {
@@ -171,19 +168,20 @@ const AdminSendBroadcast = () => {
         })
     }, [])
 
-    const sendBroadcast = () => {
-        websocket.send({
-            notification_type: "broadcast",
-            username: username.toLowerCase(),
-            message: {
+    const sendBroadcast = async () => {
+        try {
+            await postAuth("/users/sendbroadcast", {
                 text: message,
                 hyperlink: link ?? "",
-                expiration,
-            },
-        })
-        // always show success message, as we have no indication of failure
-        setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
-        getBroadcasts().then((res: Notification[]) => setBroadcasts(res))
+                expiration: expiration.toString(),
+            })
+            setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
+            getBroadcasts().then((res: Notification[]) => setBroadcasts(res))
+        } catch (error) {
+            const m = "Failed to send broadcast."
+            esconsole(m, ["error", "admin"])
+            setBroadcastStatus({ message: m, style: "alert alert-danger" })
+        }
     }
 
     const expireBroadcast = async (id: string) => {

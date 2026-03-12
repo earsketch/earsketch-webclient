@@ -5,12 +5,14 @@ import { screen } from "@testing-library/dom" // find elements on screen
 import "@testing-library/jest-dom/vitest" // assertions
 import userEvent from "@testing-library/user-event" // clicking
 import "../../AudioContextMock/AudioContext.mock" // jsdom has no AudioContext
+import ResizeObserver from "resize-observer-polyfill"
 import { Provider } from "react-redux" // redux
 import store from "../../../../src/reducers" // earsketch redux store
 import { Browser } from "../../../../src/browser/Browser"
 import * as request from "../../../../src/request"
 import * as soundsThunks from "../../../../src/browser/soundsThunks"
 import * as scriptsState from "../../../../src/browser/scriptsState"
+window.ResizeObserver = ResizeObserver // jsdom has no ResizeObserver
 
 // mocked modules
 vi.mock("i18next")
