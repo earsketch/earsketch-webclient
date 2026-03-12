@@ -150,6 +150,7 @@
     "notifications.title": "Notifications",
     "notifications.pinned": "Notifications épinglées",
     "notifications.other": "Autres notifications",
+    "notifications.refresh": "Refresh notifications",
     "notifications.viewAll": "Afficher tout",
     "notifications.markAllRead": "Marquer tout comme lu",
     "forgotPassword.title": "Mot de passe oublié ?",
