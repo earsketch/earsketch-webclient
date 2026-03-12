@@ -177,6 +177,23 @@ Cypress.Commands.add("interceptUsersInfo", (username = TEST_USER) => {
 
 /**
  * @memberOf cy
+ * @method interceptUsersNotifications
+ * @param [notifications=[]]
+ * @returns Chainable
+ */
+Cypress.Commands.add("interceptUsersNotifications", (notifications = []) => {
+    cy.intercept(
+        {
+            hostname: API_HOST,
+            method: "GET",
+            path: "/EarSketchWS/users/notifications",
+        },
+        { body: notifications }
+    ).as("users_notifications")
+})
+
+/**
+ * @memberOf cy
  * @method interceptAudioUser
  * @param [userAudio=[]]
  * @returns Chainable
