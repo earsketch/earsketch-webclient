@@ -150,6 +150,7 @@
     "notifications.title": "إشعارات",
     "notifications.pinned": "الإشعارات المثبته",
     "notifications.other": "إشعارات أخرى",
+    "notifications.refresh": "Refresh notifications",
     "notifications.viewAll": "عرض الكل",
     "notifications.markAllRead": "اشر عليها بانها قرات",
     "forgotPassword.title": "هل نسيت كلمة المرور الخاصة بك؟",
