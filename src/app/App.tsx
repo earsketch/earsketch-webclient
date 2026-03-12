@@ -501,7 +501,7 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
 
     return (
         <button
-            className="mx-3 whitespace-nowrap py-1 px-2 rounded-md bg-gray-400 text-black hover:text-black hover:bg-gray-300"
+            className="mx-3 whitespace-nowrap py-1 px-2 rounded-md bg-amber text-black  hover:text-black hover:bg-amber-200"
             onClick={openAccountMenu}
             title={t("accountMenu.login")}
             aria-label={t("accountMenu.login")}
