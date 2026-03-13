@@ -52,9 +52,7 @@ export default ({ mode }: { mode: string }) => {
             environment: "jsdom",
         },
         server: {
-            host: "0.0.0.0",
             port,
-            allowedHosts: ["localhost", "127.0.0.1", "everleigh-tribeless-transculturally.ngrok-free.dev"],
         },
         preview: {
             port,
