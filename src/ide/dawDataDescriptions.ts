@@ -31,7 +31,7 @@ export function getDAWDataDifferences(previous: DAWData, current: DAWData): stri
         // First run, no comparison needed
         return []
     }
-
+    console.log(current)
     const differences: string[] = []
 
     // Compare tempo changes
