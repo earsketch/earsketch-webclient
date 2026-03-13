@@ -3,7 +3,9 @@ import { getDAWDataDifferences } from "../../../../src/ide/dawDataDescriptions"
 import baseline from "../../fixtures/dawDiffScripts/baseline.json"
 import baselinePlus1Track from "../../fixtures/dawDiffScripts/baseline-plus-1-track.json"
 import baselineMinusFirstMb from "../../fixtures/dawDiffScripts/baseline-minus-first-mb.json"
+import baselineMinusBothMb from "../../fixtures/dawDiffScripts/baseline-minus-both-mb.json"
 import baselineChangedTempo from "../../fixtures/dawDiffScripts/baseline-changed-tempo.json"
+import baselineMinusEffect from "../../fixtures/dawDiffScripts/baseline-minus-1-effect.json"
 import type { DAWData } from "../../../../src/types/common"
 
 // Mock i18n to return JSON strings for testing
@@ -140,6 +142,28 @@ describe("getDAWDataDifferences", () => {
             { key: "trackClipsRemoved", params: { trackNum: 3, spanStart: 8, spanEnd: 9 } },
         ],
         false)
+    })
+
+    it("detects clips removed when comparing baseline to baseline-minus-both-mb", () => {
+        const differences = getDAWDataDifferences(baseline, baselineMinusBothMb)
+        // Should detect all clips removed on track 3 (track index 3)
+        expectDifferences(differences, [
+            { key: "trackClipsRemoved", params: { trackNum: 3, spanStart: 0, spanEnd: 0 } },
+        ])
+    })
+
+    it("detects effect removed when comparing baseline to baseline-minus-effect", () => {
+        const differences = getDAWDataDifferences(baseline, baselineMinusEffect)
+        expectDifferences(differences, [
+            { key: "trackEffectTypesRemoved", params: { trackNum: 2, effects: "VOLUME" } },
+        ])
+    })
+
+    it("detects effect added when comparing baseline to baseline-minus-effect", () => {
+        const differences = getDAWDataDifferences(baselineMinusEffect, baseline)
+        expectDifferences(differences, [
+            { key: "trackEffectTypesAdded", params: { trackNum: 2, effects: "VOLUME" } },
+        ])
     })
 
     it("detects tempo change", () => {
