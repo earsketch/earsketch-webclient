@@ -14,7 +14,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint src",
     "preview": "vite preview",
     "test": "cypress run --component",
     "test-vitest": "vitest tests/vitest/",
