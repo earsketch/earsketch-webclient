@@ -36,6 +36,7 @@ export function getDAWDataDifferences(previous: DAWData, current: DAWData): stri
         // First run, no comparison needed
         return []
     }
+
     const differences: string[] = []
 
     // Compare tempo changes
@@ -215,6 +216,40 @@ export function getDAWDataDifferences(previous: DAWData, current: DAWData): stri
                         count: removedEffectTypes.length,
                         effects: removedEffectTypes.join(", "),
                     }))
+                }
+
+                // Compare envelope points for effects present in both runs
+                const sharedEffectTypes = [...currentEffectKeys].filter(key => prevEffectKeys.has(key))
+                for (const effect of sharedEffectTypes) {
+                    const prevParams = prevTrack.effects[effect] as Record<string, unknown[]>
+                    const currentParams = currentTrack.effects[effect] as Record<string, unknown[]>
+                    const allParams = new Set([...Object.keys(prevParams), ...Object.keys(currentParams)])
+
+                    for (const effectParam of allParams) {
+                        const prevCount = (prevParams[effectParam] ?? []).length
+                        const currentCount = (currentParams[effectParam] ?? []).length
+                        const delta = currentCount - prevCount
+
+                        if (delta === 0) {
+                            const serializePoints = (points: unknown[]) =>
+                                JSON.stringify(points.map(({ measure, value, shape }: any) => ({ measure, value, shape })))
+                            if (serializePoints(prevParams[effectParam] ?? []) !== serializePoints(currentParams[effectParam] ?? [])) {
+                                differences.push(i18n.t("messages:idecontroller.trackEffectEnvelopeChanged", {
+                                    trackNum,
+                                    effect,
+                                    effectParam,
+                                }))
+                            }
+                        } else {
+                            const key = delta > 0 ? "trackEffectEnvelopePointAdded" : "trackEffectEnvelopePointRemoved"
+                            differences.push(i18n.t(`messages:idecontroller.${key}`, {
+                                trackNum,
+                                effect,
+                                effectParam,
+                                count: Math.abs(delta),
+                            }))
+                        }
+                    }
                 }
             }
         }

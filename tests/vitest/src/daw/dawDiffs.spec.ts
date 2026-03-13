@@ -8,6 +8,7 @@ import baselineChangedTempo from "../../fixtures/dawDiffScripts/baseline-changed
 import baselineMinusEffect from "../../fixtures/dawDiffScripts/baseline-minus-1-effect.json"
 import baselineAddEffectEnvPoint from "../../fixtures/dawDiffScripts/baseline-add-effect-env-point.json"
 import baselineAddEffectEnvPoints from "../../fixtures/dawDiffScripts/baseline-add-effect-env-points.json"
+import baselineChangedEffectEnvPointValue from "../../fixtures/dawDiffScripts/baseline-changed-effect-env-point-value.json"
 
 import type { DAWData } from "../../../../src/types/common"
 
@@ -194,6 +195,13 @@ describe("getDAWDataDifferences", () => {
         const differences = getDAWDataDifferences(baselineAddEffectEnvPoint, baseline)
         expectDifferences(differences, [
             { key: "trackEffectEnvelopePointRemoved", params: { trackNum: 2, effect: "VOLUME", effectParam: "GAIN", count: 1 } },
+        ])
+    })
+
+    it("detects effect envelope value changed when point count is the same", () => {
+        const differences = getDAWDataDifferences(baseline, baselineChangedEffectEnvPointValue)
+        expectDifferences(differences, [
+            { key: "trackEffectEnvelopeChanged", params: { trackNum: 2, effect: "VOLUME", effectParam: "GAIN" } },
         ])
     })
 
