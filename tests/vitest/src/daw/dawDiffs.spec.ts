@@ -6,6 +6,9 @@ import baselineMinusFirstMb from "../../fixtures/dawDiffScripts/baseline-minus-f
 import baselineMinusBothMb from "../../fixtures/dawDiffScripts/baseline-minus-both-mb.json"
 import baselineChangedTempo from "../../fixtures/dawDiffScripts/baseline-changed-tempo.json"
 import baselineMinusEffect from "../../fixtures/dawDiffScripts/baseline-minus-1-effect.json"
+import baselineAddEffectEnvPoint from "../../fixtures/dawDiffScripts/baseline-add-effect-env-point.json"
+import baselineAddEffectEnvPoints from "../../fixtures/dawDiffScripts/baseline-add-effect-env-points.json"
+
 import type { DAWData } from "../../../../src/types/common"
 
 // Mock i18n to return JSON strings for testing
@@ -163,6 +166,34 @@ describe("getDAWDataDifferences", () => {
         const differences = getDAWDataDifferences(baselineMinusEffect, baseline)
         expectDifferences(differences, [
             { key: "trackEffectTypesAdded", params: { trackNum: 2, effects: "VOLUME" } },
+        ])
+    })
+
+    it("detects effect envelope multiple points added when comparing baseline to baseline-add-effect-env-points", () => {
+        const differences = getDAWDataDifferences(baseline, baselineAddEffectEnvPoints)
+        expectDifferences(differences, [
+            { key: "trackEffectEnvelopePointAdded", params: { trackNum: 2, effect: "VOLUME", effectParam: "GAIN", count: 2 } },
+        ])
+    })
+
+    it("detects effect envelope single point added when comparing baseline to baseline-add-effect-env-point", () => {
+        const differences = getDAWDataDifferences(baseline, baselineAddEffectEnvPoint)
+        expectDifferences(differences, [
+            { key: "trackEffectEnvelopePointAdded", params: { trackNum: 2, effect: "VOLUME", effectParam: "GAIN", count: 1 } },
+        ])
+    })
+
+    it("detects effect envelope multiple points removed when comparing baseline-add-effect-env-points to baseline", () => {
+        const differences = getDAWDataDifferences(baselineAddEffectEnvPoints, baseline)
+        expectDifferences(differences, [
+            { key: "trackEffectEnvelopePointRemoved", params: { trackNum: 2, effect: "VOLUME", effectParam: "GAIN", count: 2 } },
+        ])
+    })
+
+    it("detects effect envelope single point added when comparing baseline-add-effect-env-point to baseline", () => {
+        const differences = getDAWDataDifferences(baselineAddEffectEnvPoint, baseline)
+        expectDifferences(differences, [
+            { key: "trackEffectEnvelopePointRemoved", params: { trackNum: 2, effect: "VOLUME", effectParam: "GAIN", count: 1 } },
         ])
     })
 
