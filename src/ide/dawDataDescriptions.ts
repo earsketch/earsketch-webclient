@@ -19,11 +19,6 @@ export function cloneDAWDataForComparison(data: DAWData): DAWData {
     }
 }
 
-export function roundToDecimalPlaces(num: number, places: number) {
-    const factor = 10 ** places
-    return Math.round(num * factor) / factor
-}
-
 // Helper function to check if two arrays are identical (order-sensitive)
 function arraysAreIdentical<T>(arr1: T[], arr2: T[]): boolean {
     if (arr1.length !== arr2.length) return false
