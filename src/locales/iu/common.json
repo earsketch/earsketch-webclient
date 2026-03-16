@@ -95,6 +95,8 @@
     "daw.tooltip.toggleEffects": "ᐅᐊᔪᑎᖏᑦ ᖃᓄᐃᑐᒥᐊᑦ",
     "daw.bypass": "ᐊᑉᓗᕈᑦ",
     "daw.needsSync": "Run the script to sync the DAW",
+    "daw.mix": "Mix",
+    "daw.mixTrack": "Mix Track",
     "newScript": "ᓄᑖᖅ ᐅᖃᒐᒃᓴᖅ",
     "editor.title": "ᓈᓴᐅᑎᖏᓐᓂᒃ ᐋᕿᒃᓱᐃᔪᑦ",
     "editor.blocksMode": "ᐃᓕᖁᓯᖓᓐᓂᒃ ᐊᔪᓕᖅᑎᑦᓯᔪᑦ",
@@ -433,7 +435,7 @@
     },
     "interpreter": {
       "runSuccess": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᔪᓯᑎᐊᖅᑐᖅ! ᓇᕿᓪᓗᒍ ᑐᓵᔪᒪᓐᓂᕈᖕᓂ ᓂᐱᓕᐅᖅᑕᐃᑦ.",
-      "runFailed": "ᐊᑕᐅᓯᕐᒥᒃ ᐅᖓᑕᓂᓗ ᑕᒻᒪᖅᓯᒪᔪᖅᑕᓕᒃ ᑎᑎᖃᒻᒥ ᐅᖃᕆᐊᓕᖕᒥ. ᑕᑯᓗᒋᑦ ᓈᓴᐅᑎᖏᑦ ᓱᓇᐅᓂᖓᓐᓂᒃ.",
+      "runFailed": "There are one or more errors in your script. Read below for details.",
       "noimport": " ᑐᑭᓕᐅᒐᐅᓯᒪᖏᑐᖅ. ᐃᒻᒪᖄ \"ᐅᕙᖓᑦ ᓯᐅᑎᒃᑯᑦ ᑐᓵᔭᒃᓴᒻᒥᑦ *\" ᐊᓯᐊᐅᓯᒪᖕᒪᑦ."
     },
     "dawservice": {
@@ -525,7 +527,34 @@
       "savefailed": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᖅ. ᑭᓯᐊᓐᓂ ᐅᖃᕆᐊᓕᒃ ᓄᖑᑕᐃᓕᔪᑎᑕᖓᑕ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᐳᑎᑦ.",
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "ᐃᓚᖏᑦ ᑎᑎᖃᑦ ᐅᖃᕆᐊᓖᑦ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᑦ, ᑭᓯᐊᓐᓂ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᑐᑦ ᐊᓯᐊᑕᐃᓕᔪᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ.",
-      "closealltabs": "ᒪᑐᐃᓯᒪᔪᖅ ᑕᒪᕐᒥᒃ ᒪᑐᓂᐊᖅᐳᑦ. ᓈᒻᒪᒃᓴᖅᐱᑦ ᑲᔪᓯᒥᐊᕐᓗᑎᑦ?"
+      "closealltabs": "ᒪᑐᐃᓯᒪᔪᖅ ᑕᒪᕐᒥᒃ ᒪᑐᓂᐊᖅᐳᑦ. ᓈᒻᒪᒃᓴᖅᐱᑦ ᑲᔪᓯᒥᐊᕐᓗᑎᑦ?",
+      "noChanges": "No DAW changes from previous run",
+      "tracksAdded": "Added {{count}} track",
+      "tracksAdded_plural": "Added {{count}} tracks",
+      "tracksRemoved": "Removed {{count}} track",
+      "tracksRemoved_plural": "Removed {{count}} tracks",
+      "projectLengthIncreased": "Project length increased from {{from}} to {{to}} measures",
+      "projectLengthDecreased": "Project length decreased from {{from}} to {{to}} measures",
+      "trackClipsAdded": "Track {{trackNum}}: Added audio ({{filekeys}}). Track spans measures {{spanStart}} to {{spanEnd}}",
+      "trackClipsRemoved": "Track {{trackNum}}: Removed audio ({{filekeys}}). Track spans measures {{spanStart}} to {{spanEnd}}",
+      "trackEffectTypesAdded": "Track {{trackNum}}: Added {{count}} effect: {{effects}}",
+      "trackEffectTypesAdded_plural": "Track {{trackNum}}: Added {{count}} effects: {{effects}}",
+      "trackEffectTypesRemoved": "Track {{trackNum}}: Removed {{count}} effect: {{effects}}",
+      "trackEffectTypesRemoved_plural": "Track {{trackNum}}: Removed {{count}} effects: {{effects}}",
+      "mixTrackEffectTypesAdded": "Mix Track: Added {{count}} effect: {{effects}}",
+      "mixTrackEffectTypesAdded_plural": "Mix Track: Added {{count}} effects: {{effects}}",
+      "mixTrackEffectTypesRemoved": "Mix Track: Removed {{count}} effect: {{effects}}",
+      "mixTrackEffectTypesRemoved_plural": "Mix Track: Removed {{count}} effects: {{effects}}",
+      "trackEffectEnvelopePointAdded": "Track {{trackNum}}: Added {{count}} envelope point to {{effect}} {{effectParam}}",
+      "trackEffectEnvelopePointAdded_plural": "Track {{trackNum}}: Added {{count}} envelope points to {{effect}} {{effectParam}}",
+      "trackEffectEnvelopePointRemoved": "Track {{trackNum}}: Removed {{count}} envelope point from {{effect}} {{effectParam}}",
+      "trackEffectEnvelopePointRemoved_plural": "Track {{trackNum}}: Removed {{count}} envelope points from {{effect}} {{effectParam}}",
+      "trackEffectEnvelopeChanged": "Track {{trackNum}}: Envelope changed for effect {{effect}} {{effectParam}}",
+      "trackClipsChanged": "Track {{trackNum}}: Changed audio files ({{measures}} measures){{addedText}}{{removedText}}. Track spans measures {{spanStart}} to {{spanEnd}}",
+      "trackClipsPositionChanged": "Track {{trackNum}}: Sound positions changed ({{filekeys}}). Track spans measures {{spanStart}} to {{spanEnd}}",
+      "clipFilesAdded": ". Added: {{filekeys}}",
+      "clipFilesRemoved": ". Removed: {{filekeys}}",
+      "tempoChanged": "Project tempo changed"
     },
     "shareScript": {
       "menuDescriptions": {
