@@ -1,0 +1,25 @@
+[
+    {
+        "title": "Welcome to Some Custom Curriculum!",
+        "URL": "/cool-welcome.html",
+        "chapters": [],
+        "sections": []
+    },
+    {
+        "title": "Unit 1: Fun in the Sun",
+        "URL": "/fun-unit-1.html",
+        "chapters": [
+            {
+                "title": "Turn off your computer and go play outside!",
+                "URL": "/go-outside.html",
+                "displayChNum": 1,
+                "sections": [
+                    {
+                        "title": "(You should not be reading this)",
+                        "URL": "/go-outside.html#nope"
+                    }
+                ]
+            }
+        ]
+    }
+]
