@@ -41,12 +41,29 @@ import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
 import type { DAWData } from "common"
 import classNames from "classnames"
+import { cloneDAWDataForComparison, getDAWDataDifferences } from "./dawDataDescriptions"
 
 const STATUS_SUCCESSFUL = 1
 const STATUS_UNSUCCESSFUL = 2
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
+let previousDAWData: DAWData = { length: 0, tracks: [], transformedClips: {} }
+let lastScriptID: string | null = null
+
+// Function to compare two DAWData objects and log human-readable differences to the console
+function logDAWDataDifferences(previous: DAWData, current: DAWData) {
+    const prevTrackCount = Math.max(0, (previous.tracks?.length || 0) - 1)
+    const differences = getDAWDataDifferences(previous, current)
+    // Log differences to console
+    if (differences.length > 0) {
+        for (const diff of differences) {
+            ideConsole.log(diff)
+        }
+    } else if (prevTrackCount > 0 || previous.length > 0) {
+        ideConsole.log(i18n.t("messages:idecontroller.noChanges"))
+    }
+}
 
 // Prompts the user for a name and language, then calls the userProject
 // service to create the script from an empty template. The tab will be
@@ -272,6 +289,9 @@ async function runScript() {
 
     editor.clearErrors()
     ideConsole.clear()
+    // The following setTimeout is needed to ensure that the console is cleared before the script is run,
+    // so that screen readers will announce all messages in the console, regardless of if they were present in the previous run.
+    await new Promise<void>(resolve => window.setTimeout(resolve, 0))
     ideConsole.status(i18n.t("messages:idecontroller.running"))
 
     const scriptID = tabs.selectActiveTabID(state)
@@ -286,13 +306,12 @@ async function runScript() {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
         setLoading(false)
+        ideConsole.status(i18n.t("messages:interpreter.runFailed"))
         ideConsole.error(error)
         editor.highlightError(error)
 
         const errType = String(error).split(":")[0]
         reporter.compile(language, false, errType, duration)
-
-        userNotification.showBanner(i18n.t("messages:interpreter.runFailed"), "failure1")
 
         saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
@@ -304,16 +323,27 @@ async function runScript() {
 
     const duration = Date.now() - startTime
     setLoading(false)
-    if (result) {
-        esconsole("Ran script, updating DAW.", "ide")
-        setDAWData(result)
-        reloadRecommendations()
-    }
     reporter.compile(language, true, undefined, duration)
-    userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
     ideConsole.status(i18n.t("messages:idecontroller.success"))
     store.dispatch(ide.setScriptMatchesDAW(true))
     saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
+
+    if (result) {
+        esconsole("Ran script, updating DAW.", "ide")
+
+        // Compare current result with previous DAW data and log differences
+        // Skip comparison if this is the first run of this script
+        if (lastScriptID === scriptID) {
+            logDAWDataDifferences(previousDAWData, result)
+        }
+
+        setDAWData(result)
+        reloadRecommendations()
+
+        // Update previousDAWData for next comparison and track current scriptID
+        previousDAWData = cloneDAWDataForComparison(result)
+        lastScriptID = scriptID
+    }
 
     // asynchronously report the script complexity
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
@@ -440,9 +470,10 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                         </div>
                     </div>
 
-                    <div ref={consoleContainer} id="console-frame" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
+                    <div ref={consoleContainer} id="console-frame" aria-live="assertive" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <div className="row">
                             <div id="console">
+                                {logs.length === 0 && <span>&nbsp;</span> /* hack for screen readers */}
                                 {logs.map((msg: ide.Log, index: number) => {
                                     const consoleLineClass = classNames({
                                         "console-line": true,
