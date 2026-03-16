@@ -272,6 +272,7 @@ const ShowOnlyFavorites = () => {
         <label className="flex items-center" style={{ opacity: loggedIn ? "1" : "0" }}>
             <input
                 type="checkbox"
+                style={{ width: `${0.875 * scalar}rem`, height: `${0.875 * scalar}rem` }}
                 className="mr-1.5"
                 onChange={() => { dispatch(sounds.setFilterByFavorites(!filterByFavorites)) }}
                 disabled={!loggedIn}
@@ -347,7 +348,8 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 </div>
                 <div className="pl-2 pr-4">
                     <button
-                        className="text-xs pr-1.5"
+                        className="pr-1.5"
+                        style={{ fontSize: `${0.75 * scalar}rem` }}
                         onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
@@ -359,7 +361,8 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                     {loggedIn &&
                         (
                             <button
-                                className="text-xs px-1.5"
+                                className="px-1.5"
+                                style={{ fontSize: `${0.75 * scalar}rem` }}
                                 onClick={() => dispatch(soundsThunks.markFavorite({ name, isFavorite }))}
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
@@ -431,7 +434,7 @@ const Folder = ({ folder, names }: FolderProps) => {
     const scalar = fontSize / 14
     return (
         <div>
-            <div className="flex flex-row justify-start sticky top-0 bg-inherit">
+            <div className="flex flex-row justify-start sticky top-0 bg-inherit z-10 bg-gray-300 dark:bg-gray-800">
                 <div
                     className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
                     title={folder}
@@ -472,6 +475,8 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }) => {
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
@@ -495,6 +500,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
             <div className={extraFilterControlsClassnames}>
                 <button
                     className={clearClassnames}
+                    style={{ fontSize: `${0.875 * scalar}rem` }}
                     onClick={() => {
                         dispatch(sounds.resetAllFilters())
                         reloadRecommendations()
@@ -503,7 +509,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                     title={t("ariaDescriptors:sounds.clearFilter")}
                     aria-label={t("ariaDescriptors:sounds.clearFilter")}
                 >
-                    <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
+                    <span className="icon icon-cross3 pr-0.5"></span>{t("soundBrowser.clearFilters")}
                 </button>
                 <NumberOfSounds/>
             </div>
