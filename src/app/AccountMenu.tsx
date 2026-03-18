@@ -4,6 +4,7 @@ import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
 import { post } from "../request"
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
+import { DialogTitle } from "@headlessui/react"
 
 export type AccountMenuMode = "login" | "register" | "recover"
 
@@ -143,57 +144,60 @@ export const AccountMenu = ({
         </ModalHeader>
 
         {mode === "login" && (
-            <form onSubmit={handleLogin}>
-                <ModalBody>
-                    <Alert message={error}></Alert>
-                    <div>
-                        <label>
-                            {t("formfieldPlaceholder.username")}
-                            <input
-                                type="text"
-                                className="form-input w-full mb-2 dark:bg-transparent"
-                                name="username"
-                                value={username}
-                                onChange={e => setUsernameLocal(e.target.value)}
-                                required
-                                maxLength={25}
-                                autoComplete="username"
-                            />
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            {t("formfieldPlaceholder.password")}
-                            <input
-                                type="password"
-                                className="form-input w-full mb-2 dark:bg-transparent"
-                                name="password"
-                                value={password}
-                                onChange={e => setPasswordLocal(e.target.value)}
-                                required
-                                autoComplete="current-password"
-                            />
-                        </label>
-                    </div>
-                    <div className="flex gap-2 mt-4">
-                        <button
-                            type="button"
-                            className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded"
-                            onClick={() => setMode("register")}
-                        >
-                            {t("registerAccount")}
-                        </button>
-                        <button
-                            type="button"
-                            className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded"
-                            onClick={() => setMode("recover")}
-                        >
-                            {t("forgotPassword.title")}
-                        </button>
-                    </div>
-                </ModalBody>
-                <ModalFooter submit="accountMenu.login" close={close} />
-            </form>
+            <div className="m-10">
+                <DialogTitle className="p-3.5 text-3xl font-bold text-gray-900 dark:text-white">{t("accountMenu.login")}</DialogTitle>
+                <form onSubmit={handleLogin}>
+                    <ModalBody>
+                        <Alert message={error}></Alert>
+                        <div>
+                            <label>
+                                {t("formfieldPlaceholder.username")}
+                                <input
+                                    type="text"
+                                    className="form-input w-full mb-2 dark:bg-transparent"
+                                    name="username"
+                                    value={username}
+                                    onChange={e => setUsernameLocal(e.target.value)}
+                                    required
+                                    maxLength={25}
+                                    autoComplete="username"
+                                />
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                {t("formfieldPlaceholder.password")}
+                                <input
+                                    type="password"
+                                    className="form-input w-full mb-2 dark:bg-transparent"
+                                    name="password"
+                                    value={password}
+                                    onChange={e => setPasswordLocal(e.target.value)}
+                                    required
+                                    autoComplete="current-password"
+                                />
+                            </label>
+                        </div>
+                        <div className="flex gap-2 mt-4">
+                            <button
+                                type="button"
+                                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded"
+                                onClick={() => setMode("register")}
+                            >
+                                {t("registerAccount")}
+                            </button>
+                            <button
+                                type="button"
+                                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded"
+                                onClick={() => setMode("recover")}
+                            >
+                                {t("forgotPassword.title")}
+                            </button>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter submit="accountMenu.login" close={close} />
+                </form>
+            </div>
         )}
 
         {mode === "register" && (
