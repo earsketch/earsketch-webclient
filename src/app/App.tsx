@@ -465,8 +465,8 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
     if (loggedIn) {
         return (
             <Menu as="div" className="relative inline-block text-left mx-3">
-                <Menu.Button className="text-gray-400">
-                    <div className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md" role="button">{username}<span className="caret" /></div>
+                <Menu.Button className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md ring-1 ring-gray-900/5 ring-inset hover:bg-gray-300">
+                    {username}<i className="icon icon-arrow-down2 pl-1.5 pr-0.5 text-xs"></i>
                 </Menu.Button>
                 <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     {[{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
