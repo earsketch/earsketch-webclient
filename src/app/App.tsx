@@ -181,7 +181,9 @@ async function postLogin(username: string) {
         // Rewrite USER_X sound references to USERNAME_X in script source.
         let source = script.source_code
         for (const [oldName, newName] of Object.entries(soundRenameMap)) {
-            source = source.replaceAll(oldName, newName)
+            // Sound names are alphanumeric/underscores, so no escaping needed.
+            // TODO: switch to replaceAll() once TS target includes ES2021.
+            source = source.replace(new RegExp(oldName, "g"), newName)
         }
 
         let promise
