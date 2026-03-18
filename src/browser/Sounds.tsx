@@ -606,6 +606,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
 const SoundPreview = () => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
+    const theme = useSelector(appState.selectColorTheme)
 
     const [recommendationMode, setRecommendationMode] = useState(0)
 
@@ -754,8 +755,8 @@ const SoundPreview = () => {
                 onMouseDown={focusPlayer}
                 className="w-full max-w-4xl outline-none rounded-2xl focus-visible:ring-2 focus-visible:ring-black"
             >
-                <div className="rounded-2xl bg-white flex items-center justify-center px-6">
-                    <AudioWaveform soundName={currentName} height={30} progress={undefined} />
+                <div className="flex items-center justify-center px-6">
+                    <AudioWaveform soundName={currentName} height={30} progress={undefined} isDarkMode={theme === "dark"} />
                 </div>
 
                 <div className="flex items-center justify-center gap-8 mt-2">

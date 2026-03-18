@@ -9,6 +9,7 @@ type AudioWaveformProps = {
     columns?: number
     className?: string
     ariaLabel?: string
+    isDarkMode?: boolean
 }
 
 function computePeaks(buffer: AudioBuffer, columns: number): Array<[number, number]> {
@@ -62,6 +63,7 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
     columns,
     className = "",
     ariaLabel = "Audio waveform",
+    isDarkMode = false,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const wrapperRef = useRef<HTMLDivElement>(null)
@@ -100,7 +102,7 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
 
             try {
                 setLoading(true)
-                const sound = await audioLibrary.getSound(soundName) // must return { buffer: AudioBuffer, ... }
+                const sound = await audioLibrary.getSound(soundName)
                 if (cancelled) return
 
                 const cols = Math.max(24, columns ?? Math.floor(measuredWidth)) // ~1 col per px
@@ -151,6 +153,9 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
         const prog = progress == null ? null : clamp01(progress)
         const playedCols = prog == null ? 0 : Math.floor(prog * cols)
 
+        const playedColor = isDarkMode ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.85)"
+        const unplayedColor = isDarkMode ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.25)"
+
         for (let i = 0; i < cols; i++) {
             const [min, max] = peaks[i]
 
@@ -163,24 +168,18 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
             const bot = Math.max(y1, y2)
             const x = i * colW
 
-            // Pick style based on played/unplayed
-            if (prog != null && i < playedCols) {
-                ctx.fillStyle = "rgba(0,0,0,0.85)" // played
-            } else {
-                ctx.fillStyle = "rgba(0,0,0,0.25)" // unplayed
-            }
+            ctx.fillStyle = prog != null && i < playedCols ? playedColor : unplayedColor
 
-            // Draw a thin rect per column
             const rectW = Math.max(1, colW * 0.7)
             const rectX = x + (colW - rectW) / 2
             ctx.fillRect(rectX, top, rectW, Math.max(1, bot - top))
         }
-    }, [peaks, measuredWidth, height, progress])
+    }, [peaks, measuredWidth, height, progress, isDarkMode])
 
     return (
         <div
             ref={wrapperRef}
-            className={`w-full rounded bg-white dark:bg-gray-900 ${className}`}
+            className={`w-full rounded ${className}`}
             style={{ height }}
             role="img"
             aria-label={ariaLabel}
