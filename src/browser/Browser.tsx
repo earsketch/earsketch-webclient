@@ -13,6 +13,7 @@ import { Collapsed } from "./Utils"
 import { BrowserTabType } from "./BrowserTab"
 import * as tabState from "../ide/tabState"
 import { addUIClick } from "../cai/dialogue/student"
+import * as appState from "../app/appState"
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
@@ -46,6 +47,8 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
     const isSelected = useSelector(layout.selectWestKind) === type
     const highlight = useSelector(caiState.selectHighlight).zone === name.toLowerCase()
     const activeProject = useSelector(tabState.selectActiveTabID)
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
 
     const { t } = useTranslation()
 
@@ -79,7 +82,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
             aria-selected={isSelected ? "true" : "false"}
             aria-controls={"panel-" + type}
         >
-            <h3 className="text-sm truncate">
+            <h3 className="truncate" style={{ fontSize: `${0.875 * scalar}rem` }} >
                 {children}
                 {name}
             </h3>
@@ -89,6 +92,8 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
 
 export const BrowserTabs = () => {
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     return (
         <div
             className="flex justify-between text-center text-white bg-blue"
@@ -97,6 +102,7 @@ export const BrowserTabs = () => {
             aria-label="Content manager tabs"
             style={{
                 minHeight: "fit-content", // Safari-specific issue
+                minWidth: "fit-content",
             }}
         >
             <BrowserTab name={t("soundBrowser.title").toLocaleUpperCase()} type={BrowserTabType.Sound}>

@@ -24,6 +24,8 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
 
     return (
         <form
@@ -33,7 +35,8 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
                 <input
                     id={id}
-                    className="w-full outline-none p-1 bg-transparent font-normal text-sm"
+                    className="w-full outline-none p-1 bg-transparent font-normal"
+                    style={{ fontSize: `${0.875 * scalar}rem` }}
                     type="text"
                     placeholder={t("search")}
                     value={searchText}
