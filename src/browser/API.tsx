@@ -92,8 +92,9 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                 </div>
             </div>
             {obj.parameters
-                ? (<div className="text-xs font-light break-word">
-                    <span className="sr-only">{t("api:parameters")}:</span><span className="px-1">(</span>
+                ? (<div className="text-xs font-light break-word relative">
+                    <span className="sr-only">{t("api:parameters")}:</span>
+                    <span className="px-1">(</span>
                     {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter]) => (
                         <span key={param}>
                             <span title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
