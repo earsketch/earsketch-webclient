@@ -39,6 +39,8 @@ const SoundSearchBar = () => {
 const FilterButton = ({ category, value, label = value, fullWidth = false }: { category: keyof sounds.Filters, value: string, label?: string, fullWidth?: boolean }) => {
     const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
 
     const handleToggle = () => {
         if (selected) dispatch(sounds.removeFilterItem({ category, value }))
@@ -60,6 +62,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
             aria-selected={selected}
             tabIndex={0}
             className={classnames}
+            style={{ fontSize: `${0.75 * scalar}rem` }}
             onClick={handleToggle}
             onKeyDown={(e) => {
                 if (e.key === " " || e.key === "Enter") {
@@ -72,7 +75,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
                 <span className="rounded-full inline-flex w-1 mr-2">
                     <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} aria-hidden="true" />
                 </span>
-                <div className="text-xs select-none mr-4">
+                <div className="select-none mr-4" style={{ fontSize: `${0.75 * scalar}rem` }}>
                     {label}
                 </div>
             </div>
@@ -573,7 +576,7 @@ const Folder = ({ folder, names }: FolderProps) => {
     const scalar = fontSize / 14
     return (
         <div>
-            <div className="flex flex-row justify-start sticky top-0 bg-inherit z-10 bg-gray-300 dark:bg-gray-800">
+            <div className="flex flex-row justify-start sticky top-0 bg-inherit z-10 bg-gray-300 dark:bg-gray-800" style={{ boxShadow: `0 -.5px 0 .5px rgb(209 213 219)` }}>
                 <div
                     className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
                     title={folder}
@@ -670,6 +673,9 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         />
     ), [currentFilterTab, setCurrentFilterTab])
 
+    const overscanSize = Math.round(2500 * scalar)
+    const increaseViewportSize = Math.round(3500 * scalar)
+
     return (
         <div className="flex flex-col grow relative">
             <SoundSearchBar />
@@ -696,8 +702,8 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                             <Virtuoso
                                 ref={virtuosoRef}
                                 style={{ height, width }}
-                                overscan={2500}
-                                increaseViewportBy={{ top: 3500, bottom: 3501 }}
+                                overscan={overscanSize}
+                                increaseViewportBy={{ top: increaseViewportSize, bottom: increaseViewportSize }}
                                 data={folders}
                                 onScroll={(e) => {
                                     const scrollOffset = (e.target as HTMLElement).scrollTop

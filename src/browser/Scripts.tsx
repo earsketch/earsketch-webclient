@@ -58,6 +58,8 @@ interface FilterItemProps {
 
 export const FilterItem = ({ value, isClearItem = false, active, selected = false }: FilterItemProps) => {
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
 
     return (
         <div
@@ -65,11 +67,11 @@ export const FilterItem = ({ value, isClearItem = false, active, selected = fals
         ${active ? "bg-blue-200 dark:bg-blue-500" : ""}
       `}
         >
-            <div className="w-5" aria-hidden>
+            <div className="w-5" aria-hidden style={{ fontSize: `${0.875 * scalar}rem` }}>
                 <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
             </div>
 
-            <div className="text-sm">
+            <div style={{ fontSize: `${0.875 * scalar}rem` }}>
                 {isClearItem ? t("clear") : value}
             </div>
         </div>
@@ -158,10 +160,12 @@ const Filters = () => {
     const numOwnersSelected = useSelector(scripts.selectNumOwnersSelected)
     const numTypesSelected = useSelector(scripts.selectNumTypesSelected)
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
 
     return (
         <div className="p-3">
-            <div className="pb-2 text-xs">{t("filter").toLocaleUpperCase()}</div>
+            <div className="pb-2" style={{ fontSize: `${0.75 * scalar}rem` }}>{t("filter").toLocaleUpperCase()}</div>
             <div className="flex justify-between">
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.owner")}
@@ -214,6 +218,8 @@ const ShowDeletedScripts = () => {
 const PillButton = ({ script, fn, aria, icon, children }: { script: Script, fn: (_: Script) => void, aria: string, icon: string, children?: React.ReactNode }) => {
     const { t } = useTranslation()
     const descriptor = t(aria, { scriptname: script.name })
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     return <button
         className="flex items-center space-x-2 border border-gray-800 rounded-full px-2 py-1 text-sm bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
         onClick={(event) => {
@@ -223,6 +229,7 @@ const PillButton = ({ script, fn, aria, icon, children }: { script: Script, fn: 
         }}
         aria-label={descriptor}
         title={descriptor}
+        style={{ fontSize: `${0.75 * scalar}rem` }}
     >
         <i className={icon} />
         {children}
@@ -299,7 +306,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
     const ariaLabel = type === "deleted" ? "" : t("scriptBrowser.openInEditor", { name: script.name })
     return (
         <div
-            className={`flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
+            className={`h-full flex flex-row justify-start border-t border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
             onClick={() => {
                 if (type === "regular") {
                     dispatch(setActiveTabAndEditor(script.shareid))
@@ -315,9 +322,9 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
         >
             <div className={`h-auto border-l-4 ${tabIndicator}`} />
             <div
-                className="flex grow truncate px-2" style={{ fontSize: `${0.875 * scalar}rem` }}
+                className="flex grow truncate px-2"
             >
-                <div className="h-11 flex grow items-center truncate justify-between">
+                <div className="h-full flex grow items-center truncate justify-between">
                     <div className="flex justify-start items-center truncate font-medium space-x-2">
                         <div className="truncate" style={{ fontSize: `${0.875 * scalar}rem` }}>
                             {script.name}
@@ -351,37 +358,42 @@ interface WindowedScriptCollectionProps {
     visible?: boolean
     initExpanded?: boolean
 }
-const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = true, initExpanded = true }: WindowedScriptCollectionProps) => (
-    <Collection
-        title={title}
-        visible={visible}
-        initExpanded={initExpanded}
-    >
-        <AutoSizer>
-            {({ height, width }: { height: number, width: number }) => (
-                <List
-                    height={height}
-                    width={width}
-                    itemCount={scriptIDs.length}
-                    itemSize={44}
-                >
-                    {({ index, style }) => {
-                        const ID = scriptIDs[index]
-                        return (
-                            <div style={style}
-                                className={index % 2 === 0
-                                    ? "bg-white dark:bg-gray-900"
-                                    : "bg-gray-300 dark:bg-gray-800" +
-                                    " hover:bg-blue-200 dark:hover:bg-blue-500"}>
-                                <ScriptEntry key={ID} script={entities[ID]} type={type} />
-                            </div>
-                        )
-                    }}
-                </List>
-            )}
-        </AutoSizer>
-    </Collection>
-)
+const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = true, initExpanded = true }: WindowedScriptCollectionProps) => {
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
+
+    return (
+        <Collection
+            title={title}
+            visible={visible}
+            initExpanded={initExpanded}
+        >
+            <AutoSizer>
+                {({ height, width }: { height: number, width: number }) => (
+                    <List
+                        height={height}
+                        width={width}
+                        itemCount={scriptIDs.length}
+                        itemSize={Math.round(44 + (fontSize - 14) * 2)}
+                    >
+                        {({ index, style }) => {
+                            const ID = scriptIDs[index]
+                            return (
+                                <div style={style}
+                                    className={index % 2 === 0
+                                        ? "bg-white dark:bg-gray-900"
+                                        : "bg-gray-300 dark:bg-gray-800" +
+                                        " hover:bg-blue-200 dark:hover:bg-blue-500"}>
+                                    <ScriptEntry key={ID} script={entities[ID]} type={type} />
+                                </div>
+                            )
+                        }}
+                    </List>
+                )}
+            </AutoSizer>
+        </Collection>
+    )
+}
 
 const RegularScriptCollection = () => {
     const entities = useSelector(scripts.selectFilteredActiveScripts)

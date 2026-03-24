@@ -68,6 +68,8 @@ interface DropdownMultiSelectorProps {
 
 export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const dispatch = useDispatch()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
 
     const selectedValues = useAppSelector(
         (state) => state.scripts.filters[category]
@@ -102,7 +104,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
                     <span className="truncate">
                         {title} {numSelected ? `(${numSelected})` : ""}
                     </span>
-                    <i className="icon icon-arrow-down2 text-xs p-1" />
+                    <i className="icon icon-arrow-down2 p-1" style={{ fontSize: `${0.75 * scalar}rem` }} />
                 </ListboxButton>
 
                 <ListboxOptions
