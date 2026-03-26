@@ -1,21 +1,22 @@
 import context from "./context"
 
-export const SINE_BUMP = `${import.meta.env.BASE_URL}earcon/sine_bump.flac`
+export const SINE_BUMP = "earcon/sine_bump.flac"
 
 // Helper to load audio buffer to cache and then play it back with a set gain
 // Using the existing audiocontext to playback the earcons
 const earconCache = new Map<string, AudioBuffer>()
 
 export async function loadEarcon(url: string): Promise<AudioBuffer> {
-    if (earconCache.has(url)) {
-        return earconCache.get(url)!
+    const resolvedUrl = `${import.meta.env.BASE_URL}${url}`
+    if (earconCache.has(resolvedUrl)) {
+        return earconCache.get(resolvedUrl)!
     }
 
-    const response = await fetch(url)
+    const response = await fetch(resolvedUrl)
     const arrayBuffer = await response.arrayBuffer()
     const audioBuffer = await context.decodeAudioData(arrayBuffer)
 
-    earconCache.set(url, audioBuffer)
+    earconCache.set(resolvedUrl, audioBuffer)
     return audioBuffer
 }
 
