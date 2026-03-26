@@ -1,6 +1,6 @@
 import context from "./context"
 
-export const SINE_BUMP = "/earcon/sine_bump.flac"
+export const SINE_BUMP = `${import.meta.env.BASE_URL}earcon/sine_bump.flac`
 
 // Helper to load audio buffer to cache and then play it back with a set gain
 // Using the existing audiocontext to playback the earcons
