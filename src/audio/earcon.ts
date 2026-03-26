@@ -7,7 +7,7 @@ export const SINE_BUMP = "earcon/sine_bump.flac"
 const earconCache = new Map<string, AudioBuffer>()
 
 export async function loadEarcon(url: string): Promise<AudioBuffer> {
-    const resolvedUrl = `${import.meta.env.BASE_URL}${url}`
+    const resolvedUrl = `${SITE_BASE_URI}/${url}`
     if (earconCache.has(resolvedUrl)) {
         return earconCache.get(resolvedUrl)!
     }
