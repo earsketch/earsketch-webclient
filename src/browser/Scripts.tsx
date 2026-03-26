@@ -1,31 +1,30 @@
-import React, { useState, useEffect, LegacyRef, ChangeEvent, MouseEvent } from "react"
+import React, { ChangeEvent, MouseEvent, useState, useEffect } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
 import { FixedSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
-import { usePopper } from "react-popper"
 
 import type { Script, ScriptType } from "common"
-import type { RootState } from "../reducers"
+import * as appState from "../app/appState"
 import * as scripts from "./scriptsState"
 import * as scriptsThunks from "./scriptsThunks"
 import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
-import * as appState from "../app/appState"
 import * as user from "../user/userState"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
-import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, VirtualReference } from "./ScriptsMenus"
+import { ScriptDropdownMenu } from "./ScriptsMenus"
 import { BrowserTabType } from "./BrowserTab"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
+import { Popover, PopoverButton, PopoverPanel, Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
-    create: () => {},
-    share: (_: Script) => {},
-    download: (_: Script) => {},
+    create: () => { },
+    share: (_: Script) => { },
+    download: (_: Script) => { },
 }
 
 const CreateScriptButton = () => {
@@ -50,59 +49,107 @@ const ScriptSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean }) => {
-    const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value))
-    const dispatch = useDispatch()
-    const { t } = useTranslation()
-    return (
-        <>
-            <div
-                className="flex justify-left items-center cursor-pointer pr-5 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
-                onClick={() => {
-                    if (isClearItem) {
-                        dispatch(scripts.resetFilter(category))
-                    } else {
-                        if (selected) dispatch(scripts.removeFilterItem({ category, value }))
-                        else dispatch(scripts.addFilterItem({ category, value }))
-                    }
-                }}
-                aria-selected={selected}
-            >
-                <div className="w-5">
-                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`}/>
-                </div>
-                <div className="text-sm select-none">
-                    {isClearItem ? t("clear") : value}
-                </div>
-            </div>
-            {isClearItem && <hr className="border-1 my-2 border-black dark:border-white" />}
-        </>
-    )
+interface FilterItemProps {
+    value?: string // the item value
+    isClearItem?: boolean // true for the "clear filters" option
+    active: boolean // passed from Headless UI
+    selected?: boolean // passed from Headless UI
 }
 
-const SortOptionsItem = ({ value, isClearItem }: { value: scripts.SortByAttribute, isClearItem: boolean }) => {
-    const selected = isClearItem ? false : useSelector(scripts.selectSortByAttribute) === value
-    const ascending = useSelector(scripts.selectSortByAscending)
-    const dispatch = useDispatch()
-
-    if (isClearItem) return null
+export const FilterItem = ({ value, isClearItem = false, active, selected = false }: FilterItemProps) => {
+    const { t } = useTranslation()
 
     return (
         <div
-            className="flex justify-left items-center cursor-pointer pr-8 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
-            onClick={() => {
-                dispatch(scripts.setSorter(value))
-            }}
-            aria-label={value}
-            title={value}
+            className={`flex items-center pr-5 select-none
+        ${active ? "bg-blue-200 dark:bg-blue-500" : ""}
+      `}
         >
-            <div className="w-8">
-                <i className={`icon ${ascending ? "icon-arrow-up" : "icon-arrow-down"} ${selected ? "block" : "hidden"}`} />
+            <div className="w-5" aria-hidden>
+                <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
             </div>
-            <div className="select-none">
-                {value}
+
+            <div className="text-sm">
+                {isClearItem ? t("clear") : value}
             </div>
         </div>
+    )
+}
+
+export const SORT_OPTIONS = [
+    { id: "date-desc", label: "scriptBrowser.filterDropdown.DateNewest", attribute: "date", ascending: false },
+    { id: "date-asc", label: "scriptBrowser.filterDropdown.DateOldest", attribute: "date", ascending: true },
+    { id: "name-az", label: "scriptBrowser.filterDropdown.NameAZ", attribute: "name", ascending: true },
+    { id: "name-za", label: "scriptBrowser.filterDropdown.NameZA", attribute: "name", ascending: false },
+] as const
+
+export const SortBySelector = () => {
+    const theme = useSelector(appState.selectColorTheme)
+    const dispatch = useDispatch()
+    const sortBy = useSelector((state: any) => state.scripts.filters.sortBy)
+    const { t } = useTranslation()
+
+    // Local state for the selected option
+    const [selectedId, setSelectedId] = useState<string>(
+        SORT_OPTIONS.find(
+            (o) => o.attribute === sortBy.attribute && o.ascending === sortBy.ascending
+        )?.id ?? SORT_OPTIONS[0].id
+    )
+
+    // Sync local state if Redux sortBy changes externally
+    useEffect(() => {
+        const currentId =
+      SORT_OPTIONS.find(
+          (o) => o.attribute === sortBy.attribute && o.ascending === sortBy.ascending
+      )?.id ?? SORT_OPTIONS[0].id
+        setSelectedId(currentId)
+    }, [sortBy.attribute, sortBy.ascending])
+
+    return (
+        <Listbox
+            value={selectedId}
+            onChange={(id: string) => {
+                const option = SORT_OPTIONS.find((o) => o.id === id)
+                if (!option) return
+                setSelectedId(id)
+                dispatch(scripts.setSortBy({ attribute: option.attribute, ascending: option.ascending }))
+            }}
+        >
+            <div className="relative w-1/3 ml-2">
+                <ListboxButton
+                    className={`flex justify-between w-full border-b-2 cursor-pointer select-none ${theme === "light" ? "border-black" : "border-white"
+                    }`}
+                    aria-label={t("scriptBrowser.filterDropdown.sortBy")}
+                >
+                    <span className="truncate">
+                        {t("scriptBrowser.filterDropdown.sortBy")}
+                    </span>
+                    <i className="icon icon-arrow-down2 text-xs p-1" />
+                </ListboxButton>
+
+                <ListboxOptions
+                    anchor="bottom start"
+                    className={`border p-2 z-50 [--anchor-gap:4px] focus:outline-none
+                      bg-white text-black dark:bg-black dark:text-white border-black`}
+                >
+                    {SORT_OPTIONS.map((option) => (
+                        <ListboxOption key={option.id} value={option.id} as="button" type="button" className="w-full block">
+                            {({ active, selected }) => (
+                                <div
+                                    className={`flex items-center px-2 py-1 ${active ? "bg-blue-200 dark:bg-blue-500" : ""
+                                    }`}
+                                >
+                                    <div className="w-5 mr-2" aria-hidden>
+                                        <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
+                                    </div>
+                                    <div aria-label={t("scriptBrowser.filterDropdown.sortByName", { filtername: t(option.label) })} className="text-sm">{t(option.label)}</div>
+                                </div>
+                            )}
+                        </ListboxOption>
+                    ))}
+                </ListboxOptions>
+            </div>
+        </Listbox>
     )
 }
 
@@ -120,7 +167,7 @@ const Filters = () => {
                     title={t("scriptBrowser.filterDropdown.owner")}
                     category="owners"
                     items={owners}
-                    aria={t("scriptBrowser.filterDropdown.owner")}
+                    aria={t("scriptBrowser.filterDropdown.filterByOwner")}
                     numSelected={numOwnersSelected}
                     position="left"
                     FilterItem={FilterItem}
@@ -128,20 +175,13 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.fileType")}
                     category="types"
-                    aria={t("scriptBrowser.filterDropdown.fileType")}
+                    aria={t("scriptBrowser.filterDropdown.filterByFile")}
                     items={["Python", "JavaScript"]}
                     numSelected={numTypesSelected}
                     position="center"
                     FilterItem={FilterItem}
                 />
-                <DropdownMultiSelector
-                    title={t("scriptBrowser.filterDropdown.sortBy")}
-                    category="sortBy"
-                    aria={t("scriptBrowser.filterDropdown.sortBy")}
-                    items={["Date", "A-Z"]}
-                    position="right"
-                    FilterItem={SortOptionsItem}
-                />
+                <SortBySelector />
             </div>
         </div>
     )
@@ -202,94 +242,42 @@ const RestoreButton = ({ script }: { script: Script }) => {
     </PillButton>
 }
 
-const sharedInfoPanelVirtualRef = new VirtualRef() as VirtualReference
-
 const SharedScriptInfoItem = ({ title, body }: { title: string, body: string }) => {
-    const theme = useSelector(appState.selectColorTheme)
-
     return (
         <div className={`px-4 py-3 ${body ? "block" : "hidden"}`}>
-            <div className={`font-semibold ${theme === "light" ? "text-gray-600" : "text-gray-500"}`}>{title}</div>
+            <div className="font-semibold text-gray-600 dark:text-gray-500">{title}</div>
             <div className="break-words">{body}</div>
         </div>
     )
 }
 
-const SingletonSharedScriptInfo = () => {
+const SharedScriptInfoButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
-    const dispatch = useDispatch()
-    const showSharedScriptInfo = useSelector(scripts.selectShowSharedScriptInfo)
-    const script = useSelector(scripts.selectSharedInfoScript)
-
-    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
-    const { styles, attributes, update } = usePopper(sharedInfoPanelVirtualRef, popperElement)
-    sharedInfoPanelVirtualRef.updatePopper = update
-
-    // Note: Synchronous dispatches inside a setState can conflict with components rendering.
-    const handleClickAsync = (event: Event) => {
-        setPopperElement(ref => {
-            if (!ref?.contains(event.target as Node)) {
-                dispatch(scripts.resetSharedScriptInfoAsync())
-            }
-            return ref
-        })
-    }
-
-    useEffect(() => {
-        document.addEventListener("mousedown", handleClickAsync)
-        return () => document.removeEventListener("mousedown", handleClickAsync)
-    }, [])
 
     return (
-        <div
-            ref={setPopperElement as LegacyRef<HTMLDivElement>}
-            style={showSharedScriptInfo ? styles.popper : { display: "none" }}
-            {...attributes.popper}
-            className="border border-black p-2 z-50 bg-white dark:bg-black"
-        >
-            <i
-                className="icon-cross2 absolute top-0 right-0 p-4 align-middle cursor-pointer text-black dark:text-gray-200"
-                onClick={() => {
-                    dispatch(scripts.resetSharedScriptInfo())
-                }}
-            />
-            {script && (<>
-                <SharedScriptInfoItem
-                    title={script.name}
-                    body="Shared Script"
-                />
-                <SharedScriptInfoItem
-                    title={t("sharedScript.originalAuthor")}
-                    body={script.username}
-                />
-                <SharedScriptInfoItem
-                    title={t("lastModified")}
-                    body={script.modified as string}
-                />
-                <SharedScriptInfoItem
-                    title={t("sharedScript.viewOnlyLink")}
-                    body={`${SITE_BASE_URI}?sharing=${script.shareid}`}
-                />
-            </>)}
-        </div>
-    )
-}
-
-const SharedScriptInfoCaller = ({ script }: { script: Script }) => {
-    const dispatch = useDispatch()
-
-    return (
-        <div
-            onClick={event => {
-                event.preventDefault()
-                event.stopPropagation()
-                sharedInfoPanelVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY)
-                sharedInfoPanelVirtualRef.updatePopper?.()
-                dispatch(scripts.setSharedScriptInfo({ script }))
-            }}
-        >
-            <i className="icon-info text-lg align-middle" />
-        </div>
+        <Popover className="">
+            <PopoverButton><i className="icon-info text-lg align-middle" /></PopoverButton>
+            <PopoverPanel anchor="bottom start" className="border border-black p-2 z-50 bg-white dark:bg-black">
+                {script && (<>
+                    <SharedScriptInfoItem
+                        title={script.name}
+                        body="Shared Script"
+                    />
+                    <SharedScriptInfoItem
+                        title={t("sharedScript.originalAuthor")}
+                        body={script.username}
+                    />
+                    <SharedScriptInfoItem
+                        title={t("lastModified")}
+                        body={script.modified as string}
+                    />
+                    <SharedScriptInfoItem
+                        title={t("sharedScript.viewOnlyLink")}
+                        body={`${SITE_BASE_URI}?sharing=${script.shareid}`}
+                    />
+                </>)}
+            </PopoverPanel>
+        </Popover>
     )
 }
 
@@ -336,15 +324,14 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                             {shared && (<i className="icon-copy3 align-middle" title={t("scriptBrowser.shared.sharedBy", { username: script.creator ?? script.username })} />)}
                         </div>
                     </div>
-                    <div className={`${type === "regular" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
-                        <DownloadButton script={script} />
-                        {loggedIn && (<ShareButton script={script} />)}
-                        <DropdownMenuCaller script={script} type="regular" />
-                    </div>
-                    <div className={`${type === "shared" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
-                        <SharedScriptInfoCaller script={script} />
-                        <DropdownMenuCaller script={script} type="shared" />
-                    </div>
+
+                    {(type === "regular" || type === "shared") && <div className="flex flex-column items-center space-x-2">
+                        {type === "regular" && <DownloadButton script={script} />}
+                        {type === "regular" && loggedIn && (<ShareButton script={script} />)}
+                        {type === "shared" && <SharedScriptInfoButton script={script} />}
+                        <ScriptDropdownMenu script={script} scriptType={type} menuType="buttonmenu" />
+                    </div>}
+
                     <div className={`${type === "deleted" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
                         <RestoreButton script={script} />
                     </div>
@@ -453,8 +440,6 @@ export const ScriptBrowser = () => {
                 <SharedScriptCollection />
                 <DeletedScriptCollection />
             </div>
-
-            <SingletonSharedScriptInfo />
         </>
     )
 }

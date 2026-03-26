@@ -1,0 +1,885 @@
+{
+    "init": true,
+    "finish": false,
+    "length": 9,
+    "tracks": [
+        {
+            "effects": {
+                "TEMPO": {
+                    "TEMPO": [
+                        {
+                            "measure": 1,
+                            "value": 120,
+                            "shape": "square",
+                            "sourceLine": 1
+                        },
+                        {
+                            "measure": 1,
+                            "value": 120,
+                            "shape": "square",
+                            "sourceLine": 7
+                        }
+                    ]
+                }
+            },
+            "clips": [
+                {
+                    "filekey": "METRONOME01",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 1,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 1.25,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 1.5,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 1.75,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME01",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 2,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 2.25,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 2.5,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 2.75,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME01",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 3,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 3.25,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 3.5,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 3.75,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME01",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 4,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 4.25,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 4.5,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 4.75,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME01",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 5,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 5.25,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 5.5,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 5.75,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME01",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 6,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 6.25,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 6.5,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 6.75,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME01",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 7,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 7.25,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 7.5,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 7.75,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME01",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 8,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 8.25,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 8.5,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 8.75,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME01",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 9,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 9.25,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 9.5,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                },
+                {
+                    "filekey": "METRONOME02",
+                    "sourceAudio": {},
+                    "audio": {},
+                    "track": 0,
+                    "measure": 9.75,
+                    "start": 1,
+                    "end": 1.625,
+                    "scale": false,
+                    "loop": false,
+                    "loopChild": false
+                }
+            ]
+        },
+        {
+            "clips": [
+                {
+                    "filekey": "RD_UK_HOUSE_MAINBEAT_8",
+                    "track": 1,
+                    "measure": 1,
+                    "start": 1,
+                    "end": 3,
+                    "scale": false,
+                    "loop": true,
+                    "silence": 0,
+                    "sourceLine": 10,
+                    "tempo": 120,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "RD_UK_HOUSE_MAINBEAT_8",
+                    "track": 1,
+                    "measure": 3,
+                    "start": 1,
+                    "end": 3,
+                    "scale": false,
+                    "loop": true,
+                    "silence": 0,
+                    "sourceLine": 10,
+                    "tempo": 120,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": true
+                }
+            ],
+            "effects": {}
+        },
+        {
+            "clips": [
+                {
+                    "filekey": "RD_POP_SYNTHBASS_6",
+                    "track": 2,
+                    "measure": 1,
+                    "start": 1,
+                    "end": 5,
+                    "scale": false,
+                    "loop": true,
+                    "silence": 0,
+                    "sourceLine": 11,
+                    "tempo": 120,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "RD_POP_SYNTHBASS_6",
+                    "track": 2,
+                    "measure": 5,
+                    "start": 1,
+                    "end": 5,
+                    "scale": false,
+                    "loop": true,
+                    "silence": 0,
+                    "sourceLine": 11,
+                    "tempo": 120,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": true
+                }
+            ],
+            "effects": {
+                "VOLUME": {
+                    "GAIN": [
+                        {
+                            "measure": 1,
+                            "value": -20,
+                            "shape": "linear",
+                            "sourceLine": 19
+                        },
+                        {
+                            "measure": 5,
+                            "value": 6,
+                            "shape": "square",
+                            "sourceLine": 19
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "clips": [
+                {
+                    "filekey": "OS_SNARE03",
+                    "track": 3,
+                    "measure": 4,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 25,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "OS_SNARE03",
+                    "track": 3,
+                    "measure": 4.25,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 25,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "OS_SNARE03",
+                    "track": 3,
+                    "measure": 4.375,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 25,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "OS_SNARE03",
+                    "track": 3,
+                    "measure": 4.5,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 25,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "OS_SNARE03",
+                    "track": 3,
+                    "measure": 4.5625,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 25,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "OS_SNARE03",
+                    "track": 3,
+                    "measure": 4.75,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 25,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "OS_SNARE03",
+                    "track": 3,
+                    "measure": 4.8125,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 25,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "OS_SNARE03",
+                    "track": 3,
+                    "measure": 4.875,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 25,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "OS_SNARE03",
+                    "track": 3,
+                    "measure": 4.9375,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 25,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "Y09_KICK_1",
+                    "track": 3,
+                    "measure": 8,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 26,
+                    "tempo": 91,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "Y09_KICK_1",
+                    "track": 3,
+                    "measure": 8.1875,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 26,
+                    "tempo": 91,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "Y09_KICK_1",
+                    "track": 3,
+                    "measure": 8.375,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 26,
+                    "tempo": 91,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "Y09_KICK_1",
+                    "track": 3,
+                    "measure": 8.5625,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 26,
+                    "tempo": 91,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "Y09_KICK_1",
+                    "track": 3,
+                    "measure": 8.75,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0,
+                    "sourceLine": 26,
+                    "tempo": 91,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "Y09_KICK_1",
+                    "track": 3,
+                    "measure": 8.875,
+                    "start": 1,
+                    "end": 1.0625,
+                    "scale": false,
+                    "loop": false,
+                    "silence": 0.0625,
+                    "sourceLine": 26,
+                    "tempo": 91,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                }
+            ],
+            "effects": {}
+        },
+        {
+            "clips": [
+                {
+                    "filekey": "YG_RNB_TAMBOURINE_1",
+                    "track": 4,
+                    "measure": 1,
+                    "start": 1,
+                    "end": 5,
+                    "scale": false,
+                    "loop": true,
+                    "silence": 0,
+                    "sourceLine": 12,
+                    "tempo": 96,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                },
+                {
+                    "filekey": "YG_RNB_TAMBOURINE_1",
+                    "track": 4,
+                    "measure": 5,
+                    "start": 1,
+                    "end": 5,
+                    "scale": false,
+                    "loop": true,
+                    "silence": 0,
+                    "sourceLine": 12,
+                    "tempo": 96,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": true
+                }
+            ],
+            "effects": {}
+        },
+        {
+            "clips": [
+                {
+                    "filekey": "YG_FUNK_CONGAS_3",
+                    "track": 5,
+                    "measure": 1,
+                    "start": 1,
+                    "end": 5,
+                    "scale": false,
+                    "loop": true,
+                    "silence": 0,
+                    "sourceLine": 13,
+                    "tempo": 105,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                }
+            ],
+            "effects": {}
+        },
+        {
+            "clips": [
+                {
+                    "filekey": "YG_FUNK_HIHAT_2",
+                    "track": 6,
+                    "measure": 5,
+                    "start": 1,
+                    "end": 5,
+                    "scale": false,
+                    "loop": true,
+                    "silence": 0,
+                    "sourceLine": 14,
+                    "tempo": 100,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                }
+            ],
+            "effects": {}
+        },
+        {
+            "clips": [
+                {
+                    "filekey": "RD_POP_TB303LEAD_3",
+                    "track": 7,
+                    "measure": 5,
+                    "start": 1,
+                    "end": 5,
+                    "scale": false,
+                    "loop": true,
+                    "silence": 0,
+                    "sourceLine": 15,
+                    "tempo": 120,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                }
+            ],
+            "effects": {}
+        },
+        {
+            "clips": [
+                {
+                    "filekey": "MILKNSIZZ_ADIOS_COWBELLS",
+                    "track": 8,
+                    "measure": 9,
+                    "start": 1,
+                    "end": 2,
+                    "scale": false,
+                    "loop": true,
+                    "silence": 0,
+                    "sourceLine": 16,
+                    "tempo": 96,
+                    "sourceAudio": {},
+                    "audio": {},
+                    "loopChild": false
+                }
+            ],
+            "effects": {}
+        }
+    ],
+    "transformedClips": {}
+}

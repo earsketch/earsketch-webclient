@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <base href="<%= BASE_URL %>">
     <meta charset="UTF-8">
-    <title>EarSketch</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="../newrelic/newrelicbrowser.%ES_NEWRELIC_CONFIG%.js"></script>
+    <title>EarSketch</title>
     <style>
         .es-spinner {
             background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" version="1.1" id="svg8" viewBox="0 0 120 120"%3E%3Cstyle id="style959"/%3E%3Cg id="layer1" transform="translate(-30 -30)" fill-opacity="1" stroke-width="1"%3E%3Cpath id="path931" d="M46 90H30a60 60 0 0060 60v-16a44 44 0 01-44-44z" fill="%234286da"/%3E%3Cpath id="path953" d="M90 30a60 60 0 00-60 60h16a44 44 0 0144-44V30z" fill="%23f3f3f3"/%3E%3Cpath id="path950" d="M150 90h-16a44 44 0 01-44 44v16a60 60 0 0060-60z" fill="%23f3f3f3"/%3E%3Cpath id="path956" d="M90 30v16a44 44 0 0144 44h16a60 60 0 00-60-60z" fill="%234286da"/%3E%3C/g%3E%3C/svg%3E');
@@ -19,11 +19,10 @@
             100% { transform: rotate(360deg); }
         }
     </style>
-    <script type="text/javascript" src="public/newrelic/newrelicbrowser.js"></script>
 
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-glyphicons.css">
+    <link rel="stylesheet" type="text/css" href="/css/vendor/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/css/vendor/bootstrap-glyphicons.css">
 
     <meta name="google-site-verification" content="ojwZ1r7MVOTRWsiqPITqwmhCOUou2CcqxRMG6itoci4"/>
     <style>
@@ -49,5 +48,6 @@
             element.style['color'] = '#EEE'
         }
     </script>
+    <script type="module" src="/src/index.tsx"></script>
 </body>
 </html>

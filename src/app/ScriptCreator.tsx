@@ -7,14 +7,16 @@ import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
 import { ModalFooter, ModalHeader, ModalBody, Alert } from "../Utils"
 
+// Unallowed characters: ! " # $ % & ' ( ) * + , . / : ; < = > ? [ \ ^ ` { | } ~
+const ILLEGAL_SCRIPT_NAME_CHAR_PATTERN = /[!"#$%&'()*+,./:;<=>?[\\\]^`{|}~]/g
+
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
     const scripts = scriptsState.selectRegularScripts(store.getState())
 
     if (name.length < 3) {
         throw new Error("messages:general.shortname")
-    } else if (/[$-/:-?{-~!"^#`[\]\\]/g.test(name)) {
-        // Why are hyphens banned from script names?
+    } else if (ILLEGAL_SCRIPT_NAME_CHAR_PATTERN.test(name)) {
         throw new Error("messages:idecontroller.illegalname")
     } else if (Object.values(scripts).some(script => !script.soft_delete && script.name.toLocaleUpperCase() === fullname.toLocaleUpperCase())) {
         // Conflict with existing non-deleted script.
@@ -34,12 +36,16 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
     const language = useSelector(app.selectScriptLanguage)
     const [name, setName] = useState("")
     const [error, setError] = useState("")
-    const [extension, setExtension] = useState(language === "python" ? ".py" : ".js")
+    const [selectedLanguage, setSelectedLanguage] = useState(language as string)
     const { t } = useTranslation()
+    const extension = selectedLanguage.startsWith("python") ? ".py" : ".js"
 
     const confirm = () => {
         try {
-            close(validateScriptName(name, extension))
+            close({
+                template: selectedLanguage,
+                filename: validateScriptName(name, extension),
+            })
         } catch (error: any) {
             setError(error.message)
         }
@@ -69,9 +75,10 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
                         <div className="absolute inset-y-0 right-0 flex items-center mr-2 text-gray-500 dark:text-gray-300">{extension}</div>
                     </div>
 
-                    <select className="form-select w-1/2 mx-6 dark:bg-transparent placeholder:text-gray-300" value={extension} onChange={e => setExtension(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
-                        <option value=".py">Python</option>
-                        <option value=".js">JavaScript</option>
+                    <select className="form-select w-1/2 mx-6 dark:bg-transparent placeholder:text-gray-300" value={selectedLanguage} onChange={e => setSelectedLanguage(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
+                        <option value="python">Python 2</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="python3">Python 3 (beta)</option>
                     </select>
                 </div>
             </ModalBody>

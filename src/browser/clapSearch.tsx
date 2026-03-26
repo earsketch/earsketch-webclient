@@ -19,14 +19,28 @@ class AudioSearchEngine {
     private textModel: any = null
     private songsData: SongsDatabase | null = null
     private isReady: boolean = false
+    private initPromise: Promise<void> | null = null
 
     async initialize(): Promise<void> {
+        if (this.isReady) return
+        if (this.initPromise) return this.initPromise
+        this.initPromise = this._doInitialize()
+        return this.initPromise
+    }
+
+    private async _doInitialize(): Promise<void> {
         try {
             console.log("A: Starting initialization...")
 
-            // FIX 1: Use the correct package - @xenova/transformers
-            const { AutoTokenizer, ClapTextModelWithProjection } = await import("@xenova/transformers")
+            const { AutoTokenizer, ClapTextModelWithProjection, env } = await import("@xenova/transformers")
             console.log("B: Imported transformers successfully")
+
+            // Point ONNX runtime to CDN so WASM files resolve correctly in dev
+            env.backends.onnx.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/"
+
+            // Disable local model lookup — otherwise @xenova/transformers tries localhost first
+            // and gets the SPA's index.html back instead of the actual model files
+            env.allowLocalModels = false
 
             // Load tokenizer
             console.log("Loading tokenizer...")
@@ -37,7 +51,7 @@ class AudioSearchEngine {
             // Load text model
             console.log("Loading text model...")
             this.textModel = await ClapTextModelWithProjection.from_pretrained("Xenova/clap-htsat-unfused")
-            const { textEmbeds } = await this.textModel(textInputs)
+            await this.textModel(textInputs)
             console.log("D: Text model loaded successfully", this.textModel)
 
             this.songsData = audioEmbeddings as SongsDatabase
@@ -47,12 +61,8 @@ class AudioSearchEngine {
             console.log(`Audio search engine ready with ${Object.keys(this.songsData).length} songs`)
         } catch (error) {
             console.error("Failed to initialize audio search engine:", error)
-            console.error("Error details:", {
-                message: "hello",
-                stack: "bye",
-                name: "seeyou",
-            })
             this.isReady = false
+            this.initPromise = null
             throw error
         }
     }
@@ -85,15 +95,16 @@ class AudioSearchEngine {
             const textInputs = this.tokenizer([query], { padding: true, truncation: true })
             console.log("Text inputs:", textInputs)
 
-            const { textEmbeds } = await this.textModel(textInputs)
-            console.log("Text embeds shape:", textEmbeds)
+            const modelOutput = await this.textModel(textInputs) as any
+            console.log("Text embeds shape:", modelOutput.text_embeds)
 
-            const queryEmbedding = Array.from(textEmbeds.data) as number[]
+            const queryEmbedding = Array.from(modelOutput.text_embeds.data) as number[]
             console.log("Query embedding length:", queryEmbedding.length)
 
             // Calculate similarities
             const results: SearchResult[] = []
             this.songsData.forEach((songData, index) => {
+                if (!songData.embedding) return
                 const similarity = this.cosineSimilarity(queryEmbedding, songData.embedding)
                 results.push({
                     songId: index,

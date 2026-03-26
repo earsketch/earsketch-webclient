@@ -1,18 +1,17 @@
-import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
+import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit"
 import { createTransform, persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
-import dayjs from "dayjs"
 
-import { Script, ScriptType } from "common"
+import { Script } from "common"
 import { selectUserName, selectLoggedIn } from "../user/userState"
-import store, { RootState, ThunkAPI } from "../reducers"
+import store, { RootState } from "../reducers"
 import * as ESUtils from "../esutils"
 
 export interface Scripts {
     [scriptID: string]: Script
 }
 
-export type SortByAttribute = "Date" | "A-Z";
+export type SortByAttribute = "date" | "name";
 
 export interface Filters {
     owners: string[]
@@ -28,6 +27,10 @@ interface AllFilters extends Filters {
     }
 }
 
+export type MultiSelectFilterKey = {
+    [K in keyof AllFilters]: AllFilters[K] extends string[] ? K : never
+}[keyof AllFilters]
+
 interface ScriptsState {
     // TODO: Rename to clarify: are regularScripts all scripts owned by user (including shared scripts)?
     regularScripts: Scripts
@@ -35,12 +38,6 @@ interface ScriptsState {
     readOnlyScripts: Scripts
     filters: AllFilters
     featureSharedScript: boolean
-    dropdownMenu: {
-        show: boolean
-        script: Script | null
-        type: ScriptType | null
-        context: boolean
-    }
     sharedScriptInfo: {
         show: boolean
         script: Script | null
@@ -59,18 +56,11 @@ const scriptsSlice = createSlice({
             owners: [],
             types: [],
             sortBy: {
-                attribute: "Date",
+                attribute: "date",
                 ascending: false,
             },
         },
         featureSharedScript: false, // When opened via a shared-script link.
-        // The below two are singleton UI component states that are incompatible with the react.window library.
-        dropdownMenu: {
-            show: false,
-            script: null,
-            type: null,
-            context: false,
-        },
         sharedScriptInfo: {
             show: false,
             script: null,
@@ -113,31 +103,22 @@ const scriptsSlice = createSlice({
         resetFilter(state, { payload }) {
             state.filters[payload as keyof Filters] = []
         },
+        setFilter: (state, action: PayloadAction<{ category: keyof Filters; values: string[] }>) => {
+            state.filters[action.payload.category] = action.payload.values
+        },
+        setSortBy(state, action: PayloadAction<{ attribute: SortByAttribute; ascending: boolean }>) {
+            state.filters.sortBy = action.payload
+        },
         setSorter(state, { payload }) {
             if (state.filters.sortBy.attribute === payload) {
                 state.filters.sortBy.ascending = !state.filters.sortBy.ascending
             } else {
                 state.filters.sortBy.attribute = payload
-                state.filters.sortBy.ascending = payload === "A-Z"
+                state.filters.sortBy.ascending = payload === "name"
             }
         },
         setFeatureSharedScript(state, { payload }) {
             state.featureSharedScript = payload
-        },
-        // TODO: Move dropdown stuff to temporary / mutable state.
-        setDropdownMenu(state, { payload }) {
-            state.dropdownMenu.show = payload.show ? payload.show : true
-            state.dropdownMenu.script = payload.script
-            state.dropdownMenu.type = payload.type
-            state.dropdownMenu.context = payload.context ? payload.context : false
-        },
-        resetDropdownMenu(state) {
-            state.dropdownMenu = {
-                show: false,
-                script: null,
-                type: null,
-                context: false,
-            }
         },
         setSharedScriptInfo(state, { payload }) {
             state.sharedScriptInfo.show = payload.show ? payload.show : true
@@ -204,10 +185,10 @@ export const {
     addFilterItem,
     removeFilterItem,
     resetFilter,
+    setFilter,
+    setSortBy,
     setSorter,
     setFeatureSharedScript,
-    setDropdownMenu,
-    resetDropdownMenu,
     setSharedScriptInfo,
     resetSharedScriptInfo,
     setScriptSource,
@@ -271,20 +252,6 @@ export const {
 //     }
 // )
 
-export const resetDropdownMenuAsync = createAsyncThunk<void, void, ThunkAPI>(
-    "scripts/resetDropdownMenuAsync",
-    (_, { dispatch }) => {
-        setTimeout(() => dispatch(resetDropdownMenu()), 0)
-    }
-)
-
-export const resetSharedScriptInfoAsync = createAsyncThunk<void, void, ThunkAPI>(
-    "scripts/resetSharedScriptInfoAsync",
-    (_, { dispatch }) => {
-        setTimeout(() => dispatch(resetSharedScriptInfo()), 0)
-    }
-)
-
 // === Selectors ===
 
 export const selectRegularScripts = (state: RootState) => state.scripts.regularScripts
@@ -341,7 +308,7 @@ const sortScriptIDs = (scripts: Scripts, sortBy: SortByAttribute, ascending: boo
     }
     return Object.values(scripts).sort((a, b) => {
         let c: any, d: any
-        if (sortBy === "A-Z") {
+        if (sortBy === "name") {
             c = a.name
             d = b.name
 
@@ -350,8 +317,8 @@ const sortScriptIDs = (scripts: Scripts, sortBy: SortByAttribute, ascending: boo
                 : d.localeCompare(c, undefined, lexicalSortOptions)
         } else {
             // TODO: Consistency in our date fields.
-            c = typeof a.modified === "string" ? dayjs(a.modified).valueOf() : a.modified
-            d = typeof b.modified === "string" ? dayjs(b.modified).valueOf() : b.modified
+            c = typeof a.modified === "string" ? Date.parse(a.modified + "Z") : a.modified
+            d = typeof b.modified === "string" ? Date.parse(b.modified + "Z") : b.modified
             return ascending ? c - d : d - c
         }
     }).map(v => v.shareid)
@@ -384,10 +351,6 @@ export const selectFilteredDeletedScriptIDs = createSelector(
 )
 
 export const selectFeatureSharedScript = (state: RootState) => state.scripts.featureSharedScript
-export const selectShowDropdownMenu = (state: RootState) => state.scripts.dropdownMenu.show
-export const selectDropdownMenuScript = (state: RootState) => state.scripts.dropdownMenu.script
-export const selectDropdownMenuType = (state: RootState) => state.scripts.dropdownMenu.type
-export const selectDropdownMenuContext = (state: RootState) => state.scripts.dropdownMenu.context
 
 export const selectShowSharedScriptInfo = (state: RootState) => state.scripts.sharedScriptInfo.show
 export const selectSharedInfoScript = (state: RootState) => state.scripts.sharedScriptInfo.script

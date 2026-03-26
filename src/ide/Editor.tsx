@@ -13,23 +13,24 @@ import { Compartment, EditorState, Extension, StateEffect, StateField, RangeSet,
 import { indentUnit } from "@codemirror/language"
 import { pythonLanguage } from "@codemirror/lang-python"
 import { javascriptLanguage } from "@codemirror/lang-javascript"
-import { gutter, GutterMarker, keymap } from "@codemirror/view"
+import { gutter, GutterMarker, keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
-import { setSoundNames, setPreview, previewPlugin, setAppLocale } from "./EditorWidgets"
+import { setSoundNames, setPreview, previewPlugin, setAppLocale, setShowBeatStringAnnotation } from "./EditorWidgets"
 
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
 import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
+import * as scripts from "../browser/scriptsState"
 
 Object.assign(window, { Sk, ace }) // for droplet
 
@@ -250,6 +251,7 @@ export function createSession(id: string, language: Language, contents: string) 
             ),
             EditorView.updateListener.of(update => {
                 sessions[id] = update.state
+                if (update.docChanged) onEdit(update)
             }),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
@@ -278,10 +280,6 @@ export function setActiveSession(session: EditorSession) {
         view.dispatch({ effects: themeConfig.reconfigure(getTheme()) })
         changeListeners.forEach(f => f())
     }
-}
-
-export function getContents(session?: EditorSession) {
-    return (session ?? view.state).doc.toString()
 }
 
 export function setContents(contents: string, id?: string, doUpdateBlocks = false) {
@@ -358,7 +356,7 @@ export function pasteCode(code: string) {
 }
 
 export function highlightError(err: any) {
-    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
+    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState())!.name)
     let lineNumber = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
     if (lineNumber !== undefined) {
         // Skulpt reports a line number greater than the document length for EOF; clamp to valid range.
@@ -396,6 +394,19 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
 }
 
 // Callbacks
+function onEdit(update: ViewUpdate) {
+    changeListeners.forEach(f => f(update.transactions.some(t => t.isUserEvent("delete"))))
+
+    // If updating the source in Redux on every update turns out to be a bottleneck, we can buffer updates or move state out of Redux.
+    const activeTabID = tabs.selectActiveTabID(store.getState())
+    const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
+    if (script) {
+        store.dispatch(scripts.setScriptSource({ id: activeTabID, source: view.state.doc.toString() }))
+        store.dispatch(tabs.addModifiedScript(activeTabID))
+        store.dispatch(setScriptMatchesDAW(false))
+    }
+}
+
 let shakeImportButton = () => {}
 let updateBlocks: () => void
 
@@ -416,13 +427,14 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const [inBlocksMode, setInBlocksMode] = useState(false)
     const [shaking, setShaking] = useState(false)
     const locale = useSelector(appState.selectLocale)
+    const showBeatStringAnnotations = useSelector(selectShowBeatStringAnnotation)
 
     useEffect(() => {
         if (!editorElement.current || !blocksElement.current) return
 
         const startShaking = () => {
             setShaking(false)
-            setTimeout(() => setShaking(true), 0)
+            window.setTimeout(() => setShaking(true), 0)
         }
 
         if (!view) {
@@ -445,6 +457,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => view.dispatch({ effects: setAppLocale.of(locale) }), [locale])
 
+    useEffect(() => view.dispatch({ effects: setShowBeatStringAnnotation.of(showBeatStringAnnotations) }), [showBeatStringAnnotations])
+
     const tryToEnterBlocksMode = () => {
         droplet.on("change", () => {})
         const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
@@ -453,7 +467,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.setMode(language, blocksModes[language].modeOptions)
             droplet.setPalette(blocksModes[language].palette)
         }
-        const result = droplet.setValue_raw(getContents())
+        const result = droplet.setValue_raw(view.state.doc.toString())
         if (result.success) {
             droplet.resize()
             setInBlocksMode(true)

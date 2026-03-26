@@ -13,16 +13,17 @@ export const CompetitionSubmission = ({ name, shareID, close }: { name: string, 
                         <span>Competition Rules</span>
                     </div>
                     <ul className="list-disc text-left p-5 pl-10 space-y-1 bg-gray-100 dark:bg-gray-800">
-                        <li>Submission deadline is 11:59PM PST on December 15th, 2024</li>
-                        <li>Song must be between 30 seconds and 2 minutes, include 5 unique musical tracks</li>
-                        <li>A reflection describing song&apos;s message must be included with submission</li>
+                        <li>Submission deadline is 11:59PM PST on November 21st, 2025</li>
+                        <li>Song must be between 30 seconds and 2 minutes</li>
+                        <li>Song must have at least five unique sounds</li>
+                        <li>Song must include sounds from more than one artist</li>
                         <li>Students can only submit one song for the competition</li>
-                        <li>Students can work alone or in groups up to four (prizes will be split among teams)</li>
-                        <li>For more information, please visit the <a href="https://www.teachers.earsketch.org/compete" target="_blank" rel="noreferrer">competition website</a>.</li>
+                        <li>A reflection describing song&apos;s message must be included with submission</li>
+                        <li>For more information, please visit the <a href="https://www.teachers.earsketch.org/compete" target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-400">competition website</a>.</li>
                     </ul>
                 </div>
                 <div className="text-center m-auto">
-                    <a href={"https://www.rocketjudge.com/register/MDRTFKSJ#scriptid=".concat(shareID)} target="_blank" rel="noreferrer">
+                    <a href={"https://www.rocketjudge.com/register/PV0NL6hn#scriptid=".concat(shareID)} target="_blank" rel="noreferrer">
                         <button style={{ minWidth: "270px", fontSize: "26px", color: "black", background: "#d3d25a" }}>Click Here to Submit</button>
                     </a>
                 </div>

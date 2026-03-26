@@ -1,5 +1,6 @@
 import { loadEnv, splitVendorChunkPlugin } from "vite"
 import { defineConfig } from "vitest/config"
+import { adapter, analyzer } from "vite-bundle-analyzer"
 import react from "@vitejs/plugin-react-swc"
 import path from "path"
 
@@ -31,14 +32,24 @@ export default ({ mode }: { mode: string }) => {
     const env = loadEnv(mode, process.cwd(), ["ES_WEB_"])
     return defineConfig({
         base: baseURL,
-        plugins: [splitVendorChunkPlugin(), react()],
+        plugins: [splitVendorChunkPlugin(), react(), adapter(analyzer({ analyzerMode: "static" }))],
         // https://vite.dev/guide/dep-pre-bundling.html#monorepos-and-linked-dependencies
         optimizeDeps: {
-            include: ["droplet", "skulpt"],
+            include: ["droplet", "skulpt", "onnxruntime-web"],
+            exclude: ["@xenova/transformers", "@huggingface/transformers"],
+        },
+        worker: {
+            format: "es",
         },
         build: {
             commonjsOptions: {
                 include: [/droplet/, /skulpt/, /node_modules/],
+            },
+            rollupOptions: {
+                input: {
+                    main: path.resolve(__dirname, "index.html"),
+                    autograder: path.resolve(__dirname, "autograder/index.html"),
+                },
             },
         },
         test: {
@@ -53,6 +64,11 @@ export default ({ mode }: { mode: string }) => {
         resolve: {
             alias: {
                 "@lib": path.resolve(__dirname, "lib"),
+                "onnxruntime-node": path.resolve(__dirname, "src/onnxruntime-node-stub.js"),
+                // Force @xenova/transformers to use its nested onnxruntime-web@1.14.0.
+                // The top-level onnxruntime-web@1.22.0-dev tries to load ort-wasm-simd-threaded.jsep.mjs
+                // (WebGPU/JSEP backend) which doesn't exist in the 1.14.0 CDN distribution.
+                "onnxruntime-web": path.resolve(__dirname, "node_modules/@xenova/transformers/node_modules/onnxruntime-web"),
             },
         },
         define: {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
+import i18n from "i18next"
 import * as d3 from "d3"
 
 import * as appState from "../app/appState"
@@ -497,7 +498,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                 <div className="mixTrackFiller text-gray-700 dark:text-gray-400">{track.label}</div>
             </div>
             <div className="daw-track">
-                <div className="mixTrackFiller" style={{ background: color }}>{!hideMixTrackLabel && <span>MIX TRACK</span>}</div>
+                <div className="mixTrackFiller" style={{ background: color }}>{!hideMixTrackLabel && <span>{t("daw.mixTrack").toLocaleUpperCase()}</span>}</div>
             </div>
         </div>
         {showEffects &&
@@ -572,8 +573,7 @@ const Measureline = () => {
         let n = 1
 
         // create d3 axis
-        const measureline = d3.axisBottom()
-            .scale(xScale) // scale ticks according to zoom
+        const measureline = d3.axisBottom(xScale) // scale ticks according to zoom
             .tickValues(d3.range(1, playLength + 1, intervals.tickInterval))
             .tickSize(15)
             .tickFormat((d: any) => {
@@ -755,7 +755,7 @@ export function setDAWData(result: types.DAWData) {
         // change mute to metronome state
         mix.mute = !state.daw.metronome
         // the mix track is special
-        mix.label = "MIX"
+        mix.label = i18n.t("daw.mix").toLocaleUpperCase()
         mix.buttons = false
     }
 
@@ -986,13 +986,12 @@ export const DAW = () => {
         const timer = useRef(0)
         const up = (event: MouseEvent) => {
             if (event.button !== 0) return
-            clearInterval(timer.current)
+            window.clearInterval(timer.current)
             document.removeEventListener("mouseup", up)
         }
         const down = (event: React.MouseEvent<HTMLButtonElement>) => {
             // Only respond to left-click. (Right-click does weird things in some browsers, maybe because of the context menu.)
             if (event.button !== 0) return
-            // NOTE: The `window.` is so TypeScript doesn't get confused by NodeJS.setInterval. :-/
             timer.current = window.setInterval(action, interval)
             action()
             // NOTE: We bind this to the document (instead of the same element `down` gets bound to)
@@ -1085,10 +1084,10 @@ export const DAW = () => {
 
     useEffect(() => {
         if (playing) {
-            const interval = setInterval(updatePlayPositionAndScroll, 60)
+            const interval = window.setInterval(updatePlayPositionAndScroll, 60)
             return () => {
                 setDAWPlayingLines([])
-                clearInterval(interval)
+                window.clearInterval(interval)
             }
         }
     }, [playing, xScale, autoScroll])
