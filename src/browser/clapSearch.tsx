@@ -1,5 +1,4 @@
-// Fixed AudioSearchEngine implementation
-import songsComplete from "./songs_complete.json"
+import audioEmbeddings from "./audio_embeddings.json"
 
 interface SearchResult {
     songId: number
@@ -9,12 +8,11 @@ interface SearchResult {
 
 interface SongData {
     filename: string
+    path: string
     embedding: number[]
 }
 
-interface SongsDatabase {
-    [songId: string]: SongData
-}
+type SongsDatabase = SongData[]
 
 class AudioSearchEngine {
     private tokenizer: any = null
@@ -42,9 +40,8 @@ class AudioSearchEngine {
             const { textEmbeds } = await this.textModel(textInputs)
             console.log("D: Text model loaded successfully", this.textModel)
 
-            // FIX 2: Actually assign the songs data
-            this.songsData = songsComplete as SongsDatabase
-            console.log("E: Songs data loaded:", Object.keys(this.songsData).length, "songs")
+            this.songsData = audioEmbeddings as SongsDatabase
+            console.log("E: Songs data loaded:", this.songsData.length, "songs")
 
             this.isReady = true
             console.log(`Audio search engine ready with ${Object.keys(this.songsData).length} songs`)
@@ -96,10 +93,10 @@ class AudioSearchEngine {
 
             // Calculate similarities
             const results: SearchResult[] = []
-            Object.entries(this.songsData).forEach(([songId, songData]) => {
+            this.songsData.forEach((songData, index) => {
                 const similarity = this.cosineSimilarity(queryEmbedding, songData.embedding)
                 results.push({
-                    songId: parseInt(songId),
+                    songId: index,
                     filename: songData.filename,
                     similarity,
                 })
@@ -126,7 +123,7 @@ class AudioSearchEngine {
     }
 
     getDatabaseSize(): number {
-        return this.songsData ? Object.keys(this.songsData).length : 0
+        return this.songsData ? this.songsData.length : 0
     }
 }
 
