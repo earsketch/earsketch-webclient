@@ -176,6 +176,8 @@ export function insertMediaSection(result: DAWData, soundConstant: string, track
         if (sliceStart - 1 >= dur) {
             throw new RangeError("sliceStart exceeds sound duration")
         }
+        const effectiveSliceStart = sliceStart || 1
+        const effectiveSliceEnd = sliceEnd || (dur + 1)
         const clip = {
             filekey: soundConstant,
             track,
@@ -183,8 +185,8 @@ export function insertMediaSection(result: DAWData, soundConstant: string, track
             start: sliceStart,
             end: sliceEnd,
             loop: true,
-            clipFamilyStart: groupStart,
-            clipFamilyEnd: groupEnd,
+            clipFamilyStart: groupStart || start,
+            clipFamilyEnd: groupEnd || (start + effectiveSliceEnd - effectiveSliceStart),
         } as Clip
         addClip(result, clip)
         return result
