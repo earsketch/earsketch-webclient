@@ -17,7 +17,7 @@ import { gutter, GutterMarker, keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setPreview, previewPlugin, setAppLocale, setShowBeatStringAnnotation } from "./EditorWidgets"
-import { playEarcon } from "../audio/earcon"
+import { playEarcon, SINE_BUMP } from "../audio/earcon"
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
@@ -427,7 +427,7 @@ function jumpToDAWClip(lineNumber: number) {
         }
         clipButton.focus()
     } else {
-        playEarcon("/earcon/sine_bump.wav", 0.3)
+        playEarcon(SINE_BUMP, 0.3)
     }
 }
 

@@ -418,8 +418,8 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
                 jumpToLine(clip.sourceLine)
             } else {
                 player.setPreview(clip.track)
-                player.play(clip.clipFamilyStart || (clip.measure + clip.start - 1), 0,
-                    clip.clipFamilyEnd || (clip.measure + clip.end - 1))
+                player.play(clip.clipFamilyStart || clip.measure, 0,
+                    clip.clipFamilyEnd || (clip.measure + clip.end - clip.start))
             }
         }}
 

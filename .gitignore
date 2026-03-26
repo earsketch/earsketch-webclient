@@ -19,6 +19,8 @@ dist/
 *.zip
 *.wav
 !public/**/*.wav
+*.flac
+!public/**/*.flac
 *.reapeaks
 
 # OS generated files
