@@ -329,40 +329,97 @@ function filterEntities(entities: SoundEntities, filters: ReturnType<typeof sele
 }
 
 export const selectFilteredRegularEntities = createSelector(
-    [selectAllRegularEntities, selectFilters, selectIsAudioSearchActive, selectAudioSearchResults],
-    (allEntities, filters, isAudioSearchActive, audioResults) => {
-        // If audio search is active, filter entities to only include audio results
+    [selectAllRegularEntities, selectAllEntities, selectFilters, selectIsAudioSearchActive, selectAudioSearchResults],
+    (regularEntities, allEntities, filters, isAudioSearchActive, audioResults) => {
+        // If audio search is active, search across all entities (including featured artists).
+        // The audio_embeddings.json stores original filesystem filenames (e.g. "Y31 percussion 1")
+        // while EarSketch entity keys use UPPERCASE_UNDERSCORE (e.g. "Y31_PERCUSSION_1").
+        // Normalize by uppercasing and replacing spaces/hyphens with underscores to bridge the gap.
         if (isAudioSearchActive && audioResults.length > 0) {
-            return pickBy(allEntities, (entity, name) => audioResults.includes(name))
+            // For each audio result filename, run the same text search that filterEntities uses.
+            // Normalize the filename to match EarSketch entity key conventions, then try progressively
+            // shorter suffix forms until something matches.
+            const fieldOf = (v: SoundEntity) =>
+                `${v.folder}${v.name}${v.artist}${v.genre}${v.instrument}${v.tempo}`.toUpperCase()
+            const normalize = (s: string) => s
+                .replace(/&/g, "N")                     // R&B → RNB
+                .replace(/([a-zA-Z])(\d)/g, "$1_$2")   // vox3 → vox_3
+                .replace(/(\d)([a-zA-Z])/g, "$1_$2")   // 808bass → 808_bass
+                .toUpperCase()
+                .replace(/[\s\-]+/g, "_")
+
+            const topK = audioResults.length
+            // Max entities per individual audio result hit: keeps variant families
+            // (e.g. RD_RNB_OTHERPERCUSSIONBEAT_1 through _6) without a broad term flooding results.
+            const MAX_PER_RESULT = 6
+            const matched: SoundEntities = {}
+            for (const result of audioResults) {
+                if (Object.keys(matched).length >= topK) break
+                const parts = normalize(result).split("_")
+                outer: for (let i = 0; i < parts.length - 1; i++) {
+                    const suffixParts = parts.slice(i)
+                    // Strip trailing all-numeric segment (e.g. _003) so "BEAT_003" → "BEAT"
+                    const stripped = /^\d+$/.test(suffixParts[suffixParts.length - 1])
+                        ? suffixParts.slice(0, -1)
+                        : suffixParts
+                    const candidates = [
+                        suffixParts.join("_"),  // OTHER_PERCUSSION_BEAT_003 (with number)
+                        stripped.join("_"),     // OTHER_PERCUSSION_BEAT
+                        stripped.join(""),      // OTHERPERCUSSIONBEAT (no underscores — matches RD_RNB_OTHERPERCUSSIONBEAT_*)
+                    ]
+                    for (const term of candidates) {
+                        if (term.length < 4) continue
+                        const hits = pickBy(allEntities, v => fieldOf(v).includes(term))
+                        const hitCount = Object.keys(hits).length
+                        // Accept hits only if they're not too broad; otherwise try a tighter term
+                        if (hitCount > 0 && hitCount <= MAX_PER_RESULT) {
+                            Object.assign(matched, hits)
+                            break outer
+                        }
+                    }
+                }
+            }
+            // Final cap: if we still overshot (e.g. last result pushed us over), trim to topK
+            const matchedEntries = Object.entries(matched)
+            if (matchedEntries.length > topK) {
+                return Object.fromEntries(matchedEntries.slice(0, topK))
+            }
+            return matched
         }
-        // Otherwise, use normal filtering
-        return filterEntities(allEntities, filters)
+        // Otherwise, use normal filtering on regular (non-featured) entities
+        return filterEntities(regularEntities, filters)
     }
 )
 
 export const selectFilteredRegularNames = createSelector(
     [selectFilteredRegularEntities, selectIsAudioSearchActive, selectAudioSearchResults],
     (entities: SoundEntities, isAudioSearchActive, audioResults) => {
-        // If audio search is active, return audio results directly
         if (isAudioSearchActive && audioResults.length > 0) {
-            return audioResults
+            const matched = Object.keys(entities)
+            return matched.length > 0 ? matched : audioResults
         }
-        // Otherwise, return normal filtered results
         return Object.keys(entities)
     }
 )
 
 export const selectFilteredRegularFolders = createSelector(
-    [selectFilteredRegularEntities],
-    (entities: SoundEntities) => {
+    [selectFilteredRegularEntities, selectIsAudioSearchActive],
+    (entities: SoundEntities, isAudioSearchActive) => {
+        if (isAudioSearchActive) return ["Search Results"]
         const entityList = Object.values(entities)
         return Array.from(new Set(entityList.map(v => v.folder)))
     }
 )
 
 export const selectFilteredRegularNamesByFolders = createSelector(
-    [selectFilteredRegularEntities, selectFilteredRegularFolders],
-    namesByFoldersSelector
+    [selectFilteredRegularEntities, selectFilteredRegularFolders, selectIsAudioSearchActive],
+    (entities: SoundEntities, folders: string[], isAudioSearchActive) => {
+        if (isAudioSearchActive) {
+            // Preserve similarity order (dict insertion order matches audioResults rank)
+            return { "Search Results": Object.keys(entities) }
+        }
+        return namesByFoldersSelector(entities, folders)
+    }
 )
 
 export const selectFilteredFeaturedEntities = createSelector(
