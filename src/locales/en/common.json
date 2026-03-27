@@ -296,6 +296,7 @@
     "shortcuts.undo": "Undo",
     "shortcuts.redo": "Redo",
     "shortcuts.comment": "Comment code",
+    "shortcuts.commandPalette": "Command Palette",
     "shortcuts.autocomplete": "Autocomplete",
     "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
     "shortcuts.zoomVertical": "Zoom (Vertical)",

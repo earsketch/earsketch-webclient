@@ -48,6 +48,7 @@ import * as userNotification from "../user/notification"
 import * as request from "../request"
 import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice } from "../Utils"
 import * as websocket from "./websocket"
+import { CommandPalette } from "./CommandPalette"
 
 import esLogo from "./ES_logo_extract.svg"
 import LanguageDetector from "i18next-browser-languagedetector"
@@ -420,6 +421,7 @@ const KeyboardShortcuts = () => {
         undo: [modifier, "Z"],
         redo: [modifier, "Shift", "Z"],
         comment: [modifier, "/"],
+        commandPalette: [modifier, "Shift", "P"],
         playPause: ["Ctrl", "Space"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
@@ -663,6 +665,10 @@ export const App = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
+    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+
+    const openCommandPalette = () => setIsCommandPaletteOpen(true)
+    const closeCommandPalette = () => setIsCommandPaletteOpen(false)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
@@ -676,6 +682,19 @@ export const App = () => {
         dispatch(appState.setLocaleCode(lng))
         dispatch(curriculum.fetchLocale({ }))
     }
+
+    // Command Palette keyboard shortcut
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === "P") {
+                event.preventDefault()
+                openCommandPalette()
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [])
 
     useEffect(() => {
         (async () => {
@@ -931,6 +950,7 @@ export const App = () => {
             share={shareScript}
             submit={submitToCompetition}
         />
+        <CommandPalette isOpen={isCommandPaletteOpen} onClose={closeCommandPalette} />
         <ModalContainer />
     </>
 }
