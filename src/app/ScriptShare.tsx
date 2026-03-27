@@ -10,22 +10,14 @@ import reporter from "./reporter"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
-import { get } from "../request"
+import { get, postAuth } from "../request"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import store from "../reducers"
-import * as websocket from "./websocket"
 
 function shareWithPeople(shareid: string, users: string[]) {
-    const data = {
-        notification_type: "sharewithpeople",
-        username: user.selectUserName(store.getState()),
-        sender: user.selectUserName(store.getState()),
-        scriptid: shareid,
-        // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
-        users: users.map(id => ({ id, exists: true })),
+    for (const recipient of users) {
+        postAuth("/users/sendscriptsharenotification", { scriptid: shareid, recipient })
     }
-
-    websocket.send(data)
 }
 
 // stuff for view-only share
@@ -131,7 +123,7 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
         textElement.current?.select()
         document.execCommand("copy")
         setCopied(true)
-        setTimeout(() => setCopied(false), 1000)
+        window.setTimeout(() => setCopied(false), 1000)
     }
 
     return <>
@@ -162,8 +154,8 @@ export const LinkTab = ({ script, close }: TabParameters) => {
     const linkElement = useRef<HTMLInputElement>(null)
     const { t } = useTranslation()
 
-    const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
-    const lockedShareLink = location.origin + location.pathname + "?sharing=" + lockedShareID
+    const sharelink = window.location.origin + window.location.pathname + "?sharing=" + script.shareid
+    const lockedShareLink = window.location.origin + window.location.pathname + "?sharing=" + lockedShareID
     const link = lock ? lockedShareLink : sharelink
 
     useEffect(() => {
@@ -241,7 +233,7 @@ export const LinkTab = ({ script, close }: TabParameters) => {
 }
 
 const EmbedTab = ({ script, close }: TabParameters) => {
-    const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
+    const sharelink = window.location.origin + window.location.pathname + "?sharing=" + script.shareid
     const [showCode, setShowCode] = useState(true)
     const [showDAW, setShowDAW] = useState(true)
     const options = "" + (showCode ? "" : "&hideCode") + (showDAW ? "" : "&hideDaw")

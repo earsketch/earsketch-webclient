@@ -36,7 +36,7 @@ const setupSoundsAndScript = (script) => {
 
     cy.interceptScriptsOwned([scriptData])
     cy.interceptScriptsShared()
-    cy.interceptScriptSave("playsound.py", scriptData)
+    cy.interceptScriptSave()
 
     cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
     cy.skipTour()

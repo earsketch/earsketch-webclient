@@ -113,7 +113,7 @@ export const fetchContent = createAsyncThunk<{ [key: string]: any }, { location?
         esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
         const response = await fetch(urlWithoutAnchor)
         // Add artificial latency; useful for testing:
-        // await new Promise(r => setTimeout(r, 1000))
+        // await new Promise(r => window.setTimeout(r, 1000))
         return processContent(_location, await response.text(), dispatch)
     }
 )
@@ -212,7 +212,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         }
     })
 
-    if (/WebKit/.test(navigator.userAgent)) {
+    if (/WebKit/.test(window.navigator.userAgent)) {
         // Apparent WebKit (including Safari) bug: adopted <video> and <audio> elements are missing their controls.
         // (This does not occur in Chrome or Firefox.)
         // Workaround: clone the element.

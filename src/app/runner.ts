@@ -76,6 +76,31 @@ function _getLineNumber(): number {
 }
 export let getLineNumber = _getLineNumber
 
+function findFutureImportsPython(code: string) {
+    const lines = code.split("\n")
+    let seenCode = false
+    const futureImports = []
+
+    for (const [i, line] of lines.entries()) {
+        const lineNo = i + 1
+        const trimmed = line.trim()
+        if (!trimmed || trimmed.startsWith("#")) continue
+
+        const match = /^from __future__ import (.+)/.exec(trimmed)
+        if (match) {
+            if (seenCode) {
+                throw new Sk.builtin.SyntaxError("from __future__ imports must occur at the beginning of the file", undefined, lineNo)
+            }
+            const imports = match[1].split(/\s*,\s*/)
+            futureImports.push(...imports.map(name => ({ lineNo, name })))
+        } else {
+            seenCode = true
+        }
+    }
+
+    return futureImports
+}
+
 // Run a python script.
 async function runPython(code: string) {
     Sk.dateSet = false
@@ -86,7 +111,18 @@ async function runPython(code: string) {
     Sk.realsyspath = undefined
 
     Sk.resetCompiler()
-    pythonAPI.setup()
+    // Check for imitation future statement to determine Python version
+    let version: 2 | 3 = 2
+    const futureImports = findFutureImportsPython(code)
+    for (const { lineNo, name } of futureImports) {
+        if (name === "python3") {
+            version = 3
+        } else {
+            throw new Sk.builtin.SyntaxError(`future feature ${name} is not defined`, undefined, lineNo)
+        }
+    }
+
+    pythonAPI.setup(version)
     Sk.yieldLimit = YIELD_TIME_MS
 
     // special cases with these key functions when import ES module is missing
@@ -126,7 +162,7 @@ async function runPython(code: string) {
             }
         }
         // Use `setTimeout` to give the event loop the chance to run other tasks.
-        setTimeout(() => {
+        window.setTimeout(() => {
             try {
                 resolve(susp.resume())
             } catch (e) {
@@ -213,7 +249,7 @@ async function runJavaScript(code: string) {
 }
 
 function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise(resolve => window.setTimeout(resolve, ms))
 }
 
 // This is a helper function for running JS-Interpreter to allow for script

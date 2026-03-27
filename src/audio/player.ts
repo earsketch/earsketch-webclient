@@ -51,8 +51,8 @@ function reset() {
 }
 
 function clearAllTimers() {
-    clearTimeout(timers.playStart)
-    clearTimeout(timers.playEnd)
+    window.clearTimeout(timers.playStart)
+    window.clearTimeout(timers.playEnd)
 }
 
 export function play(startMes: number, delay = 0) {
@@ -84,7 +84,7 @@ export function play(startMes: number, delay = 0) {
     }
 
     // set flags
-    clearTimeout(timers.playStart)
+    window.clearTimeout(timers.playStart)
     timers.playStart = window.setTimeout(() => {
         playbackData.startMeasure = startMes
         playbackData.endMeasure = endMes
@@ -102,7 +102,7 @@ export function play(startMes: number, delay = 0) {
     }, delay * 1000)
 
     // schedule to call the onFinished callback
-    clearTimeout(timers.playEnd)
+    window.clearTimeout(timers.playEnd)
     timers.playEnd = window.setTimeout(() => {
         reset()
         callbacks.onFinishedCallback()
@@ -160,8 +160,8 @@ export function setLoop(loop_: typeof loop) {
             play(1, tempoMap.measureToTime(dawData!.length + 1) - currentTime)
         }
     } else if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (dawData!.length + 1)) {
-        clearTimeout(timers.playStart)
-        clearTimeout(timers.playEnd)
+        window.clearTimeout(timers.playStart)
+        window.clearTimeout(timers.playEnd)
         // User switched off loop while playing.
         // Because we were playing a loop, we didn't schedule anything after the loop end.
         // Now there's no loop, so we need to schedule everything from [end of old loop] to [end of project].

@@ -7,6 +7,11 @@ html, body {
   font-family: @font;
 }
 
+/* Prevent Headless UI from adding padding-right to html when page has no scrollbar */
+html {
+  padding-right: 0 !important;
+}
+
 .gutter {
   background-color: black;
   background-repeat: no-repeat;

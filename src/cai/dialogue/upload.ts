@@ -29,7 +29,7 @@ async function uploadCaiHistory(project: string, node: any, sourceCode?: string)
 export function addToNodeHistory(nodeObj: any, sourceCode?: string, project?: string) {
     project = project || selectActiveProject(store.getState())
 
-    if (location.href.includes("wizard") && nodeObj[0] !== "Slash") {
+    if (window.location.href.includes("wizard") && nodeObj[0] !== "Slash") {
         return
     } // Disabled for Wizard of Oz operators.
     if ((ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) && state[project] && state[project].nodeHistory) {

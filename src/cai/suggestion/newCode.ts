@@ -70,7 +70,7 @@ export const NewCodeModule: SuggestionModule = {
     suggestion: () => {
         const state = store.getState()
         const activeProject = selectActiveProject(state)
-        const currentState: CodeFeatures = analyzeCode(activeProject.slice(-2) === "js" ? "javascript" : "python", selectActiveTabScript(state).source_code).codeFeatures
+        const currentState: CodeFeatures = analyzeCode(activeProject.slice(-2) === "js" ? "javascript" : "python", selectActiveTabScript(state)!.source_code).codeFeatures
         const potentialSuggestions: SuggestionOptions = {}
 
         // create objects with weight for each topic. add weight to "next in project" topic from "fromOtherProjects" array

@@ -23,8 +23,17 @@ const earsketch: any = {
         .map(([name, config]) => [name, new Sk.builtin.func(wrapFunction(ES_PASSTHROUGH[name], config))])
     ),
 }
-const module = new Sk.builtin.module()
-module.$d = earsketch
+const earsketchModule = new Sk.builtin.module()
+earsketchModule.$d = earsketch
+
+// Create `__future__` module (overriding Skulpt's builtin one) to prevent errors from our future imports.
+const future: any = {
+    __name__: new Sk.builtin.str("__future__"),
+    python3: Sk.builtin.none.none$,
+}
+
+const futureModule = new Sk.builtin.module()
+futureModule.$d = future
 
 // Pipe Skulpt's stdout to the EarSketch console.
 function outf(text: string) {
@@ -51,14 +60,15 @@ for (const constant of EFFECT_NAMES.concat(ANALYSIS_NAMES)) {
 }
 // Then, configure Skulpt options.
 Sk.pre = "output"
-// NOTE: We can opt into Python 3 (insofar as Skulpt supports it) by replacing `python2` with `python3` below.
-Sk.configure({ output: outf, read: builtinRead, __future__: Sk.python2 })
 
-export function setup() {
+export function setup(version: 2 | 3) {
+    Sk.configure({ output: outf, read: builtinRead, __future__: version === 2 ? Sk.python2 : Sk.python3 })
     // Reset DAW contents.
     dawData = Sk.ffi.remapToPy(passthrough.init())
     // Inject EarSketch Python API as `earsketch` module.
-    Sk.sysmodules.mp$ass_subscript(earsketch.__name__, module)
+    Sk.sysmodules.mp$ass_subscript(earsketch.__name__, earsketchModule)
+    // Inject __future__ module to avoid errors.
+    Sk.sysmodules.mp$ass_subscript(future.__name__, futureModule)
 }
 
 // Helper function that maps JavaScript errors to Python errors.

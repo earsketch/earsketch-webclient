@@ -46,18 +46,24 @@ describe("Curriculum", () => {
     it("can toggle language from Python to JavaScript", () => {
         cy.toggleCurriculumLanguage()
         // if curriculum-python is not visible, it means we are in JS
-        cy.get(".curriculum-javascript").scrollIntoView().should("be.visible")
-        cy.get(".curriculum-python").scrollIntoView().should("be.not.visible")
+        cy.get(".curriculum-javascript").as("curriculumJavascript").scrollIntoView()
+        cy.get("@curriculumJavascript").should("be.visible")
+        cy.get(".curriculum-python").as("curriculumPython").scrollIntoView()
+        cy.get("@curriculumPython").should("be.not.visible")
     })
 
     it("can toggle language from JavaScript to Python", () => {
         cy.toggleCurriculumLanguage()
-        cy.get(".curriculum-javascript").scrollIntoView().should("be.visible")
-        cy.get(".curriculum-python").scrollIntoView().should("be.not.visible")
+        cy.get(".curriculum-javascript").as("curriculumJavascript").scrollIntoView()
+        cy.get("@curriculumJavascript").should("be.visible")
+        cy.get(".curriculum-python").as("curriculumPython").scrollIntoView()
+        cy.get("@curriculumPython").should("be.not.visible")
         // now switch back to Python
         cy.get("button[title='Switch script language to python']").click()
-        cy.get(".curriculum-python").scrollIntoView().should("be.visible")
-        cy.get(".curriculum-javascript").scrollIntoView().should("be.not.visible")
+        cy.get(".curriculum-javascript").as("curriculumJavascript").scrollIntoView()
+        cy.get("@curriculumJavascript").should("be.not.visible")
+        cy.get(".curriculum-python").as("curriculumPython").scrollIntoView()
+        cy.get("@curriculumPython").should("be.visible")
     })
 
     it("should show the correct internationalization", () => {

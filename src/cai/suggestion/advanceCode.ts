@@ -87,7 +87,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         const currentScript = selectActiveTabScript(state)
         const activeProject = selectActiveProject(state)
         const lang = parseLanguage(activeProject)
-        const currentState: CodeFeatures = analyzeCode(activeProject.slice(-2) === "js" ? "javascript" : "python", selectActiveTabScript(state).source_code).codeFeatures
+        const currentState: CodeFeatures = analyzeCode(activeProject.slice(-2) === "js" ? "javascript" : "python", selectActiveTabScript(state)!.source_code).codeFeatures
 
         const possibleSuggestions: SuggestionOptions = {}
         const modRecommentations: CodeRecommendation[] = []

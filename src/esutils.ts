@@ -27,14 +27,15 @@ export const beatStringToArray = (beat: string) => {
     })
 }
 
-// Parses the language from a file extension using regex. Returns 'python' if
-// the extension is '.py' and 'javascript' otherwise.
+// Parses the language from a file extension using regex.
 export const parseLanguage = (filename: string) => {
     const ext = parseExt(filename)
     if (ext === ".py") {
         return "python"
-    } else {
+    } else if (ext === ".js") {
         return "javascript"
+    } else {
+        throw new Error("Invalid extension")
     }
 }
 
@@ -85,13 +86,13 @@ export const whichBrowser = () => {
 }
 
 export const whichOS = () => {
-    if (navigator.appVersion.includes("Win")) {
+    if (window.navigator.appVersion.includes("Win")) {
         return "Windows"
-    } else if (navigator.appVersion.includes("Mac")) {
+    } else if (window.navigator.appVersion.includes("Mac")) {
         return "MacOS"
-    } else if (navigator.appVersion.includes("X11")) {
+    } else if (window.navigator.appVersion.includes("X11")) {
         return "UNIX"
-    } else if (navigator.appVersion.includes("Linux")) {
+    } else if (window.navigator.appVersion.includes("Linux")) {
         return "Linux"
     }
     return "Unknown OS"

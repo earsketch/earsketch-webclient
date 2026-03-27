@@ -1,4 +1,6 @@
 describe("Editor", () => {
+    const anonymousScriptName = "cypress_test"
+
     beforeEach(() => {
         const testSoundMeta = {
             folder: "STUB FOLDER",
@@ -15,15 +17,15 @@ describe("Editor", () => {
         // Create a new script.
         cy.get('[title="Open SCRIPTS Tab"]').click()
         cy.get('[data-test="newScript"]').click()
-        cy.get("#scriptName").type("cypress_test")
+        cy.get("#scriptName").type(anonymousScriptName)
         cy.get("input").contains("CREATE").click()
-        cy.get("div").contains("cypress_test.py")
+        cy.get("div").contains(`${anonymousScriptName}.py`)
         cy.waitForHeadlessDialog()
     })
 
     it("runs template script", () => {
         cy.get("button").contains("RUN").click()
-        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console-frame").contains("Script ran successfully")
         cy.get("#console").contains("Script ran successfully")
     })
 
@@ -33,7 +35,7 @@ describe("Editor", () => {
         // NOTE: Clicking "RUN" instead of using Ctrl+Enter because the shortcut is different on Mac.
         cy.get("button").contains("RUN").click()
         cy.get("#console-frame").contains(message)
-        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console-frame").contains("Script ran successfully")
     })
 
     it("shows an error for a bad script", () => {
@@ -76,12 +78,14 @@ print(5 % 2)
 `)
         cy.get("button[title='Editor Settings']").click()
         cy.get("button[title='Enable blocks mode']").click() // enable blocks
+        cy.get("button[title='Editor Settings']").click()
         cy.get("canvas.droplet-main-canvas").should("be.visible")
         cy.get("div.droplet-palette-element").should("be.visible")
         cy.get("button").contains("RUN").click()
 
         cy.get("button[title='Editor Settings']").click()
         cy.get("button[title='Disable blocks mode']").click() // disable blocks
+        cy.get("button[title='Editor Settings']").click()
         cy.get("canvas.droplet-main-canvas").should("not.be.visible")
         cy.get("div.droplet-palette-element").should("not.be.visible")
         cy.get("button").contains("RUN").click()
@@ -100,7 +104,7 @@ print(5 % 2)
 fitMedia(OS_CLAP01, 1, 1, 2);
 `)
         cy.get("button").contains("RUN").click()
-        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console-frame").contains("Script ran successfully")
     })
 
     it("calls fetch exactly once per sound", () => {
@@ -114,7 +118,7 @@ from earsketch import *
 makeBeat(OS_CLAP01, 1, 1, "0000", 4)
 `)
         cy.get("button").contains("RUN").click()
-        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console-frame").contains("Script ran successfully")
 
         // We expect 3 intercepted calls: METRONOME01, METRONOME02, and OS_CLAP01
         // https://github.com/cypress-io/cypress/issues/16655
@@ -124,9 +128,22 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
     it("allows user to login, edit script, and save", () => {
         const username = "cypress"
         const scriptName = "RecursiveMelody.py"
+        const anonymousScriptMessage1 = "Greetings from anonymous script."
+        const anonymousScriptName2 = "cypress_test_anon2"
+        const anonymousScriptMessage2 = "Greetings from another anonymous script 2."
+        cy.get("#editor").type(`{moveToEnd}{enter}# ${anonymousScriptMessage1}`)
+
+        // Create another anonymouse script.
+        cy.get('[title="Open SCRIPTS Tab"]').click()
+        cy.get('[data-test="newScript"]').click()
+        cy.get("#scriptName").type(anonymousScriptName2)
+        cy.get("input").contains("CREATE").click()
+        cy.get("div").contains(`${anonymousScriptName2}.py`)
+        cy.waitForHeadlessDialog()
+        cy.get("#editor").type(`{moveToEnd}{enter}# ${anonymousScriptMessage2}`)
 
         // Setup intercepts for login and save
-        cy.interceptScriptSave(scriptName)
+        cy.interceptScriptSave()
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
         cy.interceptAudioUser([])
@@ -150,9 +167,21 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         cy.interceptAudioUser()
         // Login with placeholder username
         cy.login("username")
-        // wait for the already created script to be saved during login
-        cy.wait("@scripts_save")
+
+        // Verify the save API was called for 2 anonymous scripts during login
+        cy.wait("@scripts_save").then((interception) => {
+            expect(interception.request.body).to.contain(`name=${anonymousScriptName}.py`)
+            expect(interception.request.body.replaceAll("+", " ")).to.contain(anonymousScriptMessage1)
+        })
+        cy.wait("@scripts_save").then((interception) => {
+            expect(interception.request.body).to.contain(`name=${anonymousScriptName2}.py`)
+            expect(interception.request.body.replaceAll("+", " ")).to.contain(anonymousScriptMessage2)
+        })
+
+        cy.get("#coder").find(`button[title="${anonymousScriptName}.py"]`).click()
+        cy.get("#coder").find(`button[title="${anonymousScriptName2}.py"]`).click()
         cy.get(`[title="Open ${scriptName} in Code Editor"]`).click()
+        cy.get("#coder").find(`[title="${scriptName}"]`).click()
 
         const message = "Hello from saved script"
         cy.get("#editor").type(`{moveToEnd}{enter}print("${message}")`)
@@ -168,7 +197,7 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         })
 
         cy.get("#console-frame").contains(message)
-        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console-frame").contains("Script ran successfully")
 
         const message2 = "another message"
         cy.get("#editor").type(`{moveToEnd}{enter}print("${message2}")`)

@@ -20,7 +20,7 @@ const SECTION_URL_CHARACTER = ":"
 const copyURL = (language: Language, currentLocation: number[]) => {
     const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
     const url = `${SITE_BASE_URI}/?curriculum=${page}&language=${language}`
-    navigator.clipboard.writeText(url)
+    window.navigator.clipboard.writeText(url)
     userNotification.show("Curriculum URL was copied to the clipboard")
 }
 

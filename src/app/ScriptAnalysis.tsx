@@ -14,7 +14,7 @@ export const ScriptAnalysis = ({ script, close }: { script: Script, close: () =>
     } catch {
         // We use `setTimeout` here to avoid calling NotificationPopup's setState during ScriptAnalysis render.
         // TODO: Bring popup state into Redux so this can be a dispatch instead.
-        setTimeout(() => {
+        window.setTimeout(() => {
             notification.show(i18n.t("messages:general.complexitySyntaxError"), "failure2", 5)
             close()
         })
