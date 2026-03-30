@@ -32,7 +32,27 @@ export default ({ mode }: { mode: string }) => {
     const env = loadEnv(mode, process.cwd(), ["ES_WEB_"])
     return defineConfig({
         base: baseURL,
-        plugins: [splitVendorChunkPlugin(), react(), adapter(analyzer({ analyzerMode: "static" }))],
+        plugins: [
+            splitVendorChunkPlugin(),
+            react(),
+            adapter(analyzer({ analyzerMode: "static" })),
+            {
+                name: "no-html-fallback-for-model-paths",
+                configureServer(server) {
+                    server.middlewares.use((req, res, next) => {
+                        // @xenova/transformers probes /models/<name>/... for local model files.
+                        // Without this, Vite's SPA fallback returns index.html, which the
+                        // library tries to parse as JSON and throws.
+                        if (req.url?.startsWith("/models/")) {
+                            res.statusCode = 404
+                            res.end("Not found")
+                            return
+                        }
+                        next()
+                    })
+                },
+            },
+        ],
         // https://vite.dev/guide/dep-pre-bundling.html#monorepos-and-linked-dependencies
         optimizeDeps: {
             include: ["droplet", "skulpt", "onnxruntime-web"],

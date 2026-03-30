@@ -62,6 +62,26 @@ class AudioSearchEngine {
             // and gets the SPA's index.html back instead of the actual model files
             env.allowLocalModels = false
 
+            // Purge any browser-cache entries that are HTML. These get cached when
+            // @xenova/transformers probed /models/... before allowLocalModels was set and
+            // Vite's SPA fallback returned index.html (status 200, content-type text/html).
+            // The library checks the browser cache BEFORE the allowLocalModels guard, so
+            // it returns the poisoned HTML and fails to parse it as JSON.
+            if (typeof caches !== "undefined") {
+                try {
+                    const transformersCache = await caches.open("transformers-cache")
+                    const keys = await transformersCache.keys()
+                    await Promise.all(keys.map(async (req) => {
+                        const res = await transformersCache.match(req)
+                        if (res?.headers.get("content-type")?.includes("text/html")) {
+                            await transformersCache.delete(req)
+                        }
+                    }))
+                } catch (_e) {
+                    // Ignore errors (e.g. SecurityError in incognito/iframe)
+                }
+            }
+
             // Load tokenizer
             console.log("Loading tokenizer...")
             this.tokenizer = await AutoTokenizer.from_pretrained("Xenova/clap-htsat-unfused")
@@ -155,7 +175,7 @@ class AudioSearchEngine {
         return avg.map(v => v / embeddings.length)
     }
 
-    async search(query: string, topK: number = 10): Promise<SearchResult[]> {
+    async search(query: string, topK: number = 20): Promise<SearchResult[]> {
         if (!this.isReady || !this.songsData) {
             throw new Error("Search engine not initialized. Call initialize() first.")
         }
@@ -194,7 +214,7 @@ class AudioSearchEngine {
         }
     }
 
-    async searchFilenames(query: string, topK: number = 10): Promise<string[]> {
+    async searchFilenames(query: string, topK: number = 20): Promise<string[]> {
         const results = await this.search(query, topK)
         console.log("Search results:", results.map(r => ({ filename: r.filename, similarity: r.similarity })))
         return results.map(r => r.filename.replace(/\.[^.]+$/, ""))

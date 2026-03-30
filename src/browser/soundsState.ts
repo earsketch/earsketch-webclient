@@ -381,10 +381,41 @@ export const selectFilteredRegularEntities = createSelector(
             }
             // Final cap: if we still overshot (e.g. last result pushed us over), trim to topK
             const matchedEntries = Object.entries(matched)
-            if (matchedEntries.length > topK) {
-                return Object.fromEntries(matchedEntries.slice(0, topK))
+            const primary = matchedEntries.length > topK
+                ? Object.fromEntries(matchedEntries.slice(0, topK))
+                : matched
+
+            // Metadata expansion: use the top SEED_SIZE primary matches as seeds to surface
+            // related sounds for discovery (folder siblings + same-instrument sounds).
+            const INSTRUMENT_EXPANSION_CAP = 15
+
+            const seeds = Object.values(primary)
+            const seedFolders = new Set(seeds.map(e => e.folder).filter(Boolean))
+            const seedInstruments = new Set(seeds.map(e => e.instrument).filter(Boolean))
+
+            // Folder expansion: all sounds from the same folder as any seed (folders are small, 2–21 entries)
+            const folderExpanded: SoundEntities = {}
+            for (const [name, entity] of Object.entries(allEntities)) {
+                if (primary[name]) continue
+                if (entity.folder && seedFolders.has(entity.folder)) {
+                    folderExpanded[name] = entity
+                }
             }
-            return matched
+
+            // Instrument expansion: broader discovery, capped per instrument type to avoid flooding
+            const instrumentCounts: Record<string, number> = {}
+            const instrumentExpanded: SoundEntities = {}
+            for (const [name, entity] of Object.entries(allEntities)) {
+                if (primary[name] || folderExpanded[name]) continue
+                if (!entity.instrument || !seedInstruments.has(entity.instrument)) continue
+                const count = instrumentCounts[entity.instrument] ?? 0
+                if (count < INSTRUMENT_EXPANSION_CAP) {
+                    instrumentExpanded[name] = entity
+                    instrumentCounts[entity.instrument] = count + 1
+                }
+            }
+
+            return { ...primary, ...folderExpanded, ...instrumentExpanded }
         }
         // Otherwise, use normal filtering on regular (non-featured) entities
         return filterEntities(regularEntities, filters)
@@ -392,34 +423,21 @@ export const selectFilteredRegularEntities = createSelector(
 )
 
 export const selectFilteredRegularNames = createSelector(
-    [selectFilteredRegularEntities, selectIsAudioSearchActive, selectAudioSearchResults],
-    (entities: SoundEntities, isAudioSearchActive, audioResults) => {
-        if (isAudioSearchActive && audioResults.length > 0) {
-            const matched = Object.keys(entities)
-            return matched.length > 0 ? matched : audioResults
-        }
-        return Object.keys(entities)
-    }
+    [selectFilteredRegularEntities],
+    (entities: SoundEntities) => Object.keys(entities)
 )
 
 export const selectFilteredRegularFolders = createSelector(
-    [selectFilteredRegularEntities, selectIsAudioSearchActive],
-    (entities: SoundEntities, isAudioSearchActive) => {
-        if (isAudioSearchActive) return ["Search Results"]
+    [selectFilteredRegularEntities],
+    (entities: SoundEntities) => {
         const entityList = Object.values(entities)
         return Array.from(new Set(entityList.map(v => v.folder)))
     }
 )
 
 export const selectFilteredRegularNamesByFolders = createSelector(
-    [selectFilteredRegularEntities, selectFilteredRegularFolders, selectIsAudioSearchActive],
-    (entities: SoundEntities, folders: string[], isAudioSearchActive) => {
-        if (isAudioSearchActive) {
-            // Preserve similarity order (dict insertion order matches audioResults rank)
-            return { "Search Results": Object.keys(entities) }
-        }
-        return namesByFoldersSelector(entities, folders)
-    }
+    [selectFilteredRegularEntities, selectFilteredRegularFolders],
+    namesByFoldersSelector
 )
 
 export const selectFilteredFeaturedEntities = createSelector(
