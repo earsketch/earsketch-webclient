@@ -125,7 +125,7 @@ export function getStandardSounds() {
 async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
-        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard_1.json"
+        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard_2.json"
         const response = await fetch(url)
         if (!response.ok) {
             throw Object.assign(new Error(`Failed to fetch standard sounds (code ${response.status}).`), { code: response.status })
