@@ -65,20 +65,41 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
         <form onSubmit={e => { e.preventDefault(); submit() }}>
             <ModalBody>
                 <Alert message={error}></Alert>
-                <input type="email" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.emailOptional")}
-                    value={email} onChange={e => setEmail(e.target.value.trim())} />
+                <div>
+                    <label>
+                        {t("formFieldPlaceholder.emailOptional")}
+                        <p className="text-sm">{t("formFieldPlaceholder.emailOptional.usedFor")}</p>
+                        <input type="email" className="form-input w-full mb-4 dark:bg-transparent" name="email"
+                            value={email} onChange={e => setEmail(e.target.value.trim())} />
+                    </label>
+                </div>
 
-                <input type="password" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.currentPassword")}
-                    value={password} onChange={e => setPassword(e.target.value)} required id="current-password" autoComplete="current-password" />
+                <div>
+                    <label>
+                        {t("formFieldPlaceholder.currentPassword")}
+                        <input type="password" className="form-input w-full mb-4 dark:bg-transparent" name="password"
+                            value={password} onChange={e => setPassword(e.target.value)} required id="current-password" autoComplete="current-password" />
+                    </label>
+                </div>
 
-                <input type="password" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder="New password (Optional)"
-                    value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={5} />
+                <div>
+                    <label>
+                        {t("formFieldPlaceholder.newPassword")} (Optional)
+                        <input type="password" className="form-input mb-4 w-full dark:bg-transparent" name="newPassword"
+                            value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={5} />
+                    </label>
+                </div>
 
                 {newPassword &&
-                <input type="password" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
-                    e.target.setCustomValidity(e.target.value === newPassword ? "" : t("messages:changepassword.pwdfail"))
-                    setConfirmPassword(e.target.value)
-                }} value={confirmPassword} required />}
+                <div>
+                    <label>
+                        {t("formFieldPlaceholder.confirmNewPassword")}
+                        <input type="password" className="form-input w-full dark:bg-transparent" name="confirmPassword" onChange={e => {
+                            e.target.setCustomValidity(e.target.value === newPassword ? "" : t("messages:changepassword.pwdfail"))
+                            setConfirmPassword(e.target.value)
+                        }} value={confirmPassword} required />
+                    </label>
+                </div>}
             </ModalBody>
 
             <ModalFooter submit="update" ready={newPassword !== "" || email !== _email} close={close} />
