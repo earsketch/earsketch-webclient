@@ -101,17 +101,29 @@ export const NotificationPopup = () => {
 
 /** Automatically fetch notifications every X minutes when logged in */
 const useNotificationLongPolling = () => {
-    const FETCH_INTERVAL_MS = 5 * 60 * 1000 // 5 minutes
+    // Polling interval sequence, repeating the final value forever
+    const NOTIFICATION_POLL_INTERVALS_MS = [5, 5, 5, 30, 60].map(minutes => minutes * 60 * 1000)
 
     const isLoggedIn = useSelector(user.selectLoggedIn)
 
     useEffect(() => {
         if (!isLoggedIn) return
 
+        let timeoutId: number | null = null
+        let intervalIndex = 0
+        let isPolling = false
+        let hasFetchedInitialNotifications = false
+        let latestNotificationCount: number | null = null
+
         const fetchNotifications = async () => {
             try {
                 const result = await request.getAuth("/users/notifications")
                 if (Array.isArray(result)) {
+                    // Reset to the shortest polling interval if we detect new notifications
+                    if (latestNotificationCount !== null && result.length > latestNotificationCount) {
+                        intervalIndex = 0
+                    }
+                    latestNotificationCount = result.length
                     userNotification.loadHistory(result)
                 }
             } catch (error) {
@@ -119,26 +131,45 @@ const useNotificationLongPolling = () => {
             }
         }
 
-        let intervalId: number | null = null
+        const clearScheduledPoll = () => {
+            if (timeoutId == null) return
+            window.clearTimeout(timeoutId)
+            timeoutId = null
+        }
 
+        const scheduleNextPoll = () => {
+            if (!isPolling || timeoutId != null) return
+
+            const interval = NOTIFICATION_POLL_INTERVALS_MS[Math.min(intervalIndex, NOTIFICATION_POLL_INTERVALS_MS.length - 1)]
+            timeoutId = window.setTimeout(async () => {
+                timeoutId = null
+                intervalIndex += 1
+                await fetchNotifications()
+                scheduleNextPoll()
+            }, interval)
+        }
+
+        // Immediately fetch on page load, then schedule the next poll
         const startPolling = () => {
-            if (intervalId != null) return
-            fetchNotifications()
-            intervalId = window.setInterval(fetchNotifications, FETCH_INTERVAL_MS)
+            if (isPolling) return
+            isPolling = true
+            if (!hasFetchedInitialNotifications) {
+                hasFetchedInitialNotifications = true
+                fetchNotifications()
+            }
+            scheduleNextPoll()
         }
 
         const stopPolling = () => {
-            if (intervalId == null) return
-            window.clearInterval(intervalId)
-            intervalId = null
+            isPolling = false
+            clearScheduledPoll()
         }
 
+        // Only poll when the page is visible to avoid unnecessary requests
         const onVisibilityChange = () => {
             if (document.visibilityState === "visible") {
-                console.log("Visibility change: Start notification polling", new Date().toLocaleTimeString())
                 startPolling()
             } else {
-                console.log("Visibility change: Stop notification polling", new Date().toLocaleTimeString())
                 stopPolling()
             }
         }
