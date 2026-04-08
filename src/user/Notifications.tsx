@@ -44,6 +44,7 @@ export const NotificationBar = () => {
 
 const popupQueue: Message[] = []
 let popupTimeout = 0
+const NOTIFICATION_POLL_INTERVALS_MS = [5, 10, 30, 60].map(minutes => minutes * 60 * 1000)
 
 export const NotificationPopup = () => {
     const [message, setMessage] = useState(null as Message | null)
@@ -101,8 +102,6 @@ export const NotificationPopup = () => {
 
 /** Automatically fetch notifications every X minutes when logged in */
 const useNotificationLongPolling = () => {
-    const FETCH_INTERVAL_MS = 5 * 60 * 1000 // 5 minutes
-
     const isLoggedIn = useSelector(user.selectLoggedIn)
 
     useEffect(() => {
@@ -119,18 +118,39 @@ const useNotificationLongPolling = () => {
             }
         }
 
-        let intervalId: number | null = null
+        let timeoutId: number | null = null
+        let intervalIndex = 0
+        let isPolling = false
+
+        const clearScheduledPoll = () => {
+            if (timeoutId == null) return
+            window.clearTimeout(timeoutId)
+            timeoutId = null
+        }
+
+        const scheduleNextPoll = () => {
+            if (!isPolling || timeoutId != null || intervalIndex >= NOTIFICATION_POLL_INTERVALS_MS.length) return
+
+            const interval = NOTIFICATION_POLL_INTERVALS_MS[intervalIndex]
+            intervalIndex += 1
+            timeoutId = window.setTimeout(async () => {
+                timeoutId = null
+                await fetchNotifications()
+                scheduleNextPoll()
+            }, interval)
+        }
 
         const startPolling = () => {
-            if (intervalId != null) return
+            if (isPolling) return
+            isPolling = true
+            intervalIndex = 0
             fetchNotifications()
-            intervalId = window.setInterval(fetchNotifications, FETCH_INTERVAL_MS)
+            scheduleNextPoll()
         }
 
         const stopPolling = () => {
-            if (intervalId == null) return
-            window.clearInterval(intervalId)
-            intervalId = null
+            isPolling = false
+            clearScheduledPoll()
         }
 
         const onVisibilityChange = () => {
