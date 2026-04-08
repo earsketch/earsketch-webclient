@@ -122,6 +122,7 @@ const useNotificationLongPolling = () => {
         let timeoutId: number | null = null
         let intervalIndex = 0
         let isPolling = false
+        let hasFetchedInitialNotifications = false
 
         const clearScheduledPoll = () => {
             if (timeoutId == null) return
@@ -133,9 +134,9 @@ const useNotificationLongPolling = () => {
             if (!isPolling || timeoutId != null || intervalIndex >= NOTIFICATION_POLL_INTERVALS_MS.length) return
 
             const interval = NOTIFICATION_POLL_INTERVALS_MS[intervalIndex]
-            intervalIndex += 1
             timeoutId = window.setTimeout(async () => {
                 timeoutId = null
+                intervalIndex += 1
                 await fetchNotifications()
                 scheduleNextPoll()
             }, interval)
@@ -144,8 +145,10 @@ const useNotificationLongPolling = () => {
         const startPolling = () => {
             if (isPolling) return
             isPolling = true
-            intervalIndex = 0
-            fetchNotifications()
+            if (!hasFetchedInitialNotifications) {
+                hasFetchedInitialNotifications = true
+                fetchNotifications()
+            }
             scheduleNextPoll()
         }
 
