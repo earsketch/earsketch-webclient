@@ -168,10 +168,8 @@ const useNotificationLongPolling = () => {
         // Only poll when the page is visible to avoid unnecessary requests
         const onVisibilityChange = () => {
             if (document.visibilityState === "visible") {
-                console.log("Visibility change: Start notification polling", new Date().toLocaleTimeString())
                 startPolling()
             } else {
-                console.log("Visibility change: Stop notification polling", new Date().toLocaleTimeString())
                 stopPolling()
             }
         }
