@@ -44,7 +44,6 @@ export const NotificationBar = () => {
 
 const popupQueue: Message[] = []
 let popupTimeout = 0
-const NOTIFICATION_POLL_INTERVALS_MS = [5, 10, 30, 60].map(minutes => minutes * 60 * 1000)
 
 export const NotificationPopup = () => {
     const [message, setMessage] = useState(null as Message | null)
@@ -102,6 +101,8 @@ export const NotificationPopup = () => {
 
 /** Automatically fetch notifications every X minutes when logged in */
 const useNotificationLongPolling = () => {
+    const NOTIFICATION_POLL_INTERVALS_MS = [5, 5, 5, 60].map(minutes => minutes * 60 * 1000)
+
     const isLoggedIn = useSelector(user.selectLoggedIn)
 
     useEffect(() => {
@@ -130,9 +131,9 @@ const useNotificationLongPolling = () => {
         }
 
         const scheduleNextPoll = () => {
-            if (!isPolling || timeoutId != null || intervalIndex >= NOTIFICATION_POLL_INTERVALS_MS.length) return
+            if (!isPolling || timeoutId != null) return
 
-            const interval = NOTIFICATION_POLL_INTERVALS_MS[intervalIndex]
+            const interval = NOTIFICATION_POLL_INTERVALS_MS[Math.min(intervalIndex, NOTIFICATION_POLL_INTERVALS_MS.length - 1)]
             timeoutId = window.setTimeout(async () => {
                 timeoutId = null
                 intervalIndex += 1
