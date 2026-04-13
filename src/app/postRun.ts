@@ -366,7 +366,7 @@ export async function addMetronome(result: DAWData) {
         audioLibrary.getSound("METRONOME02"),
     ])
     const track = result.tracks[0]
-    for (let i = 1; i < result.length + 1; i += 0.25) {
+    for (let i = 1; i < Math.ceil(result.length + 1); i += 0.25) {
         const filekey = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
         const sound = i % 1 === 0 ? stressed : unstressed
         track.clips.push({
