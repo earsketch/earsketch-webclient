@@ -534,7 +534,9 @@ export const App = () => {
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
     const [isAdmin, setIsAdmin] = useState(false)
     const [loginState, setLoginState] = useState<LoginState>("logged-out")
-    const loginLock = useRef(false)
+    /** When a login is in progress, callers (e.g. Strict Mode’s second useEffect) await 
+     * this promise instead of returning early. */
+    const loginInProgressRef = useRef<Promise<void> | null>(null)
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
@@ -617,68 +619,75 @@ export const App = () => {
     }, [currentLocale])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
-        if (loginLock.current) {
-            // Prevent duplicate login processes
+        if (loginInProgressRef.current) {
+            await loginInProgressRef.current
             return
         }
-        loginLock.current = true
         setLoginState("logging-in")
         esconsole("Logging in", ["DEBUG", "MAIN"])
-        let succeeded = false
 
-        try {
-            scriptsThunks.saveAll()
+        const loginPromise = (async () => {
+            let succeeded = false
+            try {
+                scriptsThunks.saveAll()
 
-            // Obtain token from username/password if necessary.
-            let token
-            if (loginInfo.token !== undefined) {
-                token = loginInfo.token
-            } else {
+                // Obtain token from username/password if necessary.
+                let token
+                if (loginInfo.token !== undefined) {
+                    token = loginInfo.token
+                } else {
+                    try {
+                        token = await request.getBasicAuth("/users/token", loginInfo.username, loginInfo.password)
+                    } catch (error) {
+                        userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
+                        esconsole(error, ["main", "login"])
+                        return
+                    }
+                }
+
+                let userInfo
                 try {
-                    token = await request.getBasicAuth("/users/token", loginInfo.username, loginInfo.password)
-                } catch (error) {
-                    userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
-                    esconsole(error, ["main", "login"])
+                    userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
+                } catch {
+                    userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
                     return
                 }
+                const username = userInfo.username
+
+                store.dispatch(user.login({ username, token }))
+
+                store.dispatch(soundsThunks.getUserSounds(username))
+                store.dispatch(soundsThunks.getFavorites(token))
+
+                // Always override with the returned username in case the letter cases mismatch.
+                setUsername(username)
+                setIsAdmin(userInfo.isAdmin)
+                email = userInfo.email
+                userNotification.user.isAdmin = userInfo.isAdmin
+
+                // Retrieve the user scripts.
+                await postLogin(username)
+                esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
+
+                setLoginState("logged-in")
+                userNotification.show(i18n.t("messages:general.loginsuccess"), "normal", 0.5)
+                const activeTabID = tabs.selectActiveTabID(store.getState())
+                activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+                succeeded = true
+            } catch (err) {
+                userNotification.show("Login failed due to network error.", "failure1", 3.5)
+            } finally {
+                if (!succeeded) {
+                    setLoginState("logged-out")
+                }
             }
+        })()
 
-            let userInfo
-            try {
-                userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
-            } catch {
-                userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
-                return
-            }
-            const username = userInfo.username
-
-            store.dispatch(user.login({ username, token }))
-
-            store.dispatch(soundsThunks.getUserSounds(username))
-            store.dispatch(soundsThunks.getFavorites(token))
-
-            // Always override with the returned username in case the letter cases mismatch.
-            setUsername(username)
-            setIsAdmin(userInfo.isAdmin)
-            email = userInfo.email
-            userNotification.user.isAdmin = userInfo.isAdmin
-
-            // Retrieve the user scripts.
-            await postLogin(username)
-            esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
-
-            setLoginState("logged-in")
-            userNotification.show(i18n.t("messages:general.loginsuccess"), "normal", 0.5)
-            const activeTabID = tabs.selectActiveTabID(store.getState())
-            activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
-            succeeded = true
-        } catch (err) {
-            userNotification.show("Login failed due to network error.", "failure1", 3.5)
+        loginInProgressRef.current = loginPromise
+        try {
+            await loginPromise
         } finally {
-            if (!succeeded) {
-                loginLock.current = false
-                setLoginState("logged-out")
-            }
+            loginInProgressRef.current = null
         }
     }
 
@@ -733,7 +742,7 @@ export const App = () => {
         // Clear out all the values set at login.
         setUsername("")
         setPassword("")
-        loginLock.current = false
+        loginInProgressRef.current = null
         setLoginState("logged-out")
 
         // User data
