@@ -534,7 +534,7 @@ export const App = () => {
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
     const [isAdmin, setIsAdmin] = useState(false)
     const [loginState, setLoginState] = useState<LoginState>("logged-out")
-    /** When a login is in progress, callers (e.g. Strict Mode’s second useEffect) await 
+    /** When a login is in progress, callers (e.g. Strict Mode’s second useEffect) await
      * this promise instead of returning early. */
     const loginInProgressRef = useRef<Promise<void> | null>(null)
     const embedMode = useSelector(appState.selectEmbedMode)
