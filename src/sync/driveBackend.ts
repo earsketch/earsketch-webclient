@@ -35,6 +35,7 @@ interface DriveFile {
     id: string
     name: string
     modifiedTime: string
+    size?: string
 }
 
 // --- GIS loader ---
@@ -220,6 +221,13 @@ export function createDriveBackend(clientId: string): SyncBackend {
             fileIdCache.delete(path)
         },
 
+        async clearAll() {
+            const files = await backend.listFiles()
+            for (const f of files) {
+                await backend.deleteFile(f.path).catch(() => {})
+            }
+        },
+
         async listFiles() {
             const allFiles: SyncFileInfo[] = []
             let pageToken: string | undefined
@@ -227,7 +235,7 @@ export function createDriveBackend(clientId: string): SyncBackend {
             do {
                 const params = new URLSearchParams({
                     spaces: "appDataFolder",
-                    fields: "nextPageToken, files(id, name, modifiedTime)",
+                    fields: "nextPageToken, files(id, name, modifiedTime, size)",
                     pageSize: "1000",
                 })
                 if (pageToken) params.set("pageToken", pageToken)
@@ -240,6 +248,7 @@ export function createDriveBackend(clientId: string): SyncBackend {
                     allFiles.push({
                         path: f.name,
                         modifiedTime: new Date(f.modifiedTime).getTime(),
+                        size: f.size ? parseInt(f.size, 10) : undefined,
                     })
                 }
 

@@ -77,6 +77,7 @@ async function walkDir(dir: FileSystemDirectoryHandle, prefix: string): Promise<
             results.push({
                 path: `${prefix}${name}`,
                 modifiedTime: file.lastModified,
+                size: file.size,
             })
         }
     }
@@ -159,6 +160,19 @@ export function createFSABackend(): SyncBackend {
         async listFiles() {
             if (!rootHandle) throw new Error("Not connected")
             return walkDir(rootHandle, "")
+        },
+
+        async clearAll() {
+            if (!rootHandle) throw new Error("Not connected")
+            // Remove manifest + known top-level directories. removeEntry with recursive:true
+            // deletes the subtree, including non-empty directories.
+            for (const name of ["manifest.json", "scripts", "sounds"]) {
+                try {
+                    await rootHandle.removeEntry(name, { recursive: true })
+                } catch {
+                    // entry doesn't exist
+                }
+            }
         },
     }
 

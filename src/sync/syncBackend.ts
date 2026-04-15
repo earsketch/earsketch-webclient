@@ -14,6 +14,7 @@ import {
 export interface SyncFileInfo {
     path: string
     modifiedTime: number // ms epoch
+    size?: number // bytes
 }
 
 export interface SyncBackend {
@@ -27,6 +28,8 @@ export interface SyncBackend {
     readFile(path: string): Promise<ArrayBuffer | null>
     deleteFile(path: string): Promise<void>
     listFiles(): Promise<SyncFileInfo[]>
+    /** Remove all sync data, including any empty directories created during sync. */
+    clearAll(): Promise<void>
 }
 
 // --- Path helpers ---

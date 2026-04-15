@@ -81,6 +81,7 @@ declare module "*beat_timestamps.json" {
 interface FileSystemDirectoryHandle {
     entries(): AsyncIterableIterator<[string, FileSystemHandle]>
     requestPermission(descriptor?: { mode?: "read" | "readwrite" }): Promise<"granted" | "denied" | "prompt">
+    removeEntry(name: string, options?: { recursive?: boolean }): Promise<void>
 }
 
 declare module "skulpt"

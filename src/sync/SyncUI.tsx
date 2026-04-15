@@ -5,6 +5,8 @@ import * as syncState from "./syncState"
 import { connectBackend, disconnectBackend } from "./syncEngine"
 import { createDriveBackend } from "./driveBackend"
 import { createFSABackend } from "./fsaBackend"
+import { openModal } from "../app/modal"
+import { SyncInspector } from "./SyncInspector"
 
 declare const ES_WEB_GOOGLE_CLIENT_ID: string | undefined
 
@@ -54,6 +56,11 @@ export const SyncButton = () => {
         disconnectBackend()
     }
 
+    const handleInspect = () => {
+        setMenuOpen(false)
+        openModal(SyncInspector, {})
+    }
+
     if (status === "connected") {
         const label = backendKind === "drive"
             ? t("sync.connectedDrive")
@@ -76,7 +83,13 @@ export const SyncButton = () => {
                     <span className="hidden sm:inline">{label}</span>
                 </button>
                 {menuOpen && (
-                    <div className="absolute top-full right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-lg z-50 min-w-[140px]">
+                    <div className="absolute top-full right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-lg z-50 min-w-[160px]">
+                        <button
+                            className="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
+                            onClick={handleInspect}
+                        >
+                            {t("sync.inspect")}
+                        </button>
                         <button
                             className="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
                             onClick={handleDisconnect}
