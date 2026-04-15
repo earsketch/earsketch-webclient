@@ -1,6 +1,13 @@
-import { Script, SoundEntity } from "common"
+import { Script } from "common"
 import * as localSoundStorage from "../audio/localSoundStorage"
 import { Scripts } from "../browser/scriptsState"
+import {
+    Manifest,
+    ManifestScript,
+    ManifestSound,
+    MANIFEST_VERSION_CURRENT,
+    detectExtension,
+} from "../app/backup"
 
 // --- Interface ---
 
@@ -22,146 +29,141 @@ export interface SyncBackend {
     listFiles(): Promise<SyncFileInfo[]>
 }
 
-// --- File path conventions ---
+// --- Path helpers ---
 
-export function scriptPath(shareId: string): string {
-    // Sanitize shareId for use as a filename (replace / with _)
-    return `scripts/${shareId.replace(/\//g, "_")}.json`
+export const MANIFEST_PATH = "manifest.json"
+
+/** Replace characters that aren't safe in filesystem paths. */
+function sanitize(name: string): string {
+    return name.replace(/[/\\:*?"<>|]/g, "_")
 }
 
-export function soundMetaPath(name: string): string {
-    return `sounds/${name}.meta.json`
+export function scriptPath(name: string): string {
+    return `scripts/${sanitize(name)}`
 }
 
-export function soundAudioPath(name: string): string {
-    return `sounds/${name}.audio`
+export function soundPath(name: string, audioData: ArrayBuffer): string {
+    return `sounds/${sanitize(name)}${detectExtension(audioData)}`
 }
 
-// --- Serialization helpers ---
-
-export interface SerializedScript {
-    shareid: string
-    name: string
-    source_code: string
-    username: string
-    created: number | string
-    modified: number | string
-}
-
-export function serializeScript(id: string, script: Script): string {
-    const data: SerializedScript = {
-        shareid: id,
-        name: script.name,
-        source_code: script.source_code,
-        username: script.username,
-        created: script.created,
-        modified: script.modified,
-    }
-    return JSON.stringify(data)
-}
-
-export function deserializeScript(json: string): [string, Script] {
-    const data: SerializedScript = JSON.parse(json)
-    const script: Script = {
-        shareid: data.shareid,
-        name: data.name,
-        source_code: data.source_code,
-        username: data.username,
-        created: data.created,
-        modified: data.modified,
-        saved: true,
-        tooltipText: "",
-        isShared: false,
-        run_status: 0,
-        readonly: false,
-        creator: data.username,
-    }
-    return [data.shareid, script]
-}
-
-export function serializeSoundMeta(entity: SoundEntity): string {
-    return JSON.stringify(entity)
-}
-
-export function deserializeSoundMeta(json: string): SoundEntity {
-    return JSON.parse(json)
-}
-
-// --- Push/pull helpers ---
+// --- Encoding ---
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
-export async function pushScripts(backend: SyncBackend, scripts: Scripts): Promise<void> {
-    const ops = Object.entries(scripts).map(([id, script]) =>
-        backend.writeFile(scriptPath(id), encoder.encode(serializeScript(id, script)).buffer as ArrayBuffer)
-    )
-    await Promise.all(ops)
+function encodeText(s: string): ArrayBuffer {
+    return encoder.encode(s).buffer as ArrayBuffer
 }
 
-export async function pushOneScript(backend: SyncBackend, id: string, script: Script): Promise<void> {
-    await backend.writeFile(scriptPath(id), encoder.encode(serializeScript(id, script)).buffer as ArrayBuffer)
+// --- Manifest ---
+
+export function buildManifest(
+    scripts: Scripts,
+    sounds: localSoundStorage.LocalSoundRecord[]
+): Manifest {
+    const manifestScripts: ManifestScript[] = []
+    for (const script of Object.values(scripts)) {
+        if (script.soft_delete) continue
+        manifestScripts.push({
+            filename: scriptPath(script.name),
+            name: script.name,
+            created: script.created ?? "",
+            modified: script.modified ?? "",
+        })
+    }
+
+    const manifestSounds: ManifestSound[] = []
+    for (const sound of sounds) {
+        manifestSounds.push({
+            filename: soundPath(sound.name, sound.audioData),
+            name: sound.name,
+            metadata: sound.metadata,
+        })
+    }
+
+    return {
+        version: MANIFEST_VERSION_CURRENT,
+        exportedAt: new Date().toISOString(),
+        scripts: manifestScripts,
+        sounds: manifestSounds,
+    }
 }
 
-export async function removeOneScript(backend: SyncBackend, id: string): Promise<void> {
-    await backend.deleteFile(scriptPath(id))
+export async function writeManifest(backend: SyncBackend, manifest: Manifest): Promise<void> {
+    await backend.writeFile(MANIFEST_PATH, encodeText(JSON.stringify(manifest, null, 2)))
 }
 
-export async function pushOneSound(backend: SyncBackend, name: string): Promise<void> {
+export async function readManifest(backend: SyncBackend): Promise<Manifest | null> {
+    const data = await backend.readFile(MANIFEST_PATH).catch(() => null)
+    if (!data) return null
+    try {
+        return JSON.parse(decoder.decode(data)) as Manifest
+    } catch {
+        return null
+    }
+}
+
+// --- Push helpers ---
+
+export async function pushScriptFile(backend: SyncBackend, script: Script): Promise<void> {
+    await backend.writeFile(scriptPath(script.name), encodeText(script.source_code))
+}
+
+export async function deleteScriptFile(backend: SyncBackend, name: string): Promise<void> {
+    await backend.deleteFile(scriptPath(name)).catch(() => {})
+}
+
+export async function pushSoundFile(backend: SyncBackend, name: string): Promise<string | null> {
     const record = await localSoundStorage.getSound(name)
-    if (!record) return
-    await Promise.all([
-        backend.writeFile(soundMetaPath(name), encoder.encode(serializeSoundMeta(record.metadata)).buffer as ArrayBuffer),
-        backend.writeFile(soundAudioPath(name), record.audioData),
-    ])
+    if (!record) return null
+    const path = soundPath(record.name, record.audioData)
+    await backend.writeFile(path, record.audioData)
+    return path
 }
 
-export async function removeOneSound(backend: SyncBackend, name: string): Promise<void> {
-    await Promise.all([
-        backend.deleteFile(soundMetaPath(name)).catch(() => {}),
-        backend.deleteFile(soundAudioPath(name)).catch(() => {}),
-    ])
+export async function deleteSoundFileByPath(backend: SyncBackend, path: string): Promise<void> {
+    await backend.deleteFile(path).catch(() => {})
 }
 
-export async function pushAllSounds(backend: SyncBackend): Promise<void> {
-    const records = await localSoundStorage.getAllSounds()
-    const ops = records.flatMap(r => [
-        backend.writeFile(soundMetaPath(r.name), encoder.encode(serializeSoundMeta(r.metadata)).buffer as ArrayBuffer),
-        backend.writeFile(soundAudioPath(r.name), r.audioData),
-    ])
-    await Promise.all(ops)
-}
-
-export async function pullScripts(backend: SyncBackend): Promise<Scripts> {
+/** Find and delete any sound file with the given base name (unknown extension). */
+export async function deleteSoundFileByName(backend: SyncBackend, name: string): Promise<void> {
+    const safeName = sanitize(name)
     const files = await backend.listFiles()
-    const scriptFiles = files.filter(f => f.path.startsWith("scripts/") && f.path.endsWith(".json"))
-
-    const scripts: Scripts = {}
-    const results = await Promise.all(scriptFiles.map(f => backend.readFile(f.path)))
-    for (const data of results) {
-        if (!data) continue
-        const json = decoder.decode(data)
-        const [id, script] = deserializeScript(json)
-        scripts[id] = script
+    const prefix = `sounds/${safeName}.`
+    for (const f of files) {
+        if (f.path.startsWith(prefix) || f.path === `sounds/${safeName}`) {
+            await backend.deleteFile(f.path).catch(() => {})
+        }
     }
-    return scripts
 }
 
-export async function pullSounds(backend: SyncBackend): Promise<void> {
-    const files = await backend.listFiles()
-    const metaFiles = files.filter(f => f.path.startsWith("sounds/") && f.path.endsWith(".meta.json"))
+// --- Pull helper ---
 
-    for (const metaFile of metaFiles) {
-        const name = metaFile.path.slice("sounds/".length, -".meta.json".length)
-        const audioPath = soundAudioPath(name)
+export interface PulledData {
+    manifest: Manifest
+    scripts: { entry: ManifestScript; source: string }[]
+    sounds: { entry: ManifestSound; audioData: ArrayBuffer }[]
+}
 
-        const [metaData, audioData] = await Promise.all([
-            backend.readFile(metaFile.path),
-            backend.readFile(audioPath),
-        ])
-        if (!metaData || !audioData) continue
+export async function pullAll(backend: SyncBackend): Promise<PulledData | null> {
+    const manifest = await readManifest(backend)
+    if (!manifest) return null
 
-        const metadata = deserializeSoundMeta(decoder.decode(metaData))
-        await localSoundStorage.storeSound(name, audioData, metadata)
-    }
+    const scriptReads = manifest.scripts.map(async entry => {
+        const data = await backend.readFile(entry.filename)
+        if (!data) return null
+        return { entry, source: decoder.decode(data) }
+    })
+    const soundReads = manifest.sounds.map(async entry => {
+        const data = await backend.readFile(entry.filename)
+        if (!data) return null
+        return { entry, audioData: data }
+    })
+
+    const [scripts, sounds] = await Promise.all([
+        Promise.all(scriptReads).then(results => results.filter(r => r !== null) as { entry: ManifestScript; source: string }[]),
+        Promise.all(soundReads).then(results => results.filter(r => r !== null) as { entry: ManifestSound; audioData: ArrayBuffer }[]),
+    ])
+
+    return { manifest, scripts, sounds }
 }

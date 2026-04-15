@@ -10,25 +10,27 @@ const LAST_EXPORT_KEY = "earsketch_last_export"
 const SESSION_EXPORTED_KEY = "earsketch_session_exported"
 const MANIFEST_VERSION = 1
 
-interface ManifestScript {
+export interface ManifestScript {
     filename: string
     name: string
     created: string | number
     modified: string | number
 }
 
-interface ManifestSound {
+export interface ManifestSound {
     filename: string
     name: string
     metadata: SoundEntity
 }
 
-interface Manifest {
+export interface Manifest {
     version: number
     exportedAt: string
     scripts: ManifestScript[]
     sounds: ManifestSound[]
 }
+
+export const MANIFEST_VERSION_CURRENT = MANIFEST_VERSION
 
 export interface ParsedBackup {
     scripts: { manifest: ManifestScript; source: string }[]
@@ -95,7 +97,7 @@ export async function exportBackup(): Promise<void> {
     setLastExportTime()
 }
 
-function detectExtension(data: ArrayBuffer): string {
+export function detectExtension(data: ArrayBuffer): string {
     const bytes = new Uint8Array(data.slice(0, 4))
     // FLAC: fLaC
     if (bytes[0] === 0x66 && bytes[1] === 0x4c && bytes[2] === 0x61 && bytes[3] === 0x43) return ".flac"

@@ -1,21 +1,21 @@
 import _ from "lodash"
 
 import store from "../reducers"
-import type { Scripts } from "../browser/scriptsState"
+import { Script } from "common"
 import { selectActiveScripts, selectRegularScripts, setRegularScripts } from "../browser/scriptsState"
-import * as ESUtils from "../esutils"
 import { getLocalUserSounds } from "../browser/soundsThunks"
 import * as localSoundStorage from "../audio/localSoundStorage"
+import * as ESUtils from "../esutils"
 import * as syncState from "./syncState"
 import {
     SyncBackend,
-    pushScripts,
-    pushOneScript,
-    removeOneScript,
-    pushOneSound,
-    removeOneSound,
-    pushAllSounds,
-    pullScripts,
+    buildManifest,
+    writeManifest,
+    pullAll,
+    pushScriptFile,
+    deleteScriptFile,
+    pushSoundFile,
+    deleteSoundFileByName,
 } from "./syncBackend"
 
 let activeBackend: SyncBackend | null = null
@@ -52,6 +52,27 @@ export function getActiveBackend(): SyncBackend | null {
     return activeBackend
 }
 
+// --- Manifest update (debounced) ---
+
+const debouncedManifestUpdate = _.debounce(async () => {
+    if (!activeBackend) return
+    beginOp()
+    try {
+        const scripts = selectActiveScripts(store.getState())
+        const sounds = await localSoundStorage.getAllSounds()
+        const manifest = buildManifest(scripts, sounds)
+        await writeManifest(activeBackend, manifest)
+    } catch {
+        // Swallow — the manifest will get rewritten on the next change.
+    } finally {
+        endOp()
+    }
+}, 1000)
+
+function scheduleManifestUpdate(): void {
+    debouncedManifestUpdate()
+}
+
 // --- Connect / disconnect ---
 
 export async function connectBackend(backend: SyncBackend): Promise<void> {
@@ -68,16 +89,13 @@ export async function connectBackend(backend: SyncBackend): Promise<void> {
     activeBackend = backend
     store.dispatch(syncState.setStatus("connected"))
 
-    // Always do a merge: pull remote items not present locally, then push local items.
-    // Local wins on conflicts (because push happens last).
     await mergeAll()
-
-    // Start watching for changes.
     startWatching()
 }
 
 export function disconnectBackend(): void {
     stopWatching()
+    debouncedManifestUpdate.cancel()
     if (activeBackend) {
         activeBackend.disconnect()
         activeBackend = null
@@ -91,61 +109,111 @@ async function mergeAll(): Promise<void> {
     if (!activeBackend) return
     beginOp()
     try {
-        // Mirror the login-flow conflict resolution: remote wins the name, local scripts
-        // with conflicting names get renamed using "Foo.py" → "Foo_1.py" → "Foo_2.py", etc.
-        const remoteScripts = await pullScripts(activeBackend)
+        const pulled = await pullAll(activeBackend)
+
+        // Snapshot local state before mutation.
         const originalLocalScripts = selectRegularScripts(store.getState())
-        const remoteByName = new Map<string, string>() // name → remote ID
-        for (const [id, script] of Object.entries(remoteScripts)) {
-            remoteByName.set(script.name, id)
-        }
+        const originalLocalSoundNames = new Set(
+            (await localSoundStorage.getAllSounds()).map(s => s.name)
+        )
 
-        // Build the merged script map: start with remote scripts (they win their names),
-        // then add local scripts, renaming any whose names conflict with a different-ID remote.
-        const merged: typeof remoteScripts = { ...remoteScripts }
-        const takenNames = new Set(Object.values(merged).map(s => s.name))
-        const renamedLocalIds = new Set<string>() // local IDs that got a new name
-
-        for (const [id, script] of Object.entries(originalLocalScripts)) {
-            if (id in remoteScripts) {
-                // Same ID exists on both sides — local wins (preserve user's latest edits).
-                merged[id] = script
-                continue
+        // Script merge: remote wins name; local with same name (different content) is renamed.
+        if (pulled) {
+            const remoteByName = new Map<string, { entry: typeof pulled.scripts[0]["entry"]; source: string }>()
+            for (const s of pulled.scripts) {
+                remoteByName.set(s.entry.name, s)
             }
-            const remoteIdWithSameName = remoteByName.get(script.name)
-            if (remoteIdWithSameName && remoteIdWithSameName !== id) {
-                // Name conflict with a different remote script — rename this local one.
-                const newName = nextAvailableName(script.name, takenNames)
-                takenNames.add(newName)
-                merged[id] = { ...script, name: newName }
-                renamedLocalIds.add(id)
-            } else {
-                merged[id] = script
-                takenNames.add(script.name)
+            const localByName = new Map<string, Script>()
+            for (const s of Object.values(originalLocalScripts)) {
+                if (!s.soft_delete) localByName.set(s.name, s)
+            }
+
+            const merged: typeof originalLocalScripts = {}
+            const takenNames = new Set<string>()
+
+            // First pass: add remote scripts under their names.
+            for (const { entry, source } of pulled.scripts) {
+                const localMatch = localByName.get(entry.name)
+                if (localMatch && localMatch.source_code === source) {
+                    // Identical content — keep the existing local entry (preserves ID, saved state, etc).
+                    merged[localMatch.shareid] = localMatch
+                    takenNames.add(localMatch.name)
+                } else {
+                    const id = `local/${Date.now()}-${Math.random().toString(36).slice(2)}`
+                    merged[id] = {
+                        shareid: id,
+                        name: entry.name,
+                        source_code: source,
+                        username: "",
+                        created: entry.created,
+                        modified: entry.modified,
+                        saved: true,
+                        tooltipText: "",
+                        isShared: false,
+                        run_status: 0,
+                        readonly: false,
+                        creator: "",
+                    }
+                    takenNames.add(entry.name)
+                }
+            }
+
+            // Second pass: add local-only scripts, renaming any that conflict.
+            for (const script of Object.values(originalLocalScripts)) {
+                if (script.soft_delete) continue
+                if (merged[script.shareid]) continue // already added
+                const remoteMatch = remoteByName.get(script.name)
+                if (remoteMatch && remoteMatch.source !== script.source_code) {
+                    // Name conflict with different content — rename local.
+                    const newName = nextAvailableName(script.name, takenNames)
+                    merged[script.shareid] = { ...script, name: newName }
+                    takenNames.add(newName)
+                } else if (!remoteMatch) {
+                    merged[script.shareid] = script
+                    takenNames.add(script.name)
+                }
+                // else: same name + same content handled in first pass
+            }
+
+            store.dispatch(setRegularScripts(merged))
+
+            // Pull remote sounds not already present locally.
+            for (const { entry, audioData } of pulled.sounds) {
+                if (!originalLocalSoundNames.has(entry.name)) {
+                    await localSoundStorage.storeSound(entry.name, audioData, entry.metadata)
+                }
+            }
+            store.dispatch(getLocalUserSounds())
+
+            // Push renamed + local-only scripts to remote.
+            // No deletions: remote files we pulled are all legitimate. When we rename a
+            // local script to resolve a conflict, the remote keeps its name (and content);
+            // we just add the renamed local script as a new file.
+            for (const script of Object.values(merged)) {
+                const wasRemote = pulled.scripts.some(p => p.entry.name === script.name && p.source === script.source_code)
+                if (!wasRemote) {
+                    await pushScriptFile(activeBackend, script)
+                }
+            }
+        } else {
+            // No remote manifest — push everything local as the initial state.
+            for (const script of Object.values(originalLocalScripts)) {
+                if (!script.soft_delete) {
+                    await pushScriptFile(activeBackend, script)
+                }
             }
         }
 
-        store.dispatch(setRegularScripts(merged))
-
-        // Pull remote sounds (skip ones we already have locally — assume same name = same content).
-        const localSoundNames = new Set((await localSoundStorage.getAllSounds()).map(s => s.name))
-        await pullSoundsExcept(activeBackend, localSoundNames)
-        store.dispatch(getLocalUserSounds())
-
-        // Push local scripts to remote: renamed ones (under their new names), plus any
-        // local scripts with no remote counterpart.
-        const toPush: typeof merged = {}
-        for (const [id, script] of Object.entries(merged)) {
-            if (renamedLocalIds.has(id) || (id in originalLocalScripts && !(id in remoteScripts))) {
-                toPush[id] = script
-            }
-        }
-        if (Object.keys(toPush).length > 0) {
-            await pushScripts(activeBackend, toPush)
+        // Push all local sounds (upsert; remote sounds with the same name were skipped on pull).
+        const allSounds = await localSoundStorage.getAllSounds()
+        for (const sound of allSounds) {
+            await pushSoundFile(activeBackend, sound.name)
         }
 
-        // Push all local sounds (upserts — safe to re-send).
-        await pushAllSounds(activeBackend)
+        // Write the manifest reflecting the final merged state.
+        const finalScripts = selectActiveScripts(store.getState())
+        const manifest = buildManifest(finalScripts, allSounds)
+        await writeManifest(activeBackend, manifest)
     } catch (err: any) {
         store.dispatch(syncState.setError(err.message ?? "Sync failed"))
     } finally {
@@ -167,77 +235,66 @@ function nextAvailableName(name: string, taken: Set<string>): string {
     return candidate
 }
 
-// Helper: pull remote sounds, skipping those whose names are in `skip`.
-async function pullSoundsExcept(backend: SyncBackend, skip: Set<string>): Promise<void> {
-    const files = await backend.listFiles()
-    const metaFiles = files.filter(f => f.path.startsWith("sounds/") && f.path.endsWith(".meta.json"))
-
-    const decoder = new TextDecoder()
-    for (const metaFile of metaFiles) {
-        const name = metaFile.path.slice("sounds/".length, -".meta.json".length)
-        if (skip.has(name)) continue
-
-        const audioPath = `sounds/${name}.audio`
-        const [metaData, audioData] = await Promise.all([
-            backend.readFile(metaFile.path),
-            backend.readFile(audioPath),
-        ])
-        if (!metaData || !audioData) continue
-
-        const metadata = JSON.parse(decoder.decode(metaData))
-        await localSoundStorage.storeSound(name, audioData, metadata)
-    }
-}
-
 // --- Change watching ---
 
-let prevScripts: Scripts = {}
+// Previous script state (for diffing): id -> { name, source_code }
+const prevScriptState = new Map<string, { name: string; source_code: string }>()
 
-// Per-script debounced push functions.
-const debouncedPushes = new Map<string, ReturnType<typeof _.debounce>>()
+// Per-script debounced file writers.
+const debouncedWriters = new Map<string, ReturnType<typeof _.debounce>>()
 
-function getDebouncedPush(id: string): ReturnType<typeof _.debounce> {
-    let fn = debouncedPushes.get(id)
+function getDebouncedWriter(id: string): ReturnType<typeof _.debounce> {
+    let fn = debouncedWriters.get(id)
     if (!fn) {
-        fn = _.debounce((script: any) => {
-            if (activeBackend) {
-                trackOp(pushOneScript(activeBackend, id, script)).catch(() => {})
-            }
+        fn = _.debounce((script: Script, oldName: string | null) => {
+            if (!activeBackend) return
+            trackOp((async () => {
+                if (oldName && oldName !== script.name) {
+                    await deleteScriptFile(activeBackend!, oldName)
+                }
+                await pushScriptFile(activeBackend!, script)
+                scheduleManifestUpdate()
+            })()).catch(() => {})
         }, 500)
-        debouncedPushes.set(id, fn)
+        debouncedWriters.set(id, fn)
     }
     return fn
 }
 
 function startWatching(): void {
-    prevScripts = { ...selectActiveScripts(store.getState()) }
+    prevScriptState.clear()
+    for (const [id, script] of Object.entries(selectActiveScripts(store.getState()))) {
+        prevScriptState.set(id, { name: script.name, source_code: script.source_code })
+    }
 
     unsubscribeStore = store.subscribe(() => {
         if (!activeBackend) return
         const currentScripts = selectActiveScripts(store.getState())
-        if (currentScripts === prevScripts) return
 
-        // Detect changes
+        // Detect changes and renames.
         for (const [id, script] of Object.entries(currentScripts)) {
-            const prev = prevScripts[id]
+            const prev = prevScriptState.get(id)
             if (!prev || prev.source_code !== script.source_code || prev.name !== script.name) {
-                getDebouncedPush(id)(script)
+                const oldName = prev?.name ?? null
+                getDebouncedWriter(id)(script, oldName !== script.name ? oldName : null)
+                prevScriptState.set(id, { name: script.name, source_code: script.source_code })
             }
         }
 
-        // Detect deletions
-        for (const id of Object.keys(prevScripts)) {
+        // Detect deletions.
+        for (const id of Array.from(prevScriptState.keys())) {
             if (!(id in currentScripts)) {
-                const debounced = debouncedPushes.get(id)
-                if (debounced) {
-                    debounced.cancel()
-                    debouncedPushes.delete(id)
+                const prev = prevScriptState.get(id)!
+                prevScriptState.delete(id)
+                const writer = debouncedWriters.get(id)
+                if (writer) {
+                    writer.cancel()
+                    debouncedWriters.delete(id)
                 }
-                trackOp(removeOneScript(activeBackend!, id)).catch(() => {})
+                trackOp(deleteScriptFile(activeBackend!, prev.name)).catch(() => {})
+                scheduleManifestUpdate()
             }
         }
-
-        prevScripts = { ...currentScripts }
     })
 }
 
@@ -246,29 +303,36 @@ function stopWatching(): void {
         unsubscribeStore()
         unsubscribeStore = null
     }
-    for (const fn of debouncedPushes.values()) {
+    for (const fn of debouncedWriters.values()) {
         fn.cancel()
     }
-    debouncedPushes.clear()
+    debouncedWriters.clear()
+    prevScriptState.clear()
 }
 
 // --- Sound hooks (called from thunks / SoundUploader) ---
 
 export function onSoundStored(name: string): void {
-    if (activeBackend) {
-        trackOp(pushOneSound(activeBackend, name)).catch(() => {})
-    }
+    if (!activeBackend) return
+    trackOp((async () => {
+        await pushSoundFile(activeBackend!, name)
+        scheduleManifestUpdate()
+    })()).catch(() => {})
 }
 
 export function onSoundDeleted(name: string): void {
-    if (activeBackend) {
-        trackOp(removeOneSound(activeBackend, name)).catch(() => {})
-    }
+    if (!activeBackend) return
+    trackOp((async () => {
+        await deleteSoundFileByName(activeBackend!, name)
+        scheduleManifestUpdate()
+    })()).catch(() => {})
 }
 
 export function onSoundRenamed(oldName: string, newName: string): void {
-    if (activeBackend) {
-        trackOp(removeOneSound(activeBackend, oldName)).catch(() => {})
-        trackOp(pushOneSound(activeBackend, newName)).catch(() => {})
-    }
+    if (!activeBackend) return
+    trackOp((async () => {
+        await deleteSoundFileByName(activeBackend!, oldName)
+        await pushSoundFile(activeBackend!, newName)
+        scheduleManifestUpdate()
+    })()).catch(() => {})
 }
