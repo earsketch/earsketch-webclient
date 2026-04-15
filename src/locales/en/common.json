@@ -338,6 +338,7 @@
     "sync.disconnect": "Disconnect",
     "sync.googleDrive": "Google Drive",
     "sync.localFolder": "Local folder",
+    "sync.localFolderUnsupported": "Requires a Chromium-based browser (Chrome, Edge, Opera, etc.).",
     "sync.inspect": "View backend data",
     "sync.inspectTitle": "Sync backend data",
     "sync.inspectBackend": "Backend",

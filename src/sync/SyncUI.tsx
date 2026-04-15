@@ -32,9 +32,10 @@ export const SyncButton = () => {
     }, [menuOpen])
 
     const driveAvailable = typeof ES_WEB_GOOGLE_CLIENT_ID === "string" && ES_WEB_GOOGLE_CLIENT_ID.length > 0
-    const fsaAvailable = "showDirectoryPicker" in window
+    const fsaSupported = "showDirectoryPicker" in window
 
-    if (!driveAvailable && !fsaAvailable) return null
+    // Hide the entire button only if there's nothing the user could possibly do.
+    if (!driveAvailable && !fsaSupported) return null
 
     const handleConnect = async (kind: "drive" | "fsa") => {
         setMenuOpen(false)
@@ -134,14 +135,14 @@ export const SyncButton = () => {
                             {t("sync.googleDrive")}
                         </button>
                     )}
-                    {fsaAvailable && (
-                        <button
-                            className="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
-                            onClick={() => handleConnect("fsa")}
-                        >
-                            {t("sync.localFolder")}
-                        </button>
-                    )}
+                    <button
+                        className="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"
+                        onClick={() => handleConnect("fsa")}
+                        disabled={!fsaSupported}
+                        title={fsaSupported ? undefined : t("sync.localFolderUnsupported")}
+                    >
+                        {t("sync.localFolder")}
+                    </button>
                 </div>
             )}
         </div>
