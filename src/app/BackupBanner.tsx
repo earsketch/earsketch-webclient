@@ -7,6 +7,8 @@ import * as backup from "./backup"
 import { openModal } from "./modal"
 import { ImportModal } from "./ImportModal"
 import * as userNotification from "../user/notification"
+import { SyncButton } from "../sync/SyncUI"
+import { selectSyncStatus } from "../sync/syncState"
 
 function timeAgo(timestamp: number): string {
     const diffMs = Date.now() - timestamp
@@ -21,10 +23,13 @@ export const BackupBanner = () => {
     const loggedIn = useSelector(user.selectLoggedIn)
     const activeScripts = useSelector(scriptsState.selectActiveScripts)
     const hasScripts = Object.keys(activeScripts).length > 0
+    const syncStatus = useSelector(selectSyncStatus)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [lastExport, setLastExport] = useState(() => backup.getLastExportTime())
 
     if (loggedIn || !hasScripts) return null
+
+    const syncConnected = syncStatus === "connected"
 
     const handleExport = async () => {
         await backup.exportBackup()
@@ -46,35 +51,38 @@ export const BackupBanner = () => {
 
     return (
         <div className="flex items-center gap-1.5 whitespace-nowrap mx-2 shrink-0">
-            <span className="hidden lg:inline text-xs text-gray-400" title={t("backup.savedToBrowser")}>
-                {lastBackupText}
-            </span>
-            <button
-                className="py-0.5 px-2 text-xs bg-amber-500 text-black hover:bg-amber-400 rounded"
-                onClick={handleExport}
-                title={t("backup.savedToBrowser") + " · " + lastBackupText}
-            >
-                {t("backup.saveButton")}
-            </button>
-            <label
-                className="py-0.5 px-2 text-xs bg-white text-black hover:bg-gray-200 rounded cursor-pointer"
-                title={t("backup.loadBackup")}
-            >
-                {t("backup.loadBackup")}
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".earsketch"
-                    className="hidden"
-                    onChange={e => {
-                        const file = e.target.files?.[0]
-                        if (file) {
-                            handleImportFile(file)
-                            e.target.value = ""
-                        }
-                    }}
-                />
-            </label>
+            <SyncButton />
+            {!syncConnected && <>
+                <span className="hidden lg:inline text-xs text-gray-400" title={t("backup.savedToBrowser")}>
+                    {lastBackupText}
+                </span>
+                <button
+                    className="py-0.5 px-2 text-xs bg-amber-500 text-black hover:bg-amber-400 rounded"
+                    onClick={handleExport}
+                    title={t("backup.savedToBrowser") + " · " + lastBackupText}
+                >
+                    {t("backup.saveButton")}
+                </button>
+                <label
+                    className="py-0.5 px-2 text-xs bg-white text-black hover:bg-gray-200 rounded cursor-pointer"
+                    title={t("backup.loadBackup")}
+                >
+                    {t("backup.loadBackup")}
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".earsketch"
+                        className="hidden"
+                        onChange={e => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                                handleImportFile(file)
+                                e.target.value = ""
+                            }
+                        }}
+                    />
+                </label>
+            </>}
         </div>
     )
 }

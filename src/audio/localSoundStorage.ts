@@ -31,6 +31,15 @@ export async function storeSound(name: string, audioData: ArrayBuffer, metadata:
     })
 }
 
+export async function getSound(name: string): Promise<LocalSoundRecord | null> {
+    const db = await openDB()
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).get(name)
+        req.onsuccess = () => resolve(req.result ? (req.result as LocalSoundRecord) : null)
+        req.onerror = () => reject(req.error)
+    })
+}
+
 export async function getAudioData(name: string): Promise<ArrayBuffer | null> {
     const db = await openDB()
     return new Promise((resolve, reject) => {

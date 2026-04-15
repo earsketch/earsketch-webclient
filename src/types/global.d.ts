@@ -16,6 +16,7 @@ declare const ES_WEB_SHOW_CAI: boolean
 declare const ES_WEB_UPLOAD_CAI_HISTORY: boolean
 declare const ES_WEB_SHOW_CHAT: boolean
 declare const ES_WEB_SHOW_LOCALE_SWITCHER: boolean
+declare const ES_WEB_GOOGLE_CLIENT_ID: string | undefined
 
 declare const Kali: any
 
@@ -74,6 +75,12 @@ declare module "*beat_similarity_indices.json" {
 declare module "*beat_timestamps.json" {
     const x: string
     export default x
+}
+
+// File System Access API extensions (Chromium only)
+interface FileSystemDirectoryHandle {
+    entries(): AsyncIterableIterator<[string, FileSystemHandle]>
+    requestPermission(descriptor?: { mode?: "read" | "readwrite" }): Promise<"granted" | "denied" | "prompt">
 }
 
 declare module "skulpt"

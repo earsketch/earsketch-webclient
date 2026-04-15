@@ -18,6 +18,7 @@ import { encodeFLAC } from "../audio/renderer"
 import * as userConsole from "../ide/console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
+import { onSoundStored } from "../sync/syncEngine"
 import * as request from "../request"
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
@@ -95,6 +96,7 @@ async function storeLocalSound(name: string, file: Blob, tempo: number, onProgre
     await localSoundStorage.storeSound(fullName, audioData, metadata)
     audioLibrary.cache.sounds[fullName] = { metadata: Promise.resolve(metadata) }
     store.dispatch(getLocalUserSounds())
+    onSoundStored(fullName)
     onProgress(1)
     userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
 }

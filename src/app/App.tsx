@@ -979,7 +979,8 @@ window.onbeforeunload = () => {
         }
     } else {
         const hasData = Object.keys(scriptsState.selectActiveScripts(store.getState())).length > 0
-        if (hasData && !backup.hasExportedThisSession()) {
+        const syncConnected = store.getState().sync.status === "connected"
+        if (hasData && !syncConnected && !backup.hasExportedThisSession()) {
             persistor.flush()
             return ""
         }

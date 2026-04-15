@@ -25,6 +25,7 @@ import {
 } from "./soundsState"
 import { beatStringToArray } from "../esutils"
 import _ from "lodash"
+import { onSoundDeleted, onSoundRenamed } from "../sync/syncEngine"
 
 /* Thunk actions */
 
@@ -110,6 +111,7 @@ export const deleteLocalUserSound = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(deleteUserSound(payload))
             // Also remove from IndexedDB if stored there
             await localSoundStorage.deleteSound(payload).catch(() => { /* ignore if not found */ })
+            onSoundDeleted(payload)
         }
     }
 )
@@ -203,6 +205,10 @@ export const renameSound = createAsyncThunk<void, { oldName: string; newName: st
         const userSounds = getState().sounds.userSounds
         if (userSounds.names.includes(oldName)) {
             dispatch(renameUserSound({ oldName, newName })) // updates soundState
+        }
+
+        if (!state.user.loggedIn) {
+            onSoundRenamed(oldName, newName)
         }
 
         if (state.user.loggedIn) {
