@@ -27,9 +27,10 @@ export const BackupBanner = () => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [lastExport, setLastExport] = useState(() => backup.getLastExportTime())
 
-    if (loggedIn || !hasScripts) return null
+    if (loggedIn) return null
 
     const syncConnected = syncStatus === "connected"
+    const showBackupControls = hasScripts && !syncConnected
 
     const handleExport = async () => {
         await backup.exportBackup()
@@ -52,7 +53,7 @@ export const BackupBanner = () => {
     return (
         <div className="flex items-center gap-1.5 whitespace-nowrap mx-2 shrink-0">
             <SyncButton />
-            {!syncConnected && <>
+            {showBackupControls && <>
                 <span className="hidden lg:inline text-xs text-gray-400" title={t("backup.savedToBrowser")}>
                     {lastBackupText}
                 </span>
