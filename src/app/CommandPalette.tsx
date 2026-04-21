@@ -5,11 +5,14 @@ import * as appState from "./appState"
 import * as scriptsState from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as curriculum from "../browser/curriculumState"
+import * as apiState from "../browser/apiState"
+import * as layout from "../ide/layoutState"
+import { BrowserTabType } from "../browser/BrowserTab"
+import { API_DOC, API_FUNCTIONS } from "../api/api"
 import * as tabs from "../ide/tabState"
 import * as tabThunks from "../ide/tabThunks"
 import * as bubble from "../bubble/bubbleState"
 import * as user from "../user/userState"
-import { API_FUNCTIONS } from "../api/api"
 import { openModal } from "./modal"
 import { AccountCreator } from "./AccountCreator"
 import { ForgotPassword } from "./ForgotPassword"
@@ -70,14 +73,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
 
     // ── Focus / reset ──────────────────────────────────────────────────────
     useEffect(() => {
-        if (isOpen) inputRef.current?.focus()
-    }, [isOpen])
-
-    useEffect(() => {
         if (!isOpen) {
             setQuery("")
             setDebouncedQuery("")
-            // Clear curriculum search text when closing
             dispatch(curriculum.setSearchText(""))
         }
     }, [isOpen, dispatch])
@@ -134,12 +132,22 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                 subtitle: "EarSketch API function",
                 category: "API",
                 action: () => {
-                    const editor = (window as any).ace?.edit?.("coder")
-                    if (editor) {
-                        editor.insert(`${funcName}()`)
-                        const pos = editor.getCursorPosition()
-                        editor.moveCursorTo(pos.row, pos.column - 1)
+                    // Open the API tab in the content manager
+                    dispatch(layout.setWest({ open: true, kind: BrowserTabType.API }))
+                    // Filter the API browser down to just this function
+                    dispatch(apiState.setSearchText(funcName))
+                    // Expand the entry by mutating obj.details (same pattern the API browser uses)
+                    const docEntries = API_DOC[funcName]
+                    if (docEntries) {
+                        docEntries.forEach((obj: any) => { obj.details = true })
                     }
+                    // After React re-renders, scroll to top and focus the entry name span
+                    window.setTimeout(() => {
+                        const panel = document.getElementById(`panel-${BrowserTabType.API}`)
+                        if (panel) panel.scrollTop = 0
+                        const span = document.querySelector<HTMLElement>(`[data-api-entry="${funcName}"]`)
+                        span?.focus()
+                    }, 100)
                     onClose()
                 },
                 icon: "icon-code",
@@ -281,8 +289,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     }, [scripts, sharedScripts, loggedIn, isAdmin, activeTabScript, colorTheme, dispatch, onClose])
 
     // ── Filtered results ───────────────────────────────────────────────────
+    // When query is empty, show all app commands and scripts as a default list.
     const filteredCommands = useMemo((): CommandItem[] => {
-        if (!debouncedQuery.trim()) return []
+        if (!debouncedQuery.trim()) return appCommandIndex
         const q = debouncedQuery.toLowerCase()
 
         // 1. App commands + scripts + API: cheap substring filter on pre-built keys
@@ -406,6 +415,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                                                 value={query}
                                                 onChange={e => setQuery(e.target.value)}
                                                 onKeyDown={handleKeyDown}
+                                                autoFocus
                                             />
                                             {query && (
                                                 <button
@@ -420,49 +430,43 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
 
                                         {/* Results */}
                                         <Combobox.Options static className="max-h-96 scroll-py-2 overflow-y-auto py-2">
-                                            {!debouncedQuery.trim()
+                                            {Object.keys(groupedCommands).length === 0
                                                 ? (
                                                     <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                                        Start typing to search scripts, sounds, API functions, and more…
+                                                        No results for &quot;{debouncedQuery}&quot;
                                                     </div>
                                                 )
-                                                : Object.keys(groupedCommands).length === 0
-                                                    ? (
-                                                        <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                                            No results for &quot;{debouncedQuery}&quot;
+                                                : Object.entries(groupedCommands).map(([category, items]) => (
+                                                    <div key={category} className="mb-2">
+                                                        <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                                                            {category}
                                                         </div>
-                                                    )
-                                                    : Object.entries(groupedCommands).map(([category, items]) => (
-                                                        <div key={category} className="mb-2">
-                                                            <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                                                {category}
-                                                            </div>
-                                                            {items.map(item => (
-                                                                <Combobox.Option
-                                                                    key={item.id}
-                                                                    value={item}
-                                                                    className={({ active }) =>
-                                                                        `cursor-pointer select-none px-4 py-2 flex items-center ${active ? "bg-blue-600 text-white" : "text-gray-900 dark:text-gray-100"}`}
-                                                                >
-                                                                    {({ active }) => (
-                                                                        <>
-                                                                            {item.icon && (
-                                                                                <i className={`${item.icon} mr-3 text-lg flex-shrink-0 ${active ? "text-white" : "text-gray-400"}`} />
+                                                        {items.map(item => (
+                                                            <Combobox.Option
+                                                                key={item.id}
+                                                                value={item}
+                                                                className={({ active }) =>
+                                                                    `cursor-pointer select-none px-4 py-2 flex items-center ${active ? "bg-blue-600 text-white" : "text-gray-900 dark:text-gray-100"}`}
+                                                            >
+                                                                {({ active }) => (
+                                                                    <>
+                                                                        {item.icon && (
+                                                                            <i className={`${item.icon} mr-3 text-lg flex-shrink-0 ${active ? "text-white" : "text-gray-400"}`} />
+                                                                        )}
+                                                                        <div className="flex-1 min-w-0">
+                                                                            <div className="font-medium truncate">{item.title}</div>
+                                                                            {item.subtitle && (
+                                                                                <div className={`text-sm truncate ${active ? "text-blue-200" : "text-gray-500 dark:text-gray-400"}`}>
+                                                                                    {item.subtitle}
+                                                                                </div>
                                                                             )}
-                                                                            <div className="flex-1 min-w-0">
-                                                                                <div className="font-medium truncate">{item.title}</div>
-                                                                                {item.subtitle && (
-                                                                                    <div className={`text-sm truncate ${active ? "text-blue-200" : "text-gray-500 dark:text-gray-400"}`}>
-                                                                                        {item.subtitle}
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                        </>
-                                                                    )}
-                                                                </Combobox.Option>
-                                                            ))}
-                                                        </div>
-                                                    ))}
+                                                                        </div>
+                                                                    </>
+                                                                )}
+                                                            </Combobox.Option>
+                                                        ))}
+                                                    </div>
+                                                ))}
                                         </Combobox.Options>
                                     </div>
                                 </Combobox>

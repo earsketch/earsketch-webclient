@@ -71,6 +71,8 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                 <span
                     className="font-bold cursor-pointer truncate" title={returnText}
                     onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
+                    data-api-entry={name}
+                    tabIndex={-1}
                 >
                     {name}
                 </span>
