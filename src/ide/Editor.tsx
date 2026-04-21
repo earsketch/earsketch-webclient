@@ -211,7 +211,7 @@ let view: EditorView = null as unknown as EditorView
 let sessions: { [key: string]: EditorSession } = {}
 const keyBindings: { key: string, run: () => boolean }[] = [
     {
-        key: "Ctrl-Enter",
+        key: "Ctrl-i",
         run: () => {
             const currentLine = view.state.doc.lineAt(view.state.selection.main.head)
             jumpToDAWClip(currentLine.number)

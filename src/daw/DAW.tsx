@@ -400,6 +400,19 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const offset = xScale(clip.measure)
     const element = useRef<HTMLButtonElement>(null)
 
+    const clipLength = clip.end - clip.start
+    const fullStart = clip.clipFamilyStart || (clip.measure + clip.start - 1)
+    const fullEnd = clip.clipFamilyEnd || (clip.measure + clip.end - 1)
+    const numClips = clipLength > 0 ? Math.round((fullEnd - fullStart) / clipLength) : 1
+    const clipDescription = numClips > 1
+        ? `track ${clip.track}, measures ${fullStart} to ${fullEnd}, made up of ${numClips} clips each ${clipLength} measure${clipLength !== 1 ? "s" : ""} long, ${clip.filekey}`
+        : `track ${clip.track}, measures ${fullStart} to ${fullEnd}, ${clipLength} measure${clipLength !== 1 ? "s" : ""} long, ${clip.filekey}`
+
+    const announceToLiveRegion = (text: string) => {
+        const liveRegion = document.getElementById("daw-live-region")
+        if (liveRegion) liveRegion.textContent = text
+    }
+
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
             const waveform = WaveformCache.get(clip)
@@ -412,14 +425,16 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
-        aria-label={`on track ${clip.track} from measure ${clip.clipFamilyStart || (clip.measure + clip.start - 1)} to ${clip.clipFamilyEnd || (clip.measure + clip.end - 1)} ${clip.filekey} `}
-        onClick={(e: React.MouseEvent) => {
-            if (e.ctrlKey || e.metaKey) {
+        aria-label={clipDescription}
+        onFocus={() => announceToLiveRegion(clipDescription)}
+        onClick={() => {
+            player.setPreview(clip.track)
+            player.play(clip.clipFamilyStart || clip.measure, 0,
+                clip.clipFamilyEnd || (clip.measure + clip.end - clip.start))
+        }}
+        onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.ctrlKey && e.key === "i") {
                 jumpToLine(clip.sourceLine)
-            } else {
-                player.setPreview(clip.track)
-                player.play(clip.clipFamilyStart || clip.measure, 0,
-                    clip.clipFamilyEnd || (clip.measure + clip.end - clip.start))
             }
         }}
 
@@ -1104,6 +1119,7 @@ export const DAW = () => {
     }, [playing, xScale, autoScroll])
 
     return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
+        <div id="daw-live-region" aria-live="assertive" aria-atomic="true" className="sr-only" />
         {hideEditor &&
         <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
