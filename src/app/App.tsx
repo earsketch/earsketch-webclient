@@ -68,6 +68,7 @@ type PanelTarget =
     | { panel: "daw" }
     | { panel: "editor" }
     | { panel: "east"; kind: "CURRICULUM" }
+    | { panel: "utility" }
 
 interface NavNode {
     label: string
@@ -75,11 +76,11 @@ interface NavNode {
 }
 
 const PANEL_SHORTCUTS: Record<string, NavNode> = {
-    1: { label: "Sounds",     target: { panel: "west", kind: BrowserTabType.Sound } },
-    2: { label: "Scripts",    target: { panel: "west", kind: BrowserTabType.Script } },
-    3: { label: "API",        target: { panel: "west", kind: BrowserTabType.API } },
-    4: { label: "DAW",        target: { panel: "daw" } },
-    5: { label: "Editor",     target: { panel: "editor" } },
+    1: { label: "Sounds", target: { panel: "west", kind: BrowserTabType.Sound } },
+    2: { label: "Scripts", target: { panel: "west", kind: BrowserTabType.Script } },
+    3: { label: "API", target: { panel: "west", kind: BrowserTabType.API } },
+    4: { label: "DAW", target: { panel: "daw" } },
+    5: { label: "Editor", target: { panel: "editor" } },
     6: { label: "Curriculum", target: { panel: "east", kind: "CURRICULUM" } },
 }
 
@@ -346,7 +347,7 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
+        <Popover.Button id="utilityPanelAnchor" className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
         <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-1/2 w-max">
@@ -645,9 +646,11 @@ export const App = () => {
         const navigateTo = (target: PanelTarget) => {
             if (target.panel === "west") {
                 dispatch(layout.setWest({ open: true, kind: target.kind }))
-                const searchId = target.kind === BrowserTabType.Sound ? "soundSearchBar"
-                    : target.kind === BrowserTabType.Script ? "scriptSearchBar"
-                    : "apiSearchBar"
+                const searchId = target.kind === BrowserTabType.Sound
+                    ? "soundSearchBar"
+                    : target.kind === BrowserTabType.Script
+                        ? "scriptSearchBar"
+                        : "apiSearchBar"
                 focusEl(`#${searchId}`)
             } else if (target.panel === "daw") {
                 focusEl("#daw-play-button button")
@@ -656,11 +659,18 @@ export const App = () => {
             } else if (target.panel === "east") {
                 dispatch(layout.setEast({ open: true, kind: target.kind }))
                 focusEl("#curriculumSearchBar")
+            } else if (target.panel === "utility") {
+                focusEl("#utilityPanelAnchor")
             }
         }
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+                if (e.key === "7") {
+                    e.preventDefault()
+                    navigateTo({ panel: "utility" })
+                    return
+                }
                 const node = PANEL_SHORTCUTS[e.key]
                 if (node) {
                     e.preventDefault()
