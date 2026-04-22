@@ -436,6 +436,17 @@ const AddSound = () => {
     )
 }
 
+const useCopyToClipboard = () => {
+    const [copied, setCopied] = useState(false)
+    const copy = (text: string) => {
+        window.navigator.clipboard.writeText(text).then(() => {
+            setCopied(true)
+            window.setTimeout(() => setCopied(false), 1500)
+        })
+    }
+    return { copied, copy }
+}
+
 const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const dispatch = useDispatch()
     const preview = useSelector(sounds.selectPreview)
@@ -456,6 +467,8 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
         tooltip = tooltip.concat("\n", t("soundBrowser.clip.tooltip.key"), ": ", clip.keySignature)
     }
 
+    const { copied, copy } = useCopyToClipboard()
+
     const loggedIn = useSelector(user.selectLoggedIn)
     const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(name)
     const userName = useSelector(user.selectUserName) as string
@@ -466,8 +479,19 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
-                <div className="flex items-center min-w-0" title={tooltip}>
-                    <h5 className="text-sm truncate pl-2">{name}</h5>
+                <div
+                    className="flex items-center min-w-0 cursor-pointer"
+                    title={tooltip}
+                    onClick={() => copy(name)}
+                    aria-label={copied ? `Copied ${name}` : `Click to copy ${name}`}
+                    aria-live="polite"
+                >
+                    {copied
+                        ? <i className="icon icon-checkmark text-green-500 dark:text-green-400 pl-2" aria-hidden="true" />
+                        : null}
+                    <h5 className={`text-sm truncate pl-2 transition-colors ${copied ? "text-green-500 dark:text-green-400" : ""}`}>
+                        {name}
+                    </h5>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -760,10 +784,22 @@ const SoundPreview = () => {
         playerRef.current?.focus()
     }
 
+    const { copied, copy } = useCopyToClipboard()
+
     return (
         <div className="flex border mt-1 mb-2 ml-2 flex-col items-center justify-center">
-            <div className="text-sm mt-2 truncate text-center">
-                {currentName ?? t("soundBrowser.noSoundsFound")}
+            <div
+                className={`text-sm mt-2 truncate text-center transition-colors
+                    ${currentName ? "cursor-pointer active:scale-95" : ""}
+                    ${copied ? "text-green-500 dark:text-green-400" : ""}`}
+                onClick={() => copy(currentName)}
+                title={currentName ? (copied ? "Copied!" : `${currentName}`) : undefined}
+                aria-live="polite"
+                aria-label={currentName ? (copied ? `Copied ${currentName}` : `Click to copy ${currentName}`) : undefined}
+            >
+                {copied
+                    ? <><i className="icon icon-checkmark text-green-500 dark:text-green-400" aria-hidden="true" /> {currentName}</>
+                    : (currentName ?? t("soundBrowser.noSoundsFound"))}
             </div>
 
             <div
