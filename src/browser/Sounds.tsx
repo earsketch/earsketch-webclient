@@ -574,6 +574,7 @@ interface SoundSearchAndFiltersProps {
 const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
     const filterRef = useRef<HTMLDivElement>(null)
     const [showPreview, setShowPreview] = useState(false)
+    const loggedIn = useSelector(user.selectLoggedIn)
     useLayoutEffect(() => {
         const el = filterRef.current
         if (!el) return
@@ -597,7 +598,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
             </div>
             <div className="flex justify-between px-1.5 py-1 mb-0.5">
                 <div className="flex items-center gap-2">
-                    <ShowOnlyFavorites />
+                    {loggedIn && <ShowOnlyFavorites />}
                     <button
                         type="button"
                         onClick={() => setShowPreview(prev => !prev)}
