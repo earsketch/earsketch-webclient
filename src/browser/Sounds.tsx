@@ -573,6 +573,7 @@ interface SoundSearchAndFiltersProps {
 
 const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
     const filterRef = useRef<HTMLDivElement>(null)
+    const [showPreview, setShowPreview] = useState(false)
     useLayoutEffect(() => {
         const el = filterRef.current
         if (!el) return
@@ -595,10 +596,29 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
                     setCurrentFilterTab={setCurrentFilterTab}/>
             </div>
             <div className="flex justify-between px-1.5 py-1 mb-0.5">
-                <ShowOnlyFavorites />
-                <AddSound />
+                <div className="flex items-center gap-2">
+                    <ShowOnlyFavorites />
+                    <button
+                        type="button"
+                        onClick={() => setShowPreview(prev => !prev)}
+                        aria-expanded={showPreview}
+                        aria-controls="sound-preview-panel"
+                        title={showPreview ? "Hide preview" : "Show preview"}
+                        aria-label={showPreview ? "Hide preview" : "Show preview"}
+                        className="flex items-center gap-1 text-sm"
+                    >
+                        <span>Sound Preview</span>
+                        <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
+                    </button>
+                </div>
             </div>
-            <SoundPreview />
+            <div
+                id="sound-preview-panel"
+                aria-hidden={!showPreview}
+                style={{ display: showPreview ? undefined : "none" }}
+            >
+                <SoundPreview />
+            </div>
         </div>
     )
 }
