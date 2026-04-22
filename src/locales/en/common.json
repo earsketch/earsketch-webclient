@@ -550,10 +550,10 @@
       "trackEffectEnvelopePointRemoved": "Track {{trackNum}}: Removed {{count}} envelope point from {{effect}} {{effectParam}}",
       "trackEffectEnvelopePointRemoved_plural": "Track {{trackNum}}: Removed {{count}} envelope points from {{effect}} {{effectParam}}",
       "trackEffectEnvelopeChanged": "Track {{trackNum}}: Envelope changed for effect {{effect}} {{effectParam}}",
-      "trackClipsChanged": "Track {{trackNum}}: Changed audio files ({{measures}} measures){{addedText}}{{removedText}}. Track spans measures {{spanStart}} to {{spanEnd}}",
+      "trackClipsChanged": "Track {{trackNum}}: Changed audio files. {{addedText}}. {{removedText}}. Track spans measures {{spanStart}} to {{spanEnd}}",
       "trackClipsPositionChanged": "Track {{trackNum}}: Sound positions changed ({{filekeys}}). Track spans measures {{spanStart}} to {{spanEnd}}",
-      "clipFilesAdded": ". Added: {{filekeys}}",
-      "clipFilesRemoved": ". Removed: {{filekeys}}",
+      "clipFilesAdded": "Added: {{filekeys}}",
+      "clipFilesRemoved": "Removed: {{filekeys}}",
       "tempoChanged": "Project tempo changed"
     },
     "shareScript": {
