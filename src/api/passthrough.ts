@@ -347,7 +347,7 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
                 i = j - 1
             }
 
-            promises.push(insertMediaSection(result, soundConstant, track, soundStart, sliceStart, sliceEnd, start, 1 + (beat.length) * stepsPerMeasure))
+            promises.push(insertMediaSection(result, soundConstant, track, soundStart, sliceStart, sliceEnd, start, start + (beat.length) * stepsPerMeasure))
         }
     }
 

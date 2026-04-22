@@ -419,7 +419,12 @@ export function jumpToLine(lineNumber: number) {
     }, 1000)
 }
 function jumpToDAWClip(lineNumber: number) {
-    const clipButton = document.querySelector(`button[data-source-line="${lineNumber}"]`) as HTMLButtonElement
+    // Prefer the parent clip over loop children (.loop class = loopChild) so
+    // fitMedia/insertMedia jumps land on the representative button, not a repeat copy.
+    const clipButton = (
+        document.querySelector(`button[data-source-line="${lineNumber}"]:not(.loop)`) ??
+        document.querySelector(`button[data-source-line="${lineNumber}"]`)
+    ) as HTMLButtonElement | null
     if (clipButton) {
         const currentLabel = clipButton.getAttribute("aria-label") || ""
         if (!currentLabel.startsWith("Focus shifted to DAW")) {
