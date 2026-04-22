@@ -635,6 +635,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
                         <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
                     </button>
                 </div>
+                <AddSound />
             </div>
             <div
                 id="sound-preview-panel"

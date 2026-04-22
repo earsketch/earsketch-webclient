@@ -9,6 +9,7 @@ import baselineMinusEffect from "../../fixtures/dawDiffScripts/baseline-minus-1-
 import baselineAddEffectEnvPoint from "../../fixtures/dawDiffScripts/baseline-add-effect-env-point.json"
 import baselineAddEffectEnvPoints from "../../fixtures/dawDiffScripts/baseline-add-effect-env-points.json"
 import baselineChangedEffectEnvPointValue from "../../fixtures/dawDiffScripts/baseline-changed-effect-env-point-value.json"
+import baselineChangedSound from "../../fixtures/dawDiffScripts/baseline-change-sound.json"
 
 import type { DAWData } from "../../../../src/types/common"
 
@@ -202,6 +203,22 @@ describe("getDAWDataDifferences", () => {
         const differences = getDAWDataDifferences(baseline, baselineChangedEffectEnvPointValue)
         expectDifferences(differences, [
             { key: "trackEffectEnvelopeChanged", params: { trackNum: 2, effect: "VOLUME", effectParam: "GAIN" } },
+        ])
+    })
+
+    it("detects sound adds and removes from a single track", () => {
+        const differences = getDAWDataDifferences(baseline, baselineChangedSound)
+        expectDifferences(differences, [
+            {
+                key: "trackClipsChanged",
+                params: {
+                    trackNum: 1,
+                    addedText: "{\"key\":\"messages:idecontroller.clipFilesAdded\",\"params\":{\"filekeys\":\"RD_POP_SYNTHBASS_6\"}}",
+                    removedText: "{\"key\":\"messages:idecontroller.clipFilesRemoved\",\"params\":{\"filekeys\":\"RD_UK_HOUSE_MAINBEAT_8\"}}",
+                    spanStart: 1,
+                    spanEnd: 5,
+                },
+            },
         ])
     })
 
