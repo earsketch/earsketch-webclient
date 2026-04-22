@@ -30,9 +30,11 @@ export const callbacks = {
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
     const searchText = useSelector(sounds.selectSearchText)
+    const count = useSelector(sounds.selectFilteredRegularNames).length
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(sounds.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(sounds.setSearchText(""))
-    const props = { id: "soundSearchBar", searchText, dispatchSearch, dispatchReset }
+    const liveMessage = `${count} ${count === 1 ? "sound" : "sounds"} found.${count > 0 ? " Jumped to the first sound." : ""}`
+    const props = { id: "soundSearchBar", aria: "Sound search bar", liveMessage, firstResultSelector: "#panel-0 h5", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -314,7 +316,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
 
     return (
         <div>
-            <div className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2.5 mr-2">
+            <div id="sound-filter-tabs" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2.5 mr-2">
                 {Object.entries(numItemsSelected).map(([name, num]: [string, number]) => {
                     return <SoundFilterTab
                         key={name}
@@ -464,7 +466,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
-                    <h5 className="text-sm truncate pl-2">{name}</h5>
+                    <h5 className="text-sm truncate pl-2" tabIndex={-1}>{name}</h5>
                 </div>
                 <div className="pl-2 pr-4">
                     <button

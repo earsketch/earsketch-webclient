@@ -42,9 +42,11 @@ const CreateScriptButton = () => {
 const ScriptSearchBar = () => {
     const dispatch = useDispatch()
     const searchText = useSelector(scripts.selectSearchText)
+    const count = useSelector(scripts.selectFilteredActiveScriptIDs).length
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(scripts.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(scripts.setSearchText(""))
-    const props = { id: "scriptSearchBar", searchText, dispatchSearch, dispatchReset }
+    const liveMessage = `${count} ${count === 1 ? "script" : "scripts"} found.`
+    const props = { id: "scriptSearchBar", aria: "Scripts search bar", liveMessage, firstResultSelector: "#panel-1 h4", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -160,7 +162,7 @@ const Filters = () => {
     const { t } = useTranslation()
 
     return (
-        <div className="p-3">
+        <div id="script-filter-tabs" className="p-3">
             <div className="pb-2 text-xs">{t("filter").toLocaleUpperCase()}</div>
             <div className="flex justify-between">
                 <DropdownMultiSelector

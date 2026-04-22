@@ -176,10 +176,12 @@ const EntryList = () => {
 const APISearchBar = () => {
     const dispatch = useDispatch()
     const searchText = useSelector(api.selectSearchText)
+    const count = useSelector(api.selectFilteredEntries).length
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(api.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(api.setSearchText(""))
     const caiHighlight = useSelector(cai.selectHighlight)
-    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", highlight: caiHighlight.zone === "apiSearchBar" }
+    const liveMessage = `${count} ${count === 1 ? "result" : "results"} found.`
+    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", aria: "API search bar", liveMessage, firstResultSelector: "#panel-2 button", highlight: caiHighlight.zone === "apiSearchBar" }
 
     return <SearchBar {...props} />
 }
