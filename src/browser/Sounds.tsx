@@ -436,11 +436,28 @@ const AddSound = () => {
     )
 }
 
+const playCopyEarcon = () => {
+    const ctx = new window.AudioContext()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = "sine"
+    osc.frequency.setValueAtTime(880, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.08)
+    gain.gain.setValueAtTime(0.2, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.15)
+    osc.onended = () => ctx.close()
+}
+
 const useCopyToClipboard = () => {
     const [copied, setCopied] = useState(false)
     const copy = (text: string) => {
         window.navigator.clipboard.writeText(text).then(() => {
             setCopied(true)
+            playCopyEarcon()
             window.setTimeout(() => setCopied(false), 1500)
         })
     }
@@ -486,11 +503,9 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                     aria-label={copied ? `Copied ${name}` : `Click to copy ${name}`}
                     aria-live="polite"
                 >
-                    {copied
-                        ? <i className="icon icon-checkmark text-green-500 dark:text-green-400 pl-2" aria-hidden="true" />
-                        : null}
-                    <h5 className={`text-sm truncate pl-2 transition-colors ${copied ? "text-green-500 dark:text-green-400" : ""}`}>
+                    <h5 className="text-sm truncate pl-2">
                         {name}
+                        {copied && <span className="text-green-500 dark:text-green-400 ml-1">(Copied <i className="icon icon-checkmark" aria-hidden="true" />)</span>}
                     </h5>
                 </div>
                 <div className="pl-2 pr-4">
