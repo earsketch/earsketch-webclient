@@ -429,9 +429,12 @@ const Clip = ({ color, clip, loopFamilyEnd }: { color: daw.Color, clip: types.Cl
     const isBeatPattern = !clip.loop && clip.clipFamilyStart !== undefined
     const isAudioSection = clip.loop && clip.clipFamilyStart !== undefined
 
+    const singleClipEnd = clip.measure + clip.end - clip.start
+    const actuallyLoops = isLoopClip && (loopFamilyEnd ?? singleClipEnd) > singleClipEnd + 0.01
+
     let clipType: string
-    if (isLoopClip) {
-        clipType = "looping clip"
+    if (actuallyLoops) {
+        clipType = `looping clip, loops till measure ${fullEnd}`
     } else if (isBeatPattern) {
         clipType = "beat pattern"
     } else if (isAudioSection) {
