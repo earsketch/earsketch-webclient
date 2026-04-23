@@ -20,6 +20,7 @@ import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
+import * as editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
 import { chooseDetectedLanguage, LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
@@ -46,6 +47,7 @@ import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
+import { BrowserTabType } from "../browser/BrowserTab"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -60,6 +62,27 @@ import { downloadScript, shareScript } from "./scriptActions"
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
+
+type PanelTarget =
+    | { panel: "west"; kind: BrowserTabType }
+    | { panel: "daw" }
+    | { panel: "editor" }
+    | { panel: "east"; kind: "CURRICULUM" }
+    | { panel: "utility" }
+
+interface NavNode {
+    label: string
+    target: PanelTarget
+}
+
+const PANEL_SHORTCUTS: Record<string, NavNode> = {
+    1: { label: "Sounds", target: { panel: "west", kind: BrowserTabType.Sound } },
+    2: { label: "Scripts", target: { panel: "west", kind: BrowserTabType.Script } },
+    3: { label: "API", target: { panel: "west", kind: BrowserTabType.API } },
+    4: { label: "DAW", target: { panel: "daw" } },
+    5: { label: "Editor", target: { panel: "editor" } },
+    6: { label: "Curriculum", target: { panel: "east", kind: "CURRICULUM" } },
+}
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
 
@@ -325,7 +348,7 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
+        <Popover.Button id="utilityPanelAnchor" className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
         <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-1/2 w-max">
@@ -616,6 +639,50 @@ export const App = () => {
             changeLanguage(ENGLISH_LOCALE.localeCode)
         }
     }, [currentLocale])
+
+    useEffect(() => {
+        const focusEl = (selector: string) =>
+            setTimeout(() => (document.querySelector(selector) as HTMLElement | null)?.focus(), 50)
+
+        const navigateTo = (target: PanelTarget) => {
+            if (target.panel === "west") {
+                dispatch(layout.setWest({ open: true, kind: target.kind }))
+                const searchId = target.kind === BrowserTabType.Sound
+                    ? "soundSearchBar"
+                    : target.kind === BrowserTabType.Script
+                        ? "scriptSearchBar"
+                        : "apiSearchBar"
+                focusEl(`#${searchId}`)
+            } else if (target.panel === "daw") {
+                focusEl("#daw-play-button button")
+            } else if (target.panel === "editor") {
+                editor.focus()
+            } else if (target.panel === "east") {
+                dispatch(layout.setEast({ open: true, kind: target.kind }))
+                focusEl("#curriculumSearchBar")
+            } else if (target.panel === "utility") {
+                focusEl("#utilityPanelAnchor")
+            }
+        }
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+                if (e.key === "7") {
+                    e.preventDefault()
+                    navigateTo({ panel: "utility" })
+                    return
+                }
+                const node = PANEL_SHORTCUTS[e.key]
+                if (node) {
+                    e.preventDefault()
+                    navigateTo(node.target)
+                }
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [dispatch])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
         if (loginLock.current) {

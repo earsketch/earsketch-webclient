@@ -15,24 +15,36 @@ import { MultiSelectFilterKey } from "./scriptsState"
 interface SearchBarProps {
     searchText: string
     aria?: string
+    liveMessage?: string
+    firstResultSelector?: string
     id?: string
     highlight?: boolean
     dispatchSearch: ChangeEventHandler<HTMLInputElement>
     dispatchReset: MouseEventHandler<HTMLElement>
 }
-export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highlight }: SearchBarProps) => {
+export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria, liveMessage, firstResultSelector, highlight }: SearchBarProps) => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
+    const [announceMessage, setAnnounceMessage] = useState("")
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        setAnnounceMessage(liveMessage ?? "")
+        if (firstResultSelector) {
+            setTimeout(() => (document.querySelector(firstResultSelector) as HTMLElement | null)?.focus(), 50)
+        }
+    }
 
     return (
         <form
             className={`p-1.5 pb-1 ${(highlight ? "border-yellow-500 border-4" : "")}`}
-            onSubmit={e => e.preventDefault()}
+            onSubmit={handleSubmit}
         >
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
                 <input
                     id={id}
+                    aria-label={aria}
                     className="w-full outline-none p-1 bg-transparent font-normal text-sm"
                     type="text"
                     placeholder={t("search")}
@@ -49,6 +61,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
                         />
                     )}
             </label>
+            <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">{announceMessage}</div>
         </form>
     )
 }
@@ -160,7 +173,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     title={title}
                     onClick={() => setExpanded(v => !v)}
                 >
-                    <h4 className="flex items-center truncate py-1">
+                    <h4 className="flex items-center truncate py-1" tabIndex={-1}>
                         <i className="icon-album pr-1.5" />
                         <div className="truncate">{title}</div>
                     </h4>

@@ -262,6 +262,7 @@ export function createSession(id: string, language: Language, contents: string) 
                 sessions[id] = update.state
                 if (update.docChanged) onEdit(update)
             }),
+            lineAnnouncementExtension,
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
             EditorView.contentAttributes.of({ "aria-label": i18n.t("editor.title") }),
@@ -305,8 +306,54 @@ export function setReadOnly(value: boolean) {
     droplet.setReadOnly(value)
 }
 
+let srLineEl: HTMLElement | null = null
+let lastAnnouncedLine = -1
+
+function announceLineNumber(lineNumber: number) {
+    if (!srLineEl) {
+        srLineEl = document.createElement("div")
+        srLineEl.setAttribute("aria-live", "assertive")
+        srLineEl.setAttribute("aria-atomic", "true")
+        srLineEl.style.position = "absolute"
+        srLineEl.style.width = "1px"
+        srLineEl.style.height = "1px"
+        srLineEl.style.overflow = "hidden"
+        srLineEl.style.clip = "rect(1px, 1px, 1px, 1px)"
+        document.body.appendChild(srLineEl)
+    }
+
+    srLineEl.textContent = ""
+
+    window.setTimeout(() => {
+        const line = view.state.doc.line(lineNumber)
+        const lineText = line.text
+        if (srLineEl) {
+            srLineEl.textContent = `Line ${lineNumber}: ${lineText || "empty line"}`
+        }
+    }, 10)
+}
+
+const lineAnnouncementExtension = EditorView.updateListener.of((update) => {
+    if (!update.selectionSet) return
+
+    const line = update.state.doc.lineAt(update.state.selection.main.head)
+
+    if (line.number === lastAnnouncedLine) return
+    lastAnnouncedLine = line.number
+
+    announceLineNumber(line.number)
+})
+
 export function focus() {
+    const { from } = view.state.selection.main
+    const line = view.state.doc.lineAt(from)
+    const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
+
+    view.contentDOM.setAttribute("aria-label", `Line ${line.number}: ${line.text || "empty line"}`)
+    view.dispatch({ selection: { anchor: from }, scrollIntoView: true })
     view.focus()
+
+    setTimeout(() => view.contentDOM.setAttribute("aria-label", originalLabel), 1000)
 }
 
 export function getSelection() {
