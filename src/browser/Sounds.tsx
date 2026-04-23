@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, ChangeEvent, useState, createRef, useLayoutEffect, useContext, useMemo } from "react"
+import React, { useRef, useEffect, ChangeEvent, useState, useMemo } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 import AutoSizer from "react-virtualized-auto-sizer"
@@ -41,6 +41,8 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
     const dispatch = useDispatch()
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
 
     const handleToggle = () => {
         if (selected) dispatch(sounds.removeFilterItem({ category, value }))
@@ -62,7 +64,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
             aria-selected={selected}
             tabIndex={0}
             className={classnames}
-            style={{ fontSize: `${0.75 * scalar}rem` }}
+            style={{ fontSize: `${fontXs}rem` }}
             onClick={handleToggle}
             onKeyDown={(e) => {
                 if (e.key === " " || e.key === "Enter") {
@@ -75,7 +77,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
                 <span className="rounded-full inline-flex w-1 mr-2">
                     <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} aria-hidden="true" />
                 </span>
-                <div className="select-none mr-4" style={{ fontSize: `${0.75 * scalar}rem` }}>
+                <div className="select-none mr-4" style={{ fontSize: `${fontXs}rem` }}>
                     {label}
                 </div>
             </div>
@@ -213,6 +215,8 @@ interface MajMinRadioButtonsProps {
 const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinRadioButtonsProps) => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
+    const fontXs = scalar * 0.75
+    const fontSm = scalar * 0.875
 
     const majorButtonClass = classNames({
         "py-1.5 px-2 border-y border-l rounded-l": true,
@@ -230,14 +234,14 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
                 role="radio"
                 aria-checked={showMajMinPageOne}
                 className={majorButtonClass}
-                style={{ fontSize: `${0.75 * scalar}rem` }}
+                style={{ fontSize: `${fontXs}rem` }}
                 onClick={chooseMaj}
             >Major</button>
             <button
                 role="radio"
                 aria-checked={!showMajMinPageOne}
                 className={minorButtonClass}
-                style={{ fontSize: `${0.75 * scalar}rem` }}
+                style={{ fontSize: `${fontXs}rem` }}
                 onClick={chooseMin}
             >Minor</button>
         </div>
@@ -248,6 +252,8 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
+    const fontXs = scalar * 0.75
+    const fontSm = scalar * 0.875
     
     const isCurrentTab = currentFilterTab === soundFilterKey
     const isExpanded = userExpandedTab === soundFilterKey
@@ -261,14 +267,14 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
         <div className="flex flex-row flex-wrap">
             <div className="relative inline-block">
                 {numItemsSelected > 0
-                    ? <div className={spanClass} style={{ fontSize: `${0.75 * scalar}rem` }} aria-hidden="true">{numItemsSelected}</div>
+                    ? <div className={spanClass} style={{ fontSize: `${fontXs}rem` }} aria-hidden="true">{numItemsSelected}</div>
                     : null}
                 <button
                     ref={isCurrentTab ? tabButtonRef : undefined}
                     aria-expanded={isExpanded}
                     aria-controls={`sound-filter-panel-${soundFilterKey}`}
                     className={tabClass}
-                    style={{ fontSize: `${0.75 * scalar}rem` }}
+                    style={{ fontSize: `${fontXs}rem` }}
                     
                     onClick={() => {
                         setCurrentFilterTab(soundFilterKey)
@@ -394,9 +400,11 @@ const NumberOfSounds = () => {
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
 
-    return <div className="flex items-center" style={{ fontSize: `${0.75 * scalar}rem` }}>
+    return <div className="flex items-center" style={{ fontSize: `${fontXs}rem` }}>
         {t("numSounds", { count: numFiltered })}
     </div>
 }
@@ -404,6 +412,8 @@ const NumberOfSounds = () => {
 const ShowOnlyFavorites = () => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const filterByFavorites = useSelector(sounds.selectFilterByFavorites)
@@ -413,7 +423,7 @@ const ShowOnlyFavorites = () => {
         <label className="flex items-center" style={{ opacity: loggedIn ? "1" : "0" }}>
             <input
                 type="checkbox"
-                style={{ width: `${0.875 * scalar}rem`, height: `${0.875 * scalar}rem` }}
+                style={{ width: `${fontSm}rem`, height: `${fontSm}rem` }}
                 className="mr-1.5"
                 onChange={() => { dispatch(sounds.setFilterByFavorites(!filterByFavorites)) }}
                 disabled={!loggedIn}
@@ -422,7 +432,7 @@ const ShowOnlyFavorites = () => {
                 role="checkbox"
                 checked={filterByFavorites}
             />
-            <span style={{ fontSize: `${0.875 * scalar}rem` }}>
+            <span style={{ fontSize: `${fontSm}rem` }}>
                 {t("soundBrowser.button.showOnlyStars")}
                 <i className="icon icon-star-full2 text-orange-600 ml-1" />
             </span>
@@ -433,6 +443,8 @@ const ShowOnlyFavorites = () => {
 const AddSound = () => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
     const { t } = useTranslation()
     const loggedIn = useSelector(user.selectLoggedIn)
     const tooltip = `${loggedIn ? t("soundBrowser.button.addSound") : "Log in to add sounds"}`
@@ -444,8 +456,8 @@ const AddSound = () => {
             disabled={!loggedIn}
             title={tooltip}
         >
-            <i className="icon icon-plus2 mr-1" style={{ fontSize: `${0.75 * scalar}rem` }} />
-            <div style={{ fontSize: `${0.875 * scalar}rem` }}>
+            <i className="icon icon-plus2 mr-1" style={{ fontSize: `${fontXs}rem` }} />
+            <div style={{ fontSize: `${fontSm}rem` }}>
                 {t("soundBrowser.button.addSound")}
             </div>
         </button>
@@ -461,6 +473,8 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
 
     let tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
     ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
@@ -485,12 +499,12 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
-                    <h5 className="truncate pl-2" style={{ fontSize: `${0.875 * scalar}rem` }}>{name}</h5>
+                    <h5 className="truncate pl-2" style={{ fontSize: `${fontSm}rem` }}>{name}</h5>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
                         className="pr-1.5"
-                        style={{ fontSize: `${0.75 * scalar}rem` }}
+                        style={{ fontSize: `${fontXs}rem` }}
                         onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
@@ -503,7 +517,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="px-1.5"
-                                style={{ fontSize: `${0.75 * scalar}rem` }}
+                                style={{ fontSize: `${fontXs}rem` }}
                                 onClick={() => dispatch(soundsThunks.markFavorite({ name, isFavorite }))}
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
@@ -517,7 +531,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                             <button
                                 className="px-1.5 text-sky-700 dark:text-blue-400"
                                 onClick={() => { editor.pasteCode(name); addUIClick("sound copy - " + name) }}
-                                style={{ fontSize: `${0.75 * scalar}rem` }}
+                                style={{ fontSize: `${fontXs}rem` }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                                 aria-label={t("ariaDescriptors:sounds.paste", { name })}
                             >
@@ -574,6 +588,8 @@ interface FolderProps {
 const Folder = ({ folder, names }: FolderProps) => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
     return (
         <div>
             <div className="flex flex-row justify-start sticky top-0 bg-inherit z-10 bg-gray-300 dark:bg-gray-800" style={{ boxShadow: `0 -.5px 0 .5px rgb(209 213 219)` }}>
@@ -581,7 +597,7 @@ const Folder = ({ folder, names }: FolderProps) => {
                     className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
                     title={folder}
                 >
-                    <h4 className="truncate" style={{ fontSize: `${0.875 * scalar}rem` }}>{folder}</h4>
+                    <h4 className="truncate" style={{ fontSize: `${fontSm}rem` }}>{folder}</h4>
                 </div>
             </div>
             <ClipList names={names} />
@@ -647,6 +663,8 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
@@ -682,7 +700,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
             <div className={extraFilterControlsClassnames}>
                 <button
                     className={clearClassnames}
-                    style={{ fontSize: `${0.875 * scalar}rem` }}
+                    style={{ fontSize: `${fontSm}rem` }}
                     onClick={() => {
                         dispatch(sounds.resetAllFilters())
                         reloadRecommendations()

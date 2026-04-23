@@ -14,6 +14,7 @@ import * as cai from "../cai/caiState"
 import { addUIClick } from "../cai/dialogue/student"
 import { highlight } from "../ide/highlight"
 import { Language } from "common"
+import * as appState from "../app/appState"
 
 const Code = ({ source, language }: { source: string, language: Language }) => {
     const { light, dark } = highlight(source, language)
@@ -60,6 +61,10 @@ const fixValue = (language: Language, value: string) => language !== "python" &&
 const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean } }) => {
     // TODO don't mutate obj.details
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 12
+    const fontSm = 0.875 * scalar
+    const fontXs = 0.75 * scalar
     const forceUpdate = useForceUpdate()
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
     const language = useSelector(selectScriptLanguage)
@@ -69,30 +74,32 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
         <div className="p-3 border-b border-r border-black border-gray-500 dark:border-gray-700">
             <div className="flex justify-between mb-2">
                 <span
-                    className="font-bold cursor-pointer truncate" title={returnText}
+                    className="font-bold cursor-pointer truncate" title={returnText} style={{ fontSize: `${fontSm}rem` }}
                     onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
                 >
                     {name}
                 </span>
                 <div className="flex">
                     <button
-                        className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 text-xs rounded-full px-2.5 border border-gray-600 ${tabsOpen ? "" : "hidden"}`}
+                        className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 rounded-full px-2.5 border border-gray-600 ${tabsOpen ? "" : "hidden"}`}
+                        style={{ fontSize: `${fontXs}rem` }}
                         onClick={() => { paste(name, obj); addUIClick("api copy - " + name) }}
                         title={t("api:pasteToCodeEditor", { name })}
                         aria-label={t("api:pasteToCodeEditor", { name })}>
                         <i className="icon icon-paste2" />
                     </button>
-                    <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-sm rounded-full pl-1.5 border border-gray-600 whitespace-nowrap"
+                    <button className="hover:bg-gray-200 active:bg-gray-300 h-full rounded-full pl-1.5 border border-gray-600 whitespace-nowrap"
+                        style={{ fontSize: `${fontSm}rem` }}
                         onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
                         title={obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}
                         aria-label={`${obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}`}>
-                        <div className="inline-block w-10">{obj.details ? t("api:close") : t("api:open")}</div>
+                        <div className="inline-block" style={{ width: `${2.5 * scalar}rem` }}>{obj.details ? t("api:close") : t("api:open")}</div>
                         <i className={`inline-block align-middle mb-px mx-1 icon icon-${obj.details ? "arrow-down" : "arrow-right"}`} />
                     </button>
                 </div>
             </div>
             {obj.parameters
-                ? (<div className="text-xs font-light break-word relative">
+                ? (<div className="font-light break-word relative" style={{ fontSize: `${fontXs}rem` }}>
                     <span className="sr-only">{t("api:parameters")}:</span>
                     <span className="px-1">(</span>
                     {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter]) => (
@@ -107,7 +114,9 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                     )).reduce((prev: any, curr: any): any => [prev, <span key={prev.key + "-comma"}> , </span>, curr])}
                     <span className="px-1">)</span>
                 </div>)
-                : (<div className="text-xs font-light">{t("api:noparams")}</div>)}
+                : (<div className="font-light" style={{ fontSize: `${fontXs}rem` }}>
+                    {t("api:noparams")}
+                </div>)}
             {obj.details && <Details obj={obj} />}
         </div>
     )
@@ -116,9 +125,13 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
 const Details = ({ obj }: { obj: APIItem }) => {
     const language = useSelector(selectScriptLanguage)
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
 
     return (
-        <div className="border-t border-gray-500 mt-2 pt-1 text-sm">
+        <div className="border-t border-gray-500 mt-2 pt-1" style={{ fontSize: `${fontSm}rem` }}>
             <span dangerouslySetInnerHTML={{ __html: t(obj.descriptionKey) }} />
             {obj.parameters &&
             <div className="mt-4">
@@ -127,12 +140,12 @@ const Details = ({ obj }: { obj: APIItem }) => {
                     <div key={param}>
                         <div className="ml-3 mt-2">
                             <h4 aria-label={t("ariaDescriptors:api.parameterHeading", { parameterName: param, parameterType: t(paramVal.typeKey) })}>
-                                <span aria-hidden={true} className="font-bold text-sm">{t("api:heading", { headingName: param })}</span>
-                                <span aria-hidden={true} className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
+                                <span aria-hidden={true} className="font-bold" style={{ fontSize: `${fontSm}rem` }}>{t("api:heading", { headingName: param })}</span>
+                                <span aria-hidden={true} className="text-gray-600" style={{ fontSize: `${fontXs}rem` }}>{t(paramVal.typeKey)}</span>
                             </h4>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
-                            <div className="text-xs"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
+                            <div style={{ fontSize: `${fontXs}rem` }}><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
 
                             {paramVal.default &&
                             <div>

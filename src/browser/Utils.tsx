@@ -25,7 +25,9 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 14
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
 
     return (
         <form
@@ -36,7 +38,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
                 <input
                     id={id}
                     className="w-full outline-none p-1 bg-transparent font-normal"
-                    style={{ fontSize: `${0.875 * scalar}rem` }}
+                    style={{ fontSize: `${fontSm}rem` }}
                     type="text"
                     placeholder={t("search")}
                     value={searchText}
@@ -69,7 +71,9 @@ interface DropdownMultiSelectorProps {
 export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const dispatch = useDispatch()
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 14
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
 
     const selectedValues = useAppSelector(
         (state) => state.scripts.filters[category]
@@ -99,12 +103,13 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
             <div className="relative w-1/3">
                 <ListboxButton
                     className={`flex justify-between w-full border-b-2 ${margin} border-black dark:border-white`}
+                    style={{ fontSize: `${fontSm}rem` }}
                     aria-label={aria}
                 >
                     <span className="truncate">
                         {title} {numSelected ? `(${numSelected})` : ""}
                     </span>
-                    <i className="icon icon-arrow-down2 p-1" style={{ fontSize: `${0.75 * scalar}rem` }} />
+                    <i className="icon icon-arrow-down2 p-1" />
                 </ListboxButton>
 
                 <ListboxOptions

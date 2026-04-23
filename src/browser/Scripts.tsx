@@ -1,7 +1,7 @@
 import React, { ChangeEvent, MouseEvent, useState, useEffect } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
+import { Virtuoso } from "react-virtuoso"
 
-import { FixedSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 
 import type { Script, ScriptType } from "common"
@@ -29,10 +29,14 @@ export const callbacks = {
 
 const CreateScriptButton = () => {
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
     return (
         <button className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer" onClick={callbacks.create} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} data-test="newScript" >
-            <i className="icon icon-plus2 text-xs mr-1" />
-            <div className="text-sm">
+            <i className="icon icon-plus2 mr-1" style={{ fontSize: `${fontXs}rem` }} />
+            <div style={{ fontSize: `${fontSm}rem` }}>
                 {t("newScript")}
             </div>
         </button>
@@ -59,7 +63,9 @@ interface FilterItemProps {
 export const FilterItem = ({ value, isClearItem = false, active, selected = false }: FilterItemProps) => {
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 14
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
 
     return (
         <div
@@ -67,11 +73,11 @@ export const FilterItem = ({ value, isClearItem = false, active, selected = fals
         ${active ? "bg-blue-200 dark:bg-blue-500" : ""}
       `}
         >
-            <div className="w-5" aria-hidden style={{ fontSize: `${0.875 * scalar}rem` }}>
+            <div aria-hidden style={{ width: `${1.25 * scalar}rem`, fontSize: `${fontSm}rem` }}>
                 <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
             </div>
 
-            <div style={{ fontSize: `${0.875 * scalar}rem` }}>
+            <div style={{ fontSize: `${fontSm}rem` }}>
                 {isClearItem ? t("clear") : value}
             </div>
         </div>
@@ -90,6 +96,10 @@ export const SortBySelector = () => {
     const dispatch = useDispatch()
     const sortBy = useSelector((state: any) => state.scripts.filters.sortBy)
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
 
     // Local state for the selected option
     const [selectedId, setSelectedId] = useState<string>(
@@ -121,12 +131,13 @@ export const SortBySelector = () => {
                 <ListboxButton
                     className={`flex justify-between w-full border-b-2 cursor-pointer select-none ${theme === "light" ? "border-black" : "border-white"
                     }`}
+                    style={{ fontSize: `${fontSm}rem` }}
                     aria-label={t("scriptBrowser.filterDropdown.sortBy")}
                 >
                     <span className="truncate">
                         {t("scriptBrowser.filterDropdown.sortBy")}
                     </span>
-                    <i className="icon icon-arrow-down2 text-xs p-1" />
+                    <i className="icon icon-arrow-down2 text-xs p-1" style={{ fontSize: `${fontSm}rem` }}/>
                 </ListboxButton>
 
                 <ListboxOptions
@@ -135,16 +146,16 @@ export const SortBySelector = () => {
                       bg-white text-black dark:bg-black dark:text-white border-black`}
                 >
                     {SORT_OPTIONS.map((option) => (
-                        <ListboxOption key={option.id} value={option.id} as="button" type="button" className="w-full block">
+                        <ListboxOption key={option.id} value={option.id} as="button" type="button" className="w-full block" style = {{ fontSize: `${fontSm}rem` }}>
                             {({ active, selected }) => (
                                 <div
                                     className={`flex items-center px-2 py-1 ${active ? "bg-blue-200 dark:bg-blue-500" : ""
                                     }`}
                                 >
-                                    <div className="w-5 mr-2" aria-hidden>
+                                    <div style={{ width: `${fontSm}rem`, marginRight: `${0.5 * scalar}rem` }} aria-hidden>
                                         <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
                                     </div>
-                                    <div aria-label={t("scriptBrowser.filterDropdown.sortByName", { filtername: t(option.label) })} className="text-sm">{t(option.label)}</div>
+                                    <div aria-label={t("scriptBrowser.filterDropdown.sortByName", { filtername: t(option.label) })}>{t(option.label)}</div>
                                 </div>
                             )}
                         </ListboxOption>
@@ -161,11 +172,13 @@ const Filters = () => {
     const numTypesSelected = useSelector(scripts.selectNumTypesSelected)
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 14
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
 
     return (
         <div className="p-3">
-            <div className="pb-2" style={{ fontSize: `${0.75 * scalar}rem` }}>{t("filter").toLocaleUpperCase()}</div>
+            <div className="pb-2" style={{ fontSize: `${fontXs}rem` }}>{t("filter").toLocaleUpperCase()}</div>
             <div className="flex justify-between">
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.owner")}
@@ -192,6 +205,10 @@ const Filters = () => {
 }
 
 const ShowDeletedScripts = () => {
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
     const dispatch = useDispatch()
     const { t } = useTranslation()
     return (
@@ -206,9 +223,10 @@ const ShowDeletedScripts = () => {
                         const elem = event.target as HTMLInputElement
                         dispatch(scripts.setShowDeleted(elem.checked))
                     }}
+                    style={{ width: `${fontSm}rem`, height: `${fontSm}rem` }}
                 />
             </div>
-            <div className="pr-1 text-sm">
+            <div className="pr-1" style={{ fontSize: `${fontSm}rem` }}>
                 {t("scriptBrowser.showDeleted")}
             </div>
         </div>
@@ -219,7 +237,9 @@ const PillButton = ({ script, fn, aria, icon, children }: { script: Script, fn: 
     const { t } = useTranslation()
     const descriptor = t(aria, { scriptname: script.name })
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 14
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
     return <button
         className="flex items-center space-x-2 border border-gray-800 rounded-full px-2 py-1 text-sm bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
         onClick={(event) => {
@@ -229,7 +249,7 @@ const PillButton = ({ script, fn, aria, icon, children }: { script: Script, fn: 
         }}
         aria-label={descriptor}
         title={descriptor}
-        style={{ fontSize: `${0.75 * scalar}rem` }}
+        style={{ fontSize: `${fontXs}rem` }}
     >
         <i className={icon} />
         {children}
@@ -290,7 +310,9 @@ const SharedScriptInfoButton = ({ script }: { script: Script }) => {
 
 const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => {
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 14
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
     const dispatch = useDispatch()
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid)
     const active = useSelector(tabs.selectActiveTabID) === script.shareid
@@ -326,7 +348,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
             >
                 <div className="h-full flex grow items-center truncate justify-between">
                     <div className="flex justify-start items-center truncate font-medium space-x-2">
-                        <div className="truncate" style={{ fontSize: `${0.875 * scalar}rem` }}>
+                        <div className="truncate" style={{ fontSize: `${fontSm}rem` }}>
                             {script.name}
                         </div>
                         <div className="pr-4 space-x-2">
@@ -359,9 +381,6 @@ interface WindowedScriptCollectionProps {
     initExpanded?: boolean
 }
 const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = true, initExpanded = true }: WindowedScriptCollectionProps) => {
-    const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 14
-
     return (
         <Collection
             title={title}
@@ -370,25 +389,17 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = 
         >
             <AutoSizer>
                 {({ height, width }: { height: number, width: number }) => (
-                    <List
-                        height={height}
-                        width={width}
-                        itemCount={scriptIDs.length}
-                        itemSize={Math.round(44 + (fontSize - 14) * 2)}
-                    >
-                        {({ index, style }) => {
-                            const ID = scriptIDs[index]
-                            return (
-                                <div style={style}
-                                    className={index % 2 === 0
-                                        ? "bg-white dark:bg-gray-900"
-                                        : "bg-gray-300 dark:bg-gray-800" +
-                                        " hover:bg-blue-200 dark:hover:bg-blue-500"}>
-                                    <ScriptEntry key={ID} script={entities[ID]} type={type} />
-                                </div>
-                            )
-                        }}
-                    </List>
+                    <Virtuoso
+                        style={{ height, width }}
+                        data={scriptIDs}
+                        itemContent={(index, ID) => (
+                            <div className={index % 2 === 0
+                                ? "bg-white dark:bg-gray-900"
+                                : "bg-gray-300 dark:bg-gray-800 hover:bg-blue-200 dark:hover:bg-blue-500"}>
+                                <ScriptEntry script={entities[ID]} type={type} />
+                            </div>
+                        )}
+                    />
                 )}
             </AutoSizer>
         </Collection>
@@ -439,6 +450,10 @@ const DeletedScriptCollection = () => {
 }
 
 export const ScriptBrowser = () => {
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 12
+    const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
     return (
         <>
             <ScriptSearchBar />
@@ -449,7 +464,7 @@ export const ScriptBrowser = () => {
                 <CreateScriptButton />
             </div>
 
-            <div className="h-full flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Script}>
+            <div className="h-full flex flex-col justify-start" style={{ fontSize: `${fontSm}rem` }} role="tabpanel" id={"panel-" + BrowserTabType.Script}>
                 <RegularScriptCollection />
                 <SharedScriptCollection />
                 <DeletedScriptCollection />
