@@ -16,7 +16,7 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
-import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
+import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines, jumpToLine } from "../ide/Editor"
 import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
@@ -349,7 +349,21 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 </div>}
             </div>
             <div className={trackClasses}>
-                {track.clips.map((clip: types.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
+                {(() => {
+                    // fitMedia/insertMedia loop clips: postRun splits each loop into individual
+                    // iteration objects, so no single clip knows the full family extent.
+                    // Scan all clips sharing a sourceLine to find the true loop end.
+                    const loopFamilyEnds: Record<number, number> = {}
+                    for (const c of track.clips) {
+                        if (c.loop && c.clipFamilyStart === undefined) {
+                            const cEnd = c.measure + c.end - c.start
+                            loopFamilyEnds[c.sourceLine] = Math.max(loopFamilyEnds[c.sourceLine] ?? 0, cEnd)
+                        }
+                    }
+                    return track.clips.map((clip: types.Clip, index: number) => (
+                        <Clip key={index} color={color} clip={clip} loopFamilyEnd={loopFamilyEnds[clip.sourceLine]} />
+                    ))
+                })()}
             </div>
         </div>
         {showEffects &&
@@ -392,7 +406,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
+const Clip = ({ color, clip, loopFamilyEnd }: { color: daw.Color, clip: types.Clip, loopFamilyEnd?: number }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
@@ -400,7 +414,42 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
-    const element = useRef<HTMLDivElement>(null)
+    const element = useRef<HTMLButtonElement>(null)
+
+    const clipLength = clip.end - clip.start
+    const fullStart = clip.clipFamilyStart || (clip.measure + clip.start - 1)
+    // Clip construction is classified based on how passthrough.ts defines it
+    // fitMedia/insertMedia:   loop=true,  no clipFamilyStart, it is a looping clip
+    // makeBeat/makeBeatSlice: loop=false, clipFamilyStart set it is a beat pattern
+    // insertMediaSection:     loop=true,  clipFamilyStart set, it is a audio section group
+    const isLoopClip = clip.loop && clip.clipFamilyStart === undefined
+    // For loop clips, postRun replaces the original with individual iteration objects, so each clip only knows its own end.
+    // loopFamilyEnd (computed in Track from all sibling clips) gives the true end of the full loop as written in the fitMedia/insertMedia call.
+    const fullEnd = isLoopClip
+        ? (loopFamilyEnd ?? (clip.measure + clip.end - 1))
+        : (clip.clipFamilyEnd || (clip.measure + clip.end - 1))
+    const isBeatPattern = !clip.loop && clip.clipFamilyStart !== undefined
+    const isAudioSection = clip.loop && clip.clipFamilyStart !== undefined
+
+    const singleClipEnd = clip.measure + clip.end - clip.start
+    const actuallyLoops = isLoopClip && (loopFamilyEnd ?? singleClipEnd) > singleClipEnd + 0.01
+
+    let clipType: string
+    if (actuallyLoops) {
+        clipType = `looping clip, loops till measure ${fullEnd}`
+    } else if (isBeatPattern) {
+        clipType = "beat pattern"
+    } else if (isAudioSection) {
+        clipType = "audio section group"
+    } else {
+        clipType = `clip, ${clipLength} measure${clipLength !== 1 ? "s" : ""} long`
+    }
+    const clipDescription = `track ${clip.track}, measures ${fullStart} to ${fullEnd}, ${clipType}, ${clip.filekey}`
+
+    const announceToLiveRegion = (text: string) => {
+        const liveRegion = document.getElementById("daw-live-region")
+        if (liveRegion) liveRegion.textContent = text
+    }
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -408,19 +457,35 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
             drawWaveform(element.current, waveform, width, trackHeight)
         }
     }, [clip, xScale, trackHeight])
-
-    return <div
+    return <button
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
+        data-source-line={clip.sourceLine}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+        aria-label={clipDescription}
+        onFocus={() => announceToLiveRegion(clipDescription)}
+        onClick={() => {
+            player.setPreview(clip.track)
+            const playStart = clip.clipFamilyStart || clip.measure
+            const playEnd = clip.clipFamilyEnd ||
+                (isLoopClip ? loopFamilyEnd : undefined) ||
+                (clip.measure + clip.end - clip.start)
+            player.play(playStart, 0, playEnd)
+        }}
+        onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.ctrlKey && e.key === "i") {
+                jumpToLine(clip.sourceLine)
+            }
+        }}
+
     >
         <h4 className="sr-only">{clip.filekey}, measure {clip.measure} to {clip.end}, line {clip.sourceLine}</h4>
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
         </div>
-    </div>
+    </button>
 }
 
 const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName }: {

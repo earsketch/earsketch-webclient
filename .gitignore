@@ -18,6 +18,9 @@ dist/
 # Binaries (non-text)
 *.zip
 *.wav
+!public/**/*.wav
+*.flac
+!public/**/*.flac
 *.reapeaks
 
 # OS generated files
