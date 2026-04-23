@@ -27,7 +27,6 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 12
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
 
     return (
         <form
@@ -73,7 +72,6 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 12
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
 
     const selectedValues = useAppSelector(
         (state) => state.scripts.filters[category]

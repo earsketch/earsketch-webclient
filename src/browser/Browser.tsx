@@ -50,7 +50,6 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
 
     const { t } = useTranslation()
 
@@ -94,7 +93,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
 
 export const BrowserTabs = () => {
     const { t } = useTranslation()
-    
+
     return (
         <div
             className="flex justify-between text-center text-white bg-blue"

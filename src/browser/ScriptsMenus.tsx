@@ -159,8 +159,6 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 12
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
-
 
     return <Menu>
         <MenuButton

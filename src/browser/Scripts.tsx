@@ -65,7 +65,6 @@ export const FilterItem = ({ value, isClearItem = false, active, selected = fals
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 12
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
 
     return (
         <div
@@ -99,7 +98,6 @@ export const SortBySelector = () => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 12
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
 
     // Local state for the selected option
     const [selectedId, setSelectedId] = useState<string>(
@@ -173,7 +171,6 @@ const Filters = () => {
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 12
-    const fontSm = scalar * 0.875
     const fontXs = scalar * 0.75
 
     return (
@@ -208,7 +205,6 @@ const ShowDeletedScripts = () => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 12
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
     const dispatch = useDispatch()
     const { t } = useTranslation()
     return (
@@ -238,7 +234,6 @@ const PillButton = ({ script, fn, aria, icon, children }: { script: Script, fn: 
     const descriptor = t(aria, { scriptname: script.name })
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 12
-    const fontSm = scalar * 0.875
     const fontXs = scalar * 0.75
     return <button
         className="flex items-center space-x-2 border border-gray-800 rounded-full px-2 py-1 text-sm bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
@@ -312,7 +307,6 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 12
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
     const dispatch = useDispatch()
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid)
     const active = useSelector(tabs.selectActiveTabID) === script.shareid
@@ -453,7 +447,6 @@ export const ScriptBrowser = () => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 12
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
     return (
         <>
             <ScriptSearchBar />

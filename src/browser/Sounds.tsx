@@ -41,7 +41,6 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
     const dispatch = useDispatch()
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
-    const fontSm = scalar * 0.875
     const fontXs = scalar * 0.75
 
     const handleToggle = () => {
@@ -216,7 +215,6 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
     const fontXs = scalar * 0.75
-    const fontSm = scalar * 0.875
 
     const majorButtonClass = classNames({
         "py-1.5 px-2 border-y border-l rounded-l": true,
@@ -253,8 +251,7 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
     const fontXs = scalar * 0.75
-    const fontSm = scalar * 0.875
-    
+
     const isCurrentTab = currentFilterTab === soundFilterKey
     const isExpanded = userExpandedTab === soundFilterKey
     const tabClass = classNames({
@@ -275,7 +272,7 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
                     aria-controls={`sound-filter-panel-${soundFilterKey}`}
                     className={tabClass}
                     style={{ fontSize: `${fontXs}rem` }}
-                    
+
                     onClick={() => {
                         setCurrentFilterTab(soundFilterKey)
                         onOpen()
@@ -400,7 +397,6 @@ const NumberOfSounds = () => {
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
-    const fontSm = scalar * 0.875
     const fontXs = scalar * 0.75
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
 
@@ -413,7 +409,6 @@ const ShowOnlyFavorites = () => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const filterByFavorites = useSelector(sounds.selectFilterByFavorites)
@@ -589,10 +584,9 @@ const Folder = ({ folder, names }: FolderProps) => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
     return (
         <div>
-            <div className="flex flex-row justify-start sticky top-0 bg-inherit z-10 bg-gray-300 dark:bg-gray-800" style={{ boxShadow: `0 -.5px 0 .5px rgb(209 213 219)` }}>
+            <div className="flex flex-row justify-start sticky top-0 bg-inherit z-10 bg-gray-300 dark:bg-gray-800" style={{ boxShadow: "0 -.5px 0 .5px rgb(209 213 219)" }}>
                 <div
                     className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
                     title={folder}
@@ -612,7 +606,7 @@ interface SoundSearchAndFiltersProps {
 
 const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndFiltersProps) => {
     const filterRef = useRef<HTMLDivElement>(null)
-    
+
     return (
         <div ref={filterRef} className="pb-1">
             <div className="pb-1">
@@ -664,7 +658,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
     const fontSm = scalar * 0.875
-    const fontXs = scalar * 0.75
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
@@ -683,13 +676,17 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
 
     const virtuosoRef = useRef<VirtuosoHandle>(null)
 
-    const Header = useMemo(() => () => (
-        <SoundListHeader
-            currentFilterTab={currentFilterTab}
-            setCurrentFilterTab={setCurrentFilterTab}
-            t={t}
-        />
-    ), [currentFilterTab, setCurrentFilterTab])
+    const Header = useMemo(() => {
+        const SoundBrowserHeader = () => (
+            <SoundListHeader
+                currentFilterTab={currentFilterTab}
+                setCurrentFilterTab={setCurrentFilterTab}
+                t={t}
+            />
+        )
+        SoundBrowserHeader.displayName = "SoundBrowserHeader"
+        return SoundBrowserHeader
+    }, [currentFilterTab, setCurrentFilterTab])
 
     const overscanSize = Math.round(2500 * scalar)
     const increaseViewportSize = Math.round(3500 * scalar)
@@ -738,7 +735,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                     }
                                 }}
                                 components={{
-                                    Header
+                                    Header,
                                 }}
                                 itemContent={(index, folder) => (
                                     <Folder
@@ -752,10 +749,10 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                     </AutoSizer>
                 </div>
             </SoundFiltersContext.Provider>
-                            
+
             <div ref={scrollToTopRef} className={scrolltoTopClassnames}>
                 <button className="px-3 py-2 rounded text-white bg-blue text-sm  shadow-lg transition-all duration-200 hover:text-amber hover:shadow-xl"
-                    onClick={() => virtuosoRef.current?.scrollToIndex({ index: 0, behavior: 'smooth' })} title={t("soundBrowser.button.backToTop")}>
+                    onClick={() => virtuosoRef.current?.scrollToIndex({ index: 0, behavior: "smooth" })} title={t("soundBrowser.button.backToTop")}>
                     <i className="icon icon-arrow-up3"></i>
                 </button>
             </div>
