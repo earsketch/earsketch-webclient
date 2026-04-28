@@ -1,4 +1,5 @@
 import _ from "lodash"
+import i18n from "i18next"
 
 import store from "../reducers"
 import { Script } from "common"
@@ -6,6 +7,7 @@ import { selectActiveScripts, selectRegularScripts, setRegularScripts } from "..
 import { getLocalUserSounds } from "../browser/soundsThunks"
 import * as localSoundStorage from "../audio/localSoundStorage"
 import * as ESUtils from "../esutils"
+import * as userNotification from "../user/notification"
 import * as syncState from "./syncState"
 import {
     SyncBackend,
@@ -42,9 +44,43 @@ function endOp(): void {
 async function trackOp<T>(promise: Promise<T>): Promise<T> {
     beginOp()
     try {
-        return await promise
+        const result = await promise
+        recordSyncSuccess()
+        return result
+    } catch (err) {
+        recordSyncError(err)
+        throw err
     } finally {
         endOp()
+    }
+}
+
+// --- Error tracking ---
+
+const FAILURE_NOTIFY_THRESHOLD = 3
+let consecutiveFailures = 0
+let toastShownAtFailures = 0
+
+export function recordSyncError(err: unknown): void {
+    consecutiveFailures++
+    const message = (err as Error)?.message ?? String(err)
+    store.dispatch(syncState.setError(message))
+
+    // Show a toast once we've crossed the threshold, but not again until we recover and re-fail.
+    if (consecutiveFailures >= FAILURE_NOTIFY_THRESHOLD && toastShownAtFailures < FAILURE_NOTIFY_THRESHOLD) {
+        toastShownAtFailures = consecutiveFailures
+        userNotification.show(i18n.t("sync.failureNotice"), "failure1")
+    }
+}
+
+export function recordSyncSuccess(): void {
+    if (consecutiveFailures > 0) {
+        consecutiveFailures = 0
+        toastShownAtFailures = 0
+        // Recover: clear the error state and return to "connected".
+        if (store.getState().sync.status === "error") {
+            store.dispatch(syncState.setStatus("connected"))
+        }
     }
 }
 
@@ -62,8 +98,9 @@ const debouncedManifestUpdate = _.debounce(async () => {
         const sounds = await localSoundStorage.getAllSounds()
         const manifest = buildManifest(scripts, sounds)
         await writeManifest(activeBackend, manifest)
-    } catch {
-        // Swallow — the manifest will get rewritten on the next change.
+        recordSyncSuccess()
+    } catch (err) {
+        recordSyncError(err)
     } finally {
         endOp()
     }
@@ -96,6 +133,8 @@ export async function connectBackend(backend: SyncBackend): Promise<void> {
 export function disconnectBackend(): void {
     stopWatching()
     debouncedManifestUpdate.cancel()
+    consecutiveFailures = 0
+    toastShownAtFailures = 0
     if (activeBackend) {
         activeBackend.disconnect()
         activeBackend = null
@@ -214,8 +253,9 @@ async function mergeAll(): Promise<void> {
         const finalScripts = selectActiveScripts(store.getState())
         const manifest = buildManifest(finalScripts, allSounds)
         await writeManifest(activeBackend, manifest)
-    } catch (err: any) {
-        store.dispatch(syncState.setError(err.message ?? "Sync failed"))
+        recordSyncSuccess()
+    } catch (err) {
+        recordSyncError(err)
     } finally {
         endOp()
     }
@@ -254,7 +294,7 @@ function getDebouncedWriter(id: string): ReturnType<typeof _.debounce> {
                 }
                 await pushScriptFile(activeBackend!, script)
                 scheduleManifestUpdate()
-            })()).catch(() => {})
+            })()).catch(() => { /* trackOp records the error */ })
         }, 500)
         debouncedWriters.set(id, fn)
     }
@@ -291,7 +331,7 @@ function startWatching(): void {
                     writer.cancel()
                     debouncedWriters.delete(id)
                 }
-                trackOp(deleteScriptFile(activeBackend!, prev.name)).catch(() => {})
+                trackOp(deleteScriptFile(activeBackend!, prev.name)).catch(() => { /* trackOp records the error */ })
                 scheduleManifestUpdate()
             }
         }
@@ -317,7 +357,7 @@ export function onSoundStored(name: string): void {
     trackOp((async () => {
         await pushSoundFile(activeBackend!, name)
         scheduleManifestUpdate()
-    })()).catch(() => {})
+    })()).catch(() => { /* trackOp records the error */ })
 }
 
 export function onSoundDeleted(name: string): void {
@@ -325,7 +365,7 @@ export function onSoundDeleted(name: string): void {
     trackOp((async () => {
         await deleteSoundFileByName(activeBackend!, name)
         scheduleManifestUpdate()
-    })()).catch(() => {})
+    })()).catch(() => { /* trackOp records the error */ })
 }
 
 export function onSoundRenamed(oldName: string, newName: string): void {
@@ -334,5 +374,5 @@ export function onSoundRenamed(oldName: string, newName: string): void {
         await deleteSoundFileByName(activeBackend!, oldName)
         await pushSoundFile(activeBackend!, newName)
         scheduleManifestUpdate()
-    })()).catch(() => {})
+    })()).catch(() => { /* trackOp records the error */ })
 }

@@ -1,13 +1,13 @@
-import { Script } from "common"
+import type { Script } from "common"
 import * as localSoundStorage from "../audio/localSoundStorage"
-import { Scripts } from "../browser/scriptsState"
+import type { Scripts } from "../browser/scriptsState"
 import {
     Manifest,
     ManifestScript,
     ManifestSound,
-    MANIFEST_VERSION_CURRENT,
+    MANIFEST_VERSION,
     detectExtension,
-} from "../app/backup"
+} from "../app/backupFormat"
 
 // --- Interface ---
 
@@ -85,7 +85,7 @@ export function buildManifest(
     }
 
     return {
-        version: MANIFEST_VERSION_CURRENT,
+        version: MANIFEST_VERSION,
         exportedAt: new Date().toISOString(),
         scripts: manifestScripts,
         sounds: manifestSounds,

@@ -355,6 +355,7 @@
     "sync.clearConfirmTitle": "Clear all synced data?",
     "sync.clearConfirmBody": "This permanently deletes all scripts and sounds from the sync backend. Your local data is not affected. Sync will be disconnected.",
     "sync.clearConfirmButton": "Delete everything",
+    "sync.failureNotice": "Sync is failing. Your work is saved locally but not uploaded — check your connection.",
     "action": "Action",
     "name": "Name"
   },
