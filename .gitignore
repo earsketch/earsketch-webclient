@@ -46,3 +46,4 @@ tests/cypress/videos/
 tests/cypress/downloads/
 eslint_report.json
 stats.html
+.env.local
