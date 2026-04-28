@@ -413,8 +413,7 @@ export function jumpToLine(lineNumber: number) {
     })
     view.focus()
 
-    // eslint-disable-next-line no-restricted-globals
-    setTimeout(() => {
+    window.setTimeout(() => {
         view.contentDOM.setAttribute("aria-label", originalLabel)
     }, 1000)
 }
