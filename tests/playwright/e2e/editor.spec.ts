@@ -55,13 +55,7 @@ test.describe("Editor", () => {
         await expect(page.locator(".console-error", { hasText: "NameError" })).toBeVisible()
     })
 
-    // TODO: Editor Settings popover doesn't dismiss the way the original Cypress
-    // test assumed (third gear-icon click reopens it; clicking the editor doesn't
-    // dismiss the controlled popover). Revisit with playwright-real-events or by
-    // refactoring the popover to a true headlessui Popover.
-    test.skip("toggles autocomplete off", async ({ page }) => {
-        // CodeMirror's contenteditable accepts editing via the page's <textarea>
-        // shadow buffer; click into the editor first to give it focus.
+    test("toggles autocomplete off", async ({ page }) => {
         const editor = page.locator("#editor")
         await editor.click()
         await page.keyboard.press("End")
@@ -74,10 +68,13 @@ test.describe("Editor", () => {
 
         await page.locator("button[title='Editor Settings']").click()
         await page.locator("button[title='Disable autocomplete']").click()
-        // Closing the settings popover by clicking the gear again gets racy in
-        // Playwright; close it by clicking the CodeMirror content area, which
-        // refocuses the editor in one action.
-        await page.locator(".cm-content").click()
+        // The settings popover returns focus to the gear button after an outside
+        // click, so a single click on the editor only dismisses the popover; a
+        // second click is needed to focus the editor for keyboard input.
+        await page.locator(".cm-content").click({ force: true })
+        await page.locator(".cm-content").click({ force: true })
+        // Belt-and-suspenders: explicitly focus the contenteditable.
+        await page.locator(".cm-content").focus()
         await page.keyboard.press("End")
         await page.keyboard.press("Enter")
         await page.keyboard.type("m")
