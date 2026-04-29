@@ -20,6 +20,12 @@ const ownedScript: Script = {
 }
 
 async function checkA11y(page: Page, selector?: string, options?: { disabledRules?: string[] }) {
+    // Let in-flight network responses, then any CSS transitions, settle so axe
+    // doesn't catch the page in a transitional, miscolored state.
+    await page.waitForLoadState("networkidle")
+    await page.evaluate(() =>
+        Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {})))
+    )
     let builder = new AxeBuilder({ page })
     if (selector) builder = builder.include(selector)
     if (options?.disabledRules) builder = builder.disableRules(options.disabledRules)
@@ -29,8 +35,6 @@ async function checkA11y(page: Page, selector?: string, options?: { disabledRule
 
 test.describe("Accessibility", () => {
     test.beforeEach(async ({ page }) => {
-        // axe 4.7+ has issues alongside mocked network calls; loosen timeout.
-        // (cypress-axe issue #160)
         test.setTimeout(60000)
         await setupBackend(page, {
             interceptCurriculum: true,
@@ -41,6 +45,9 @@ test.describe("Accessibility", () => {
             scriptsShared: [],
         })
         await page.goto("/")
+        // Wait for the Quick Tour modal to render before scanning, so axe
+        // doesn't trip over half-painted state.
+        await expect(page.locator("button", { hasText: "Skip" })).toBeVisible()
         await checkA11y(page)
         await skipTour(page)
         await expect(page.locator("button", { hasText: "Welcome Students and Teachers!" })).toBeVisible()

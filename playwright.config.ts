@@ -4,7 +4,7 @@ export default defineConfig({
     testDir: "tests/playwright",
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
-    retries: process.env.CI ? 2 : 0,
+    retries: 0,
     workers: process.env.CI ? 2 : undefined,
     reporter: process.env.CI ? [["html", { open: "never" }], ["junit", { outputFile: "tests/playwright/reports/junit.xml" }]] : "list",
     outputDir: "tests/playwright/test-results",
