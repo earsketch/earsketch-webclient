@@ -22,6 +22,8 @@ import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
 import { AudioWaveform } from "../app/AudioWaveForm"
+import { Transition } from "@headlessui/react"
+import { usePopper } from "react-popper"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -454,14 +456,44 @@ const playCopyEarcon = () => {
 
 const useCopyToClipboard = () => {
     const [copied, setCopied] = useState(false)
+    const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null)
+    const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
+    const { styles, attributes } = usePopper(referenceElement, popperElement, {
+        placement: "top",
+        modifiers: [{ name: "offset", options: { offset: [0, 8] } }],
+    })
+
     const copy = (text: string) => {
         window.navigator.clipboard.writeText(text).then(() => {
             setCopied(true)
             playCopyEarcon()
-            window.setTimeout(() => setCopied(false), 1500)
+            console.log(`Copied ${text} sound constant to clipboard`)
+            window.setTimeout(() => setCopied(false), 1000)
         })
     }
-    return { copied, copy }
+
+    const popover = (
+        <Transition
+            show={copied}
+            as="div"
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 scale-95 translate-y-1"
+            enterTo="opacity-100 scale-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 scale-100 translate-y-0"
+            leaveTo="opacity-0 scale-95 translate-y-1"
+            className="origin-bottom-left"
+            style={styles.popper}
+            {...attributes.popper}
+            ref={setPopperElement}
+        >
+            <div className="bg-white p-2 rounded-md shadow-md">
+                Copied!
+            </div>
+        </Transition>
+    )
+
+    return { copied, copy, setReferenceElement, popover }
 }
 
 const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
@@ -484,7 +516,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
         tooltip = tooltip.concat("\n", t("soundBrowser.clip.tooltip.key"), ": ", clip.keySignature)
     }
 
-    const { copied, copy } = useCopyToClipboard()
+    const { copied, copy, setReferenceElement, popover } = useCopyToClipboard()
 
     const loggedIn = useSelector(user.selectLoggedIn)
     const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(name)
@@ -496,17 +528,20 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
-                <div
-                    className="flex items-center min-w-0 cursor-pointer"
-                    title={tooltip}
-                    onClick={() => copy(name)}
-                    aria-label={copied ? `Copied ${name}` : `Click to copy ${name}`}
-                    aria-live="polite"
-                >
-                    <h5 className="text-sm truncate pl-2">
-                        {name}
-                        {copied && <span className="text-green-500 dark:text-green-400 ml-1">(Copied <i className="icon icon-checkmark" aria-hidden="true" />)</span>}
-                    </h5>
+                <div className="flex items-center min-w-0">
+                    {popover}
+                    <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+                        {copied ? `Copied ${name} to clipboard` : ""}
+                    </span>
+                    <div
+                        ref={setReferenceElement}
+                        className="flex items-center min-w-0 cursor-pointer"
+                        title={tooltip}
+                        onClick={() => copy(name)}
+                        aria-label={`Copy ${name} to clipboard`}
+                    >
+                        <h5 className="text-sm truncate pl-2">{name}</h5>
+                    </div>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -646,7 +681,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
                         aria-label={showPreview ? "Hide preview" : "Show preview"}
                         className="flex items-center gap-1 text-sm"
                     >
-                        <span>Sound Preview</span>
+                        <h4 className="text-sm">Sound Preview</h4>
                         <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
                     </button>
                 </div>
@@ -800,22 +835,35 @@ const SoundPreview = () => {
         playerRef.current?.focus()
     }
 
-    const { copied, copy } = useCopyToClipboard()
+    const entities = useSelector(sounds.selectAllEntities)
+    const currentEntity = currentName ? entities[currentName] : null
+    const tooltip = currentEntity
+        ? `${t("soundBrowser.clip.tooltip.file")}: ${currentEntity.name}
+    ${t("soundBrowser.clip.tooltip.folder")}: ${currentEntity.folder}
+    ${t("soundBrowser.clip.tooltip.artist")}: ${currentEntity.artist}
+    ${t("soundBrowser.clip.tooltip.genre")}: ${currentEntity.genre}
+    ${t("soundBrowser.clip.tooltip.instrument")}: ${currentEntity.instrument}
+    ${t("soundBrowser.clip.tooltip.originalTempo")}: ${currentEntity.tempo}
+    ${t("soundBrowser.clip.tooltip.year")}: ${currentEntity.year}${currentEntity.keySignature ? `\n${t("soundBrowser.clip.tooltip.key")}: ${currentEntity.keySignature}` : ""}`
+        : undefined
+
+    const { copied, copy, setReferenceElement, popover } = useCopyToClipboard()
 
     return (
         <div className="flex border mt-1 mb-2 ml-2 flex-col items-center justify-center">
-            <div
-                className={`text-sm mt-2 truncate text-center transition-colors
-                    ${currentName ? "cursor-pointer active:scale-95" : ""}
-                    ${copied ? "text-green-500 dark:text-green-400" : ""}`}
-                onClick={() => copy(currentName)}
-                title={currentName ? (copied ? "Copied!" : `${currentName}`) : undefined}
-                aria-live="polite"
-                aria-label={currentName ? (copied ? `Copied ${currentName}` : `Click to copy ${currentName}`) : undefined}
-            >
-                {copied
-                    ? <><i className="icon icon-checkmark text-green-500 dark:text-green-400" aria-hidden="true" /> {currentName}</>
-                    : (currentName ?? t("soundBrowser.noSoundsFound"))}
+            <div className="flex justify-center mt-2">
+                {popover}
+                <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+                    {copied ? `Copied ${currentName} to clipboard` : ""}
+                </span>
+                <div
+                    ref={setReferenceElement}
+                    className={`text-sm truncate text-center ${currentName ? "cursor-pointer" : ""}`}
+                    onClick={() => currentName && copy(currentName)}
+                    title={tooltip}
+                >
+                    <h5 className="text-sm">{currentName ?? t("soundBrowser.noSoundsFound")}</h5>
+                </div>
             </div>
 
             <div
