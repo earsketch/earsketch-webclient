@@ -459,6 +459,56 @@ const AddSound = () => {
     )
 }
 
+const ClipTooltip = ({ children, label, fontSize }: { children: React.ReactElement, label: React.ReactNode, fontSize: number }) => {
+    const [visible, setVisible] = useState(false)
+    const [coords, setCoords] = useState({ x: 0, y: 0, flip: false })
+    const timerRef = useRef<number | null>(null)
+    const triggerRef = useRef<HTMLElement>(null)
+
+    const handleMouseEnter = () => {
+        timerRef.current = window.setTimeout(() => {
+            if (!triggerRef.current) return
+            const rect = triggerRef.current.getBoundingClientRect()
+            const tooltipHeight = fontSize * 250
+            const nearBottom = rect.bottom + tooltipHeight > window.innerHeight
+            setCoords({
+                x: rect.left,
+                y: nearBottom ? rect.top : rect.bottom,
+                flip: nearBottom,
+            })
+            setVisible(true)
+        }, 600)
+    }
+
+    const handleMouseLeave = () => {
+        if (timerRef.current) window.clearTimeout(timerRef.current)
+        setVisible(false)
+    }
+
+    return (
+        <>
+            {React.cloneElement(children, {
+                ref: triggerRef,
+                onMouseEnter: handleMouseEnter,
+                onMouseLeave: handleMouseLeave,
+            })}
+            {visible && (
+                <div
+                    className="fixed z-50 rounded px-3 py-2 text-white shadow-lg pointer-events-none bg-gray-800 dark:bg-[#181818] dark:outline dark:outline-1 dark:outline-gray-200"
+                    style={{
+                        top: coords.flip ? undefined : coords.y + 4,
+                        bottom: coords.flip ? window.innerHeight - coords.y + 4 : undefined,
+                        left: coords.x + 16,
+                        fontSize: `${fontSize}rem`,
+                    }}
+                >
+                    {label}
+                </div>
+            )}
+        </>
+    )
+}
+
 const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const dispatch = useDispatch()
     const preview = useSelector(sounds.selectPreview)
@@ -471,17 +521,18 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const fontSm = scalar * 0.875
     const fontXs = scalar * 0.75
 
-    let tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
-    ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
-    ${t("soundBrowser.clip.tooltip.artist")}: ${clip.artist}
-    ${t("soundBrowser.clip.tooltip.genre")}: ${clip.genre}
-    ${t("soundBrowser.clip.tooltip.instrument")}: ${clip.instrument}
-    ${t("soundBrowser.clip.tooltip.originalTempo")}: ${clip.tempo}
-    ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}`.replace(/\n\s+/g, "\n")
-
-    if (clip.keySignature) {
-        tooltip = tooltip.concat("\n", t("soundBrowser.clip.tooltip.key"), ": ", clip.keySignature)
-    }
+    const tooltipContent = (
+        <div>
+            <div>{t("soundBrowser.clip.tooltip.file")}: {name}</div>
+            <div>{t("soundBrowser.clip.tooltip.folder")}: {clip.folder}</div>
+            <div>{t("soundBrowser.clip.tooltip.artist")}: {clip.artist}</div>
+            <div>{t("soundBrowser.clip.tooltip.genre")}: {clip.genre}</div>
+            <div>{t("soundBrowser.clip.tooltip.instrument")}: {clip.instrument}</div>
+            <div>{t("soundBrowser.clip.tooltip.originalTempo")}: {clip.tempo}</div>
+            <div>{t("soundBrowser.clip.tooltip.year")}: {clip.year}</div>
+            {clip.keySignature && <div>{t("soundBrowser.clip.tooltip.key")}: {clip.keySignature}</div>}
+        </div>
+    )
 
     const loggedIn = useSelector(user.selectLoggedIn)
     const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(name)
@@ -493,65 +544,82 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
-                <div className="flex items-center min-w-0" title={tooltip}>
-                    <h5 className="truncate pl-2" style={{ fontSize: `${fontSm}rem` }}>{name}</h5>
-                </div>
-                <div className="pl-2 pr-4">
-                    <button
-                        className="pr-1.5"
-                        style={{ fontSize: `${fontXs}rem` }}
-                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
-                        title={t("soundBrowser.clip.tooltip.previewSound")}
-                        aria-label={t("ariaDescriptors:sounds.preview", { name })}
-                    >
-                        {preview?.kind === "sound" && preview.name === name
-                            ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
-                            : <i className="icon icon-play4" />}
-                    </button>
-                    {loggedIn &&
-                        (
+
+                {/* Clip name with metadata tooltip */}
+                <ClipTooltip label={tooltipContent} fontSize={fontXs}>
+                    <div className="flex items-center min-w-0 text-left" style={{ background: "none", border: "none" }}>
+                        <h5 className="truncate pl-2" style={{ fontSize: `${fontSm}rem` }}>{name}</h5>
+                    </div>
+                </ClipTooltip>
+
+                <div className="pl-2 pr-4 flex items-center">
+
+                    {/* Preview button */}
+                    <ClipTooltip label={t("soundBrowser.clip.tooltip.previewSound")} fontSize={fontXs}>
+                        <button
+                            className="pr-1.5"
+                            style={{ fontSize: `${fontXs}rem` }}
+                            onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
+                            aria-label={t("ariaDescriptors:sounds.preview", { name })}
+                        >
+                            {preview?.kind === "sound" && preview.name === name
+                                ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
+                                : <i className="icon icon-play4" />}
+                        </button>
+                    </ClipTooltip>
+
+                    {/* Favorite button */}
+                    {loggedIn && (
+                        <ClipTooltip label={t("soundBrowser.clip.tooltip.markFavorite")} fontSize={fontXs}>
                             <button
                                 className="px-1.5"
                                 style={{ fontSize: `${fontXs}rem` }}
                                 onClick={() => dispatch(soundsThunks.markFavorite({ name, isFavorite }))}
-                                title={t("soundBrowser.clip.tooltip.markFavorite")}
+                                aria-label={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
                                 {isFavorite
                                     ? <i className="icon icon-star-full2 text-orange-600" />
                                     : <i className="icon icon-star-empty3 text-orange-600" />}
                             </button>
-                        )}
-                    {tabsOpen &&
-                        (
+                        </ClipTooltip>
+                    )}
+
+                    {/* Paste button */}
+                    {tabsOpen && (
+                        <ClipTooltip label={t("soundBrowser.clip.tooltip.paste")} fontSize={fontXs}>
                             <button
                                 className="px-1.5 text-sky-700 dark:text-blue-400"
                                 onClick={() => { editor.pasteCode(name); addUIClick("sound copy - " + name) }}
                                 style={{ fontSize: `${fontXs}rem` }}
-                                title={t("soundBrowser.clip.tooltip.paste")}
                                 aria-label={t("ariaDescriptors:sounds.paste", { name })}
                             >
                                 <i className="icon icon-paste2" />
                             </button>
-                        )}
-                    {(loggedIn && isUserOwned) &&
-                        (
-                            <>
+                        </ClipTooltip>
+                    )}
+
+                    {/* Rename / Delete buttons */}
+                    {loggedIn && isUserOwned && (
+                        <>
+                            <ClipTooltip label="Rename sound" fontSize={fontXs}>
                                 <button
                                     className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
                                     onClick={() => callbacks.rename(clip)}
-                                    title="Rename sound"
                                 >
                                     <i className="icon icon-pencil3" />
                                 </button>
+                            </ClipTooltip>
+
+                            <ClipTooltip label="Delete sound" fontSize={fontXs}>
                                 <button
                                     className="text-xs pl-1.5 text-sky-700 dark:text-blue-400"
                                     onClick={() => callbacks.delete(clip)}
-                                    title="Delete sound"
                                 >
                                     <i className="icon icon-backspace" />
                                 </button>
-                            </>
-                        )}
+                            </ClipTooltip>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
