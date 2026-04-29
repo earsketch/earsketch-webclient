@@ -68,17 +68,7 @@ test.describe("Editor", () => {
 
         await page.locator("button[title='Editor Settings']").click()
         await page.locator("button[title='Disable autocomplete']").click()
-        // Closing the settings popover and refocusing the editor is finicky:
-        // - force:true is needed because the popover backdrop intercepts
-        //   pointer events on the cm-content element.
-        // - Two clicks because headlessui returns focus to the gear after
-        //   outside-click dismissal.
-        // - Explicit .focus() because force-click doesn't always trigger the
-        //   focus events the contenteditable relies on.
-        // The headlessui focus-return behavior affects every popover in the
-        // app; a holistic fix is left for a follow-up PR.
-        await page.locator(".cm-content").click({ force: true })
-        await page.locator(".cm-content").click({ force: true })
+        await page.keyboard.press("Escape")
         await page.locator(".cm-content").focus()
         await page.keyboard.press("End")
         await page.keyboard.press("Enter")
