@@ -13,23 +13,29 @@ phases:
     commands:
       - apt-get update -qq
       - apt-get install -qq python3-requests
+      - npm ci
+      - npx playwright install --with-deps chromium
   pre_build:
     commands:
       - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
       - export LOCAL_STAGING_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}"
   build:
     commands:
-      - npm ci
       - nohup npm run dev & echo $! > pidfile
       - npx wait-on --timeout 120000 http://localhost:8888
-      - npm run test-cypress
+      - npm run test-playwright
       - kill $(cat pidfile)
   post_build:
     commands:
       - if [ "$CODEBUILD_BUILD_SUCCEEDING" == "0" ]; then python3 "$ES_SCRIPT_HOME/github_add_pr_comment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_BUILD_NUMBER" "$LOCAL_STAGING_DIR_NAME" "$CODEBUILD_RESOLVED_SOURCE_VERSION"; fi
 
+reports:
+  playwright-reports:
+    files:
+      - "tests/playwright/reports/*.xml"
+    file-format: "JUNITXML"
+
 artifacts:
   files:
-    - 'tests/cypress/reports/index.html'
-  name: cypress-report-build-$CODEBUILD_BUILD_NUMBER
-  discard-paths: yes
+    - 'playwright-report/**/*'
+  name: playwright-report-build-$CODEBUILD_BUILD_NUMBER
