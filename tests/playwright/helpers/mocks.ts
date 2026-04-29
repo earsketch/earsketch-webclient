@@ -264,10 +264,9 @@ export async function registerCurriculumRoutes(page: Page, counter?: RouteCounte
         const locale = url.split("/")[4]
         return fulfillJson(route, makeSearchDoc(locale))
     })
-    await page.route(/\/curriculum\/[^/]+\/[^/]+\/getting-started\.html$/, (route) => {
-        counter?.bump("curriculum_getting_started")
-        return route.fulfill({ status: 200, contentType: "text/html", body: gettingStarted })
-    })
+    // NOTE: Playwright applies route handlers in reverse registration order
+    // (most-recent first). Register the catchall before the specific override
+    // so the override wins.
     await page.route(/\/curriculum\/[^/]+\/[^/]+\/[^/]+\.html$/, (route) => {
         counter?.bump("curriculum_content")
         const url = route.request().url()
@@ -290,5 +289,9 @@ export async function registerCurriculumRoutes(page: Page, counter?: RouteCounte
             </body>
             </html>`
         return route.fulfill({ status: 200, contentType: "text/html", body })
+    })
+    await page.route(/\/curriculum\/[^/]+\/[^/]+\/getting-started\.html$/, (route) => {
+        counter?.bump("curriculum_getting_started")
+        return route.fulfill({ status: 200, contentType: "text/html", body: gettingStarted })
     })
 }

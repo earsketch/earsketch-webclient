@@ -45,25 +45,22 @@ test.describe("Curriculum", () => {
 
     test("toggles language Python → JavaScript", async ({ page }) => {
         await toggleCurriculumLanguage(page)
-        const js = page.locator(".curriculum-javascript")
-        const py = page.locator(".curriculum-python")
+        const js = page.locator(".curriculum-javascript").first()
+        const py = page.locator(".curriculum-python").first()
         await js.scrollIntoViewIfNeeded()
         await expect(js).toBeVisible()
-        await py.scrollIntoViewIfNeeded()
         await expect(py).toBeHidden()
     })
 
     test("toggles language back JS → Python", async ({ page }) => {
         await toggleCurriculumLanguage(page)
-        const js = page.locator(".curriculum-javascript")
-        const py = page.locator(".curriculum-python")
+        const js = page.locator(".curriculum-javascript").first()
+        const py = page.locator(".curriculum-python").first()
         await js.scrollIntoViewIfNeeded()
         await expect(js).toBeVisible()
-        await py.scrollIntoViewIfNeeded()
         await expect(py).toBeHidden()
 
         await page.locator("button[title='Switch script language to python']").click()
-        await js.scrollIntoViewIfNeeded()
         await expect(js).toBeHidden()
         await py.scrollIntoViewIfNeeded()
         await expect(py).toBeVisible()

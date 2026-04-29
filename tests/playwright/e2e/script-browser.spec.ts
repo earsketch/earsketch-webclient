@@ -46,7 +46,7 @@ test.describe("script browser", () => {
             .locator("..")
             .locator("input").fill(scriptName1)
         await page.locator('input[type="submit"]').click()
-        await expect(page.locator(`text=${scriptName2}`)).toBeVisible()
+        await expect(page.locator(`text=${scriptName2}`).first()).toBeVisible()
         await expect(page.locator("text=That name already exists in your deleted scripts")).toBeVisible()
     })
 })

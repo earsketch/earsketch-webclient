@@ -88,10 +88,10 @@ test.describe("Accessibility", () => {
     async function testCreateScriptModal(page: Page) {
         await page.locator('[title="Open SCRIPTS Tab"]').click()
         await page.locator('[data-test="newScript"]').click()
-        await page.locator("div", { hasText: "Create a new script" }).first()
-            .locator("input[id='scriptName']").fill("test")
-        await page.locator("div", { hasText: "Create a new script" }).first()
-            .locator("input[id='scriptName']").fill("")
+        const dialog = page.getByRole("dialog")
+        // Touch the form so CSS transitions complete before axe scans.
+        await dialog.locator("input[id='scriptName']").fill("test")
+        await dialog.locator("input[id='scriptName']").fill("")
         await checkA11y(page)
     }
 
@@ -107,10 +107,9 @@ test.describe("Accessibility", () => {
     async function testCreateAccountModal(page: Page) {
         await page.locator("button", { hasText: "Create / Reset Account" }).click()
         await page.locator("button", { hasText: "Register a New Account" }).click()
-        await page.locator("div", { hasText: "Create an account" }).first()
-            .locator("input[name='username']").fill("test")
-        await page.locator("div", { hasText: "Create an account" }).first()
-            .locator("input[name='username']").fill("")
+        const dialog = page.getByRole("dialog")
+        await dialog.locator("input[name='username']").fill("test")
+        await dialog.locator("input[name='username']").fill("")
         await checkA11y(page)
     }
 
@@ -128,20 +127,16 @@ test.describe("Accessibility", () => {
         await login(page, username)
         await page.locator("button[title='Open SOUNDS Tab']").click()
         await page.locator("button", { hasText: "Add sound" }).click()
-        await page.locator("div", { hasText: "Add a New Sound" }).first()
-            .locator("input[id='name']").fill("test")
+        const dialog = page.getByRole("dialog")
+        await dialog.locator("input[id='name']").fill("test")
         await checkA11y(page)
         await page.locator("button", { hasText: "QUICK RECORD" }).click()
         await checkA11y(page)
         await page.locator("button", { hasText: "FREESOUND" }).click()
         await checkA11y(page)
-        await page.locator("div", { hasText: "Add a New Sound" }).first()
-            .locator("input[placeholder='Search']").fill("birds")
-        await page.locator("div", { hasText: "Add a New Sound" }).first()
-            .locator("input[value='SEARCH']").click()
-        await expect(
-            page.locator("div", { hasText: "Add a New Sound" }).first().locator("audio")
-        ).toBeVisible()
+        await dialog.locator("input[placeholder='Search']").fill("birds")
+        await dialog.locator("input[value='SEARCH']").click()
+        await expect(dialog.locator("audio").first()).toBeVisible()
         await checkA11y(page)
     })
 
@@ -149,8 +144,8 @@ test.describe("Accessibility", () => {
         await login(page, username)
         await page.locator('[title="Open SCRIPTS Tab"]').click()
         await checkA11y(page)
-        await page.locator("div", { hasText: scriptName }).first().click()
-        await expect(page.locator("#coder").locator("div", { hasText: scriptName }).first()).toBeVisible()
+        await page.getByLabel(`Open ${scriptName} in Code Editor`).click()
+        await expect(page.locator("#coder").getByText(scriptName).first()).toBeVisible()
         await checkA11y(page)
     })
 })

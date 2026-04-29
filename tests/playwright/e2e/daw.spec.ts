@@ -44,7 +44,8 @@ async function setupSoundsAndScript(page: Page, script: string) {
     await login(page)
 
     await page.locator("button[title='Open SCRIPTS Tab']").click()
-    await page.locator("div", { hasText: "playsound.py" }).first().click({ force: true })
+    // Click the script row by its accessible name to avoid matching outer containers.
+    await page.getByLabel("Open playsound.py in Code Editor").click()
     await page.locator("button#run-button").click()
 
     await expect(page.locator("div", { hasText: "Script ran successfully" }).first()).toBeVisible()

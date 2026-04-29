@@ -77,12 +77,12 @@ test.describe("add a sound", () => {
         const fixturePath = path.resolve(__dirname, "..", "fixtures", fileName)
         await page.locator("input[type='file']").setInputFiles(fixturePath)
 
-        await expect(page.locator("div", { hasText: "Add a New Sound" }).first()).toBeVisible()
+        await expect(page.getByRole("dialog").getByText("Add a New Sound")).toBeVisible()
         await page.locator("#name").fill("_UNIQUE_STRING_GOES_HERE")
         await page.locator("input[value='UPLOAD']").click()
 
-        await expect(page.locator("div", { hasText: "Add a New Sound" })).toHaveCount(0, { timeout: 10000 })
-        await expect(page.locator("div", { hasText: soundConst }).first()).toBeVisible()
+        await expect(page.getByRole("dialog")).toHaveCount(0, { timeout: 10000 })
+        await expect(page.getByText(soundConst)).toBeVisible()
     })
 })
 
@@ -123,21 +123,21 @@ test.describe("edit sound uploads", () => {
 
         // The rename button may be hidden behind hover styles; force-click matches the original Cypress flow.
         await page.locator("button[title='Rename sound']").click({ force: true })
-        await expect(page.locator("div", { hasText: "Rename Sound" }).first()).toBeVisible()
+        await expect(page.getByRole("dialog").getByText("Rename Sound")).toBeVisible()
         await page.locator(`input[value='SHH${randSuffix}']`).pressSequentially("1")
         await page.locator("input[value='RENAME']").click()
 
-        await expect(page.locator("div", { hasText: "Rename Sound" })).toHaveCount(0)
-        await expect(page.locator("div", { hasText: soundConst + "1" }).first()).toBeVisible()
+        await expect(page.getByRole("dialog")).toHaveCount(0)
+        await expect(page.getByText(soundConst + "1")).toBeVisible()
     })
 
     test("deletes sound", async ({ page }) => {
         await setupBackend(page, { interceptAudioDelete: true })
 
         await page.locator("button[title='Delete sound']").click({ force: true })
-        await expect(page.locator("div", { hasText: "Confirm" }).first()).toBeVisible()
+        await expect(page.getByRole("dialog").getByText("Confirm")).toBeVisible()
         await page.locator("input[value='DELETE']").click()
 
-        await expect(page.locator("div", { hasText: soundConst })).toHaveCount(0)
+        await expect(page.getByText(soundConst)).toHaveCount(0)
     })
 })
