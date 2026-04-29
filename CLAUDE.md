@@ -26,17 +26,11 @@ npm run test-vitest tests/vitest/src/esutils.spec.js
 # Run Cypress component tests
 npm test
 
-# Run Playwright e2e tests (requires `npm run dev` or `npm run serve-local` running on :8888)
+# Run Playwright end-to-end tests (requires `npm run dev` or `npm run serve-local` running on :8888)
 npm run test-playwright
 
 # Open Playwright UI mode for interactive debugging
 npm run test-playwright-ui
-
-# Run Cypress e2e tests (legacy; mirrored by the Playwright suite)
-npm run test-cypress
-
-# Open Cypress GUI
-npm run test-cypress-gui
 
 # Build + serve locally with dev API
 npm run serve-local
@@ -119,8 +113,7 @@ All user-facing text must use `i18next`. In React components, use the `useTransl
 ### Testing
 
 - **Vitest** (`tests/vitest/`): Unit tests for utilities and components. Mock modules go in `__mocks__/` directories next to the originals.
-- **Playwright e2e** (`tests/playwright/e2e/`): Full browser tests against the running app. Helpers in `tests/playwright/helpers/` mirror the old Cypress `commands.js` API mocks. Run with `npm run test-playwright` (needs `npm run dev` or `npm run serve-local` on :8888 in another terminal).
-- **Cypress e2e** (`tests/cypress/e2e/`): Legacy suite, mirrored by Playwright. Will be removed once the Playwright suite is stable in CI.
+- **Playwright end-to-end** (`tests/playwright/e2e/`): Full browser tests against the running app. Helpers in `tests/playwright/helpers/` provide API-route mocks. Run with `npm run test-playwright` (needs `npm run dev` or `npm run serve-local` on :8888 in another terminal).
 - **Cypress component** (`tests/cypress/component/`): Driven by `cypress run --component`. These import `src/app/runner.ts` directly to test the script-execution pipeline; they're not real React component tests. TODO: port to Vitest browser mode.
 - **Manual test plans** (`tests/manual/`): Markdown checklists for manual QA.
 

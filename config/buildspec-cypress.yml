@@ -37,5 +37,5 @@ reports:
 
 artifacts:
   files:
-    - 'playwright-report/**/*'
+    - "playwright-report/**/*"
   name: playwright-report-build-$CODEBUILD_BUILD_NUMBER
