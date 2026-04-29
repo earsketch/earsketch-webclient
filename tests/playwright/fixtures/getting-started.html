@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.12" name="generator"/>
+<title>Get Started with EarSketch</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getstartedwithearsketch">Get Started with EarSketch</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this chapter you will learn how EarSketch works, you will place sounds (clips) into your music and see how to debug your code.</p>
+</div>
+<div class="sect2">
+<h3 id="discoverearsketch">Discover EarSketch</h3>
+<div class="paragraph">
+<p>In EarSketch, you will give the computer instructions by writing code. One line of code is one instruction. All the instructions together are called the program (these instructions can also be called an algorithm). Just like following a recipe in a cookbook can lead to cooked meal, executing a program in EarSketch can lead to a song. Where in the program does the code go? Find out in the video below!</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video1a">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_1_Discover_EarSketch.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>To use EarSketch</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>You can browse and select sounds in your <strong>sound browser</strong>.</p>
+</li>
+<li>
+<p>You will write code in your <strong>code editor</strong> .</p>
+</li>
+<li>
+<p>When you click the <strong>run</strong> button, your music will be shown in the <strong>Digital Audio Workstation</strong> (or <strong>DAW</strong>).</p>
+</li>
+<li>
+<p>You can then click the <strong>play</strong> button to listen to your music.</p>
+</li>
+<li>
+<p>Then change your code until you are satisfied with what you hear!</p>
+</li>
+<li>
+<p>You can open and close this curriculum panel using the toggle button on the top of the panel.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><em>What is a DAW?</em></p>
+</div>
+<div class="paragraph">
+<p>A <strong>Digital Audio Workstation</strong>, or <strong>DAW</strong>, is a piece of software that produces or edits audio or sound clips on a computer, be it in a professional studio or in home laptop-based studios.</p>
+</div>
+<div class="paragraph">
+<p>Some popular DAWs include <a href="https://www.ableton.com/" rel="noopener" target="_blank">Ableton</a>, <a href="https://www.apple.com/logic-pro/" rel="noopener" target="_blank">Logic Pro</a>, <a href="http://www.apple.com/mac/garageband/" rel="noopener" target="_blank">GarageBand</a>, and <a href="http://www.reaper.fm/" rel="noopener" target="_blank">Reaper</a>.</p>
+</div>
+<div class="paragraph">
+<p>With a DAW, you can record, edit, visualize and play audio files. These audio files are called <strong>clips</strong>.</p>
+</div>
+<div class="paragraph">
+<p>EarSketch is just like a DAW, except you get to directly program the musical elements using code.</p>
+</div>
+<div class="paragraph">
+<p>Here is how to make full use of the DAW:</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video1b">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/001-06-TheDAWinDetail-PY-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/001-06-TheDAWinDetail-PY-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>Let’s try running a code example in EarSketch! On the box below, press the blue clipboard icon in the top right corner. This will paste the example code onto a new file in the <strong>code editor</strong>. No need to understand the code yet, just press the <em>run</em> button and your music will show up in the DAW. You can press the <em>play</em> button to hear it.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># python code
+#
+# script_name: Intro Script
+#
+# author: The EarSketch Team
+#
+# description: This code adds one audio clip to the DAW
+#
+#
+#
+
+#Setup Section
+from earsketch import *
+init()
+setTempo(120)
+
+#Music Section
+fitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9)
+
+#Finish Section
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// javascript code
+//
+// script_name: Intro Script
+//
+// author: The EarSketch Team
+//
+// description: This code adds one audio clip to the DAW
+//
+//
+//
+
+//Setup Section
+init();
+setTempo(120);
+
+//Music Section
+fitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9);
+
+//Finish Section
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="createanewscript">Create your first script!</h3>
+<div class="paragraph">
+<p>In EarSketch, each script that you write will correspond to one song. Let’s see how to create a script:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Sign in or create a new account</strong> in the top right corner of your screen. If you click the white button that reads "Create / Reset Account", you can either recover a lost password, or create a new account ("Register a New Account"). <em>Caution:</em> in general on the internet, don’t use the same password for all your accounts &amp; never share your passwords.</p>
+</li>
+<li>
+<p><strong>Click to create.</strong> If you don’t have any scripts open, click on the large blue link in the code editor that states "Click here to create a new script!"</p>
+<div class="paragraph">
+<p>If you have one or more scripts open already, then click on the white "+" icon next to the right most tab.</p>
+</div>
+<div class="imageblock" id="newscriptplus">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P1/NewScriptPlus.png"/>
+</div>
+<div class="title">Figure 1.2.1: Create a new script, open scripts</div>
+</div>
+</li>
+<li>
+<p><strong>Choose a name and language:</strong> The "Create a new script" dialog box opens. Give your new script a name which will be name of your song. Then select the programming language (Python or Javascript). Finally, click the "Create" button.</p>
+<div class="imageblock curriculum-python" id="newscriptpromptpy">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P1/newScriptPromptPY.png"/>
+</div>
+<div class="title">Figure 1.2.2: The create a new script dialog box</div>
+</div>
+<div class="imageblock curriculum-javascript" id="newscriptpromptjs">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P1/newScriptPromptJS.png"/>
+</div>
+<div class="title">Figure 1.2.2: The create a new script dialog box</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong><em>What is a programming language?</em></strong></p>
+</div>
+<div class="paragraph">
+<p>Code is written in a <strong>programming language</strong>, which includes vocabulary and a syntax, just like a regular language. You need to know the grammar rules of your programming language or the computer won’t be able to execute your instructions.</p>
+</div>
+<div class="paragraph">
+<p>In EarSketch, you can code in either Python or JavaScript.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><em>You are in Python mode. Python is used by companies like Google, Yahoo, NASA, Disney and to code games like Civilization 4, Battlefield 2 and Crystal Space.</em></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><em>You are in JavaScript mode. JavaScript is one of the ten most popular programming languages in the world. Almost every website uses JavaScript.</em></p>
+</div>
+<div class="paragraph">
+<p>At the deepest level, computers operate in combinations of 1s and 0s: binary numbers. That’s because the electronic components can react differently if there is electric current (1) or if there is no electric current (0). When you press the <strong>run</strong> button, the computer translates the Python or JavaScript instructions into binary code. The code is then <strong>executed</strong> by the computer, and you can see your music appear in the DAW.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fitmedia">The <code>fitMedia()</code> function</h3>
+<div class="paragraph">
+<p>Now that you have created your first script, let’s start working on your music!</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Start writing your code between the <code>setTempo(120)</code> and <code>finish()</code> lines.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Start writing your code between the <code>setTempo(120);</code> and <code>finish();</code> lines.</p>
+</div>
+<div class="paragraph">
+<p>Watch this video to see how to add an audio clip to your song:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video110py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_3_fitmedia_py.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video110js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_3_fitmedia_js.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>To add a sound clip to the DAW, we start by typing <code>fitMedia()</code>. Between the parenthesis, we’ll have 4 parameters, separated by commas:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>A clip name</strong>: place your cursor between the parenthesis, go to the sound browser, select a clip, and paste it using the blue paste icon.</p>
+</li>
+<li>
+<p><strong>The track number</strong>: tracks are the rows that run across the DAW; they help you organize your sounds by instrument-type (vocals, lead guitar, rhythm guitar, bass, drums, etc.). You can start at track one for your first sound.</p>
+</li>
+<li>
+<p><strong>Start measure</strong>: the measure when your sound will start playing. Measures are musical time units. One measure is 4 beats. You can start at measure one with your first sound.</p>
+</li>
+<li>
+<p><strong>End measure</strong>: the measure when your sound will stop playing.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><em>Example:</em> <code>fitMedia(Y18_DRUM_SAMPLES_2, 1, 1, 5)</code> will place the sound <code>Y18_DRUM_SAMPLES_2</code> on track 1 from measure 1 to measure 5.</p>
+</div>
+<div class="paragraph">
+<p>Then, press <em>run</em>: you should visualize your sound in the DAW. When you press <em>play</em> you can hear it.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>A <strong>statement</strong> tells the computer to carry out an action. For example, <code>fitMedia(Y18_DRUM_SAMPLES_1, 1, 1, 5);</code> is a statement. Every statement in JavaScript <strong><em>should end with a semicolon</em></strong>.</p>
+</div>
+<div class="paragraph">
+<p>The <strong>Sound Browser</strong>: Browse or search 4,000 audio clips to use in your music, made by musicians/producers <a href="https://en.wikipedia.org/wiki/Young_Guru" rel="noopener" target="_blank">Young Guru</a>, <a href="https://en.wikipedia.org/wiki/Richard_Devine" rel="noopener" target="_blank">Richard Devine</a>, <a href="https://en.wikipedia.org/wiki/Ciara" rel="noopener" target="_blank">Ciara</a>, <a href="https://en.wikipedia.org/wiki/Common_(rapper)" rel="noopener" target="_blank">Common</a>, <a href="https://en.wikipedia.org/wiki/Pharrell_Williams" rel="noopener" target="_blank">Pharrell Williams</a>, Irizarry y Caraballo, and <a href="https://www.sndbrd.com/" rel="noopener" target="_blank">Milknsizz</a>.</p>
+</div>
+<div class="paragraph">
+<p>See some examples of code using <code>fitMedia()</code> (Remember you can click the blue clip board in the top right corner of the box to paste the code into a new file):</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># python code
+#
+# script_name: EarSketch Demo
+#
+# author: The EarSketch Team
+#
+# description: Using fitMedia() to add a clip to the DAW
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+fitMedia(Y18_DRUM_SAMPLES_2, 1, 1, 5)
+
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// javascript code
+//
+// script_name: EarSketch Demo
+//
+// author: The EarSketch Team
+//
+// description: Using fitMedia() to add a clip to the DAW
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+fitMedia(Y18_DRUM_SAMPLES_2, 1, 1, 5);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>For an extra challenge, add more <code>fitMedia()</code> calls to your script like we do below. Notice that we use a different track number for each <code>fitMedia()</code> call:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># python code
+#
+# script_name: Opus 1
+#
+# author: The EarSketch Team
+#
+# description: Using multiple fitMedia() calls, on different tracks and with different clips
+#
+#
+#
+
+# Setup Section
+from earsketch import *
+
+init()
+setTempo(100)
+
+# Music Section
+
+fitMedia(Y01_DRUMS_1, 1, 1, 9)
+fitMedia(Y11_BASS_1, 2, 1, 9)
+fitMedia(Y11_GUITAR_1, 3, 1, 9)
+
+# Finish Section
+
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// javascript code
+//
+// script_name: Opus 1
+//
+// author: The EarSketch Team
+//
+// description: Using multiple fitMedia() calls, on different tracks and with different clips
+//
+//
+//
+
+// Setup Section
+
+init();
+setTempo(100);
+
+// Music Section
+
+fitMedia(Y01_DRUMS_1, 1, 1, 9);
+fitMedia(Y11_BASS_1, 2, 1, 9);
+fitMedia(Y11_GUITAR_1, 3, 1, 9);
+
+// Finish Section
+
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="paragraph">
+<p>Using sounds that you like:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Place sounds on 2 different tracks</p>
+</li>
+<li>
+<p>Place sounds from measures 2 to 12</p>
+</li>
+<li>
+<p>Create a short song with 3 tracks that is 8 measures long or more</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>For each exercise, you can have your neighbour listen to your song.</p>
+</div>
+<div class="paragraph">
+<p>If you have errors when running your code, check out the next chapter about debugging.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="debugging">Debug your code</h3>
+<div class="paragraph">
+<p>Sometimes programmers make mistakes that cause code to work incorrectly, or not run at all. In programming, coding faults are called <strong>errors</strong>, or <strong>bugs</strong>. The process of finding and fixing bugs is called <strong>debugging</strong>. You can use debugging strategies, using the console.</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video3py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_4_Debugging_Console_py.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video3js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_4_Debugging_Console_js.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>What are the different types of errors?</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Syntax errors</strong>: Your program does not run because your code breaks the language’s <strong>syntax</strong> rules (ex: you forgot to close a parenthesis, or you wrote fitMedia incorrectly).</p>
+</li>
+<li>
+<p><strong>Runtime errors</strong>: Your program starts to run but halts due to an error.</p>
+</li>
+<li>
+<p><strong>Logic errors</strong>: Your program runs, but it doesn’t do what is expected. You can fix these by looking at the DAW to check if the clips you meant to add were actually added in the right place.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Here are some common errors:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>Misspelling:</strong> Check the spelling when using a function like <code>fitMedia()</code> or sound constants.</p>
+</li>
+<li>
+<p><strong>Case sensitivity:</strong> Most words used in programming are case-sensitive (the computer recognizes the difference between capitalized and uncapitalized letters). Pay attention to lowercase and uppercase letters. For example, write <code>fitMedia()</code> and not <code>FitMedia()</code> or <code>fitmedia()</code>. Most items in a script follow a rule called <strong>camel-caps</strong>: the first word is lower case, and the first letter of subsequent words are capitalized, as in <code>exampleFunctionName()</code>.</p>
+</li>
+<li>
+<p><strong>Parentheses:</strong> Forgetting an opening or closing parenthesis where needed will cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>Script setup:</strong> EarSketch adds setup functions to a new script automatically, but you might accidentally delete <code>from earsketch import *</code>, <code>init()</code>, <code>setTempo()</code>, or <code>finish()</code>. Make sure these functions appear in every script.</p>
+</li>
+<li>
+<p><strong>Punctuation:</strong> Missing commas or other punctuation errors</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>Misspelling:</strong> Check the spelling when using a function like <code>fitMedia()</code> or sound constants.</p>
+</li>
+<li>
+<p><strong>Case sensitivity:</strong> Most words used in programming are case-sensitive (the computer recognizes the difference between capitalized and uncapitalized letters). Pay attention to lowercase and uppercase letters. For example, write <code>fitMedia()</code> and not <code>FitMedia()</code> or <code>fitmedia()</code>. Most items in a script follow a rule called <strong>camel-caps</strong>: the first word is lower case, and the first letter of subsequent words are capitalized, as in <code>exampleFunctionName()</code>.</p>
+</li>
+<li>
+<p><strong>Parentheses:</strong> Forgetting an opening or closing parenthesis where needed will cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>Script setup:</strong> EarSketch adds setup functions to a new script automatically, but you might accidentally delete <code>init()</code>, <code>setTempo()</code>, or <code>finish()</code>. Make sure these functions appear in every script.</p>
+</li>
+<li>
+<p><strong>Punctuation:</strong> Missing commas or other punctuation errors</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Time to practice!
+Find the 5 errors in the following code:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># python code
+#
+# script_name: Find the 5 Errors
+#
+# author: The EarSketch Team
+#
+# description: Find and fix the errors in this script
+#
+
+from earsketch import *
+
+init)
+setTempo(88)
+
+fitMdia(HIPHOP_DUSTYGROOVEPART_001, 1, 1 9)
+fitmedia(2, HIPHOP_DUSTYGROOVEPART_003, 1, 9)
+
+
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// javascript code
+//
+// script_name: Find the 5 Errors
+//
+// author: The EarSketch Team
+//
+// description: Find and fix the errors in this script
+//
+
+init);
+setTempo(88);
+
+fitMdia(HIPHOP_DUSTYGROOVEPART_001, 1, 1 9);
+fitmedia(2, HIPHOP_DUSTYGROOVEPART_001, 1, 9);
+
+
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Here is the answer</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The <code>init()</code> function is missing a parentheses</p>
+</li>
+<li>
+<p>The first <code>fitMedia()</code> is missing an 'e'</p>
+</li>
+<li>
+<p>The first <code>fitMedia()</code> is missing a comma between the third and fourth parameters</p>
+</li>
+<li>
+<p>The second <code>fitMedia()</code> is missing an uppercase 'M'</p>
+</li>
+<li>
+<p>In the second <code>fitMedia()</code>, the order of parameters is not correct: it should be sound clip name then track number</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Take a look at <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html">Every Error Explained in Detail</a> for a description of different error types and what you can do to prevent them.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter1summary">Chapter 1 Summary</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>A line of code is an instruction to be carried out by the computer. All the instructions together make up the program.</p>
+</li>
+<li>
+<p><strong>DAW’s</strong> are specialized computer software for recording, editing, and playing digital audio files, or <strong>clips</strong>. EarSketch is a DAW that allows audio clips to be placed on a timeline with code.</p>
+</li>
+<li>
+<p>To make music in EarSketch, code is first typed into the code editor panel. After pressing run, music is played in the DAW panel.</p>
+</li>
+<li>
+<p>Sound clips can be found in the Sound Browser. They are referred to by typing or pasting their name in all caps.</p>
+</li>
+<li>
+<p>A computer <strong>program</strong> is a sequence of instructions that the computer executes to accomplish a specific task.</p>
+</li>
+<li>
+<p><strong>Programming languages</strong> are a collection of words and symbols that are understood by the computer. A programming language follows a syntax in order to organize code.</p>
+</li>
+<li>
+<p>An EarSketch script consists of a comments section, setup section, music section, and finish section.</p>
+</li>
+<li>
+<p>Create a new script by clicking the large blue link or the "+" icon if another script is already open.</p>
+</li>
+<li>
+<p><code>fitMedia()</code> is the primary way of adding sound to the DAW. It has four arguments, the information it needs to make music:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>fileName:</strong> The sound clip that is placed in the DAW.</p>
+</li>
+<li>
+<p><strong>trackNumber:</strong> The track on which music is placed.</p>
+</li>
+<li>
+<p><strong>startLocation:</strong> The measure at which the sound clip will start.</p>
+</li>
+<li>
+<p><strong>endLocation:</strong> The measure at which the sound clip will end.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Debugging</strong> is the process of finding and fixing <strong>bugs</strong>, errors made by the programmer.</p>
+</li>
+<li>
+<p>The rules of <strong>syntax</strong> define how code must be written in a particular programming language.</p>
+</li>
+<li>
+<p>The <strong>console</strong> shows information about the state of a program, making it useful for debugging syntax errors.</p>
+</li>
+<li>
+<p>Common beginner errors include typos, incorrect case, missing parentheses, improper script setup…​</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>A line of code is an instruction to be carried out by the computer. All the instructions together make up the program.</p>
+</li>
+<li>
+<p><strong>DAW’s</strong> are specialized computer software for recording, editing, and playing digital audio files, or <strong>clips</strong>. EarSketch is a DAW that allows audio clips to be placed on a timeline with code.</p>
+</li>
+<li>
+<p>To make music in EarSketch, code is first typed into the code editor panel. After pressing run, music is played in the DAW panel.</p>
+</li>
+<li>
+<p>Sound clips can be found in the Sound Browser. They are referred to be typing or pasting their name in all caps.</p>
+</li>
+<li>
+<p>A computer <strong>program</strong> is a sequence of instructions that the computer executes to accomplish a specific task.</p>
+</li>
+<li>
+<p><strong>Programming languages</strong> are a collection of words and symbols that are understood by the computer. A programming language follows a syntax in order to organize code.</p>
+</li>
+<li>
+<p>An EarSketch script consists of a comments section, setup section, music section, and finish section.</p>
+</li>
+<li>
+<p>Create a new script by clicking the large blue link or the "+" icon if another script is already open.</p>
+</li>
+<li>
+<p><code>fitMedia()</code> is the primary way of adding sound to the DAW. It has four arguments, the information it needs to make music:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>fileName:</strong> The sound clip that is placed in the DAW.</p>
+</li>
+<li>
+<p><strong>trackNumber:</strong> The track on which music is placed.</p>
+</li>
+<li>
+<p><strong>startLocation:</strong> The measure at which the sound clip will start.</p>
+</li>
+<li>
+<p><strong>endLocation:</strong> The measure at which the sound clip will end.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Debugging</strong> is the process of finding and fixing <strong>bugs</strong>, errors made by the programmer.</p>
+</li>
+<li>
+<p>The rules of <strong>syntax</strong> define how code must be written in a particular programming language.</p>
+</li>
+<li>
+<p>The <strong>console</strong> shows information about the state of a program, making it useful for debugging syntax errors.</p>
+</li>
+<li>
+<p>Common beginner errors include typos, incorrect case, missing parentheses, improper script setup…​</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Which of the following is NOT a panel in the EarSketch workspace?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>The effects browser</p>
+</li>
+<li>
+<p>The code editor</p>
+</li>
+<li>
+<p>The DAW</p>
+</li>
+<li>
+<p>The console</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>How many parameters do you need for your <code>fitMedia()</code> function?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>4</p>
+</li>
+<li>
+<p>6</p>
+</li>
+<li>
+<p>2</p>
+</li>
+<li>
+<p>3</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>One script corresponds to…​</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>One EarSketch song</p>
+</li>
+<li>
+<p>One line of code</p>
+</li>
+<li>
+<p>One programming language</p>
+</li>
+<li>
+<p>One programmer</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>What is a measure?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>A musical time unit</p>
+</li>
+<li>
+<p>An audio volume unit</p>
+</li>
+<li>
+<p>A line in the DAW</p>
+</li>
+<li>
+<p>A pitch unit</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Which of the following is NOT a common type of error found in code?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Grammatical Errors</p>
+</li>
+<li>
+<p>Runtime Errors</p>
+</li>
+<li>
+<p>Logic Errors</p>
+</li>
+<li>
+<p>Syntax Errors</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Where in the EarSketch workspace can you get information about your bugs?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>The console</p>
+</li>
+<li>
+<p>The sound browser</p>
+</li>
+<li>
+<p>The script browser</p>
+</li>
+<li>
+<p>The DAW</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
