@@ -20,9 +20,8 @@ const ownedScript: Script = {
 }
 
 async function checkA11y(page: Page, selector?: string, options?: { disabledRules?: string[] }) {
-    // Let in-flight network responses, then any CSS transitions, settle so axe
-    // doesn't catch the page in a transitional, miscolored state.
-    await page.waitForLoadState("networkidle")
+    // Let any in-flight CSS transitions finish so axe doesn't catch the page
+    // mid-fade with transitional colors.
     await page.evaluate(() =>
         Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {})))
     )
