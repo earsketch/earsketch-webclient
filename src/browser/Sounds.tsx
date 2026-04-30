@@ -793,6 +793,50 @@ const DefaultSoundCollection = () => {
 }
 
 export const SoundBrowser = () => {
+    const dispatch = useDispatch()
+    const preview = useSelector(sounds.selectPreview)
+    const previewNodes = useSelector(sounds.selectPreviewNodes)
+    const lastPreviewNameRef = useRef<string | null>(null)
+
+    useEffect(() => {
+        if (preview?.kind === "sound") {
+            lastPreviewNameRef.current = preview.name
+        }
+    }, [preview])
+
+    useEffect(() => {
+        const handleKeyPress = (event: KeyboardEvent) => {
+            if (event.ctrlKey && event.shiftKey && event.key === "L") {
+                event.preventDefault()
+                const name = preview?.kind === "sound" ? preview.name : lastPreviewNameRef.current
+                if (name) {
+                    dispatch(soundsThunks.togglePreview({ name, kind: "sound" }))
+                }
+            }
+        }
+        window.addEventListener("keydown", handleKeyPress)
+        return () => {
+            window.removeEventListener("keydown", handleKeyPress)
+        }
+    }, [preview, previewNodes])
+
+    useEffect(() => {
+        const handleKeyPress = (event: KeyboardEvent) => {
+            if (event.ctrlKey && event.shiftKey && event.key === "Insert") {
+                event.preventDefault()
+                const name = preview?.kind === "sound" ? preview.name : lastPreviewNameRef.current
+                if (name) {
+                    editor.pasteCode(name)
+                    addUIClick("sound copy - " + name)
+                }
+            }
+        }
+        window.addEventListener("keydown", handleKeyPress)
+        return () => {
+            window.removeEventListener("keydown", handleKeyPress)
+        }
+    }, [preview])
+
     return (
         <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
             <DefaultSoundCollection />
