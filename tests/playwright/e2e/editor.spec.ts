@@ -31,7 +31,7 @@ test.describe("Editor", () => {
 
     test("runs the template script", async ({ page }) => {
         await page.locator("button", { hasText: "RUN" }).click()
-        await expect(page.locator('[data-test="notificationBar"]', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
         await expect(page.locator("#console", { hasText: "Script ran successfully" })).toBeVisible()
     })
 
@@ -43,7 +43,7 @@ test.describe("Editor", () => {
         await editor.pressSequentially(`\nprint("${message}")`)
         await page.locator("button", { hasText: "RUN" }).click()
         await expect(page.locator("#console-frame", { hasText: message })).toBeVisible()
-        await expect(page.locator('[data-test="notificationBar"]', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
     })
 
     test("surfaces an error for a bad script", async ({ page }) => {
@@ -133,7 +133,7 @@ print(5 % 2)
         await page.keyboard.press("Delete")
         await editor.pressSequentially("\nfitMedia(OS_CLAP01, 1, 1, 2);\n")
         await page.locator("button", { hasText: "RUN" }).click()
-        await expect(page.locator('[data-test="notificationBar"]', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
     })
 
     test("calls fetch exactly once per sound", async ({ page }) => {
@@ -156,7 +156,7 @@ from earsketch import *
 makeBeat(OS_CLAP01, 1, 1, "0000", 4)
 `)
         await page.locator("button", { hasText: "RUN" }).click()
-        await expect(page.locator('[data-test="notificationBar"]', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
 
         // Expect 3 sample fetches: METRONOME01, METRONOME02, OS_CLAP01
         expect(counter.count("audio_sample")).toBe(3)
@@ -231,7 +231,7 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
 
         await page.locator("button", { hasText: "RUN" }).click()
         await expect(page.locator("#console-frame", { hasText: message })).toBeVisible()
-        await expect(page.locator('[data-test="notificationBar"]', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
 
         // Save via keyboard shortcut
         const message2 = "another message"

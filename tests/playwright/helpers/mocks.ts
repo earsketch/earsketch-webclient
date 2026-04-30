@@ -106,7 +106,7 @@ export async function setupBackend(page: Page, opts: MockOptions = {}): Promise<
 
     // Standard audio library — always set if anything is mocked
     const standardAudio = standardLibraryDefault(opts.standardAudio ?? [])
-    await page.route(`https://${CLOUDFRONT_HOST}/backend-static/audio-standard_1.json`, (route) => {
+    await page.route(`https://${CLOUDFRONT_HOST}/backend-static/audio-standard_2.json`, (route) => {
         counter.bump("audio_standard")
         return fulfillJson(route, standardAudio)
     })
@@ -143,6 +143,10 @@ export async function setupBackend(page: Page, opts: MockOptions = {}): Promise<
         await page.route(`https://${API_HOST}/EarSketchWS/users/info*`, (route) => {
             counter.bump("users_info")
             return fulfillJson(route, { created: "2019-04-22 16:13:06.0", email: "", isAdmin: true, username })
+        })
+        await page.route(`https://${API_HOST}/EarSketchWS/users/notifications`, (route) => {
+            counter.bump("users_notifications")
+            return fulfillJson(route, [])
         })
     }
 
