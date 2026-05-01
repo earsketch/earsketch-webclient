@@ -42,7 +42,7 @@ import * as user from "../user/userState"
 import type { DAWData } from "common"
 import classNames from "classnames"
 import { cloneDAWDataForComparison, getDAWDataDifferences } from "./dawDataDescriptions"
-import * as Tooltip from '@radix-ui/react-tooltip'
+import * as Tooltip from "@radix-ui/react-tooltip"
 
 const STATUS_SUCCESSFUL = 1
 const STATUS_UNSUCCESSFUL = 2

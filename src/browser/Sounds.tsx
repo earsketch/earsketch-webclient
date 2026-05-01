@@ -16,7 +16,7 @@ import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
-import * as Tooltip from '@radix-ui/react-tooltip'
+import * as Tooltip from "@radix-ui/react-tooltip"
 
 import { SearchBar } from "./Utils"
 
