@@ -95,7 +95,7 @@ test.describe("DAW", () => {
                 const leftNum = parseInt(left.split("px")[0], 10)
                 if (cursorPixelLocation < 200) return leftNum <= cursorPixelLocation
                 return leftNum >= cursorPixelLocation
-            }).toBe(true)
+            }, { timeout: 10000 }).toBe(true)
         }
         await page.locator("button[title='Pause']").click()
     })

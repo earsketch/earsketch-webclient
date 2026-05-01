@@ -24,9 +24,9 @@ headers = {"Accept": "application/vnd.github+json"}
 auth = HTTPBasicAuth(github_user, github_token)
 
 body = (
-    "### Cypress failure report for commit "
+    "### Playwright failure report for commit "
     + "<sub>{}</sub>\r\n".format(commit_sha[:7])
-    + "https://earsketch-cicd.s3.us-east-1.amazonaws.com/cypress-reports/cypress-report-build-"
+    + "https://earsketch-cicd.s3.us-east-1.amazonaws.com/playwright-reports/playwright-report-build-"
     + build_number
     + "/index.html"
 )
