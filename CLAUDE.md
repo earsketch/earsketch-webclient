@@ -17,14 +17,15 @@ npm run build
 # Lint
 npm run lint
 
-# Run Vitest unit tests
+# Run Vitest tests (jsdom unit suite + browser-mode component suite)
 npm run test-vitest
 
 # Run a single Vitest test file
 npm run test-vitest tests/vitest/src/esutils.spec.js
 
-# Run Cypress component tests
-npm test
+# Run only the unit (jsdom) project or only the browser project
+npm run test-vitest -- --project=unit
+npm run test-vitest -- --project=browser
 
 # Run Playwright end-to-end tests (requires `npm run dev` or `npm run serve-local` running on :8888)
 npm run test-playwright
@@ -112,9 +113,10 @@ All user-facing text must use `i18next`. In React components, use the `useTransl
 
 ### Testing
 
-- **Vitest** (`tests/vitest/`): Unit tests for utilities and components. Mock modules go in `__mocks__/` directories next to the originals.
+- **Vitest** (`tests/vitest/`): Two projects share the same Vite config:
+  - `unit` (`tests/vitest/src/`): jsdom unit tests for utilities and components. Mock modules go in `__mocks__/` directories next to the originals.
+  - `browser` (`tests/vitest/browser/`): script-pipeline tests that import `src/app/runner.ts` and exercise Skulpt / JS-Interpreter / Web Audio. Run in headless Chromium via the Playwright provider; `tests/vitest/browser/setup.js` registers the `toMatchResult` matcher and loads `lib/kali.min`.
 - **Playwright end-to-end** (`tests/playwright/e2e/`): Full browser tests against the running app. Helpers in `tests/playwright/helpers/` provide API-route mocks. Run with `npm run test-playwright` (needs `npm run dev` or `npm run serve-local` on :8888 in another terminal).
-- **Cypress component** (`tests/cypress/component/`): Driven by `cypress run --component`. These import `src/app/runner.ts` directly to test the script-execution pipeline; they're not real React component tests. TODO: port to Vitest browser mode.
 - **Manual test plans** (`tests/manual/`): Markdown checklists for manual QA.
 
 ### Local Libraries

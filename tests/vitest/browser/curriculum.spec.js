@@ -1,4 +1,5 @@
-/* eslint-disable no-unused-expressions */
+import { describe, expect, it } from "vitest"
+
 import * as ESUtils from "../../../src/esutils"
 import * as runner from "../../../src/app/runner"
 
@@ -14,24 +15,16 @@ const EXCLUDE_LIST = [
     "Random Clip", // randomness in track output
     "Amen Remix", // randomness in track output
     "add-beats-instead-of-this", // demonstrative fragment
-    "add-beats-instead-of-this", // demonstrative fragment
-    "getting-started-finding-errors", // errors intended
     "getting-started-finding-errors", // errors intended
     "get-user-input-user-input-1", // readInput()
-    "get-user-input-user-input-1", // readInput()
-    "get-user-input-user-input-2", // readInput()
     "get-user-input-user-input-2", // readInput()
     "get-user-input-what-tempo", // readInput()
-    "get-user-input-what-tempo", // readInput()
-    "get-user-input-boolean-operations", // readInput()
     "get-user-input-boolean-operations", // readInput()
     "mixing-with-conditionals-condition", // demonstrative fragment
-    "mixing-with-conditionals-condition", // demonstrative fragment
-    "mixing-with-conditionals-condition1", // demonstrative fragment
     "mixing-with-conditionals-condition1", // demonstrative fragment
 ]
 
-describe("curriculum.scripts.cy.jsx", () => {
+describe("curriculum scripts", () => {
     for (const [filename, script] of Object.entries({ ...CURRICULUM_SCRIPTS, ...CURRICULUM_V2_SCRIPTS })) {
         const name = ESUtils.parseName(filename)
         if (EXCLUDE_LIST.includes(name)) {
@@ -39,13 +32,12 @@ describe("curriculum.scripts.cy.jsx", () => {
         }
         const language = ESUtils.parseLanguage(filename)
 
-        it(`should compile ${name} correctly in ${language.toUpperCase()}`, async function () {
-            this.timeout(6000)
+        it(`should compile ${name} correctly in ${language.toUpperCase()}`, { timeout: 6000 }, async () => {
             const result = await runner.run(language, script)
             if (filename in CURRICULUM_SCRIPTS) {
-                expect(result).to.matchResult(CURRICULUM_RESULTS[name], script)
+                expect(result).toMatchResult(CURRICULUM_RESULTS[name], script)
             } else if (filename in CURRICULUM_V2_SCRIPTS) {
-                expect(result).to.matchResult(CURRICULUM_V2_RESULTS[name], script)
+                expect(result).toMatchResult(CURRICULUM_V2_RESULTS[name], script)
             }
         })
     }
