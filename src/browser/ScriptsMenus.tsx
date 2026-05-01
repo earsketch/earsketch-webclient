@@ -157,7 +157,7 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
     const caiHighlight = useSelector(cai.selectHighlight)
     const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
+    const scalar = fontSize / 14
     const fontSm = scalar * 0.875
 
     return <Menu>
@@ -168,7 +168,7 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
             aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
         >
             <div className="truncate min-w-0 flex items-center">
-                <i className="icon-menu3 px-2" style={{ fontSize: `${1.25 * scalar}rem` }} />
+                <i className="icon-menu3 px-2" style={{ fontSize: `${1.5 * scalar}rem` }} />
             </div>
         </MenuButton>
         <MenuItems anchor="bottom start" className="focus:outline-none border border-black p-2 z-50 bg-white dark:bg-black">

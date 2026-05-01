@@ -90,7 +90,7 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
 export const CheckboxButton = ({ value = 0, label = value.toString(), fullWidth = false, onClick, selected = false, submitOnClick = true, selectedColor = "amber" }: { value?: number, label?: string, fullWidth?: boolean, onClick: (input: number) => void, selected?: boolean, submitOnClick?: boolean, selectedColor?: "amber" | "green" }) => {
     const fontSize = useSelector(appState.selectFontSize)
     const scalar = fontSize / 14
-    const fontXs = scalar * 0.75
+    const fontSm = scalar * 0.875
     const classnames = classNames({
         "rounded cursor-pointer p-1 mt-1 mr-2": true,
         "hover:bg-amber-50 dark:hover:bg-amber-900 hover:text-black dark:text-white": selectedColor === "amber",
@@ -114,7 +114,7 @@ export const CheckboxButton = ({ value = 0, label = value.toString(), fullWidth 
             <span className="rounded-full inline-flex w-1 mr-2">
                 <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
             </span>
-            <div className="select-none mr-4" style={{ fontSize: `${fontXs}rem` }}>
+            <div className="select-none mr-4" style={{ fontSize: `${fontSm}rem` }}>
                 {label}
             </div>
         </div>
