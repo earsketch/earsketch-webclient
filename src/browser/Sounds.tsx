@@ -16,6 +16,7 @@ import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { SearchBar } from "./Utils"
 
@@ -459,55 +460,23 @@ const AddSound = () => {
     )
 }
 
-const ClipTooltip = ({ children, label, fontSize }: { children: React.ReactElement, label: React.ReactNode, fontSize: number }) => {
-    const [visible, setVisible] = useState(false)
-    const [coords, setCoords] = useState({ x: 0, y: 0, flip: false })
-    const timerRef = useRef<number | null>(null)
-    const triggerRef = useRef<HTMLElement>(null)
-
-    const handleMouseEnter = () => {
-        timerRef.current = window.setTimeout(() => {
-            if (!triggerRef.current) return
-            const rect = triggerRef.current.getBoundingClientRect()
-            const tooltipHeight = fontSize * 250
-            const nearBottom = rect.bottom + tooltipHeight > window.innerHeight
-            setCoords({
-                x: rect.left,
-                y: nearBottom ? rect.top : rect.bottom,
-                flip: nearBottom,
-            })
-            setVisible(true)
-        }, 600)
-    }
-
-    const handleMouseLeave = () => {
-        if (timerRef.current) window.clearTimeout(timerRef.current)
-        setVisible(false)
-    }
-
-    return (
-        <>
-            {React.cloneElement(children, {
-                ref: triggerRef,
-                onMouseEnter: handleMouseEnter,
-                onMouseLeave: handleMouseLeave,
-            })}
-            {visible && (
-                <div
-                    className="fixed z-50 rounded px-3 py-2 text-white shadow-lg pointer-events-none bg-gray-800 dark:bg-[#181818] dark:outline dark:outline-1 dark:outline-gray-200"
-                    style={{
-                        top: coords.flip ? undefined : coords.y + 4,
-                        bottom: coords.flip ? window.innerHeight - coords.y + 4 : undefined,
-                        left: coords.x + 16,
-                        fontSize: `${fontSize}rem`,
-                    }}
-                >
-                    {label}
-                </div>
-            )}
-        </>
-    )
-}
+const ClipTooltip = ({ children, label, fontSize }: { children: React.ReactElement, label: React.ReactNode, fontSize: number }) => (
+    <Tooltip.Root delayDuration={600} disableHoverableContent>
+        <Tooltip.Trigger asChild>
+            {children}
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+            <Tooltip.Content
+                side="bottom"
+                sideOffset={4}
+                className="z-50 rounded px-3 py-2 text-white shadow-lg pointer-events-none bg-gray-800 dark:bg-[#181818] dark:outline dark:outline-1 dark:outline-gray-200"
+                style={{ fontSize: `${fontSize}rem` }}
+            >
+                {label}
+            </Tooltip.Content>
+        </Tooltip.Portal>
+    </Tooltip.Root>
+)
 
 const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const dispatch = useDispatch()
