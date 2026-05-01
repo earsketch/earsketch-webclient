@@ -69,6 +69,7 @@ jobs:
 
           LINTER_RULES_PATH: /
           JSCPD_CONFIG_FILE: .jscpd.json
+          PYTHON_PYLINT_CONFIG_FILE: .pylintrc
           VALIDATE_JAVASCRIPT_ES: false
           VALIDATE_TYPESCRIPT_ES: false
           VALIDATE_JAVASCRIPT_STANDARD: false
