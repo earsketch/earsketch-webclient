@@ -75,10 +75,7 @@ test.describe("Editor", () => {
         await page.keyboard.type("m")
         await expect(page.locator(".cm-tooltip-autocomplete")).toHaveCount(0)
         // Some cm-line should contain just "m", with no autocompleted expansion.
-        await expect.poll(async () => {
-            const texts = await page.locator(".cm-line").allTextContents()
-            return texts.map((t) => t.trim()).includes("m")
-        }).toBe(true)
+        await expect(page.locator(".cm-line").filter({ hasText: /^m$/ })).toBeVisible()
     })
 
     test("interrupts a long-running script", async ({ page }) => {
