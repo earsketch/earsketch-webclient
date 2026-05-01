@@ -51,7 +51,7 @@ phases:
       - echo "Entered the build phase..."
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - npm test
-      - npm run test:component
+      - npm run test:scripts
       - ES_NEWRELIC_CONFIG=$ES_BUILD_ENVIRONMENT npm run build -- --mode $ES_BUILD_ENVIRONMENT
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR

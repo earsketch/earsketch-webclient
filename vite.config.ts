@@ -67,9 +67,9 @@ export default ({ mode }: { mode: string }) => {
                 {
                     extends: true,
                     test: {
-                        name: "browser",
-                        include: ["tests/vitest/browser/**/*.spec.{js,ts,jsx,tsx}"],
-                        setupFiles: ["./tests/vitest/browser/setup.js"],
+                        name: "scripts",
+                        include: ["tests/vitest/scripts/**/*.spec.{js,ts,jsx,tsx}"],
+                        setupFiles: ["./tests/vitest/scripts/setup.js"],
                         browser: {
                             enabled: true,
                             provider: "playwright",

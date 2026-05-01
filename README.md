@@ -36,7 +36,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for details about the project structure a
 
 - `npm test` - Run unit tests (Vitest, jsdom)
 
-- `npm run test:component` - Run component tests (Vitest browser mode, headless Chromium)
+- `npm run test:scripts` - Run script-pipeline tests (Vitest browser mode, headless Chromium)
 
 - `npm run test:e2e` - Run end-to-end tests (Playwright)
 

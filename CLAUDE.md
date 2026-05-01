@@ -23,8 +23,8 @@ npm test
 # Run a single Vitest test file
 npm test tests/vitest/src/esutils.spec.js
 
-# Run component tests (script-pipeline tests in headless Chromium via Vitest browser mode)
-npm run test:component
+# Run script-pipeline tests in headless Chromium via Vitest browser mode
+npm run test:scripts
 
 # Run Playwright end-to-end tests (requires `npm run dev` or `npm run serve-local` running on :8888)
 npm run test:e2e
@@ -114,7 +114,7 @@ All user-facing text must use `i18next`. In React components, use the `useTransl
 
 - **Vitest** (`tests/vitest/`): Two projects share the same Vite config:
   - `unit` (`tests/vitest/src/`): jsdom unit tests for utilities and components. Mock modules go in `__mocks__/` directories next to the originals.
-  - `browser` (`tests/vitest/browser/`): script-pipeline tests that import `src/app/runner.ts` and exercise Skulpt / JS-Interpreter / Web Audio. Run in headless Chromium via the Playwright provider; `tests/vitest/browser/setup.js` registers the `toMatchResult` matcher and loads `lib/kali.min`.
+  - `scripts` (`tests/vitest/scripts/`): runs Python and JavaScript scripts through `src/app/runner.ts` and asserts on the resulting `DAWData`, exercising Skulpt / JS-Interpreter / Web Audio. Runs in headless Chromium via the Playwright provider; `tests/vitest/scripts/setup.js` registers the `toMatchResult` matcher and loads `lib/kali.min`.
 - **Playwright end-to-end** (`tests/playwright/e2e/`): Full browser tests against the running app. Helpers in `tests/playwright/helpers/` provide API-route mocks. Run with `npm run test:e2e` (needs `npm run dev` or `npm run serve-local` on :8888 in another terminal).
 - **Manual test plans** (`tests/manual/`): Markdown checklists for manual QA.
 
