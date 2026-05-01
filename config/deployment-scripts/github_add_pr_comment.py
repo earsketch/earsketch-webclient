@@ -1,4 +1,5 @@
 """Post a Playwright failure-report comment on a pull request."""
+
 import sys
 
 import requests
