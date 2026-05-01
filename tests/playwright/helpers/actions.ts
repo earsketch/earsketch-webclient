@@ -29,8 +29,8 @@ export async function createScript(page: Page, scriptName: string) {
     await page.locator("input").filter({ hasText: "CREATE" }).click()
     await expect(page.locator("#scriptName")).toHaveCount(0, { timeout: 10000 })
     await expect(page.locator("div[id^='headlessui-dialog-']")).toHaveCount(0, { timeout: 10000 })
-    // See note in the original Cypress command: tab off the New Script button
-    // so AutoSizer can re-render before we try to open the script menu.
+    // Tab off the New Script button so AutoSizer can re-render before we try
+    // to open the script menu.
     await page.keyboard.press("Tab")
 }
 
@@ -52,7 +52,7 @@ export async function toggleCurriculumLanguage(page: Page) {
  *
  * Tests that need to drive incoming WebSocket messages (currently all skipped:
  * broadcasts, script-share, user-login) will need to inject mock-socket and
- * coordinate via page.evaluate. See the original Cypress wsServer.js.
+ * coordinate via page.evaluate.
  */
 export async function visitWithStubWebSocket(page: Page, url: string) {
     await page.addInitScript({

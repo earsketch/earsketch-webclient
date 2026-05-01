@@ -44,10 +44,14 @@ export interface MockOptions {
     favorites?: unknown[]
     scriptsOwned?: Script[]
     scriptsShared?: Script[]
+    notifications?: Array<Record<string, unknown>>
     username?: string
     interceptCurriculum?: boolean
     interceptScriptSave?: boolean
     interceptScriptById?: Script
+    interceptScriptImport?: Script
+    interceptScriptRename?: Script
+    interceptScriptSaveShared?: Script
     interceptUsersEdit?: boolean
     interceptModifyPassword?: { password: string }
     interceptFreesoundSearch?: boolean
@@ -88,7 +92,7 @@ function fulfillJson(route: Route, body: unknown, status = 200) {
 
 /**
  * Tracks every request that matched a given route pattern, so tests can assert
- * counts (cy.get("@audio_sample.all").should("have.length", 3) equivalent).
+ * counts.
  */
 export class RouteCounter {
     private map = new Map<string, number>()
@@ -146,7 +150,7 @@ export async function setupBackend(page: Page, opts: MockOptions = {}): Promise<
         })
         await page.route(`https://${API_HOST}/EarSketchWS/users/notifications`, (route) => {
             counter.bump("users_notifications")
-            return fulfillJson(route, [])
+            return fulfillJson(route, opts.notifications ?? [])
         })
     }
 
@@ -206,6 +210,20 @@ export async function setupBackend(page: Page, opts: MockOptions = {}): Promise<
                 username: TEST_USER,
             })
         })
+    }
+
+    for (const [optKey, urlPath, counterKey] of [
+        ["interceptScriptImport", "import", "scripts_import"],
+        ["interceptScriptRename", "rename", "scripts_rename"],
+        ["interceptScriptSaveShared", "saveshared", "scripts_saveshared"],
+    ] as const) {
+        const script = opts[optKey]
+        if (script) {
+            await page.route(`https://${API_HOST}/EarSketchWS/scripts/${urlPath}`, (route) => {
+                counter.bump(counterKey)
+                return fulfillJson(route, script)
+            })
+        }
     }
 
     for (const tag of ["upload", "rename", "delete"] as const) {

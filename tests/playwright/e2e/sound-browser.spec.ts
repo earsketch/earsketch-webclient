@@ -121,7 +121,7 @@ test.describe("edit sound uploads", () => {
     test("renames sound", async ({ page }) => {
         await setupBackend(page, { interceptAudioRename: true })
 
-        // The rename button may be hidden behind hover styles; force-click matches the original Cypress flow.
+        // The rename button is hidden until row hover; force-click bypasses that.
         await page.locator("button[title='Rename sound']").click({ force: true })
         await expect(page.getByRole("dialog").getByText("Rename Sound")).toBeVisible()
         await page.locator(`input[value='SHH${randSuffix}']`).pressSequentially("1")

@@ -1,11 +1,23 @@
-import { test } from "@playwright/test"
+import { test, expect } from "@playwright/test"
+import { setupBackend } from "../helpers/mocks"
+import { skipTour, login } from "../helpers/actions"
 
-// TODO: Port from cypress when migrating to a real WebSocket mock. The original
-// Cypress test relied on cy.stub'ing window.WebSocket with mock-socket and
-// driving messages from the test runner. Playwright's split between Node and
-// browser contexts means we need to inject mock-socket into the page and drive
-// server messages via page.evaluate. Skipped (matches the original Cypress
-// it.skip).
-test.skip("broadcast notification is received", async () => {
-    // intentionally empty
+test("broadcast notification is delivered on login", async ({ page }) => {
+    await setupBackend(page, {
+        interceptUsersAuth: true,
+        userAudio: [],
+        favorites: [],
+        scriptsOwned: [],
+        scriptsShared: [],
+        notifications: [{
+            notification_type: "broadcast",
+            username: "user2",
+            message: { text: "Hello, EarSketch!", hyperlink: "", expiration: 7 },
+        }],
+    })
+    await page.goto("/")
+    await skipTour(page)
+    await login(page)
+
+    await expect(page.locator("[data-test='numUnreadNotifications']")).toHaveText("1")
 })
