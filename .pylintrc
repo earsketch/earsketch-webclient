@@ -1,0 +1,5 @@
+# Existence of this file shadows Super-Linter's bundled config.
+
+[BASIC]
+# Don't demand UPPER_CASE for module-level "constants".
+const-naming-style = any

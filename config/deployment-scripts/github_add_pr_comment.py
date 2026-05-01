@@ -35,7 +35,7 @@ createCommentParams = {
     "body": body,
 }
 r = requests.post(
-    url + "/comments", headers=headers, auth=auth, json=createCommentParams
+    url + "/comments", headers=headers, auth=auth, json=createCommentParams, timeout=30
 )
 new_comment = r.json()
 try:
