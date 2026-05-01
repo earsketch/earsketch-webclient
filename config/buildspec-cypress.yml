@@ -23,7 +23,7 @@ phases:
     commands:
       - nohup npm run dev & echo $! > pidfile
       - npx wait-on --timeout 120000 http://localhost:8888
-      - npm run test-playwright
+      - npm run test:e2e
       - kill $(cat pidfile)
   post_build:
     commands:

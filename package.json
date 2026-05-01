@@ -16,9 +16,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint src",
     "preview": "vite preview",
-    "test-vitest": "vitest run",
-    "test-playwright": "playwright test",
-    "test-playwright-ui": "playwright test --ui",
+    "test": "vitest run --project=unit",
+    "test:component": "vitest run --project=browser",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "serve-local": "export ES_API_HOST=https://api-dev.ersktch.gatech.edu ES_BASE_URI=/ NODE_ENV=development ES_BASE_URL=/; tsc -b && vite build --mode development && ln -s ../curriculum dist/curriculum && vite preview",
     "lint:report": "eslint --output-file eslint_report.json --format json src"
   },

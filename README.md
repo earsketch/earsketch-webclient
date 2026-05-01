@@ -34,13 +34,13 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for details about the project structure a
 
 - `npm run build` - Build the app for production to the `dist` folder
 
-- `npm run test` - Run unit tests and sample scripts
+- `npm test` - Run unit tests (Vitest, jsdom)
 
-- `npm run test-vitest` - Run component tests
+- `npm run test:component` - Run component tests (Vitest browser mode, headless Chromium)
 
-- `npm run test-cypress` - Run e2e tests
+- `npm run test:e2e` - Run end-to-end tests (Playwright)
 
-- `npm run test-cypress-gui` - Run e2e tests in a GUI
+- `npm run test:e2e:ui` - Run end-to-end tests in Playwright's UI mode
 
 ## Deployment
 

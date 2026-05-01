@@ -1,9 +1,9 @@
 # EarSketch Vitest Tests
 
-Run tests with the following command:
-```bash
-npm run test-vitest
-```
+Two projects share this directory:
+
+- `src/` — jsdom unit tests. Run with `npm test`.
+- `browser/` — script-pipeline tests that run in headless Chromium via Vitest browser mode. Run with `npm run test:component`.
 
 ## Writing a test
 
