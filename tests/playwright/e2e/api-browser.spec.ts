@@ -10,7 +10,7 @@ test.describe("API browser", () => {
     })
 
     test("expands and pastes API entry", async ({ page }) => {
-        const scriptName = "api_cypress_test"
+        const scriptName = "api_test_script"
         const functionText = "analyze"
         await createScript(page, scriptName)
 

@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export const API_HOST = "api-dev.ersktch.gatech.edu"
 export const CLOUDFRONT_HOST = "earsketch-test.ersktch.gatech.edu"
-export const TEST_USER = "cypress"
+export const TEST_USER = "tester"
 
 export interface AudioMeta {
     artist?: string
@@ -200,7 +200,7 @@ export async function setupBackend(page: Page, opts: MockOptions = {}): Promise<
                 modified: "2022-04-06 14:53:07.0",
                 name,
                 run_status: 0,
-                shareid: `cypress_${name}`,
+                shareid: `test_${name}`,
                 soft_delete: false,
                 source_code: source,
                 username: TEST_USER,

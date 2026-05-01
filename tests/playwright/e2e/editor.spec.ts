@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { setupBackend, type Script } from "../helpers/mocks"
+import { setupBackend, TEST_USER, type Script } from "../helpers/mocks"
 import { skipTour, login, waitForHeadlessDialog } from "../helpers/actions"
 
 const TEST_SOUND_META = {
@@ -10,7 +10,7 @@ const TEST_SOUND_META = {
 }
 
 test.describe("Editor", () => {
-    const anonymousScriptName = "cypress_test"
+    const anonymousScriptName = "test_script"
 
     test.beforeEach(async ({ page }) => {
         await setupBackend(page, {
@@ -163,10 +163,10 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
     })
 
     test("logs in, edits a saved script, and persists changes", async ({ page }) => {
-        const username = "cypress"
+        const username = TEST_USER
         const scriptName = "RecursiveMelody.py"
         const anonymousScriptMessage1 = "Greetings from anonymous script."
-        const anonymousScriptName2 = "cypress_test_anon2"
+        const anonymousScriptName2 = "test_script_anon2"
         const anonymousScriptMessage2 = "Greetings from another anonymous script 2."
 
         const editor = page.locator("#editor")

@@ -15,7 +15,7 @@ test.describe("script browser", () => {
     })
 
     test("renames a script", async ({ page }) => {
-        const scriptName = "cypress_test"
+        const scriptName = "test_script"
         await createScript(page, scriptName)
         await page.locator(`[title="Script Options for ${scriptName}.py"]`).click()
         await page.locator(`[title="Rename ${scriptName}.py"]`).click()
@@ -28,8 +28,8 @@ test.describe("script browser", () => {
     })
 
     test("deletes a script and prevents reuse of deleted name", async ({ page }) => {
-        const scriptName1 = "first_cypress_test"
-        const scriptName2 = "second_cypress_test"
+        const scriptName1 = "first_test_script"
+        const scriptName2 = "second_test_script"
         await createScript(page, scriptName1)
         await createScript(page, scriptName2)
 

@@ -1,9 +1,9 @@
 import { test, expect, type Page } from "@playwright/test"
 import AxeBuilder from "@axe-core/playwright"
-import { setupBackend, type Script } from "../helpers/mocks"
+import { setupBackend, TEST_USER, type Script } from "../helpers/mocks"
 import { skipTour, login } from "../helpers/actions"
 
-const username = "cypress"
+const username = TEST_USER
 const scriptName = "RecursiveMelody.py"
 
 const ownedScript: Script = {

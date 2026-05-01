@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { setupBackend } from "../helpers/mocks"
+import { setupBackend, TEST_USER } from "../helpers/mocks"
 
 const sharedScript = {
     created: "2022-04-20 19:10:00.0",
@@ -11,7 +11,7 @@ const sharedScript = {
     shareid: "abcabcabcabcabcabcabcabc",
     soft_delete: false,
     source_code: "from earsketch import *\n\nsetTempo(111)\n# todo: music\n",
-    username: "cypress",
+    username: TEST_USER,
 }
 
 test.describe("embedded mode", () => {

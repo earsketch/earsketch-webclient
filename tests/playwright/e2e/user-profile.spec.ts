@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test"
-import { setupBackend } from "../helpers/mocks"
+import { setupBackend, TEST_USER } from "../helpers/mocks"
 import { skipTour, login, visitWithStubWebSocket } from "../helpers/actions"
 
 test("logs in and changes user email and password", async ({ page }) => {
-    const changedEmail = "alternate.cypress@earsketch.cyp"
+    const changedEmail = "tester.alternate@example.com"
     const originalPassword = "not_a_real_password"
     const changedPassword = "this_is_changed"
 
@@ -23,7 +23,7 @@ test("logs in and changes user email and password", async ({ page }) => {
 
     await expect(page.locator("h1", { hasText: "EarSketch" })).toBeVisible()
 
-    await page.locator("button", { hasText: "cypress" }).click()
+    await page.locator("button", { hasText: TEST_USER }).click()
     await page.locator("button", { hasText: "Edit Profile" }).click()
 
     await page.locator("input[placeholder='Email Address (Optional)']").fill(changedEmail)

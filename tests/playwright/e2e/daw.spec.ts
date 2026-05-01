@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test"
-import { setupBackend, type AudioMeta } from "../helpers/mocks"
+import { setupBackend, TEST_USER, type AudioMeta } from "../helpers/mocks"
 import { skipTour, login, visitWithStubWebSocket } from "../helpers/actions"
 
 const TEST_SOUND_META: AudioMeta = {
@@ -34,7 +34,7 @@ async function setupSoundsAndScript(page: Page, script: string) {
             shareid: "qeT7pez_OVHwmxeDVzkT7w",
             soft_delete: false,
             source_code: script,
-            username: "cypress",
+            username: TEST_USER,
         }],
         interceptScriptSave: true,
     })

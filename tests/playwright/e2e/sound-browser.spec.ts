@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 import * as path from "node:path"
 import { fileURLToPath } from "node:url"
-import { setupBackend, type AudioMeta } from "../helpers/mocks"
+import { setupBackend, TEST_USER, type AudioMeta } from "../helpers/mocks"
 import { skipTour, login, visitWithStubWebSocket } from "../helpers/actions"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -41,7 +41,7 @@ test.describe("preview sound", () => {
 
 test.describe("add a sound", () => {
     test("uploads a sound", async ({ page }) => {
-        const username = "cypress"
+        const username = TEST_USER
         const fileName = "clink.wav"
         const usernameUpper = username.toUpperCase()
         const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
@@ -87,7 +87,7 @@ test.describe("add a sound", () => {
 })
 
 test.describe("edit sound uploads", () => {
-    const username = "cypress"
+    const username = TEST_USER
     const usernameUpper = username.toUpperCase()
     const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
     const soundConst = usernameUpper + "_SHH" + randSuffix
