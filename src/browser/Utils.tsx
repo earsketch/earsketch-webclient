@@ -25,7 +25,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
+    const scalar = fontSize / 14
     const fontSm = scalar * 0.875
 
     return (
@@ -70,8 +70,8 @@ interface DropdownMultiSelectorProps {
 export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const dispatch = useDispatch()
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
-    const fontSm = scalar * 0.875
+    const scalar = fontSize / 14
+    const textXs = scalar * 0.75
 
     const selectedValues = useAppSelector(
         (state) => state.scripts.filters[category]
@@ -101,13 +101,13 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
             <div className="relative w-1/3">
                 <ListboxButton
                     className={`flex justify-between w-full border-b-2 ${margin} border-black dark:border-white`}
-                    style={{ fontSize: `${fontSm}rem` }}
+                    style={{ fontSize: `${scalar}rem` }}
                     aria-label={aria}
                 >
                     <span className="truncate">
                         {title} {numSelected ? `(${numSelected})` : ""}
                     </span>
-                    <i className="icon icon-arrow-down2 p-1" />
+                    <i className="icon icon-arrow-down2 p-1" style={{ fontSize: `${textXs}rem` }}/>
                 </ListboxButton>
 
                 <ListboxOptions
@@ -156,6 +156,8 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
     const [expanded, setExpanded] = useState(initExpanded)
     const filteredTitle = title.replace(/\([^)]*\)/g, "")
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
 
     return (
         <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "grow" : "grow-0"}`}>
@@ -168,14 +170,14 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     title={title}
                     onClick={() => setExpanded(v => !v)}
                 >
-                    <h4 className="flex items-center truncate py-1">
-                        <i className="icon-album pr-1.5" />
+                    <h4 className="flex items-center truncate py-1" style={{ fontSize: `${scalar}rem` }}>
+                        <i className="icon-album pr-1.5"/>
                         <div className="truncate">{title}</div>
                     </h4>
-                    <div className="w-1/12">
+                    <div className="shrink-0 pr-2 flex items-center">
                         {expanded
-                            ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { name: filteredTitle })} aria-expanded={true} aria-label={t("thing.collapse", { name: filteredTitle })}> </button>
-                            : <button className="icon icon-arrow-right2" title={t("thing.expand", { name: filteredTitle })} aria-expanded={false} aria-label={t("thing.expand", { name: filteredTitle })}> </button>}
+                            ? <button className="icon icon-arrow-down2" style={{ fontSize: `${scalar}rem` }} title={t("thing.collapse", { name: filteredTitle })} aria-expanded={true} aria-label={t("thing.collapse", { name: filteredTitle })}> </button>
+                            : <button className="icon icon-arrow-right2" style={{ fontSize: `${scalar}rem` }} title={t("thing.expand", { name: filteredTitle })} aria-expanded={false} aria-label={t("thing.expand", { name: filteredTitle })}> </button>}
                     </div>
                 </div>
             </div>

@@ -400,7 +400,7 @@ const NumberOfSounds = () => {
     const fontXs = scalar * 0.75
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
 
-    return <div className="flex items-center" style={{ fontSize: `${fontXs}rem` }}>
+    return <div className="flex items-center whitespace-nowrap" style={{ fontSize: `${fontXs}rem` }}>
         {t("numSounds", { count: numFiltered })}
     </div>
 }
@@ -419,7 +419,7 @@ const ShowOnlyFavorites = () => {
             <input
                 type="checkbox"
                 style={{ width: `${fontSm}rem`, height: `${fontSm}rem` }}
-                className="mr-1.5"
+                className="mr-1.5 whitespace-nowrap"
                 onChange={() => { dispatch(sounds.setFilterByFavorites(!filterByFavorites)) }}
                 disabled={!loggedIn}
                 title={t("soundBrowser.button.showOnlyStarsDescriptive")}
@@ -446,7 +446,7 @@ const AddSound = () => {
 
     return (
         <button
-            className={`flex items-center rounded-full px-2 ${loggedIn ? "bg-black text-white cursor-pointer" : "text-gray-200 border-gray-200"}`}
+            className={`flex items-center rounded-full px-2 whitespace-nowrap ${loggedIn ? "bg-black text-white cursor-pointer" : "text-gray-200 border-gray-200"}`}
             onClick={callbacks.upload}
             disabled={!loggedIn}
             title={tooltip}
@@ -732,7 +732,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const searchText = useSelector(sounds.selectSearchText)
     const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
     const clearClassnames = classNames({
-        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
+        "flex items-center rounded pl-1 pr-1.5 border whitespace-nowrap": true,
         "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
         "text-gray-200 border-gray-200": !clearButtonEnabled,
     })
