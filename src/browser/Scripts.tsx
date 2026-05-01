@@ -30,7 +30,7 @@ export const callbacks = {
 const CreateScriptButton = () => {
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
+    const scalar = fontSize / 14
     const fontSm = scalar * 0.875
     const fontXs = scalar * 0.75
     return (
@@ -63,7 +63,7 @@ interface FilterItemProps {
 export const FilterItem = ({ value, isClearItem = false, active, selected = false }: FilterItemProps) => {
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
+    const scalar = fontSize / 14
     const fontSm = scalar * 0.875
 
     return (
@@ -96,8 +96,9 @@ export const SortBySelector = () => {
     const sortBy = useSelector((state: any) => state.scripts.filters.sortBy)
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
+    const scalar = fontSize / 14
     const fontSm = scalar * 0.875
+    const fontXs = scalar * 0.75
 
     // Local state for the selected option
     const [selectedId, setSelectedId] = useState<string>(
@@ -129,13 +130,13 @@ export const SortBySelector = () => {
                 <ListboxButton
                     className={`flex justify-between w-full border-b-2 cursor-pointer select-none ${theme === "light" ? "border-black" : "border-white"
                     }`}
-                    style={{ fontSize: `${fontSm}rem` }}
+                    style={{ fontSize: `${scalar}rem` }}
                     aria-label={t("scriptBrowser.filterDropdown.sortBy")}
                 >
                     <span className="truncate">
                         {t("scriptBrowser.filterDropdown.sortBy")}
                     </span>
-                    <i className="icon icon-arrow-down2 text-xs p-1" style={{ fontSize: `${fontSm}rem` }}/>
+                    <i className="icon icon-arrow-down2 p-1" style={{ fontSize: `${fontXs}rem` }}/>
                 </ListboxButton>
 
                 <ListboxOptions
@@ -170,7 +171,7 @@ const Filters = () => {
     const numTypesSelected = useSelector(scripts.selectNumTypesSelected)
     const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
+    const scalar = fontSize / 14
     const fontXs = scalar * 0.75
 
     return (
@@ -203,7 +204,7 @@ const Filters = () => {
 
 const ShowDeletedScripts = () => {
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
+    const scalar = fontSize / 14
     const fontSm = scalar * 0.875
     const dispatch = useDispatch()
     const { t } = useTranslation()
@@ -233,8 +234,8 @@ const PillButton = ({ script, fn, aria, icon, children }: { script: Script, fn: 
     const { t } = useTranslation()
     const descriptor = t(aria, { scriptname: script.name })
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
-    const fontXs = scalar * 0.75
+    const scalar = fontSize / 14
+    const fontSm = scalar * 0.875
     return <button
         className="flex items-center space-x-2 border border-gray-800 rounded-full px-2 py-1 text-sm bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
         onClick={(event) => {
@@ -244,7 +245,7 @@ const PillButton = ({ script, fn, aria, icon, children }: { script: Script, fn: 
         }}
         aria-label={descriptor}
         title={descriptor}
-        style={{ fontSize: `${fontXs}rem` }}
+        style={{ fontSize: `${fontSm}rem` }}
     >
         <i className={icon} />
         {children}
@@ -305,7 +306,7 @@ const SharedScriptInfoButton = ({ script }: { script: Script }) => {
 
 const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => {
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
+    const scalar = fontSize / 14
     const fontSm = scalar * 0.875
     const dispatch = useDispatch()
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid)
@@ -322,7 +323,8 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
     const ariaLabel = type === "deleted" ? "" : t("scriptBrowser.openInEditor", { name: script.name })
     return (
         <div
-            className={`h-full flex flex-row justify-start border-t border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
+            className={`flex flex-row items-center justify-start border-b border-t border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
+            style={{ height: `${44 + (fontSize - 14) * 2}px` }}
             onClick={() => {
                 if (type === "regular") {
                     dispatch(setActiveTabAndEditor(script.shareid))
@@ -336,7 +338,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
             title={ariaLabel}
             aria-label={ariaLabel}
         >
-            <div className={`h-auto border-l-4 ${tabIndicator}`} />
+            <div className={`h-full border-l-4 ${tabIndicator}`} />
             <div
                 className="flex grow truncate px-2"
             >
@@ -445,8 +447,7 @@ const DeletedScriptCollection = () => {
 
 export const ScriptBrowser = () => {
     const fontSize = useSelector(appState.selectFontSize)
-    const scalar = fontSize / 12
-    const fontSm = scalar * 0.875
+    const scalar = fontSize / 14
     return (
         <>
             <ScriptSearchBar />
@@ -457,7 +458,7 @@ export const ScriptBrowser = () => {
                 <CreateScriptButton />
             </div>
 
-            <div className="h-full flex flex-col justify-start" style={{ fontSize: `${fontSm}rem` }} role="tabpanel" id={"panel-" + BrowserTabType.Script}>
+            <div className="h-full flex flex-col justify-start" style={{ fontSize: `${2 * scalar}rem` }} role="tabpanel" id={"panel-" + BrowserTabType.Script}>
                 <RegularScriptCollection />
                 <SharedScriptCollection />
                 <DeletedScriptCollection />
