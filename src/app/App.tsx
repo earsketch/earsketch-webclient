@@ -454,7 +454,7 @@ const MiscActionMenu = () => {
 
     const actions = [
         { nameKey: "startQuickTour", action: resumeQuickTour },
-        { nameKey: "reportError", action: reportError },
+        ...(ES_WEB_STATIC ? [] : [{ nameKey: "reportError", action: reportError }]),
     ]
 
     const links = [
@@ -648,22 +648,24 @@ export const App = () => {
             await store.dispatch(soundsThunks.getLocalUserSounds())
 
             // Attempt to load userdata from a previous session.
-            if (savedLoginInfo) {
-                await login({ username, password }).then(() => {
-                    // Remove defunct localStorage key
-                    localStorage.removeItem(USER_STATE_KEY)
-                }).catch((error: Error) => {
-                    if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
-                        localStorage.clear()
-                        window.location.reload()
-                        esconsole(error, ["error"])
-                        reporter.exception("Auto-login failed. Clearing localStorage.")
+            if (!ES_WEB_STATIC) {
+                if (savedLoginInfo) {
+                    await login({ username, password }).then(() => {
+                        // Remove defunct localStorage key
+                        localStorage.removeItem(USER_STATE_KEY)
+                    }).catch((error: Error) => {
+                        if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
+                            localStorage.clear()
+                            window.location.reload()
+                            esconsole(error, ["error"])
+                            reporter.exception("Auto-login failed. Clearing localStorage.")
+                        }
+                    })
+                } else {
+                    const token = user.selectToken(store.getState())
+                    if (token !== null) {
+                        await login({ token })
                     }
-                })
-            } else {
-                const token = user.selectToken(store.getState())
-                if (token !== null) {
-                    await login({ token })
                 }
             }
 
@@ -913,9 +915,9 @@ export const App = () => {
                     <FontSizeMenu />
                     <SwitchThemeButton />
                     <MiscActionMenu />
-                    <BackupBanner />
+                    {ES_WEB_STATIC && <BackupBanner />}
                     <NotificationMenu />
-                    <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />
+                    {!ES_WEB_STATIC && <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />}
                 </div>
             </header>}
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />

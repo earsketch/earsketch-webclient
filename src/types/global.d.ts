@@ -17,6 +17,7 @@ declare const ES_WEB_UPLOAD_CAI_HISTORY: boolean
 declare const ES_WEB_SHOW_CHAT: boolean
 declare const ES_WEB_SHOW_LOCALE_SWITCHER: boolean
 declare const ES_WEB_GOOGLE_CLIENT_ID: string | undefined
+declare const ES_WEB_STATIC: boolean
 
 declare const Kali: any
 

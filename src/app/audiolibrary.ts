@@ -67,6 +67,10 @@ async function getSoundBuffer(sound: SoundEntity) {
         }
     }
 
+    if (ES_WEB_STATIC && !sound.standard) {
+        // Non-standard sounds without a local copy can't be fetched in static mode.
+        throw new Error(`Sound not available: ${name}`)
+    }
     const url = sound.standard
         ? STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
         : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
@@ -189,6 +193,10 @@ export async function getMetadata(name: string) {
 }
 
 async function _getMetadata(name: string) {
+    if (ES_WEB_STATIC) {
+        // No backend to look up metadata for unknown sound names.
+        return null
+    }
     const url = URL_DOMAIN + "/audio/metadata?" + new URLSearchParams({ name })
     const response = await fetch(url)
     const text = await response.text()
