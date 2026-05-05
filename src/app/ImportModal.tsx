@@ -17,12 +17,16 @@ export const ImportModal = ({ parsed, close }: Props) => {
     const [error, setError] = useState("")
     const [importing, setImporting] = useState(false)
 
-    // Only track scripts whose names actually conflict with existing ones
+    // Only track scripts whose names conflict AND whose content differs from the existing one.
+    // Identical-content matches (e.g. re-importing the same backup) are skipped silently by importBackup.
     const existingScripts = useSelector(scriptsState.selectActiveScripts)
-    const existingNames = new Set(Object.values(existingScripts).map(s => s.name))
+    const existingByName = new Map(Object.values(existingScripts).map(s => [s.name, s]))
     const conflictingNames = parsed.scripts
+        .filter(s => {
+            const existing = existingByName.get(s.manifest.name)
+            return existing !== undefined && existing.source_code !== s.source
+        })
         .map(s => s.manifest.name)
-        .filter(name => existingNames.has(name))
 
     const [conflicts, setConflicts] = useState<{ [name: string]: "rename" | "skip" }>(
         () => Object.fromEntries(conflictingNames.map(name => [name, "rename"]))

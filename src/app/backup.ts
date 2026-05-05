@@ -119,6 +119,8 @@ export async function importBackup(
         let name = manifest.name
         const conflicting = Object.values(existing).find(s => s.name === name && !s.soft_delete)
         if (conflicting) {
+            // Skip silently if the existing script has identical content (e.g. re-importing the same backup).
+            if (conflicting.source_code === source) continue
             const action = options.onConflict(name)
             if (action === "skip") continue
             // rename: append _1, _2, ...
