@@ -169,15 +169,11 @@ async function postLogin(username: string) {
 
     // Fetch the user's scripts now that they're logged in.
     // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
+    // This clears regularScripts from Redux; we keep our `saved` snapshot so failed migrations can be restored below.
     await refreshScriptBrowser()
 
-    const promises = []
-    for (const script of Object.values(saved)) {
-        if (script.soft_delete) {
-            // Don't migrate scripts the user deleted while logged out.
-            continue
-        }
-
+    const eligibleScripts = Object.values(saved).filter(script => !script.soft_delete)
+    const migrationTasks = eligibleScripts.map(script => {
         // Rewrite USER_X sound references to USERNAME_X in script source.
         let source = script.source_code
         for (const [oldName, newName] of Object.entries(soundRenameMap)) {
@@ -185,37 +181,49 @@ async function postLogin(username: string) {
             // TODO: switch to replaceAll() once TS target includes ES2021.
             source = source.replace(new RegExp(oldName, "g"), newName)
         }
-
-        let promise
-        if (script.original_id !== undefined) {
-            promise = scriptsThunks.importSharedScript(script.original_id)
-        } else {
-            promise = store.dispatch(scriptsThunks.saveScript({
+        const reopen = openTabs.includes(script.shareid)
+        const promise = script.original_id !== undefined
+            ? scriptsThunks.importSharedScript(script.original_id)
+            : store.dispatch(scriptsThunks.saveScript({
                 name: script.name,
                 source,
                 overwrite: false,
                 ...(script.creator === "earsketch" && { creator: "earsketch" }),
             })).unwrap()
-        }
-        const reopen = openTabs.includes(script.shareid)
-        promise = promise.then(script => ({ script, reopen }))
-        promises.push(promise)
-    }
+        return promise.then(migrated => ({ migrated, reopen }))
+    })
 
-    if (promises.length > 0) {
+    if (migrationTasks.length > 0) {
         store.dispatch(tabThunks.resetTabs())
 
-        const results = await Promise.all(promises)
-        // Re-open scripts that were opened before login (which now have new IDs).
-        // TODO: Ideally, we would preserve the order of the open tabs.
-        for (const { script, reopen } of results) {
-            if (reopen) {
-                store.dispatch(tabThunks.setActiveTabAndEditor(script.shareid))
+        const results = await Promise.allSettled(migrationTasks)
+        const failed: { [shareid: string]: Script } = {}
+        for (let i = 0; i < results.length; i++) {
+            const result = results[i]
+            if (result.status === "fulfilled") {
+                // Re-open scripts that were opened before login (which now have new IDs).
+                // TODO: Ideally, we would preserve the order of the open tabs.
+                if (result.value.reopen) {
+                    store.dispatch(tabThunks.setActiveTabAndEditor(result.value.migrated.shareid))
+                }
+            } else {
+                const original = eligibleScripts[i]
+                failed[original.shareid] = original
+                esconsole(`Failed to migrate script ${original.name}: ${result.reason}`, ["error", "user"])
             }
+        }
+        if (Object.keys(failed).length > 0) {
+            // Restore failed scripts to Redux so the user doesn't lose them.
+            const current = scriptsState.selectRegularScripts(store.getState())
+            store.dispatch(scriptsState.setRegularScripts({ ...current, ...failed }))
+            userNotification.show(i18n.t("backup.scriptMigrationFailed", { count: Object.keys(failed).length }), "failure1")
         }
     }
 
     // Upload local sounds to the server now that the user is logged in.
+    // This is independent of the script migration above: a script-save failure shouldn't block sound uploads.
+    const uploadedSoundNames: string[] = []
+    let soundUploadFailures = 0
     for (const sound of localSounds) {
         const suffix = sound.name.startsWith(LOCAL_SOUND_PREFIX) ? sound.name.slice(LOCAL_SOUND_PREFIX.length) : sound.name
         try {
@@ -227,20 +235,30 @@ async function postLogin(username: string) {
                 tempo: String(sound.metadata.tempo ?? -1),
             })
             const token = user.selectToken(store.getState())
-            await fetch(URL_DOMAIN + "/audio/upload", {
+            const response = await fetch(URL_DOMAIN + "/audio/upload", {
                 method: "POST",
                 headers: { Authorization: "Bearer " + token },
                 body: data,
             })
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`)
+            }
+            uploadedSoundNames.push(sound.name)
         } catch (err) {
             esconsole("Failed to upload local sound " + sound.name + ": " + err, ["error", "user"])
+            soundUploadFailures++
         }
     }
-    // Clear IndexedDB after successful migration.
-    if (localSounds.length > 0) {
-        await localSoundStorage.clear()
+    // Remove only the sounds we successfully uploaded; failed ones stay in IndexedDB so the user doesn't lose them.
+    for (const name of uploadedSoundNames) {
+        await localSoundStorage.deleteSound(name)
+    }
+    if (uploadedSoundNames.length > 0) {
         audioLibrary.clearCache()
         store.dispatch(soundsThunks.getUserSounds(username))
+    }
+    if (soundUploadFailures > 0) {
+        userNotification.show(i18n.t("backup.soundMigrationFailed", { count: soundUploadFailures }), "failure1")
     }
 
     const shareID = ESUtils.getURLParameter("sharing")

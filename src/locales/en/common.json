@@ -327,6 +327,8 @@
     "backup.importConflictRename": "Rename (add suffix)",
     "backup.importConflictSkip": "Skip",
     "backup.importSuccess": "Imported {{scriptCount}} script(s) and {{soundCount}} sound(s).",
+    "backup.scriptMigrationFailed": "Couldn't migrate {{count}} script(s) to your account. They are still saved in this browser.",
+    "backup.soundMigrationFailed": "Couldn't upload {{count}} sound(s) to your account. They are still saved in this browser.",
     "backup.leaveWarning": "Download a backup first so you don't lose your work.",
     "backup.firstVisitNotice": "Your scripts are saved in this browser only. Download a backup before leaving so you don't lose your work.",
     "scriptBrowser.noScripts": "No scripts yet. Load a backup or create a new script.",
