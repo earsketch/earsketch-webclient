@@ -172,8 +172,13 @@ async function postLogin(username: string) {
     // This clears regularScripts from Redux; we keep our `saved` snapshot so failed migrations can be restored below.
     await refreshScriptBrowser()
 
-    const eligibleScripts = Object.values(saved).filter(script => !script.soft_delete)
-    const migrationTasks = eligibleScripts.map(script => {
+    const serverScripts = scriptsState.selectRegularScripts(store.getState())
+    const serverByName = new Map(Object.values(serverScripts).filter(s => !s.soft_delete).map(s => [s.name, s]))
+
+    const tasksToMigrate: { script: Script; reopen: boolean; promise: Promise<Script> }[] = []
+    const skippedReopens: string[] = []
+    for (const script of Object.values(saved)) {
+        if (script.soft_delete) continue
         // Rewrite USER_X sound references to USERNAME_X in script source.
         let source = script.source_code
         for (const [oldName, newName] of Object.entries(soundRenameMap)) {
@@ -182,6 +187,15 @@ async function postLogin(username: string) {
             source = source.replace(new RegExp(oldName, "g"), newName)
         }
         const reopen = openTabs.includes(script.shareid)
+        // Skip silently if a server script with the same name has identical content.
+        // (Shared-script imports go through importSharedScript and are deduped by the server.)
+        if (script.original_id === undefined) {
+            const existing = serverByName.get(script.name)
+            if (existing && existing.source_code === source) {
+                if (reopen) skippedReopens.push(existing.shareid)
+                continue
+            }
+        }
         const promise = script.original_id !== undefined
             ? scriptsThunks.importSharedScript(script.original_id)
             : store.dispatch(scriptsThunks.saveScript({
@@ -190,27 +204,30 @@ async function postLogin(username: string) {
                 overwrite: false,
                 ...(script.creator === "earsketch" && { creator: "earsketch" }),
             })).unwrap()
-        return promise.then(migrated => ({ migrated, reopen }))
-    })
+        tasksToMigrate.push({ script, reopen, promise })
+    }
 
-    if (migrationTasks.length > 0) {
+    if (tasksToMigrate.length > 0 || skippedReopens.length > 0) {
         store.dispatch(tabThunks.resetTabs())
 
-        const results = await Promise.allSettled(migrationTasks)
+        const results = await Promise.allSettled(tasksToMigrate.map(t => t.promise))
         const failed: { [shareid: string]: Script } = {}
         for (let i = 0; i < results.length; i++) {
             const result = results[i]
+            const task = tasksToMigrate[i]
             if (result.status === "fulfilled") {
                 // Re-open scripts that were opened before login (which now have new IDs).
                 // TODO: Ideally, we would preserve the order of the open tabs.
-                if (result.value.reopen) {
-                    store.dispatch(tabThunks.setActiveTabAndEditor(result.value.migrated.shareid))
+                if (task.reopen) {
+                    store.dispatch(tabThunks.setActiveTabAndEditor(result.value.shareid))
                 }
             } else {
-                const original = eligibleScripts[i]
-                failed[original.shareid] = original
-                esconsole(`Failed to migrate script ${original.name}: ${result.reason}`, ["error", "user"])
+                failed[task.script.shareid] = task.script
+                esconsole(`Failed to migrate script ${task.script.name}: ${result.reason}`, ["error", "user"])
             }
+        }
+        for (const shareid of skippedReopens) {
+            store.dispatch(tabThunks.setActiveTabAndEditor(shareid))
         }
         if (Object.keys(failed).length > 0) {
             // Restore failed scripts to Redux so the user doesn't lose them.
