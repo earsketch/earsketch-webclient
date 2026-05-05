@@ -369,23 +369,10 @@ export const selectNumTypesSelected = (state: RootState) => state.scripts.filter
 /** If a script name already is taken, find the next possible name by appending a number (1), (2), etc. */
 export const selectNextScriptName = createSelector(
     [selectRegularScripts, (_, name: string) => name],
-    (scripts, name) => {
-        const base = ESUtils.parseName(name)
-        const ext = ESUtils.parseExt(name)
-
-        const matchedNames = new Set()
-        for (const script of Object.values(scripts)) {
-            if (script.name.startsWith(base)) {
-                matchedNames.add(script.name)
-            }
-        }
-
-        for (let counter = 1; matchedNames.has(name); counter++) {
-            name = base + "_" + counter + ext
-        }
-
-        return name
-    }
+    (scripts, name) => ESUtils.nextAvailableScriptName(
+        name,
+        new Set(Object.values(scripts).map(s => s.name))
+    )
 )
 
 /**

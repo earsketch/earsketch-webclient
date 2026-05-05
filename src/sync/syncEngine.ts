@@ -204,7 +204,7 @@ async function mergeAll(): Promise<void> {
                 const remoteMatch = remoteByName.get(script.name)
                 if (remoteMatch && remoteMatch.source !== script.source_code) {
                     // Name conflict with different content — rename local.
-                    const newName = nextAvailableName(script.name, takenNames)
+                    const newName = ESUtils.nextAvailableScriptName(script.name, takenNames)
                     merged[script.shareid] = { ...script, name: newName }
                     takenNames.add(newName)
                 } else if (!remoteMatch) {
@@ -259,20 +259,6 @@ async function mergeAll(): Promise<void> {
     } finally {
         endOp()
     }
-}
-
-/** Append _1, _2, ... to a filename's base until it's unique. Mirrors selectNextScriptName. */
-function nextAvailableName(name: string, taken: Set<string>): string {
-    if (!taken.has(name)) return name
-    const base = ESUtils.parseName(name)
-    const ext = ESUtils.parseExt(name)
-    let counter = 1
-    let candidate = `${base}_${counter}${ext}`
-    while (taken.has(candidate)) {
-        counter++
-        candidate = `${base}_${counter}${ext}`
-    }
-    return candidate
 }
 
 // --- Change watching ---
