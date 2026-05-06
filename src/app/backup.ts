@@ -84,7 +84,8 @@ export async function parseBackup(file: File): Promise<ParsedBackup> {
     const manifestFile = zip.file("manifest.json")
     if (!manifestFile) throw new Error("Invalid backup: missing manifest.json")
     const manifest: Manifest = JSON.parse(await manifestFile.async("string"))
-    if (manifest.version !== MANIFEST_VERSION) throw new Error(`Unsupported backup version: ${manifest.version}`)
+    // Reject zips written by a newer client; older versions are accepted as long as the format stays a strict superset.
+    if (manifest.version > MANIFEST_VERSION) throw new Error(`Unsupported backup version: ${manifest.version}`)
 
     const scripts: ParsedBackup["scripts"] = []
     for (const entry of manifest.scripts) {
