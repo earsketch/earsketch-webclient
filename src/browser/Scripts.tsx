@@ -1,4 +1,4 @@
-import React, { ChangeEvent, MouseEvent, useState, useEffect, useRef } from "react"
+import React, { ChangeEvent, MouseEvent, useState, useEffect } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
 import { FixedSizeList as List } from "react-window"
@@ -11,10 +11,7 @@ import * as scriptsThunks from "./scriptsThunks"
 import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as user from "../user/userState"
-import * as backup from "../app/backup"
-import { openModal } from "../app/modal"
-import { ImportModal } from "../app/ImportModal"
-import * as userNotification from "../user/notification"
+import { loadAndOpenImport } from "../app/ImportModal"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { ScriptDropdownMenu } from "./ScriptsMenus"
@@ -397,18 +394,6 @@ const RegularScriptCollection = () => {
     const type: ScriptType = "regular"
     const title = `${t("scriptBrowser.myScripts").toLocaleUpperCase()} (${filtered ? numFilteredScripts + "/" : ""}${numScripts})`
     const initExpanded = !useSelector(scripts.selectFeatureSharedScript)
-    const fileInputRef = useRef<HTMLInputElement>(null)
-
-    const handleImportFile = async (file: File) => {
-        try {
-            const parsed = await backup.parseBackup(file)
-            openModal(ImportModal, { parsed })
-        } catch (err: any) {
-            userNotification.show(err.message ?? "Failed to load backup", "failure1")
-        }
-    }
-
-    // Show empty state for logged-out users with no scripts at all
     if (!loggedIn && numScripts === 0 && numDeleted === 0) {
         return (
             <div className="text-center p-6 text-gray-500 dark:text-gray-400">
@@ -416,14 +401,13 @@ const RegularScriptCollection = () => {
                 <label className="inline-block mt-3 py-1 px-3 text-sm bg-sky-700 text-white rounded cursor-pointer hover:bg-sky-800">
                     {t("backup.loadBackup")}
                     <input
-                        ref={fileInputRef}
                         type="file"
                         accept=".earsketch"
                         className="hidden"
                         onChange={e => {
                             const file = e.target.files?.[0]
                             if (file) {
-                                handleImportFile(file)
+                                loadAndOpenImport(file)
                                 e.target.value = ""
                             }
                         }}

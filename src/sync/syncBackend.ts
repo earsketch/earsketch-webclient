@@ -9,8 +9,6 @@ import {
     detectExtension,
 } from "../app/backupFormat"
 
-// --- Interface ---
-
 export interface SyncFileInfo {
     path: string
     modifiedTime: number // ms epoch
@@ -32,8 +30,6 @@ export interface SyncBackend {
     clearAll(): Promise<void>
 }
 
-// --- Path helpers ---
-
 export const MANIFEST_PATH = "manifest.json"
 
 /** Replace characters that aren't safe in filesystem paths. */
@@ -49,16 +45,12 @@ export function soundPath(name: string, audioData: ArrayBuffer): string {
     return `sounds/${sanitize(name)}${detectExtension(audioData)}`
 }
 
-// --- Encoding ---
-
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
 function encodeText(s: string): ArrayBuffer {
     return encoder.encode(s).buffer as ArrayBuffer
 }
-
-// --- Manifest ---
 
 export function buildManifest(
     scripts: Scripts,
@@ -106,8 +98,6 @@ export async function readManifest(backend: SyncBackend): Promise<Manifest | nul
     }
 }
 
-// --- Push helpers ---
-
 export async function pushScriptFile(backend: SyncBackend, script: Script): Promise<void> {
     await backend.writeFile(scriptPath(script.name), encodeText(script.source_code))
 }
@@ -139,8 +129,6 @@ export async function deleteSoundFileByName(backend: SyncBackend, name: string):
         }
     }
 }
-
-// --- Pull helper ---
 
 export interface PulledData {
     manifest: Manifest

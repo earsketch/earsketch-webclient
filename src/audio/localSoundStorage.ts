@@ -10,8 +10,11 @@ const DB_NAME = "earsketch-local-sounds"
 const STORE_NAME = "sounds"
 const DB_VERSION = 1
 
+let dbPromise: Promise<IDBDatabase> | null = null
+
 function openDB(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
+    if (dbPromise) return dbPromise
+    dbPromise = new Promise((resolve, reject) => {
         const req = indexedDB.open(DB_NAME, DB_VERSION)
         req.onupgradeneeded = () => {
             req.result.createObjectStore(STORE_NAME, { keyPath: "name" })
@@ -19,6 +22,8 @@ function openDB(): Promise<IDBDatabase> {
         req.onsuccess = () => resolve(req.result)
         req.onerror = () => reject(req.error)
     })
+    dbPromise.catch(() => { dbPromise = null })
+    return dbPromise
 }
 
 export async function storeSound(name: string, audioData: ArrayBuffer, metadata: SoundEntity): Promise<void> {

@@ -1,4 +1,3 @@
-// Export/import logic for local backup (.earsketch ZIP files).
 import JSZip from "jszip"
 import { Script } from "common"
 import * as localSoundStorage from "../audio/localSoundStorage"
@@ -6,6 +5,7 @@ import * as scriptsState from "../browser/scriptsState"
 import { getLocalUserSounds } from "../browser/soundsThunks"
 import store from "../reducers"
 import { Manifest, ManifestScript, ManifestSound, MANIFEST_VERSION, detectExtension } from "./backupFormat"
+import { download } from "./exporter"
 
 export type { Manifest, ManifestScript, ManifestSound }
 export { MANIFEST_VERSION as MANIFEST_VERSION_CURRENT, detectExtension }
@@ -16,18 +16,6 @@ const SESSION_EXPORTED_KEY = "earsketch_session_exported"
 export interface ParsedBackup {
     scripts: { manifest: ManifestScript; source: string }[]
     sounds: { manifest: ManifestSound; audioData: ArrayBuffer }[]
-}
-
-const dummyAnchor = document.createElement("a")
-document.body.appendChild(dummyAnchor)
-dummyAnchor.style.display = "none"
-
-function triggerDownload(name: string, blob: Blob) {
-    const url = URL.createObjectURL(blob)
-    dummyAnchor.href = url
-    dummyAnchor.download = name
-    dummyAnchor.click()
-    setTimeout(() => URL.revokeObjectURL(url), 10000)
 }
 
 function todayString() {
@@ -74,7 +62,7 @@ export async function exportBackup(): Promise<void> {
     zip.file("manifest.json", JSON.stringify(manifest, null, 2))
 
     const blob = await zip.generateAsync({ type: "blob" })
-    triggerDownload(`earsketch-backup-${todayString()}.earsketch`, blob)
+    download(`earsketch-backup-${todayString()}.earsketch`, blob)
     setLastExportTime()
 }
 
@@ -115,20 +103,19 @@ export async function importBackup(
 
     let scriptCount = 0
     const newScripts = { ...existing }
+    let nextLocalIDNum = parseInt(scriptsState.selectNextLocalScriptID(state).slice("local/".length))
 
     for (const { manifest, source } of parsed.scripts) {
         let name = manifest.name
         const conflicting = Object.values(existing).find(s => s.name === name && !s.soft_delete)
         if (conflicting) {
-            // Skip silently if the existing script has identical content (e.g. re-importing the same backup).
             if (conflicting.source_code === source) continue
             const action = options.onConflict(name)
             if (action === "skip") continue
-            // rename: append _1, _2, ...
             name = scriptsState.selectNextScriptName(state, name)
         }
 
-        const id = `local/${Date.now()}-${Math.random().toString(36).slice(2)}`
+        const id = `local/${nextLocalIDNum++}`
         newScripts[id] = {
             shareid: id,
             name,
@@ -163,9 +150,9 @@ export function getLastExportTime(): number | null {
 export function setLastExportTime(): void {
     const now = Date.now()
     localStorage.setItem(LAST_EXPORT_KEY, String(now))
-    sessionStorage.setItem(SESSION_EXPORTED_KEY, "1")
+    window.sessionStorage.setItem(SESSION_EXPORTED_KEY, "1")
 }
 
 export function hasExportedThisSession(): boolean {
-    return sessionStorage.getItem(SESSION_EXPORTED_KEY) === "1"
+    return window.sessionStorage.getItem(SESSION_EXPORTED_KEY) === "1"
 }

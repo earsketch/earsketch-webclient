@@ -1,22 +1,13 @@
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAppSelector as useSelector } from "../hooks"
 import * as user from "../user/userState"
 import * as scriptsState from "../browser/scriptsState"
+import * as ESUtils from "../esutils"
 import * as backup from "./backup"
-import { openModal } from "./modal"
-import { ImportModal } from "./ImportModal"
-import * as userNotification from "../user/notification"
+import { loadAndOpenImport } from "./ImportModal"
 import { SyncButton } from "../sync/SyncUI"
 import { selectSyncStatus } from "../sync/syncState"
-
-function timeAgo(timestamp: number): string {
-    const diffMs = Date.now() - timestamp
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-    if (diffDays === 0) return "today"
-    if (diffDays === 1) return "1 day ago"
-    return `${diffDays} days ago`
-}
 
 export const BackupBanner = () => {
     const { t } = useTranslation()
@@ -24,7 +15,6 @@ export const BackupBanner = () => {
     const activeScripts = useSelector(scriptsState.selectActiveScripts)
     const hasScripts = Object.keys(activeScripts).length > 0
     const syncStatus = useSelector(selectSyncStatus)
-    const fileInputRef = useRef<HTMLInputElement>(null)
     const [lastExport, setLastExport] = useState(() => backup.getLastExportTime())
 
     if (loggedIn) return null
@@ -37,17 +27,8 @@ export const BackupBanner = () => {
         setLastExport(backup.getLastExportTime())
     }
 
-    const handleImportFile = async (file: File) => {
-        try {
-            const parsed = await backup.parseBackup(file)
-            await openModal(ImportModal, { parsed })
-        } catch (err: any) {
-            userNotification.show(err.message ?? "Failed to load backup", "failure1")
-        }
-    }
-
     const lastBackupText = lastExport
-        ? timeAgo(lastExport)
+        ? ESUtils.humanReadableTimeAgo(lastExport)
         : t("backup.lastBackupNever")
 
     return (
@@ -70,14 +51,13 @@ export const BackupBanner = () => {
                 >
                     {t("backup.loadBackup")}
                     <input
-                        ref={fileInputRef}
                         type="file"
                         accept=".earsketch"
                         className="hidden"
                         onChange={e => {
                             const file = e.target.files?.[0]
                             if (file) {
-                                handleImportFile(file)
+                                loadAndOpenImport(file)
                                 e.target.value = ""
                             }
                         }}

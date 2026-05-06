@@ -4,8 +4,6 @@ const IDB_NAME = "earsketch-fsa-handle"
 const IDB_STORE = "handles"
 const IDB_KEY = "sync-dir"
 
-// --- Handle persistence via IndexedDB ---
-
 function openHandleDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
         const req = indexedDB.open(IDB_NAME, 1)
@@ -46,8 +44,6 @@ async function clearHandle(): Promise<void> {
     })
 }
 
-// --- Helpers ---
-
 /** Get a file handle from a path like "scripts/foo.json", creating parent dirs as needed. */
 async function getFileFromPath(root: FileSystemDirectoryHandle, path: string, create: boolean): Promise<FileSystemFileHandle | null> {
     const parts = path.split("/")
@@ -84,8 +80,6 @@ async function walkDir(dir: FileSystemDirectoryHandle, prefix: string): Promise<
     return results
 }
 
-// --- FSA backend ---
-
 export function createFSABackend(): SyncBackend {
     let rootHandle: FileSystemDirectoryHandle | null = null
 
@@ -101,7 +95,6 @@ export function createFSABackend(): SyncBackend {
         },
 
         async connect() {
-            // Try to restore a previously saved handle
             const saved = await loadHandle()
             if (saved) {
                 const perm = await saved.requestPermission({ mode: "readwrite" })
@@ -111,7 +104,6 @@ export function createFSABackend(): SyncBackend {
                 }
             }
 
-            // No saved handle or permission denied — show picker
             rootHandle = await (window as any).showDirectoryPicker({ mode: "readwrite" })
             await saveHandle(rootHandle!)
         },

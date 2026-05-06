@@ -19,7 +19,6 @@ export const SyncButton = () => {
     const [menuOpen, setMenuOpen] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
 
-    // Close menu on outside click
     useEffect(() => {
         if (!menuOpen) return
         const handler = (e: MouseEvent) => {
@@ -34,7 +33,6 @@ export const SyncButton = () => {
     const driveAvailable = typeof ES_WEB_GOOGLE_CLIENT_ID === "string" && ES_WEB_GOOGLE_CLIENT_ID.length > 0
     const fsaSupported = "showDirectoryPicker" in window
 
-    // Hide the entire button only if there's nothing the user could possibly do.
     if (!driveAvailable && !fsaSupported) return null
 
     const handleConnect = async (kind: "drive" | "fsa") => {
@@ -112,7 +110,6 @@ export const SyncButton = () => {
         )
     }
 
-    // Disconnected or error — show connect menu
     return (
         <div className="relative flex items-center gap-1 mx-1 shrink-0" ref={menuRef}>
             <button

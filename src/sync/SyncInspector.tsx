@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ModalHeader, ModalBody, Alert } from "../Utils"
+import { ModalHeader, ModalBody, Alert, confirm } from "../Utils"
 import { SyncBackend, SyncFileInfo } from "./syncBackend"
 import { disconnectBackend, getActiveBackend } from "./syncEngine"
 
@@ -25,7 +25,6 @@ export const SyncInspector = ({ close }: Props) => {
     const [files, setFiles] = useState<SyncFileInfo[] | null>(null)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(true)
-    const [confirmingClear, setConfirmingClear] = useState(false)
     const [clearing, setClearing] = useState(false)
 
     const backend: SyncBackend | null = getActiveBackend()
@@ -51,6 +50,7 @@ export const SyncInspector = ({ close }: Props) => {
 
     const doClear = async () => {
         if (!backend) return
+        if (!await confirm({ textKey: "sync.clearConfirmBody", okKey: "sync.clearConfirmButton", type: "danger" })) return
         setClearing(true)
         setError("")
         try {
@@ -124,34 +124,12 @@ export const SyncInspector = ({ close }: Props) => {
                 </div>
             )}
 
-            {confirmingClear && (
-                <div className="mt-4 p-3 border border-red-400 bg-red-50 dark:bg-red-900 dark:border-red-600 rounded text-sm">
-                    <p className="font-semibold mb-2">{t("sync.clearConfirmTitle")}</p>
-                    <p className="mb-3">{t("sync.clearConfirmBody")}</p>
-                    <div className="flex gap-2">
-                        <button
-                            className="btn text-xs py-1 px-2 bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
-                            onClick={doClear}
-                            disabled={clearing}
-                        >
-                            {t("sync.clearConfirmButton")}
-                        </button>
-                        <button
-                            className="btn text-xs py-1 px-2 bg-white text-black hover:bg-gray-200"
-                            onClick={() => setConfirmingClear(false)}
-                            disabled={clearing}
-                        >
-                            {t("cancel")}
-                        </button>
-                    </div>
-                </div>
-            )}
         </ModalBody>
         <div className="flex items-center justify-between border-t p-3.5">
             <button
                 className="btn text-sm py-1.5 px-3 bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
-                onClick={() => setConfirmingClear(true)}
-                disabled={loading || clearing || !files || files.length === 0 || confirmingClear}
+                onClick={doClear}
+                disabled={loading || clearing || !files || files.length === 0}
             >
                 {t("sync.clearButton")}
             </button>

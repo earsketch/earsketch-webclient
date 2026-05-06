@@ -1,3 +1,4 @@
+import i18n from "i18next"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAppSelector as useSelector } from "../hooks"
@@ -6,10 +7,20 @@ import type { ParsedBackup } from "./backup"
 import * as scriptsState from "../browser/scriptsState"
 import * as userNotification from "../user/notification"
 import { ModalHeader, ModalBody, Alert } from "../Utils"
+import { openModal } from "./modal"
 
 interface Props {
     parsed: ParsedBackup
     close: () => void
+}
+
+export async function loadAndOpenImport(file: File): Promise<void> {
+    try {
+        const parsed = await backup.parseBackup(file)
+        await openModal(ImportModal, { parsed })
+    } catch (err: any) {
+        userNotification.show(err.message ?? i18n.t("backup.loadFailed"), "failure1")
+    }
 }
 
 export const ImportModal = ({ parsed, close }: Props) => {
@@ -17,8 +28,8 @@ export const ImportModal = ({ parsed, close }: Props) => {
     const [error, setError] = useState("")
     const [importing, setImporting] = useState(false)
 
-    // Only track scripts whose names conflict AND whose content differs from the existing one.
-    // Identical-content matches (e.g. re-importing the same backup) are skipped silently by importBackup.
+    // Identical-content collisions (e.g. re-importing the same backup) are silently skipped by importBackup,
+    // so the conflict picker only surfaces collisions where the content differs.
     const existingScripts = useSelector(scriptsState.selectActiveScripts)
     const existingByName = new Map(Object.values(existingScripts).map(s => [s.name, s]))
     const conflictingNames = parsed.scripts

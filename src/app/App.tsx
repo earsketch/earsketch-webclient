@@ -49,7 +49,7 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
 import { BackupBanner } from "./BackupBanner"
-import { ImportModal } from "./ImportModal"
+import { loadAndOpenImport } from "./ImportModal"
 import * as backup from "./backup"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
@@ -156,7 +156,6 @@ async function postLogin(username: string) {
     const saved = scriptsState.selectRegularScripts(state)
     const openTabs = tabs.selectOpenTabs(state)
 
-    // Migrate local sounds: build a rename map (USER_X → USERNAME_X) so we can rewrite script references.
     const localSounds = await localSoundStorage.getAllSounds()
     const userPrefix = username.toUpperCase() + "_"
     const soundRenameMap: { [oldName: string]: string } = {}
@@ -167,9 +166,8 @@ async function postLogin(username: string) {
         }
     }
 
-    // Fetch the user's scripts now that they're logged in.
-    // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
-    // This clears regularScripts from Redux; we keep our `saved` snapshot so failed migrations can be restored below.
+    // refreshScriptBrowser must run before migration: anonymous scripts may collide with server-side names.
+    // It clears regularScripts from Redux; the `saved` snapshot above lets failed migrations be restored.
     await refreshScriptBrowser()
 
     const serverScripts = scriptsState.selectRegularScripts(store.getState())
@@ -179,16 +177,15 @@ async function postLogin(username: string) {
     const skippedReopens: string[] = []
     for (const script of Object.values(saved)) {
         if (script.soft_delete) continue
-        // Rewrite USER_X sound references to USERNAME_X in script source.
         let source = script.source_code
         for (const [oldName, newName] of Object.entries(soundRenameMap)) {
-            // Sound names are alphanumeric/underscores, so no escaping needed.
+            // Sound names are [A-Z0-9_], so they don't need regex escaping.
             // TODO: switch to replaceAll() once TS target includes ES2021.
             source = source.replace(new RegExp(oldName, "g"), newName)
         }
         const reopen = openTabs.includes(script.shareid)
-        // Skip silently if a server script with the same name has identical content.
-        // (Shared-script imports go through importSharedScript and are deduped by the server.)
+        // Shared-script imports go through importSharedScript and are deduped by the server,
+        // so identical-content skip only applies to original (non-shared) scripts.
         if (script.original_id === undefined) {
             const existing = serverByName.get(script.name)
             if (existing && existing.source_code === source) {
@@ -230,46 +227,35 @@ async function postLogin(username: string) {
             store.dispatch(tabThunks.setActiveTabAndEditor(shareid))
         }
         if (Object.keys(failed).length > 0) {
-            // Restore failed scripts to Redux so the user doesn't lose them.
             const current = scriptsState.selectRegularScripts(store.getState())
             store.dispatch(scriptsState.setRegularScripts({ ...current, ...failed }))
             userNotification.show(i18n.t("backup.scriptMigrationFailed", { count: Object.keys(failed).length }), "failure1")
         }
     }
 
-    // Upload local sounds to the server now that the user is logged in.
-    // This is independent of the script migration above: a script-save failure shouldn't block sound uploads.
+    const uploadResults = await Promise.allSettled(localSounds.map(async sound => {
+        const suffix = sound.name.startsWith(LOCAL_SOUND_PREFIX) ? sound.name.slice(LOCAL_SOUND_PREFIX.length) : sound.name
+        await request.postForm("/audio/upload", {
+            file: new Blob([sound.audioData]),
+            name: suffix,
+            filename: `${suffix}.flac`,
+            tempo: String(sound.metadata.tempo ?? -1),
+        })
+        return sound.name
+    }))
     const uploadedSoundNames: string[] = []
     let soundUploadFailures = 0
-    for (const sound of localSounds) {
-        const suffix = sound.name.startsWith(LOCAL_SOUND_PREFIX) ? sound.name.slice(LOCAL_SOUND_PREFIX.length) : sound.name
-        try {
-            const blob = new Blob([sound.audioData])
-            const data = request.form({
-                file: blob,
-                name: suffix,
-                filename: `${suffix}.flac`,
-                tempo: String(sound.metadata.tempo ?? -1),
-            })
-            const token = user.selectToken(store.getState())
-            const response = await fetch(URL_DOMAIN + "/audio/upload", {
-                method: "POST",
-                headers: { Authorization: "Bearer " + token },
-                body: data,
-            })
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`)
-            }
-            uploadedSoundNames.push(sound.name)
-        } catch (err) {
-            esconsole("Failed to upload local sound " + sound.name + ": " + err, ["error", "user"])
+    for (let i = 0; i < uploadResults.length; i++) {
+        const result = uploadResults[i]
+        if (result.status === "fulfilled") {
+            uploadedSoundNames.push(result.value)
+        } else {
+            esconsole("Failed to upload local sound " + localSounds[i].name + ": " + result.reason, ["error", "user"])
             soundUploadFailures++
         }
     }
-    // Remove only the sounds we successfully uploaded; failed ones stay in IndexedDB so the user doesn't lose them.
-    for (const name of uploadedSoundNames) {
-        await localSoundStorage.deleteSound(name)
-    }
+    // Failed uploads stay in IndexedDB so the user doesn't lose them.
+    await Promise.all(uploadedSoundNames.map(name => localSoundStorage.deleteSound(name)))
     if (uploadedSoundNames.length > 0) {
         audioLibrary.clearCache()
         store.dispatch(soundsThunks.getUserSounds(username))
@@ -572,14 +558,6 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
             userNotification.show(err.message ?? "Failed to save backup", "failure1")
         }
     }
-    const handleImportFile = async (file: File) => {
-        try {
-            const parsed = await backup.parseBackup(file)
-            await openModal(ImportModal, { parsed })
-        } catch (err: any) {
-            userNotification.show(err.message ?? "Failed to load backup", "failure1")
-        }
-    }
 
     const loggedIn = loginState === "logged-in"
     const loggingIn = loginState === "logging-in"
@@ -606,7 +584,7 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
             onChange={e => {
                 const file = e.target.files?.[0]
                 if (file) {
-                    handleImportFile(file)
+                    loadAndOpenImport(file)
                     e.target.value = ""
                 }
             }}
@@ -737,23 +715,20 @@ export const App = () => {
                     store.dispatch(bubble.resume())
                 }
             }
-
-            // App-level drag-and-drop for .earsketch backup files.
-            const onDrop = async (e: DragEvent) => {
-                e.preventDefault()
-                const file = [...(e.dataTransfer?.files ?? [])].find(f => f.name.endsWith(".earsketch"))
-                if (file) {
-                    try {
-                        const parsed = await backup.parseBackup(file)
-                        openModal(ImportModal, { parsed })
-                    } catch (err: any) {
-                        userNotification.show(err.message ?? "Failed to load backup", "failure1")
-                    }
-                }
-            }
-            document.addEventListener("dragover", e => e.preventDefault())
-            document.addEventListener("drop", onDrop)
         })()
+
+        const onDragOver = (e: DragEvent) => e.preventDefault()
+        const onDrop = (e: DragEvent) => {
+            e.preventDefault()
+            const file = [...(e.dataTransfer?.files ?? [])].find(f => f.name.endsWith(".earsketch"))
+            if (file) loadAndOpenImport(file)
+        }
+        document.addEventListener("dragover", onDragOver)
+        document.addEventListener("drop", onDrop)
+        return () => {
+            document.removeEventListener("dragover", onDragOver)
+            document.removeEventListener("drop", onDrop)
+        }
     }, [])
 
     useEffect(() => {

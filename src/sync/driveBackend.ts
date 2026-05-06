@@ -38,8 +38,6 @@ interface DriveFile {
     size?: string
 }
 
-// --- GIS loader ---
-
 let gisLoaded = false
 
 function loadGIS(): Promise<void> {
@@ -54,14 +52,11 @@ function loadGIS(): Promise<void> {
     })
 }
 
-// --- Drive backend ---
-
 export function createDriveBackend(clientId: string): SyncBackend {
     let accessToken: string | null = null
     let tokenExpiresAt = 0
     let tokenClient: ReturnType<typeof google.accounts.oauth2.initTokenClient> | null = null
 
-    // Cache of file path → Drive file ID, populated by listFiles().
     const fileIdCache = new Map<string, string>()
 
     function isTokenValid(): boolean {
@@ -70,13 +65,12 @@ export function createDriveBackend(clientId: string): SyncBackend {
 
     async function ensureToken(): Promise<string> {
         if (isTokenValid()) return accessToken!
-        // Try silent re-auth (prompt: "" skips consent if already granted)
+        // prompt: "" requests silent re-auth: skips consent if already granted.
         return new Promise<string>((resolve, reject) => {
             if (!tokenClient) {
-                reject(new Error("Drive not initialized — call connect() first"))
+                reject(new Error("Drive not initialized; call connect() first"))
                 return
             }
-            // Re-init with a one-shot callback for this request
             tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: clientId,
                 scope: SCOPE,
@@ -103,7 +97,7 @@ export function createDriveBackend(clientId: string): SyncBackend {
         const resp = await fetch(url, { ...init, headers })
 
         if (resp.status === 401) {
-            // Token expired between check and use — retry once
+            // Token expired between check and use; retry once.
             accessToken = null
             const newToken = await ensureToken()
             headers.set("Authorization", `Bearer ${newToken}`)
@@ -116,8 +110,6 @@ export function createDriveBackend(clientId: string): SyncBackend {
         }
         return resp
     }
-
-    // --- SyncBackend implementation ---
 
     const backend: SyncBackend = {
         kind: "drive",
@@ -133,7 +125,7 @@ export function createDriveBackend(clientId: string): SyncBackend {
         async connect() {
             await loadGIS()
 
-            return new Promise<void>((resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 tokenClient = google.accounts.oauth2.initTokenClient({
                     client_id: clientId,
                     scope: SCOPE,
@@ -151,6 +143,10 @@ export function createDriveBackend(clientId: string): SyncBackend {
                 })
                 tokenClient.requestAccessToken()
             })
+
+            // listFiles populates fileIdCache; without it, readFile/writeFile/deleteFile
+            // miss the cache on a fresh page load and would re-create files Drive already has.
+            await backend.listFiles()
         },
 
         disconnect() {
@@ -168,7 +164,6 @@ export function createDriveBackend(clientId: string): SyncBackend {
             const fileId = fileIdCache.get(path)
 
             if (fileId) {
-                // Update existing file
                 const boundary = "----earsketch_sync"
                 const metaPart = JSON.stringify({})
                 const parts = [
@@ -187,7 +182,6 @@ export function createDriveBackend(clientId: string): SyncBackend {
                     body,
                 })
             } else {
-                // Create new file
                 const boundary = "----earsketch_sync"
                 const metaPart = JSON.stringify({ name: path, parents: ["appDataFolder"] })
                 const encoder = new TextEncoder()
@@ -223,9 +217,7 @@ export function createDriveBackend(clientId: string): SyncBackend {
 
         async clearAll() {
             const files = await backend.listFiles()
-            for (const f of files) {
-                await backend.deleteFile(f.path).catch(() => {})
-            }
+            await Promise.all(files.map(f => backend.deleteFile(f.path).catch(() => {})))
         },
 
         async listFiles() {
@@ -265,8 +257,6 @@ export function createDriveBackend(clientId: string): SyncBackend {
 export function wasPreviouslyConnected(): boolean {
     return localStorage.getItem(LS_KEY) === "1"
 }
-
-// --- Utility ---
 
 function concatBuffers(buffers: ArrayBuffer[]): ArrayBuffer {
     const totalLength = buffers.reduce((sum, b) => sum + b.byteLength, 0)
