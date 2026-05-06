@@ -371,7 +371,7 @@ export const selectNextScriptName = createSelector(
     [selectRegularScripts, (_, name: string) => name],
     (scripts, name) => ESUtils.nextAvailableScriptName(
         name,
-        new Set(Object.values(scripts).map(s => s.name))
+        new Set(Object.values(scripts).filter(s => !s.soft_delete).map(s => s.name))
     )
 )
 
