@@ -20,7 +20,9 @@ describe("Notifications", () => {
         cy.skipTour()
         cy.login()
 
-        // verify notification badge is showing 1 unread notification
-        cy.get("[data-test='numUnreadNotifications']").contains("1")
+        // broadcasts no longer inflate the unread count; instead, a separate
+        // blue exclamation indicator should be visible.
+        cy.get("[data-test='numUnreadNotifications']").should("not.exist")
+        cy.get("[data-test='broadcastIndicator']").should("be.visible")
     })
 })

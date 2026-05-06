@@ -155,10 +155,21 @@ const useNotificationLongPolling = () => {
     }, [isLoggedIn])
 }
 
+/** Small blue circular "!" indicator used for broadcast announcements. */
+const BroadcastBadge = ({ className = "", ariaLabel }: { className?: string, ariaLabel?: string }) => (
+    <div
+        role="status"
+        aria-label={ariaLabel}
+        data-test="broadcastIndicator"
+        className={`inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-blue-600 rounded-full leading-none ${className}`}
+    >!</div>
+)
+
 /** Notification bell icon and dropdown menu for the header nav */
 export const NotificationMenu = ({ openSharedScript }: { openSharedScript: (s: string) => void }) => {
     const notifications = useSelector(user.selectNotifications)
-    const numUnread = notifications.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
+    const numUnread = notifications.filter(v => v && v.unread && v.notification_type !== "broadcast").length
+    const hasBroadcast = notifications.some(v => v && v.notification_type === "broadcast")
     const { t } = useTranslation()
 
     const [showHistory, setShowHistory] = useState(false)
@@ -172,6 +183,7 @@ export const NotificationMenu = ({ openSharedScript }: { openSharedScript: (s: s
             <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-3 relative" title={t("ariaDescriptors:header.toggleNotifications")}>
                 <i className="icon icon-bell" />
                 {numUnread > 0 && <div role="status" aria-label={t("ariaDescriptors:header.unreadNotifications", { numUnread })} className="text-sm w-4 h-4 text-white bg-red-600 rounded-full absolute top-0 -right-1 leading-none" data-test="numUnreadNotifications">{numUnread}</div>}
+                {hasBroadcast && <BroadcastBadge className="absolute -bottom-1 -right-1" ariaLabel={t("ariaDescriptors:header.broadcastNotification")} />}
             </Popover.Button>
             <div className="relative right-1">
                 <NotificationPopup />
@@ -195,10 +207,10 @@ const Notification = ({ item, openSharedScript, close }: {
     return <div>
         <div style={{ margin: "10px" }} onClick={() => userNotification.markAsRead(item)}>
             <div className="flex items-start">
-                {/* pin or read/unread marker */}
+                {/* broadcast badge or read/unread marker */}
                 <div className="mr-1.5">
                     {item.pinned
-                        ? <i className="icon icon-pushpin text-sm" />
+                        ? <BroadcastBadge />
                         : <div className={item.unread ? "marker" : "empty-marker"} style={{ minWidth: "14px" }} />}
                 </div>
 
@@ -326,12 +338,12 @@ export const NotificationHistory = ({ openSharedScript, close }: {
             </div>
         </div>
 
-        <div className="notification-type-header">{t("notifications.pinned")}</div>
+        <div className="notification-type-header">{t("notifications.broadcasts")}</div>
         {notifications.map((item, index) =>
             item.notification_type === "broadcast" && <div key={index}>
                 <div style={{ margin: "10px 20px" }}>
                     <div className="flex items-center float-left" style={{ margin: "10px", marginLeft: 0 }}>
-                        <div><i className="icon icon-pushpin"></i></div>
+                        <BroadcastBadge />
                     </div>
                     <div className="flex justify-between">
                         <div>
