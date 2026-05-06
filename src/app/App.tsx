@@ -563,8 +563,31 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
         }
     }
 
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const triggerImport = () => fileInputRef.current?.click()
+    const handleExport = async () => {
+        try {
+            await backup.exportBackup()
+        } catch (err: any) {
+            userNotification.show(err.message ?? "Failed to save backup", "failure1")
+        }
+    }
+    const handleImportFile = async (file: File) => {
+        try {
+            const parsed = await backup.parseBackup(file)
+            await openModal(ImportModal, { parsed })
+        } catch (err: any) {
+            userNotification.show(err.message ?? "Failed to load backup", "failure1")
+        }
+    }
+
     const loggedIn = loginState === "logged-in"
     const loggingIn = loginState === "logging-in"
+
+    const backupItems = [
+        { name: t("backup.saveButton"), action: handleExport },
+        { name: t("backup.loadBackup"), action: triggerImport },
+    ]
 
     return <>
         {!loggedIn &&
@@ -575,6 +598,19 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
                 GO <i className="icon icon-arrow-right" />
             </button>
         </form>}
+        <input
+            ref={fileInputRef}
+            type="file"
+            accept=".earsketch"
+            className="hidden"
+            onChange={e => {
+                const file = e.target.files?.[0]
+                if (file) {
+                    handleImportFile(file)
+                    e.target.value = ""
+                }
+            }}
+        />
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400">
                 {loggedIn
@@ -583,8 +619,8 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
             </Menu.Button>
             <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {(loggedIn
-                    ? [{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
-                    : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
+                    ? [{ name: t("editProfile"), action: editProfile }, ...backupItems, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
+                    : [{ name: t("registerAccount"), action: createAccount }, ...backupItems, { name: t("forgotPassword.title"), action: forgotPass }])
                     .map(({ name, action }) =>
                         <Menu.Item key={name}>
                             {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{name}</button>}
