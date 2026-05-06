@@ -6,37 +6,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
 # Start dev server (connects to api-dev.ersktch.gatech.edu by default)
-pnpm dev
+npm run dev
 
 # Build for production (requires ES_API_HOST, ES_BASE_URI, ES_BASE_URL env vars)
-pnpm build
+npm run build
 
 # Lint
-pnpm lint
+npm run lint
 
 # Run Vitest unit tests
-pnpm test-vitest
+npm run test-vitest
 
 # Run a single Vitest test file
-pnpm test-vitest tests/vitest/src/esutils.spec.js
+npm run test-vitest tests/vitest/src/esutils.spec.js
 
 # Run Cypress component tests
-pnpm test
+npm test
 
 # Run Cypress e2e tests
-pnpm test-cypress
+npm run test-cypress
 
 # Open Cypress GUI
-pnpm test-cypress-gui
+npm run test-cypress-gui
 
 # Build + serve locally with dev API
-pnpm serve-local
+npm run serve-local
 ```
 
-Node 24 is required (see `engines` in package.json). The package manager is pnpm.
+Node 24 is required (see `engines` in package.json). The lockfile is `package-lock.json` (npm).
 
 ## Architecture Overview
 
