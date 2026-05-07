@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next"
 
 export const ExtensionHost = () => {
     const extensionUrl = useSelector(selectExtensionUrl)
-    const extensionTargetOrigin = extensionUrl ? new URL(extensionUrl).origin : "https://emlbot1.lmc.gatech.edu" // TODO: remove this, for testing purposes only
+    const extensionTargetOrigin = extensionUrl ? new URL(extensionUrl).origin : ""
     const iframeRef = useRef<HTMLIFrameElement>(null)
     const logs: Log[] = useSelector(selectLogs)
     const tracks: Track[] = useSelector(selectTracks)
@@ -175,7 +175,7 @@ export const ExtensionHost = () => {
                 <iframe
                     ref={iframeRef}
                     src={extensionPermissions.includes("sidePanel") ? extensionUrl : undefined}
-                    onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOrigin) }}  // WIP: checking this
+                    onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOrigin) }} // WIP: checking this
                     className="w-full h-full border border-gray-300"
                     title="EarSketch Extension"
                 />
