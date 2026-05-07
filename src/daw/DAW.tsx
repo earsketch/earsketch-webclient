@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
+import i18n from "i18next"
 import * as d3 from "d3"
 
 import * as appState from "../app/appState"
@@ -497,7 +498,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                 <div className="mixTrackFiller text-gray-700 dark:text-gray-400">{track.label}</div>
             </div>
             <div className="daw-track">
-                <div className="mixTrackFiller" style={{ background: color }}>{!hideMixTrackLabel && <span>MIX TRACK</span>}</div>
+                <div className="mixTrackFiller" style={{ background: color }}>{!hideMixTrackLabel && <span>{t("daw.mixTrack").toLocaleUpperCase()}</span>}</div>
             </div>
         </div>
         {showEffects &&
@@ -754,7 +755,7 @@ export function setDAWData(result: types.DAWData) {
         // change mute to metronome state
         mix.mute = !state.daw.metronome
         // the mix track is special
-        mix.label = "MIX"
+        mix.label = i18n.t("daw.mix").toLocaleUpperCase()
         mix.buttons = false
     }
 

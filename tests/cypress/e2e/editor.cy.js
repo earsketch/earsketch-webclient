@@ -25,7 +25,7 @@ describe("Editor", () => {
 
     it("runs template script", () => {
         cy.get("button").contains("RUN").click()
-        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console-frame").contains("Script ran successfully")
         cy.get("#console").contains("Script ran successfully")
     })
 
@@ -35,7 +35,7 @@ describe("Editor", () => {
         // NOTE: Clicking "RUN" instead of using Ctrl+Enter because the shortcut is different on Mac.
         cy.get("button").contains("RUN").click()
         cy.get("#console-frame").contains(message)
-        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console-frame").contains("Script ran successfully")
     })
 
     it("shows an error for a bad script", () => {
@@ -104,7 +104,7 @@ print(5 % 2)
 fitMedia(OS_CLAP01, 1, 1, 2);
 `)
         cy.get("button").contains("RUN").click()
-        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console-frame").contains("Script ran successfully")
     })
 
     it("calls fetch exactly once per sound", () => {
@@ -118,7 +118,7 @@ from earsketch import *
 makeBeat(OS_CLAP01, 1, 1, "0000", 4)
 `)
         cy.get("button").contains("RUN").click()
-        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console-frame").contains("Script ran successfully")
 
         // We expect 3 intercepted calls: METRONOME01, METRONOME02, and OS_CLAP01
         // https://github.com/cypress-io/cypress/issues/16655
@@ -197,7 +197,7 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         })
 
         cy.get("#console-frame").contains(message)
-        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console-frame").contains("Script ran successfully")
 
         const message2 = "another message"
         cy.get("#editor").type(`{moveToEnd}{enter}print("${message2}")`)

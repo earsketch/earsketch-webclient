@@ -1,4 +1,9 @@
 {
-    "threshold": 3,
-    "ignore": ["**/tests/integration/scripts/**.results.js", "**/tests/e2e-cypress/fixtures/**", "**/node_modules/**"]
+  "threshold": 3,
+  "ignore": [
+    "**/tests/integration/scripts/**.results.js",
+    "**/tests/e2e-cypress/fixtures/**",
+    "**/node_modules/**",
+    "**/tests/vitest/fixtures/**"
+  ]
 }
