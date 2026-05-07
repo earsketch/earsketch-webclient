@@ -35,10 +35,12 @@ export const ExtensionHost = () => {
     const colorThemeRef = useRef(colorTheme)
     const currentUserRef = useRef(currentUser)
     const extensionPermissionsRef = useRef(extensionPermissions)
+    const extensionTargetOriginRef = useRef(extensionTargetOrigin)
 
     useEffect(() => { logsRef.current = logs }, [logs])
     useEffect(() => { tracksRef.current = tracks }, [tracks])
     useEffect(() => { extensionPermissionsRef.current = extensionPermissions }, [extensionPermissions])
+    useEffect(() => { extensionTargetOriginRef.current = extensionTargetOrigin }, [extensionTargetOrigin])
     useEffect(() => {
         colorThemeRef.current = colorTheme
         if (iframeRef.current?.contentWindow && extensionPermissions.includes("colorTheme")) {
@@ -47,7 +49,7 @@ export const ExtensionHost = () => {
                 colorTheme: colorThemeRef.current,
             }
             if (iframeRef.current?.contentWindow) {
-                iframeRef.current.contentWindow.postMessage(JSON.stringify(message), extensionTargetOrigin) // TODO extensionTargetOrigin isn't working for remote html
+                iframeRef.current.contentWindow.postMessage(JSON.stringify(message), extensionTargetOriginRef.current)
             }
         }
     }, [colorTheme, extensionPermissions])
@@ -58,7 +60,7 @@ export const ExtensionHost = () => {
                 messageType: "currentUserChanged",
                 currentUser: currentUserRef.current,
             }
-            iframeRef.current.contentWindow.postMessage(JSON.stringify(message), extensionTargetOrigin)
+            iframeRef.current.contentWindow.postMessage(JSON.stringify(message), extensionTargetOriginRef.current)
         }
     }, [currentUser, extensionPermissions])
 
@@ -96,7 +98,7 @@ export const ExtensionHost = () => {
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {
             const isFromLocalOriginIframe = event.source === iframeRef.current?.contentWindow
-            const isFromRemoteOriginIframe = event.origin === extensionTargetOrigin && event.origin !== window.location.origin
+            const isFromRemoteOriginIframe = event.origin === extensionTargetOriginRef.current && event.origin !== window.location.origin
 
             if (isFromLocalOriginIframe || isFromRemoteOriginIframe) {
                 console.log("Received message from iframe:", event.data)
@@ -151,7 +153,7 @@ export const ExtensionHost = () => {
                 }
 
                 if (iframeRef.current?.contentWindow) {
-                    iframeRef.current.contentWindow.postMessage(JSON.stringify(result), extensionTargetOrigin)
+                    iframeRef.current.contentWindow.postMessage(JSON.stringify(result), extensionTargetOriginRef.current)
                 } else {
                     console.warn("iframe contentWindow is not available")
                 }
@@ -175,7 +177,7 @@ export const ExtensionHost = () => {
                 <iframe
                     ref={iframeRef}
                     src={extensionPermissions.includes("sidePanel") ? extensionUrl : undefined}
-                    onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOrigin) }} // WIP: checking this
+                    onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOriginRef.current) }}
                     className="w-full h-full border border-gray-300"
                     title="EarSketch Extension"
                 />
