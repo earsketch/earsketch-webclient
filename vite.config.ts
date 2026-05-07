@@ -10,12 +10,14 @@ let apiHost
 let URL_WEBSOCKET
 let SITE_BASE_URI
 let baseURL
+let buildType
 const port = process.env.port ? +process.env.port : 8888
 if (process.env.NODE_ENV === "production") {
     apiHost = process.env.ES_API_HOST ?? "builderror"
     URL_WEBSOCKET = apiHost.replace("http", "ws") + "/EarSketchWS"
     SITE_BASE_URI = process.env.ES_BASE_URI ?? "https://earsketch.gatech.edu/earsketch2"
     baseURL = process.env.ES_BASE_URL ?? "/earsketch2/"
+    buildType = process.env.ES_BUILD_TYPE ?? "production"
 } else {
     apiHost = "https://api-dev.ersktch.gatech.edu"
     const wsHost = apiHost.replace("http", "ws")
@@ -23,6 +25,7 @@ if (process.env.NODE_ENV === "production") {
     const clientPath = process.env.path ? "/" + process.env.path : ""
     SITE_BASE_URI = `http://localhost:${port}${clientPath}`
     baseURL = process.env.ES_BASE_URL ?? "/"
+    buildType = process.env.ES_BUILD_TYPE ?? "test"
 }
 
 const nrConfig = process.env.ES_NEWRELIC_CONFIG ?? "dev"
@@ -47,6 +50,7 @@ export default ({ mode }: { mode: string }) => {
                     autograder: path.resolve(__dirname, "autograder/index.html"),
                 },
             },
+            sourcemap: buildType === "review" ? "inline" : false,
         },
         test: {
             environment: "jsdom",
