@@ -27,7 +27,6 @@ if (process.env.NODE_ENV === "production") {
     baseURL = process.env.ES_BASE_URL ?? "/"
     buildType = process.env.ES_BUILD_TYPE ?? "test"
 }
-console.log("buildType: '%s' '%s'", process.env.ES_BUILD_TYPE, buildType)
 const nrConfig = process.env.ES_NEWRELIC_CONFIG ?? "dev"
 
 // https://vite.dev/config/
