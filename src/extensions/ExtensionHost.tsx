@@ -47,7 +47,7 @@ export const ExtensionHost = () => {
                 colorTheme: colorThemeRef.current,
             }
             if (iframeRef.current?.contentWindow) {
-                iframeRef.current.contentWindow.postMessage(JSON.stringify(message), window.location.href) // TODO extensionTargetOrigin isn't working for remote html
+                iframeRef.current.contentWindow.postMessage(JSON.stringify(message), extensionTargetOrigin) // TODO extensionTargetOrigin isn't working for remote html
             }
         }
     }, [colorTheme, extensionPermissions])
@@ -58,7 +58,7 @@ export const ExtensionHost = () => {
                 messageType: "currentUserChanged",
                 currentUser: currentUserRef.current,
             }
-            iframeRef.current.contentWindow.postMessage(JSON.stringify(message), window.location.href)
+            iframeRef.current.contentWindow.postMessage(JSON.stringify(message), extensionTargetOrigin)
         }
     }, [currentUser, extensionPermissions])
 
