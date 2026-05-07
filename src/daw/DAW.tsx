@@ -187,7 +187,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     }, [el])
 
     return <div ref={el} id="dawHeader" className="grow-0 bg-white dark:bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-        <h1 className="sr-only">DAW Transport Controls</h1>
+        <h1 className="sr-only">{t("ariaDescriptors:daw.transportControls")}</h1>
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div id="daw-label">
@@ -340,7 +340,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
             <div className="dawTrackCtrl flex sticky left-0 border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50">
-                <h3 className="sr-only">Track {track.label}</h3>
+                <h3 className="sr-only">{t("ariaDescriptors:daw.trackHeading", { label: track.label })}</h3>
                 <div className="dawTrackName text-gray-700 dark:text-gray-400 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <div className="justify-center items-center flex space-x-3 w-4/5">
@@ -436,20 +436,20 @@ const Clip = ({ color, clip, loopFamilyEnd }: { color: daw.Color, clip: types.Cl
 
     let clipType: string
     if (actuallyLoops) {
-        clipType = `looping clip, loops till measure ${fullEnd}`
+        clipType = t("ariaDescriptors:daw.clipLooping", { end: fullEnd })
     } else if (isBeatPattern) {
-        clipType = "beat pattern"
+        clipType = t("ariaDescriptors:daw.clipBeatPattern")
     } else if (isAudioSection) {
-        clipType = "audio section group"
+        clipType = t("ariaDescriptors:daw.clipAudioSection")
     } else {
-        clipType = `clip, ${clipLength} measure${clipLength !== 1 ? "s" : ""} long`
+        clipType = t("ariaDescriptors:daw.clipLength", { count: clipLength })
     }
-    const clipDescription = `track ${clip.track}, measures ${fullStart} to ${fullEnd}, ${clipType}, ${clip.filekey}`
+    const clipDescription = t("ariaDescriptors:daw.clipDescription", { track: clip.track, start: fullStart, end: fullEnd, type: clipType, filekey: clip.filekey })
 
-    const announceToLiveRegion = (text: string) => {
-        const liveRegion = document.getElementById("daw-live-region")
-        if (liveRegion) liveRegion.textContent = text
-    }
+ //   const announceToLiveRegion = (text: string) => {
+ //       const liveRegion = document.getElementById("daw-live-region")
+ //       if (liveRegion) liveRegion.textContent = text
+ //   }
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -462,9 +462,8 @@ const Clip = ({ color, clip, loopFamilyEnd }: { color: daw.Color, clip: types.Cl
         data-source-line={clip.sourceLine}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
-        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+        title={scriptMatchesDAW ? `Source Line: ${clip.sourceLine}` : t("daw.needsSync")}
         aria-label={clipDescription}
-        onFocus={() => announceToLiveRegion(clipDescription)}
         onClick={() => {
             player.setPreview(clip.track)
             const playStart = clip.clipFamilyStart || clip.measure
@@ -480,7 +479,6 @@ const Clip = ({ color, clip, loopFamilyEnd }: { color: daw.Color, clip: types.Cl
         }}
 
     >
-        <h4 className="sr-only">{clip.filekey}, measure {clip.measure} to {clip.end}, line {clip.sourceLine}</h4>
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
@@ -631,32 +629,43 @@ const SchedPlayhead = () => {
     return pendingPosition === null ? null : <div className="daw-sched-marker" style={{ left: xScale(pendingPosition) }}></div>
 }
 
-const Measureline = () => {
+const Measureline = ({ setPlayPosition }: { setPlayPosition: (pos: number) => void }) => {
     const dispatch = useDispatch()
     const xScale = useSelector(daw.selectXScale)
     const intervals = useSelector(daw.selectMeasurelineZoomIntervals)
     const playLength = useSelector(daw.selectPlayLength)
     const playing = useSelector(daw.selectPlaying)
+    const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
     const [focusedMeasure, setFocusedMeasure] = useState(1)
 
     const handleSliderKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "ArrowRight") {
             e.preventDefault()
-            setFocusedMeasure(m => Math.min(m + 1, playLength))
+            setFocusedMeasure(m => {
+                const next = Math.min(m + 1, playLength)
+                setPlayPosition(next)
+                return next
+            })
         } else if (e.key === "ArrowLeft") {
             e.preventDefault()
-            setFocusedMeasure(m => Math.max(m - 1, 1))
+            setFocusedMeasure(m => {
+                const next = Math.max(m - 1, 1)
+                setPlayPosition(next)
+                return next
+            })
         } else if (e.key === "Home") {
             e.preventDefault()
             setFocusedMeasure(1)
+            setPlayPosition(1)
         } else if (e.key === "End") {
             e.preventDefault()
             setFocusedMeasure(playLength)
+            setPlayPosition(playLength)
         } else if (e.key === "Enter" || e.key === " ") {
             e.preventDefault()
             player.setPosition(focusedMeasure)
-            _setPlayPosition?.(focusedMeasure)
+            setPlayPosition(focusedMeasure)
             dispatch(daw.setPendingPosition(playing ? focusedMeasure : null))
         }
     }
@@ -728,17 +737,17 @@ const Measureline = () => {
         }
     })
     return <>
-        <h2 id="daw-measureline-heading" className="sr-only">DAW Timeline</h2>
+        <h2 id="daw-measureline-heading" className="sr-only">{t("ariaDescriptors:daw.timelineHeading")}</h2>
         <div
             ref={element}
             id="daw-measureline"
             role="slider"
             aria-labelledby="daw-measureline-heading"
-            aria-label="Navigate measures. Use arrow keys to browse, Enter or Space to set playback start."
+            aria-label={t("ariaDescriptors:daw.measurelineLabel")}
             aria-valuenow={focusedMeasure}
             aria-valuemin={1}
             aria-valuemax={playLength}
-            aria-valuetext={`Measure ${focusedMeasure} of ${playLength}`}
+            aria-valuetext={t("ariaDescriptors:daw.measurePosition", { measure: focusedMeasure, total: playLength })}
             tabIndex={0}
             className="relative w-full"
             style={{ top: "-1px", minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}
@@ -1222,7 +1231,7 @@ export const DAW = () => {
                     <div className="relative">
                         <div className="sticky top-0 z-10">
                             <Timeline />
-                            <Measureline />
+                            <Measureline setPlayPosition={setPlayPosition} />
                         </div>
 
                         <div className="daw-track-group-container" style={{ marginBottom: "14px" }}>

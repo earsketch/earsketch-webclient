@@ -326,9 +326,9 @@ function announceLineNumber(lineNumber: number) {
 
     window.setTimeout(() => {
         const line = view.state.doc.line(lineNumber)
-        const lineText = line.text
+        const lineText = line.text || i18n.t("ariaDescriptors:editor.emptyLine")
         if (srLineEl) {
-            srLineEl.textContent = `Line ${lineNumber}: ${lineText || "empty line"}`
+            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text: lineText })
         }
     }, 10)
 }
@@ -349,7 +349,7 @@ export function focus() {
     const line = view.state.doc.lineAt(from)
     const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
 
-    view.contentDOM.setAttribute("aria-label", `Line ${line.number}: ${line.text || "empty line"}`)
+    view.contentDOM.setAttribute("aria-label", i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: line.number, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") }))
     view.dispatch({ selection: { anchor: from }, scrollIntoView: true })
     view.focus()
 

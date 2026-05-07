@@ -339,7 +339,7 @@ const KeyboardShortcuts = () => {
         redo: [modifier, "Shift", "Z"],
         comment: [modifier, "/"],
         playPause: ["Ctrl", "Space"],
-        jumpToCodeDaw: ["Ctrl", "Enter"],
+        jumpToCodeDaw: ["Ctrl", "I"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
