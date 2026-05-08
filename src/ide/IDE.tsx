@@ -113,7 +113,7 @@ function switchToShareMode() {
 
 let setLoading: (loading: boolean) => void
 
-function saveScript() {
+export function saveScript() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
     const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 

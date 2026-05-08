@@ -831,7 +831,7 @@ export const App = () => {
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
         </div>
         <Bubble />
-        <CommandPalette isOpen={isCommandPaletteOpen} onClose={closeCommandPalette} />
+        <CommandPalette isOpen={isCommandPaletteOpen} onClose={closeCommandPalette} email={email} />
         <ModalContainer />
     </>
 }

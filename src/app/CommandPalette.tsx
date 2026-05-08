@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback, Fragment } from "react"
 import { Dialog, Combobox, Transition } from "@headlessui/react"
+import { useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import * as appState from "./appState"
 import * as scriptsState from "../browser/scriptsState"
@@ -7,23 +8,25 @@ import * as scriptsThunks from "../browser/scriptsThunks"
 import * as curriculum from "../browser/curriculumState"
 import * as apiState from "../browser/apiState"
 import * as layout from "../ide/layoutState"
+import * as daw from "../daw/dawState"
+
 import { BrowserTabType } from "../browser/BrowserTab"
 import { API_DOC, API_FUNCTIONS } from "../api/api"
 import * as tabs from "../ide/tabState"
 import * as tabThunks from "../ide/tabThunks"
 import * as bubble from "../bubble/bubbleState"
 import * as user from "../user/userState"
+import * as exporter from "./exporter"
+import { ProfileEditor } from "./ProfileEditor"
 import { openModal } from "./modal"
 import { AccountCreator } from "./AccountCreator"
 import { ForgotPassword } from "./ForgotPassword"
-import { AdminWindow } from "./AdminWindow"
-import { ScriptShare } from "./ScriptShare"
-import { Download } from "./Download"
-import { ScriptHistory } from "./ScriptHistory"
-import { ScriptAnalysis } from "./ScriptAnalysis"
 import { SoundUploader } from "./SoundUploader"
-import esconsole from "../esconsole"
-import { openShare } from "../ide/IDE"
+import { openScriptHistory, openCodeIndicator, renameScript, shareScript, downloadScript, deleteScript, deleteSharedScript, submitToCompetition } from "./scriptActions"
+import { importScript } from "../browser/scriptsThunks"
+import { saveScript, openShare, createScript } from "../ide/IDE"
+import * as editor from "../ide/Editor"
+import * as ESUtils from "../esutils"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -41,6 +44,7 @@ interface CommandItem {
 interface CommandPaletteProps {
     isOpen: boolean
     onClose: () => void
+    email: string
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -51,29 +55,47 @@ const DEBOUNCE_MS = 150
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
+export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, email }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
     const [query, setQuery] = useState("")
     const [debouncedQuery, setDebouncedQuery] = useState("")
     const inputRef = useRef<HTMLInputElement>(null)
+    // Store onClose in a ref so it never appears in memo/effect dependency arrays.
+    // This prevents appCommandIndex from rebuilding on every render when the
+    // parent re-renders and passes a new function reference for onClose.
+    const onCloseRef = useRef<() => void>(onClose)
+    useEffect(() => { onCloseRef.current = onClose }, [onClose])
 
     // ── Selectors ──────────────────────────────────────────────────────────
-    const scripts = useSelector(scriptsState.selectAllScripts)
+    const openTabIDs = useSelector(tabs.selectOpenTabs)
+    const allScripts = useSelector(scriptsState.selectAllScripts)
+    const regularScripts = useSelector(scriptsState.selectRegularScripts)
     const sharedScripts = useSelector(scriptsState.selectSharedScripts)
     const standardSoundNames = useSelector((state: any) => state.sounds.standardSounds.names as string[])
     const standardSoundEntities = useSelector((state: any) => state.sounds.standardSounds.entities as Record<string, any>)
     const userSoundNames = useSelector((state: any) => state.sounds.userSounds.names as string[])
     const userSoundEntities = useSelector((state: any) => state.sounds.userSounds.entities as Record<string, any>)
     const loggedIn = useSelector(user.selectLoggedIn)
-    const isAdmin = useSelector((state: any) => (user.selectNotifications(state) as any[]).some((n: any) => n?.notification_type === "admin"))
+    const username = useSelector(user.selectUserName) ?? ""
+    const isPlaying = useSelector(daw.selectPlaying)
+
     const activeTabScript = useSelector(tabs.selectActiveTabScript)
     const colorTheme = useSelector(appState.selectColorTheme)
     // Curriculum: use the existing lunr-backed selector by keeping searchText in sync
     const curriculumResults = useSelector(curriculum.selectSearchResults)
 
-    // ── Focus / reset ──────────────────────────────────────────────────────
+    // ── Focus input on open; reset query on close ──────────────────────────
+    // Driven by isOpen so the component can stay persistently mounted.
+    // rAF lets the Dialog's focus trap settle before we steal focus,
+    // avoiding an infinite focus loop between autoFocus and the Dialog trap.
     useEffect(() => {
-        if (!isOpen) {
+        if (isOpen) {
+            const id = window.requestAnimationFrame(() => {
+                inputRef.current?.focus()
+            })
+            return () => window.cancelAnimationFrame(id)
+        } else {
             setQuery("")
             setDebouncedQuery("")
             dispatch(curriculum.setSearchText(""))
@@ -92,37 +114,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     }, [query, dispatch])
 
     // ── Static app-command index ───────────────────────────────────────────
-    // Only rebuilds when login state, theme, or active script changes.
-    // Sounds and curriculum are handled separately below.
+    // Only contains the small fixed set of app commands and API functions.
+    // Scripts, sounds, and curriculum are all filtered lazily in filteredCommands.
     const appCommandIndex = useMemo((): CommandItem[] => {
         const cmds: CommandItem[] = []
-
-        // Scripts
-        for (const script of Object.values(scripts)) {
-            if (script.soft_delete) continue
-            cmds.push({
-                id: `script-${script.shareid}`,
-                title: script.name,
-                subtitle: `by ${script.creator || script.username}`,
-                category: "Scripts",
-                action: () => { dispatch(tabThunks.setActiveTabAndEditor(script.shareid)); onClose() },
-                icon: "icon-file-text2",
-                searchKey: `scripts script file code ${script.name} ${script.creator ?? ""} ${script.username}`.toLowerCase(),
-            })
-        }
-
-        // Shared scripts
-        for (const script of Object.values(sharedScripts)) {
-            cmds.push({
-                id: `shared-${script.shareid}`,
-                title: script.name,
-                subtitle: `Shared by ${script.username}`,
-                category: "Shared Scripts",
-                action: async () => { await openShare(script.shareid); dispatch(tabThunks.setActiveTabAndEditor(script.shareid)); onClose() },
-                icon: "icon-share2",
-                searchKey: `shared scripts script file ${script.name} ${script.username}`.toLowerCase(),
-            })
-        }
 
         // API functions — small fixed list, fine to include in static index
         for (const funcName of Object.keys(API_FUNCTIONS)) {
@@ -132,23 +127,29 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                 subtitle: "EarSketch API function",
                 category: "API",
                 action: () => {
-                    // Open the API tab in the content manager
+                    // Open the API tab in the content manager (clear any existing search text)
                     dispatch(layout.setWest({ open: true, kind: BrowserTabType.API }))
-                    // Filter the API browser down to just this function
-                    dispatch(apiState.setSearchText(funcName))
+                    dispatch(apiState.setSearchText(""))
                     // Expand the entry by mutating obj.details (same pattern the API browser uses)
                     const docEntries = API_DOC[funcName]
                     if (docEntries) {
                         docEntries.forEach((obj: any) => { obj.details = true })
                     }
-                    // After React re-renders, scroll to top and focus the entry name span
+                    // After React re-renders, scroll the panel so the entry is near the top, then focus it
                     window.setTimeout(() => {
                         const panel = document.getElementById(`panel-${BrowserTabType.API}`)
-                        if (panel) panel.scrollTop = 0
                         const span = document.querySelector<HTMLElement>(`[data-api-entry="${funcName}"]`)
+                        if (panel && span) {
+                            // Walk up to the entry's container div (direct child of the panel)
+                            let entry: HTMLElement = span
+                            while (entry.parentElement && entry.parentElement !== panel) {
+                                entry = entry.parentElement
+                            }
+                            panel.scrollTop = entry.offsetTop - panel.offsetTop
+                        }
                         span?.focus()
                     }, 100)
-                    onClose()
+                    onCloseRef.current()
                 },
                 icon: "icon-code",
                 searchKey: `api function earsketch ${funcName}`.toLowerCase(),
@@ -156,148 +157,343 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         }
 
         // ── App commands ────────────────────────────────────────────────────
+        const isMac = ESUtils.whichOS() === "MacOS"
+        const scriptName = activeTabScript?.name ?? ""
+        const scriptType: "regular" | "shared" | "readonly" =
+            activeTabScript
+                ? (activeTabScript.readonly ? "readonly" : activeTabScript.isShared ? "shared" : "regular")
+                : "regular"
+
+        // Play / Pause — always available (mirrors Ctrl+Space shortcut)
+        cmds.push({
+            id: "play-pause",
+            title: isPlaying ? t("daw.tooltip.pause") : t("daw.tooltip.play"),
+            subtitle: "Ctrl+Space",
+            category: "Commands",
+            action: () => {
+                // Simulate Ctrl+Space which the DAW already listens for
+                window.dispatchEvent(new KeyboardEvent("keydown", { key: " ", ctrlKey: true, bubbles: true }))
+                onCloseRef.current()
+            },
+            icon: isPlaying ? "icon-pause2" : "icon-play4",
+            searchKey: "play pause daw audio commands",
+        })
+
+        // Script-dependent commands — only shown when a script tab is open
+        if (activeTabScript) {
+            cmds.push(
+                {
+                    id: "run-script",
+                    title: `${t("shortcuts.run")} (${scriptName})`,
+                    subtitle: isMac ? "Cmd+Enter" : "Ctrl+Enter",
+                    category: "Commands",
+                    action: () => {
+                        (document.querySelector('[data-test="run-button"]') as HTMLButtonElement | null)?.click()
+                        onCloseRef.current()
+                    },
+                    icon: "icon-arrow-right22",
+                    searchKey: `run execute script code commands ${scriptName}`.toLowerCase(),
+                },
+                {
+                    id: "save-script",
+                    title: `${t("shortcuts.save")} (${scriptName})`,
+                    subtitle: isMac ? "Cmd+S" : "Ctrl+S",
+                    category: "Commands",
+                    action: () => {
+                        saveScript()
+                        onCloseRef.current()
+                    },
+                    icon: "icon-floppy-disk",
+                    searchKey: `save script file commands ${scriptName}`.toLowerCase(),
+                },
+                {
+                    id: "download-script",
+                    title: `${t("script.download")} (${scriptName})`,
+                    subtitle: t("script.download"),
+                    category: "Commands",
+                    action: () => { downloadScript(activeTabScript); onCloseRef.current() },
+                    icon: "icon-cloud-download",
+                    searchKey: `download script export commands ${scriptName}`.toLowerCase(),
+                },
+                {
+                    id: "print-script",
+                    title: `${t("script.print")} (${scriptName})`,
+                    subtitle: t("script.print"),
+                    category: "Commands",
+                    action: () => { exporter.print(activeTabScript); onCloseRef.current() },
+                    icon: "icon-printer",
+                    searchKey: `print script commands ${scriptName}`.toLowerCase(),
+                },
+                {
+                    id: "script-analysis",
+                    title: `${t("script.codeIndicator")} (${scriptName})`,
+                    subtitle: t("script.codeIndicator"),
+                    category: "Commands",
+                    action: () => { openCodeIndicator(activeTabScript); onCloseRef.current() },
+                    icon: "icon-info",
+                    searchKey: `code indicator analysis analyze complexity commands ${scriptName}`.toLowerCase(),
+                }
+            )
+
+            // Copy (regular only)
+            if (scriptType === "regular") {
+                cmds.push({
+                    id: "copy-script",
+                    title: `${t("script.copy")} (${scriptName})`,
+                    subtitle: t("script.copy"),
+                    category: "Commands",
+                    action: () => {
+                        dispatch(scriptsThunks.saveScript({ name: activeTabScript.name, source: activeTabScript.source_code, overwrite: false }))
+                        onCloseRef.current()
+                    },
+                    icon: "icon-copy",
+                    searchKey: `copy duplicate script commands ${scriptName}`.toLowerCase(),
+                })
+            }
+
+            // Rename (regular only)
+            if (scriptType === "regular") {
+                cmds.push({
+                    id: "rename-script",
+                    title: `${t("script.rename")} (${scriptName})`,
+                    subtitle: t("script.rename"),
+                    category: "Commands",
+                    action: () => { renameScript(activeTabScript); onCloseRef.current() },
+                    icon: "icon-pencil2",
+                    searchKey: `rename script commands ${scriptName}`.toLowerCase(),
+                })
+            }
+
+            // Share (regular + logged in)
+            if (scriptType === "regular" && loggedIn) {
+                cmds.push({
+                    id: "share-script",
+                    title: `${t("script.share")} (${scriptName})`,
+                    subtitle: t("script.share"),
+                    category: "Commands",
+                    action: () => { shareScript(activeTabScript); onCloseRef.current() },
+                    icon: "icon-share32",
+                    searchKey: `share script collaborate commands ${scriptName}`.toLowerCase(),
+                })
+            }
+
+            // History (regular + shared, requires login)
+            if (scriptType !== "readonly" && loggedIn) {
+                cmds.push({
+                    id: "script-history",
+                    title: `${t("script.history")} (${scriptName})`,
+                    subtitle: t("script.history"),
+                    category: "Commands",
+                    action: () => { openScriptHistory(activeTabScript, !activeTabScript.isShared); onCloseRef.current() },
+                    icon: "icon-history",
+                    searchKey: `history version revert script commands ${scriptName}`.toLowerCase(),
+                })
+            }
+
+            // Import (shared + readonly only)
+            if (scriptType === "shared" || scriptType === "readonly") {
+                cmds.push({
+                    id: "import-script",
+                    title: `${t("script.import")} (${scriptName})`,
+                    subtitle: t("script.import"),
+                    category: "Commands",
+                    action: () => { importScript(activeTabScript); onCloseRef.current() },
+                    icon: "icon-import",
+                    searchKey: `import script commands ${scriptName}`.toLowerCase(),
+                })
+            }
+
+            // Delete (regular + shared, not readonly)
+            if (scriptType !== "readonly") {
+                cmds.push({
+                    id: "delete-script",
+                    title: `${t("script.delete")} (${scriptName})`,
+                    subtitle: t("script.delete"),
+                    category: "Commands",
+                    action: () => {
+                        if (scriptType === "regular") deleteScript(activeTabScript)
+                        else deleteSharedScript(activeTabScript)
+                        onCloseRef.current()
+                    },
+                    icon: "icon-bin",
+                    searchKey: `delete remove script commands ${scriptName}`.toLowerCase(),
+                })
+            }
+
+            // Submit to competition (regular + logged in + feature flag)
+            if (scriptType === "regular" && loggedIn && ES_WEB_SHOW_COMPETITION_SUBMIT) {
+                cmds.push({
+                    id: "submit-competition",
+                    title: `${t("script.submitCompetition")} (${scriptName})`,
+                    subtitle: t("script.submitCompetition"),
+                    category: "Commands",
+                    action: () => { submitToCompetition(activeTabScript); onCloseRef.current() },
+                    icon: "icon-earth",
+                    searchKey: `submit competition script commands ${scriptName}`.toLowerCase(),
+                })
+            }
+        }
+
+        // Edit Profile (logged in only)
+        if (loggedIn) {
+            cmds.push({
+                id: "edit-profile",
+                title: t("editProfile"),
+                subtitle: t("editProfile"),
+                category: "Commands",
+                action: () => { openModal(ProfileEditor, { username, email }); onCloseRef.current() },
+                icon: "icon-user",
+                searchKey: "edit profile account settings commands",
+            })
+        }
+
+        // ── General commands (always visible) ───────────────────────────────
         cmds.push(
             {
-                id: "run-script",
-                title: "Run Script",
-                subtitle: "Execute the current script",
+                id: "new-script",
+                title: t("newScript"),
+                subtitle: t("newScript"),
                 category: "Commands",
-                action: () => { (document.querySelector('[data-test="run-button"]') as HTMLButtonElement | null)?.click(); onClose() },
-                icon: "icon-play3",
-                searchKey: "run execute play script code commands",
-            },
-            {
-                id: "save-script",
-                title: "Save Script",
-                subtitle: "Save the current script",
-                category: "Commands",
-                action: () => {
-                    if (activeTabScript) dispatch(scriptsThunks.saveScript({ name: activeTabScript.name, source: activeTabScript.source_code }))
-                    onClose()
-                },
-                icon: "icon-floppy-disk",
-                searchKey: "save script file commands",
+                action: () => { createScript(); onCloseRef.current() },
+                icon: "icon-plus2",
+                searchKey: "new script create file commands",
             },
             {
                 id: "toggle-theme",
-                title: "Toggle Theme",
-                subtitle: `Switch to ${colorTheme === "light" ? "dark" : "light"} theme`,
+                title: t("switchThemeLight"),
+                subtitle: colorTheme === "light" ? t("switchThemeLight") : t("switchThemeDark"),
                 category: "Commands",
-                action: () => { dispatch(appState.setColorTheme(colorTheme === "light" ? "dark" : "light")); onClose() },
+                action: () => { dispatch(appState.setColorTheme(colorTheme === "light" ? "dark" : "light")); onCloseRef.current() },
                 icon: "icon-brightness-contrast",
                 searchKey: "toggle theme dark light appearance settings commands",
             },
             {
                 id: "start-tutorial",
-                title: "Start Quick Tour",
-                subtitle: "Begin the interactive tutorial",
+                title: t("startQuickTour"),
+                subtitle: t("startQuickTour"),
                 category: "Commands",
-                action: () => { dispatch(bubble.reset()); dispatch(bubble.resume()); onClose() },
-                icon: "icon-question",
+                action: () => { dispatch(bubble.reset()); dispatch(bubble.resume()); onCloseRef.current() },
+                icon: "icon-info",
                 searchKey: "start quick tour tutorial help guide commands",
             },
             {
                 id: "upload-sound",
-                title: "Upload Sound",
-                subtitle: "Upload a sound file",
+                title: t("soundBrowser.button.addSound"),
+                subtitle: t("soundBrowser.button.addSound"),
                 category: "Commands",
                 action: () => {
                     if (loggedIn) openModal(SoundUploader)
-                    else esconsole("Please log in to upload sounds", ["user"])
-                    onClose()
+                    onCloseRef.current()
                 },
-                icon: "icon-upload",
-                searchKey: "upload sound audio file commands",
+                icon: "icon-plus2",
+                searchKey: "upload add sound audio file commands",
             }
         )
 
-        if (loggedIn) {
-            cmds.push(
-                {
-                    id: "share-script",
-                    title: "Share Script",
-                    subtitle: "Share the current script with others",
-                    category: "Commands",
-                    action: () => { if (activeTabScript) openModal(ScriptShare, { script: activeTabScript }); onClose() },
-                    icon: "icon-share2",
-                    searchKey: "share script collaborate commands",
-                },
-                {
-                    id: "download-script",
-                    title: "Download Script",
-                    subtitle: "Download the current script",
-                    category: "Commands",
-                    action: () => { if (activeTabScript) openModal(Download, { script: activeTabScript }); onClose() },
-                    icon: "icon-download",
-                    searchKey: "download script export file commands",
-                },
-                {
-                    id: "script-history",
-                    title: "Script History",
-                    subtitle: "View version history of the current script",
-                    category: "Commands",
-                    action: () => { if (activeTabScript) openModal(ScriptHistory, { script: activeTabScript, allowRevert: true }); onClose() },
-                    icon: "icon-history",
-                    searchKey: "script history version changes revert commands",
-                },
-                {
-                    id: "script-analysis",
-                    title: "Script Analysis",
-                    subtitle: "Analyze the current script",
-                    category: "Commands",
-                    action: () => { if (activeTabScript) openModal(ScriptAnalysis, { script: activeTabScript }); onClose() },
-                    icon: "icon-stats-dots",
-                    searchKey: "script analysis analyze code complexity commands",
-                }
-            )
-        } else {
+        if (!loggedIn) {
             cmds.push(
                 {
                     id: "create-account",
-                    title: "Create Account",
-                    subtitle: "Sign up for EarSketch",
+                    title: t("registerAccount"),
+                    subtitle: t("registerAccount"),
                     category: "Commands",
-                    action: () => { openModal(AccountCreator); onClose() },
+                    action: () => { openModal(AccountCreator); onCloseRef.current() },
                     icon: "icon-user-plus",
                     searchKey: "create account signup register commands",
                 },
                 {
                     id: "forgot-password",
-                    title: "Forgot Password",
-                    subtitle: "Reset your password",
+                    title: t("forgotPassword.title"),
+                    subtitle: t("forgotPassword.title"),
                     category: "Commands",
-                    action: () => { openModal(ForgotPassword); onClose() },
+                    action: () => { openModal(ForgotPassword); onCloseRef.current() },
                     icon: "icon-key",
                     searchKey: "forgot password reset recover account commands",
                 }
             )
         }
 
-        if (isAdmin) {
-            cmds.push({
-                id: "admin-window",
-                title: "Admin Window",
-                subtitle: "Open the admin panel",
-                category: "Commands",
-                action: () => { openModal(AdminWindow); onClose() },
-                icon: "icon-cog",
-                searchKey: "admin administration panel settings commands",
-            })
-        }
-
         return cmds
-    }, [scripts, sharedScripts, loggedIn, isAdmin, activeTabScript, colorTheme, dispatch, onClose])
+    }, [loggedIn, username, email, isPlaying, activeTabScript, colorTheme, dispatch, t])
+
+    // ── Open tabs index ────────────────────────────────────────────────────
+    // Built separately so it can be shown at the top with no query typed.
+    const openTabCommands = useMemo((): CommandItem[] => {
+        return openTabIDs.flatMap(id => {
+            const script = allScripts[id]
+            if (!script) return []
+            return [{
+                id: `open-tab-${id}`,
+                title: script.name,
+                subtitle: script.isShared ? `Shared by ${script.username}` : `by ${script.creator || script.username}`,
+                category: "Open Tabs",
+                action: () => {
+                    dispatch(tabThunks.setActiveTabAndEditor(id))
+                    // Close the palette first, then focus the editor on the next frame
+                    onCloseRef.current()
+                    window.requestAnimationFrame(() => editor.focus())
+                },
+                icon: "icon-file-text2",
+                searchKey: `open tab script ${script.name} ${script.creator ?? ""} ${script.username}`.toLowerCase(),
+            }]
+        })
+    }, [openTabIDs, allScripts, dispatch])
 
     // ── Filtered results ───────────────────────────────────────────────────
-    // When query is empty, show all app commands and scripts as a default list.
+    // When query is empty, show open tabs + all app commands as the default list.
     const filteredCommands = useMemo((): CommandItem[] => {
-        if (!debouncedQuery.trim()) return appCommandIndex
+        if (!debouncedQuery.trim()) return [...openTabCommands, ...appCommandIndex]
         const q = debouncedQuery.toLowerCase()
 
-        // 1. App commands + scripts + API: cheap substring filter on pre-built keys
+        // 1. App commands + API: cheap substring filter on pre-built keys
         const results: CommandItem[] = appCommandIndex.filter(item => item.searchKey.includes(q))
 
-        // 2. Sounds: filter lazily here — never stored in index — capped at MAX_SOUNDS
+        // 2. Open tabs — always searched first since they're the most likely target
+        for (const cmd of openTabCommands) {
+            if (cmd.searchKey.includes(q)) results.push(cmd)
+        }
+
+        // 3. Scripts: filter lazily, capped to avoid iterating thousands of entries
+        const MAX_SCRIPTS = 50
+        let scriptCount = 0
+        for (const script of Object.values(regularScripts)) {
+            if (scriptCount >= MAX_SCRIPTS) break
+            if (script.soft_delete) continue
+            // Skip scripts already shown in Open Tabs
+            if (openTabIDs.includes(script.shareid)) continue
+            const key = `scripts script file code ${script.name} ${script.creator ?? ""} ${script.username}`.toLowerCase()
+            if (key.includes(q)) {
+                results.push({
+                    id: `script-${script.shareid}`,
+                    title: script.name,
+                    subtitle: `by ${script.creator || script.username}`,
+                    category: "Scripts",
+                    action: () => { dispatch(tabThunks.setActiveTabAndEditor(script.shareid)); onCloseRef.current() },
+                    icon: "icon-file-text2",
+                    searchKey: key,
+                })
+                scriptCount++
+            }
+        }
+
+        // Shared scripts (skip those already in Open Tabs)
+        for (const script of Object.values(sharedScripts)) {
+            if (openTabIDs.includes(script.shareid)) continue
+            const key = `shared scripts script file ${script.name} ${script.username}`.toLowerCase()
+            if (key.includes(q)) {
+                results.push({
+                    id: `shared-${script.shareid}`,
+                    title: script.name,
+                    subtitle: `Shared by ${script.username}`,
+                    category: "Shared Scripts",
+                    action: async () => { await openShare(script.shareid); dispatch(tabThunks.setActiveTabAndEditor(script.shareid)); onCloseRef.current() },
+                    icon: "icon-share2",
+                    searchKey: key,
+                })
+            }
+        }
+
+        // 3. Sounds: filter lazily here — never stored in index — capped at MAX_SOUNDS
         let soundCount = 0
         for (const name of standardSoundNames) {
             if (soundCount >= MAX_SOUNDS) break
@@ -313,7 +509,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                     action: () => {
                         const editor = (window as any).ace?.edit?.("coder")
                         if (editor) editor.insert(s.name)
-                        onClose()
+                        onCloseRef.current()
                     },
                     icon: "icon-music",
                     searchKey: key,
@@ -335,7 +531,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                     action: () => {
                         const editor = (window as any).ace?.edit?.("coder")
                         if (editor) editor.insert(s.name)
-                        onClose()
+                        onCloseRef.current()
                     },
                     icon: "icon-music",
                     searchKey: s.name.toLowerCase(),
@@ -350,9 +546,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             results.push({
                 id: `curriculum-${result.id}`,
                 title: result.title,
-                subtitle: "Curriculum",
+                subtitle: result.text,
                 category: "Curriculum",
-                action: () => { dispatch(curriculum.fetchContent({ url: result.id })); onClose() },
+                action: () => {
+                    dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
+                    // Signal Curriculum.tsx to focus the first heading once the new
+                    // content is appended. Set this before fetchContent so the flag
+                    // is in place before any navigation state changes are applied.
+                    dispatch(curriculum.setFocusPending(true))
+                    dispatch(curriculum.fetchContent({ url: result.id }))
+                    onCloseRef.current()
+                },
                 icon: "icon-book",
                 searchKey: result.title.toLowerCase(),
             })
@@ -362,10 +566,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     }, [
         debouncedQuery,
         appCommandIndex,
+        openTabCommands, openTabIDs,
+        regularScripts, sharedScripts,
         standardSoundNames, standardSoundEntities,
         userSoundNames, userSoundEntities,
         curriculumResults,
-        dispatch, onClose,
+        dispatch,
     ])
 
     // ── Group for display ──────────────────────────────────────────────────
@@ -375,12 +581,21 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             if (!groups[cmd.category]) groups[cmd.category] = []
             groups[cmd.category].push(cmd)
         }
-        return groups
+        // Sort so Commands always appears first, then all other categories alphabetically
+        const CATEGORY_ORDER: Record<string, number> = { "Open Tabs": 0, Commands: 1 }
+        return Object.fromEntries(
+            Object.entries(groups).sort(([a], [b]) => {
+                const aOrder = CATEGORY_ORDER[a] ?? 2
+                const bOrder = CATEGORY_ORDER[b] ?? 2
+                if (aOrder !== bOrder) return aOrder - bOrder
+                return a.localeCompare(b)
+            })
+        )
     }, [filteredCommands])
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-        if (e.key === "Escape") onClose()
-    }, [onClose])
+        if (e.key === "Escape") onCloseRef.current()
+    }, [])
 
     // ── Render ─────────────────────────────────────────────────────────────
     return (
@@ -415,7 +630,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                                                 value={query}
                                                 onChange={e => setQuery(e.target.value)}
                                                 onKeyDown={handleKeyDown}
-                                                autoFocus
                                             />
                                             {query && (
                                                 <button
@@ -450,9 +664,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                                                             >
                                                                 {({ active }) => (
                                                                     <>
-                                                                        {item.icon && (
-                                                                            <i className={`${item.icon} mr-3 text-lg flex-shrink-0 ${active ? "text-white" : "text-gray-400"}`} />
-                                                                        )}
+                                                                        <span className="mr-3 text-lg flex-shrink-0 w-[1em] text-center inline-block">
+                                                                            {item.icon && (
+                                                                                <i className={`${item.icon} ${active ? "text-white" : "text-gray-400"}`} />
+                                                                            )}
+                                                                        </span>
                                                                         <div className="flex-1 min-w-0">
                                                                             <div className="font-medium truncate">{item.title}</div>
                                                                             {item.subtitle && (
