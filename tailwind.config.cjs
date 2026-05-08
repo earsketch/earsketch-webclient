@@ -1,4 +1,5 @@
 const colors = require("tailwindcss/colors")
+const plugin = require("tailwindcss/plugin")
 
 module.exports = {
     content: [
@@ -60,6 +61,16 @@ module.exports = {
         require("@tailwindcss/typography"),
         require("@tailwindcss/forms")({
             strategy: "class", // only generate classes
+        }),
+        plugin(({ addVariant }) => {
+            addVariant("scale", ({ container }) => {
+                container.walkRules(rule => {
+                    rule.selector = `.scale\\:${rule.selector.slice(1)}`
+                    rule.walkDecls(decl => {
+                        decl.value = decl.value.replace(/([0-9.]+)rem/g, "$1em")
+                    })
+                })
+            })
         }),
     ],
 }
