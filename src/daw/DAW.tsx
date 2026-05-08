@@ -470,6 +470,14 @@ const Clip = ({ color, clip, loopFamilyEnd }: { color: daw.Color, clip: types.Cl
             const playEnd = clip.clipFamilyEnd ||
                 (isLoopClip ? loopFamilyEnd : undefined) ||
                 (clip.measure + clip.end - clip.start)
+            player.callbacks.onStartedCallback = () => {
+                store.dispatch(daw.setPlaying(true))
+                store.dispatch(daw.setPendingPosition(null))
+            }
+            player.callbacks.onFinishedCallback = () => {
+                store.dispatch(daw.setPlaying(false))
+                _setPlayPosition?.(1)
+            }
             player.play(playStart, 0, playEnd)
         }}
         onKeyDown={(e: React.KeyboardEvent) => {
