@@ -189,6 +189,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     return <div ref={el} id="dawHeader" className="grow-0 bg-white dark:bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
+        <h1 className="sr-only">{t("ariaDescriptors:daw.transportControls")}</h1>
         <div id="daw-label">
             <span className="panel-label">
                 {titleKey &&
@@ -339,6 +340,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
             <div className="dawTrackCtrl flex sticky left-0 border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50">
+                <h3 className="sr-only">{t("ariaDescriptors:daw.trackHeading", { label: track.label })}</h3>
                 <div className="dawTrackName text-gray-700 dark:text-gray-400 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <div className="justify-center items-center flex space-x-3 w-4/5">
@@ -434,20 +436,20 @@ const Clip = ({ color, clip, loopFamilyEnd }: { color: daw.Color, clip: types.Cl
 
     let clipType: string
     if (actuallyLoops) {
-        clipType = `looping clip, loops till measure ${fullEnd}`
+        clipType = t("ariaDescriptors:daw.clipLooping", { end: fullEnd })
     } else if (isBeatPattern) {
-        clipType = "beat pattern"
+        clipType = t("ariaDescriptors:daw.clipBeatPattern")
     } else if (isAudioSection) {
-        clipType = "audio section group"
+        clipType = t("ariaDescriptors:daw.clipAudioSection")
     } else {
-        clipType = `clip, ${clipLength} measure${clipLength !== 1 ? "s" : ""} long`
+        clipType = t("ariaDescriptors:daw.clipLength", { count: clipLength })
     }
-    const clipDescription = `track ${clip.track}, measures ${fullStart} to ${fullEnd}, ${clipType}, ${clip.filekey}`
+    const clipDescription = t("ariaDescriptors:daw.clipDescription", { track: clip.track, start: fullStart, end: fullEnd, type: clipType, filekey: clip.filekey })
 
-    const announceToLiveRegion = (text: string) => {
-        const liveRegion = document.getElementById("daw-live-region")
-        if (liveRegion) liveRegion.textContent = text
-    }
+//    const announceToLiveRegion = (text: string) => {
+//       const liveRegion = document.getElementById("daw-live-region")
+//        if (liveRegion) liveRegion.textContent = text
+//    }
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -460,15 +462,22 @@ const Clip = ({ color, clip, loopFamilyEnd }: { color: daw.Color, clip: types.Cl
         data-source-line={clip.sourceLine}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
-        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+        title={scriptMatchesDAW ? `Source Line: ${clip.sourceLine}` : t("daw.needsSync")}
         aria-label={clipDescription}
-        onFocus={() => announceToLiveRegion(clipDescription)}
         onClick={() => {
             player.setPreview(clip.track)
             const playStart = clip.clipFamilyStart || clip.measure
             const playEnd = clip.clipFamilyEnd ||
                 (isLoopClip ? loopFamilyEnd : undefined) ||
                 (clip.measure + clip.end - clip.start)
+            player.callbacks.onStartedCallback = () => {
+                store.dispatch(daw.setPlaying(true))
+                store.dispatch(daw.setPendingPosition(null))
+            }
+            player.callbacks.onFinishedCallback = () => {
+                store.dispatch(daw.setPlaying(false))
+                _setPlayPosition?.(1)
+            }
             player.play(playStart, 0, playEnd)
         }}
         onKeyDown={(e: React.KeyboardEvent) => {
@@ -1158,7 +1167,7 @@ export const DAW = () => {
     }, [playing, xScale, autoScroll])
 
     return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
-        <div id="daw-live-region" aria-live="assertive" aria-atomic="true" className="sr-only" />
+        <div id="daw-live-region" aria-live="polite" aria-atomic="true" className="sr-only">  </div>
         {hideEditor &&
         <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
