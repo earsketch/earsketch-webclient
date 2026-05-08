@@ -3,6 +3,7 @@ import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "..
 import { useTranslation } from "react-i18next"
 
 import * as layout from "../ide/layoutState"
+import { selectFontSize } from "../app/appState"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { SoundBrowser } from "./Sounds"
@@ -125,6 +126,8 @@ const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
 
 export const Browser = () => {
     const open = useSelector((state: RootState) => state.layout.west.open)
+    const appFontSize = useSelector(selectFontSize)
+    const scaledFontSize = (appFontSize / 14.0) * 16
     const { t } = useTranslation()
     let kind: BrowserTabType = useSelector(layout.selectWestKind)
 
@@ -135,6 +138,7 @@ export const Browser = () => {
     return (
         <div
             className="flex flex-col h-full w-full text-left font-sans bg-white text-black dark:bg-gray-900 dark:text-white"
+            style={{ fontSize: `${scaledFontSize}px` }}
             id="content-manager">
             {open
                 ? <div className="flex flex-col h-full">
