@@ -590,7 +590,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
     }, [])
 
     return (
-        <div ref={filterRef} className="pb-1">
+        <div ref={filterRef} className="pb-2">
             <div className="pb-1">
                 <Filters
                     currentFilterTab={currentFilterTab}
@@ -599,25 +599,26 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
             <div className="flex justify-between px-1.5 py-1 mb-0.5">
                 <div className="flex items-center gap-2">
                     {loggedIn && <ShowOnlyFavorites />}
-                    <button
-                        type="button"
-                        onClick={() => setShowPreview(prev => !prev)}
-                        aria-expanded={showPreview}
-                        aria-controls="sound-preview-panel"
-                        title={showPreview ? "Hide preview" : "Show preview"}
-                        aria-label={showPreview ? "Hide preview" : "Show preview"}
-                        className="flex items-center gap-1 text-sm"
-                    >
-                        <span>Sound Preview</span>
-                        <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
-                    </button>
                 </div>
                 <AddSound />
             </div>
+            <button
+                type="button"
+                onClick={() => setShowPreview(prev => !prev)}
+                aria-expanded={showPreview}
+                aria-controls="sound-preview-panel"
+                title={showPreview ? "Hide preview" : "Show preview"}
+                aria-label={showPreview ? "Hide preview" : "Show preview"}
+                className="flex bg-blue text-white w-full justify-center items-center gap-1 text-sm p-1"
+            >
+                <span>SOUND PREVIEW</span>
+                <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
+            </button>
             <div
                 id="sound-preview-panel"
                 aria-hidden={!showPreview}
                 style={{ display: showPreview ? undefined : "none" }}
+                className="bg-blue"
             >
                 <SoundPreview />
             </div>
@@ -763,7 +764,7 @@ const SoundPreview = () => {
     }
 
     return (
-        <div className="flex border mt-1 mb-2 ml-2 flex-col items-center justify-center">
+        <div className="flex border border-blue mb-2 flex-col items-center justify-center bg-white dark:bg-transparent">
             <div className="text-sm mt-2 truncate text-center">
                 {currentName ?? t("soundBrowser.noSoundsFound")}
             </div>
