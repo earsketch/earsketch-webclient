@@ -1,9 +1,8 @@
-import React, { useRef, useEffect, ChangeEvent, useState, useLayoutEffect, useContext } from "react"
+import React, { useRef, useEffect, ChangeEvent, useState, useMemo } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
-
-import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
+import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
 import classNames from "classnames"
 
 import { addUIClick } from "../cai/dialogue/student"
@@ -545,7 +544,6 @@ interface FolderProps {
     folder: string,
     names: string[],
     index: number,
-    listRef: React.RefObject<any>
 }
 
 const Folder = ({ folder, names }: FolderProps) => {
@@ -565,27 +563,11 @@ const Folder = ({ folder, names }: FolderProps) => {
 interface SoundSearchAndFiltersProps {
     currentFilterTab: keyof sounds.Filters,
     setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
-    setFilterHeight: React.Dispatch<React.SetStateAction<number>>
 }
 
-const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
-    const filterRef = useRef<HTMLDivElement>(null)
-    useLayoutEffect(() => {
-        const el = filterRef.current
-        if (!el) return
-        // Seed the initial height immediately.
-        setFilterHeight(el.offsetHeight)
-        // Only call setFilterHeight again when the height actually changes,
-        // so we don't trigger a parent re-render (and steal focus) on every render.
-        const observer = new ResizeObserver(() => {
-            setFilterHeight(el.offsetHeight)
-        })
-        observer.observe(el)
-        return () => observer.disconnect()
-    }, [])
-
+const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndFiltersProps) => {
     return (
-        <div ref={filterRef} className="pb-1">
+        <div className="pb-1">
             <div className="pb-1">
                 <Filters
                     currentFilterTab={currentFilterTab}
@@ -599,13 +581,10 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
     )
 }
 
-// Context to pass SoundFilters props into the stable innerElementType without
-// recreating it (which would cause react-window to remount).
+// Context to pass SoundFilters props into the stable Virtuoso Header component.
 interface SoundFiltersContextValue {
     currentFilterTab: keyof sounds.Filters
     setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
-    setFilterHeight: React.Dispatch<React.SetStateAction<number>>
-    filterHeight: number
 }
 const SoundFiltersContext = React.createContext<SoundFiltersContextValue | null>(null)
 
@@ -615,92 +594,59 @@ const SoundFiltersContext = React.createContext<SoundFiltersContextValue | null>
 // filterHeight so that react-window's absolute-positioned items are pushed down
 // to start below the filters. SoundFilters is never touched by react-window so
 // focus inside it is completely stable.
-const SoundListInner = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ children, ...rest }, ref) => {
-        const ctx = useContext(SoundFiltersContext)!
-        const { t } = useTranslation()
-        return (
-            <div
-                ref={ref}
-                style={{ ...rest.style, paddingTop: ctx.filterHeight }}
-                {...rest}
-            >
-                <h3 className="sr-only">
-                    {t("soundBrowser.filterHeader")}
-                </h3>
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0 }}>
-                    <SoundFilters
-                        currentFilterTab={ctx.currentFilterTab}
-                        setCurrentFilterTab={ctx.setCurrentFilterTab}
-                        setFilterHeight={ctx.setFilterHeight}
-                    />
-                </div>
-                <h3 className="sr-only">
-                    {t("soundBrowser.soundHeader")}
-                </h3>
-                {children}
-            </div>
-        )
-    }
+const SoundListHeader = ({ currentFilterTab, setCurrentFilterTab, t }: {
+    currentFilterTab: keyof sounds.Filters,
+    setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>,
+    t: (key: string) => string
+}) => (
+    <>
+        <h3 className="sr-only">{t("soundBrowser.filterHeader")}</h3>
+        <SoundFilters
+            currentFilterTab={currentFilterTab}
+            setCurrentFilterTab={setCurrentFilterTab}
+        />
+        <h3 className="sr-only">{t("soundBrowser.soundHeader")}</h3>
+    </>
 )
-SoundListInner.displayName = "SoundListInner"
 
 const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
     title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }) => {
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
     const searchText = useSelector(sounds.selectSearchText)
     const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
     const clearClassnames = classNames({
-        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
+        "text-sm flex items-center rounded pl-1 pr-1.5 border whitespace-nowrap": true,
         "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
         "text-gray-200 border-gray-200": !clearButtonEnabled,
     })
-    const listRef = useRef<List>(null)
     const scrollToTopRef = useRef<HTMLDivElement>(null)
-    const [filterHeight, setFilterHeight] = useState(0)
 
     const soundListClassnames = "grow"
     const extraFilterControlsClassnames = "sticky top-0 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
     const scrolltoTopClassnames = "absolute bottom-4 right-4 z-10 opacity-0 transform translate-y-full transition-all duration-300 pointer-events-none"
 
-    useEffect(() => {
-        if (listRef?.current) {
-            listRef.current.resetAfterIndex(0)
-        }
-    }, [folders, namesByFolders])
+    const virtuosoRef = useRef<VirtuosoHandle>(null)
 
-    useLayoutEffect(() => {
-        listRef.current?.resetAfterIndex(0)
-    }, [filterHeight])
+    const Header = useMemo(() => {
+        const SoundBrowserHeader = () => (
+            <SoundListHeader
+                currentFilterTab={currentFilterTab}
+                setCurrentFilterTab={setCurrentFilterTab}
+                t={t}
+            />
+        )
+        SoundBrowserHeader.displayName = "SoundBrowserHeader"
+        return SoundBrowserHeader
+    }, [currentFilterTab, setCurrentFilterTab])
 
-    const getItemSize = (index: number) => {
-        const folderHeight = 25
-        const clipHeight = 30
-        if (index === folders.length - 1) {
-            // add extra space for the last folder to scroll above the scroll to top button
-            return folderHeight + (clipHeight * namesByFolders[folders[index]].length) + (clipHeight * 2)
-        } else {
-            return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
-        }
-    }
-
-    const handleScroll = ({ scrollOffset }: { scrollOffset: number }) => {
-        if (scrollToTopRef.current) {
-            if (scrollOffset > 0) {
-                scrollToTopRef.current.style.opacity = "1"
-                scrollToTopRef.current.style.transform = "translateY(0)"
-                scrollToTopRef.current.style.pointerEvents = "auto"
-            } else {
-                scrollToTopRef.current.style.opacity = "0"
-                scrollToTopRef.current.style.transform = "translateY(100%)"
-                scrollToTopRef.current.style.pointerEvents = "none"
-            }
-        }
-    }
+    const overscanSize = Math.round(2500 * scalar)
+    const increaseViewportSize = Math.round(3500 * scalar)
 
     return (
         <div className="flex flex-col grow relative">
@@ -720,41 +666,49 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                 </button>
                 <NumberOfSounds/>
             </div>
-
-            <SoundFiltersContext.Provider value={{ currentFilterTab, setCurrentFilterTab, setFilterHeight, filterHeight }}>
+            <SoundFiltersContext.Provider value={{ currentFilterTab, setCurrentFilterTab }}>
                 <div className={soundListClassnames}>
                     <AutoSizer>
                         {({ height, width }: { height: number, width: number }) => (
-                            <List
-                                ref={listRef}
-                                innerElementType={SoundListInner}
-                                height={height}
-                                width={width}
-                                itemCount={folders.length}
-                                itemSize={getItemSize}
-                                onScroll={handleScroll}
-                            >
-                                {({ index, style }) => {
-                                    const names = namesByFolders[folders[index]]
-                                    return (
-                                        <div style={{ ...style, top: (style.top as number) + filterHeight }}>
-                                            <Folder
-                                                folder={folders[index]}
-                                                names={names}
-                                                index={index}
-                                                listRef={listRef}
-                                            />
-                                        </div>
-                                    )
+                            <Virtuoso
+                                ref={virtuosoRef}
+                                style={{ height, width }}
+                                overscan={overscanSize}
+                                increaseViewportBy={{ top: increaseViewportSize, bottom: increaseViewportSize }}
+                                data={folders}
+                                onScroll={(e) => {
+                                    const scrollOffset = (e.target as HTMLElement).scrollTop
+                                    if (scrollToTopRef.current) {
+                                        if (scrollOffset > 0) {
+                                            scrollToTopRef.current.style.opacity = "1"
+                                            scrollToTopRef.current.style.transform = "translateY(0)"
+                                            scrollToTopRef.current.style.pointerEvents = "auto"
+                                        } else {
+                                            scrollToTopRef.current.style.opacity = "0"
+                                            scrollToTopRef.current.style.transform = "translateY(100%)"
+                                            scrollToTopRef.current.style.pointerEvents = "none"
+                                        }
+                                    }
                                 }}
-                            </List>
+                                components={{
+                                    Header,
+                                }}
+                                itemContent={(index, folder) => (
+                                    <Folder
+                                        folder={folder}
+                                        names={namesByFolders[folder]}
+                                        index={index}
+                                    />
+                                )}
+                            />
                         )}
                     </AutoSizer>
                 </div>
             </SoundFiltersContext.Provider>
+
             <div ref={scrollToTopRef} className={scrolltoTopClassnames}>
                 <button className="px-3 py-2 rounded text-white bg-blue text-sm  shadow-lg transition-all duration-200 hover:text-amber hover:shadow-xl"
-                    onClick={() => listRef.current?.scrollToItem(0)} title={t("soundBrowser.button.backToTop")}>
+                    onClick={() => virtuosoRef.current?.scrollToIndex({ index: 0, behavior: "smooth" })} title={t("soundBrowser.button.backToTop")}>
                     <i className="icon icon-arrow-up3"></i>
                 </button>
             </div>
