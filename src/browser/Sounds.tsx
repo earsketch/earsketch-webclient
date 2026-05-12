@@ -453,7 +453,8 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     }
 
     const loggedIn = useSelector(user.selectLoggedIn)
-    const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(name)
+    const favorites = useSelector(sounds.selectFavorites)
+    const isFavorite = loggedIn && favorites.includes(name)
     const userName = useSelector(user.selectUserName) as string
     const isUserOwned = loggedIn && clip.folder === userName.toUpperCase()
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
@@ -668,41 +669,22 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
             </div>
             <SoundFiltersContext.Provider value={{ currentFilterTab, setCurrentFilterTab }}>
                 <div className={soundListClassnames}>
-                    <AutoSizer>
-                        {({ height, width }: { height: number, width: number }) => (
-                            <Virtuoso
-                                ref={virtuosoRef}
-                                style={{ height, width }}
-                                overscan={overscanSize}
-                                increaseViewportBy={{ top: increaseViewportSize, bottom: increaseViewportSize }}
-                                data={folders}
-                                onScroll={(e) => {
-                                    const scrollOffset = (e.target as HTMLElement).scrollTop
-                                    if (scrollToTopRef.current) {
-                                        if (scrollOffset > 0) {
-                                            scrollToTopRef.current.style.opacity = "1"
-                                            scrollToTopRef.current.style.transform = "translateY(0)"
-                                            scrollToTopRef.current.style.pointerEvents = "auto"
-                                        } else {
-                                            scrollToTopRef.current.style.opacity = "0"
-                                            scrollToTopRef.current.style.transform = "translateY(100%)"
-                                            scrollToTopRef.current.style.pointerEvents = "none"
-                                        }
-                                    }
-                                }}
-                                components={{
-                                    Header,
-                                }}
-                                itemContent={(index, folder) => (
-                                    <Folder
-                                        folder={folder}
-                                        names={namesByFolders[folder]}
-                                        index={index}
-                                    />
-                                )}
+                    <Virtuoso
+                        ref={virtuosoRef}
+                        overscan={overscanSize}
+                        increaseViewportBy={{ top: increaseViewportSize, bottom: increaseViewportSize }}
+                        data={folders}
+                        components={{
+                            Header,
+                        }}
+                        itemContent={(index, folder) => (
+                            <Folder
+                                folder={folder}
+                                names={namesByFolders[folder]}
+                                index={index}
                             />
                         )}
-                    </AutoSizer>
+                    />
                 </div>
             </SoundFiltersContext.Provider>
 
