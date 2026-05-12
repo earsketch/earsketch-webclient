@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, ChangeEvent, useState, useMemo, useCallback } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
-import AutoSizer from "react-virtualized-auto-sizer"
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
 import classNames from "classnames"
 
