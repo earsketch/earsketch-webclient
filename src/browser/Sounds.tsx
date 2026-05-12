@@ -545,7 +545,7 @@ const ClipList = ({ names }: { names: string[] }) => {
     const upperUserName = userName?.toUpperCase() ?? ""
 
     return (
-        <div className="flex flex-col mb-4">
+        <div className="flex flex-col">
             {names?.map((v: string) => {
                 if (!entities[v]) return null
                 const clip = entities[v]
