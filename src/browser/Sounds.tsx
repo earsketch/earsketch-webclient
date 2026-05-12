@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, ChangeEvent, useState, useMemo } from "react"
+import React, { useRef, useEffect, ChangeEvent, useState, useMemo, useCallback } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 import AutoSizer from "react-virtualized-auto-sizer"
@@ -432,13 +432,23 @@ const AddSound = () => {
     )
 }
 
-const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
+type ClipPreviewState = "play" | "loading" | "stop"
+
+interface ClipProps {
+    clip: SoundEntity
+    bgcolor: string
+    borderColor: string
+    previewState: ClipPreviewState
+    loggedIn: boolean
+    isFavorite: boolean
+    isUserOwned: boolean
+    tabsOpen: boolean
+}
+
+const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, isFavorite, isUserOwned, tabsOpen }: ClipProps) => {
     const dispatch = useDispatch()
-    const preview = useSelector(sounds.selectPreview)
-    const previewNodes = useSelector(sounds.selectPreviewNodes)
-    const name = clip.name
-    const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
+    const name = clip.name
 
     let tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
     ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
@@ -452,30 +462,25 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
         tooltip = tooltip.concat("\n", t("soundBrowser.clip.tooltip.key"), ": ", clip.keySignature)
     }
 
-    const loggedIn = useSelector(user.selectLoggedIn)
-    const favorites = useSelector(sounds.selectFavorites)
-    const isFavorite = loggedIn && favorites.includes(name)
-    const userName = useSelector(user.selectUserName) as string
-    const isUserOwned = loggedIn && clip.folder === userName.toUpperCase()
-    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
-
     return (
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-8 border-blue-300" />
-            <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
+            <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${borderColor}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
                     <h5 className="text-sm truncate pl-2">{name}</h5>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
                         className="text-xs pr-1.5"
-                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
+                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewState !== "play" ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
-                        {preview?.kind === "sound" && preview.name === name
-                            ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
-                            : <i className="icon icon-play4" />}
+                        {previewState === "stop"
+                            ? <i className="icon icon-stop2" />
+                            : previewState === "loading"
+                                ? <i className="animate-spin es-spinner" />
+                                : <i className="icon icon-play4" />}
                     </button>
                     {loggedIn &&
                         (
@@ -523,20 +528,46 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             </div>
         </div>
     )
-}
+})
+Clip.displayName = "Clip"
 
 const ClipList = ({ names }: { names: string[] }) => {
     const entities = useSelector(sounds.selectAllEntities)
     const theme = useSelector(appState.selectColorTheme)
+    const preview = useSelector(sounds.selectPreview)
+    const previewNodes = useSelector(sounds.selectPreviewNodes)
+    const loggedIn = useSelector(user.selectLoggedIn)
+    const favorites = useSelector(sounds.selectFavorites)
+    const userName = useSelector(user.selectUserName) as string
+    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+
+    const bgcolor = theme === "light" ? "bg-white" : "bg-gray-900"
+    const borderColor = theme === "light" ? "border-gray-300" : "border-gray-700"
+    const upperUserName = userName?.toUpperCase() ?? ""
 
     return (
         <div className="flex flex-col mb-4">
-            {names?.map((v: string) =>
-                entities[v] && <Clip
-                    key={v} clip={entities[v]}
-                    bgcolor={theme === "light" ? "bg-white" : "bg-gray-900"}
-                />
-            )}
+            {names?.map((v: string) => {
+                if (!entities[v]) return null
+                const clip = entities[v]
+                const isThisClipPlaying = preview?.kind === "sound" && preview.name === v
+                const previewState: ClipPreviewState = isThisClipPlaying
+                    ? (previewNodes ? "stop" : "loading")
+                    : "play"
+                return (
+                    <Clip
+                        key={v}
+                        clip={clip}
+                        bgcolor={bgcolor}
+                        borderColor={borderColor}
+                        previewState={previewState}
+                        loggedIn={loggedIn}
+                        isFavorite={loggedIn && favorites.includes(v)}
+                        isUserOwned={loggedIn && clip.folder === upperUserName}
+                        tabsOpen={tabsOpen}
+                    />
+                )
+            })}
         </div>
     )
 }
@@ -649,6 +680,14 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const overscanSize = Math.round(2500 * scalar)
     const increaseViewportSize = Math.round(3500 * scalar)
 
+    const itemContent = useCallback((index: number, folder: string) => (
+        <Folder
+            folder={folder}
+            names={namesByFolders[folder]}
+            index={index}
+        />
+    ), [namesByFolders])
+
     return (
         <div className="flex flex-col grow relative">
             <SoundSearchBar />
@@ -677,13 +716,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                         components={{
                             Header,
                         }}
-                        itemContent={(index, folder) => (
-                            <Folder
-                                folder={folder}
-                                names={namesByFolders[folder]}
-                                index={index}
-                            />
-                        )}
+                        itemContent={itemContent}
                     />
                 </div>
             </SoundFiltersContext.Provider>
