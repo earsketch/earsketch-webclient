@@ -2,7 +2,6 @@ import React, { ChangeEvent, MouseEvent, useState, useEffect } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
 import { Virtuoso } from "react-virtuoso"
-import AutoSizer from "react-virtualized-auto-sizer"
 
 import type { Script, ScriptType } from "common"
 import * as appState from "../app/appState"
@@ -356,21 +355,16 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = 
             visible={visible}
             initExpanded={initExpanded}
         >
-            <AutoSizer>
-                {({ height, width }: { height: number, width: number }) => (
-                    <Virtuoso
-                        style={{ height, width }}
-                        data={scriptIDs}
-                        itemContent={(index, ID) => (
-                            <div className={index % 2 === 0
-                                ? "bg-white dark:bg-gray-900"
-                                : "bg-gray-300 dark:bg-gray-800 hover:bg-blue-200 dark:hover:bg-blue-500"}>
-                                <ScriptEntry script={entities[ID]} type={type} />
-                            </div>
-                        )}
-                    />
+            <Virtuoso
+                data={scriptIDs}
+                itemContent={(index, ID) => (
+                    <div className={index % 2 === 0
+                        ? "bg-white dark:bg-gray-900"
+                        : "bg-gray-300 dark:bg-gray-800 hover:bg-blue-200 dark:hover:bg-blue-500"}>
+                        <ScriptEntry script={entities[ID]} type={type} />
+                    </div>
                 )}
-            </AutoSizer>
+            />
         </Collection>
     )
 }
