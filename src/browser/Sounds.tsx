@@ -67,11 +67,11 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
                 }
             }}
         >
-            <div className="flex flex-row gap-x-1">
-                <span className="rounded-full inline-flex w-1 mr-2">
-                    <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} aria-hidden="true" />
+            <div className="flex flex-row scale:gap-x-1">
+                <span className="rounded-full inline-flex scale:w-1 scale:mr-2">
+                    <i className={`icon-checkmark3 scale:text-sm w-full ${selected ? "block" : "hidden"}`} aria-hidden="true" />
                 </span>
-                <div className="text-xs select-none mr-4">
+                <div className="scale:text-xs select-none scale:mr-4">
                     {label}
                 </div>
             </div>
