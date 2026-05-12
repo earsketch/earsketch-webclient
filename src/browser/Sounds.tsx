@@ -712,6 +712,20 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                         overscan={overscanSize}
                         increaseViewportBy={{ top: increaseViewportSize, bottom: increaseViewportSize }}
                         data={folders}
+                        onScroll={(e) => {
+                            const scrollOffset = (e.target as HTMLElement).scrollTop
+                            if (scrollToTopRef.current) {
+                                if (scrollOffset > 0) {
+                                    scrollToTopRef.current.style.opacity = "1"
+                                    scrollToTopRef.current.style.transform = "translateY(0)"
+                                    scrollToTopRef.current.style.pointerEvents = "auto"
+                                } else {
+                                    scrollToTopRef.current.style.opacity = "0"
+                                    scrollToTopRef.current.style.transform = "translateY(100%)"
+                                    scrollToTopRef.current.style.pointerEvents = "none"
+                                }
+                            }
+                        }}
                         components={{
                             Header,
                         }}
