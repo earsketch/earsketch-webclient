@@ -80,7 +80,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
             aria-selected={isSelected ? "true" : "false"}
             aria-controls={"panel-" + type}
         >
-            <h3 className="text-sm truncate">
+            <h3 className="scale:text-sm truncate">
                 {children}
                 {name}
             </h3>
