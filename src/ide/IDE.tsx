@@ -398,6 +398,10 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
         }
     }, [logs])
 
+    useEffect(() => {
+        dispatch(layout.setWestSizeForFontSize(fontSize))
+    }, [fontSize])
+
     const gutterSize = hideEditor ? 0 : 9
     const isWestOpen = useSelector(layout.isWestOpen)
     const isEastOpen = useSelector(layout.isEastOpen)
