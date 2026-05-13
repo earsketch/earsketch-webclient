@@ -16,6 +16,7 @@ import { deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, op
 
 import { ContextMenu } from "radix-ui"
 import classNames from "classnames"
+import * as appState from "../app/appState"
 
 interface ScriptMenuItem {
     name: string;
@@ -155,6 +156,8 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
     const { t } = useTranslation()
     const caiHighlight = useSelector(cai.selectHighlight)
     const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
+    const fontSize = useSelector(appState.selectFontSize)
+    const scaledFontSize = (fontSize / 14) * 16
 
     return <Menu>
         <MenuButton
@@ -164,13 +167,13 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
             aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
         >
             <div className="truncate min-w-0">
-                <i className="icon-menu3 text-2xl px-2 align-middle" />
+                <i className="icon-menu3 scale:text-2xl px-2 align-middle" />
             </div>
         </MenuButton>
-        <MenuItems anchor="bottom start" className="focus:outline-none border border-black p-2 z-50 bg-white dark:bg-black">
+        <MenuItems anchor="bottom start" style={{ fontSize: `${scaledFontSize}px` }} className="focus:outline-none border border-black p-2 z-50 bg-white dark:bg-black">
             <MenuItem disabled>
                 {({ close }) => (
-                    <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
+                    <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 scale:text-sm text-black border-black dark:text-white dark:border-white">
                         <div className="truncate">
                             {script?.name}
                         </div>
@@ -188,7 +191,7 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
             {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true, highlighted }) => visible && <MenuItem key={name} disabled={disabled}>
                 {({ active }) => (
                     <button
-                        className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
+                        className={"flex items-center justify-start py-1.5 space-x-2 scale:text-sm text-black dark:text-white w-full " +
                                   (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
                                   (disabled ? "cursor-not-allowed" : "cursor-pointer") + " " +
                                   (highlighted ? "border-yellow-500 border-4" : "")}
@@ -196,7 +199,7 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
                         aria-label={aria}
                         title={aria}
                     >
-                        <div className="flex justify-center items-center w-6">
+                        <div className="flex justify-center items-center scale:w-6">
                             <i className={`${icon} align-middle`} />
                         </div>
                         <div className={disabled ? "text-gray-500" : ""}>{name}</div>
@@ -216,14 +219,14 @@ const ScriptContextMenu = ({ script, className, children, scriptMenuItems }: { s
             <ContextMenu.Portal>
                 <ContextMenu.Content className="focus:outline-none border border-black p-2 z-50 bg-white dark:bg-black">
                     <ContextMenu.Item className="" disabled>
-                        <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
+                        <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 scale:text-sm text-black border-black dark:text-white dark:border-white">
                             <div className="truncate">
                                 {script?.name}
                             </div>
                         </div>
                     </ContextMenu.Item>
                     {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible, highlighted }) => {
-                        const menuItemsClasses = classNames("focus:outline-none data-[highlighted]:bg-blue-200 dark:data-[highlighted]:bg-blue-500 bg-white dark:bg-black flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full", {
+                        const menuItemsClasses = classNames("focus:outline-none data-[highlighted]:bg-blue-200 dark:data-[highlighted]:bg-blue-500 bg-white dark:bg-black flex items-center justify-start py-1.5 space-x-2 scale:text-sm text-black dark:text-white w-full", {
                             "cursor-not-allowed": disabled,
                             "cursor-pointer": !disabled,
                             "border-yellow-500 border-4": highlighted,

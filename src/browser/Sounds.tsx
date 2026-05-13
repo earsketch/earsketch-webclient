@@ -395,7 +395,7 @@ const ShowOnlyFavorites = () => {
         <label className="flex items-center" style={{ opacity: loggedIn ? "1" : "0" }}>
             <input
                 type="checkbox"
-                className="scale:mr-1.5"
+                className="scale:mr-1.5 scale:w-4 scale:h-4"
                 onChange={() => { dispatch(sounds.setFilterByFavorites(!filterByFavorites)) }}
                 disabled={!loggedIn}
                 title={t("soundBrowser.button.showOnlyStarsDescriptive")}
@@ -496,7 +496,7 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                     {tabsOpen &&
                         (
                             <button
-                                className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
+                                className="scale:text-xs px-1.5 text-sky-700 dark:text-blue-400"
                                 onClick={() => { editor.pasteCode(name); addUIClick("sound copy - " + name) }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                                 aria-label={t("ariaDescriptors:sounds.paste", { name })}

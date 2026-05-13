@@ -65,6 +65,8 @@ interface DropdownMultiSelectorProps {
 
 export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const dispatch = useDispatch()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scaledFontSize = (fontSize / 14) * 16
 
     const selectedValues = useAppSelector(
         (state) => state.scripts.filters[category]
@@ -104,6 +106,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
 
                 <ListboxOptions
                     anchor="bottom start"
+                    style={{ fontSize: `${scaledFontSize}px` }}
                     className={`z-50 [--anchor-max-height:24rem] [--anchor-gap:4px] overflow-y-auto border pt-1 p-2 focus:outline-none
                       bg-white text-black dark:bg-black dark:text-white border-black`}
                 >
@@ -125,7 +128,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
                             type="button"
                             key={item}
                             value={item}
-                            className="w-full block text-left p-0 m-0 bg-transparent border-0 focus:outline-none"
+                            className="scale:text-sm w-full block text-left p-0 m-0 bg-transparent border-0 focus:outline-none"
                         >
                             {({ active, selected }) => (
                                 <FilterItem
