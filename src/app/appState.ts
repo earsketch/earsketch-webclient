@@ -105,7 +105,7 @@ export const selectColorTheme = (state: RootState) => state.app.colorTheme
 // TODO: Figure out the right way to do this with redux-persist.
 export const selectFontSize = (state: RootState) => state.app.fontSize || 14
 // Convert from the interface's 14px base to Tailwind's 16px rem base,
-// so portaled em units scale correctly relative to the user's font size setting.
+// so that em units in scaled components adjust correctly.
 export const selectScaledFontSize = (state: RootState) => {
     const fontSize = selectFontSize(state)
     return (fontSize / 14) * 16
