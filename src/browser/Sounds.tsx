@@ -21,7 +21,8 @@ import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
-import { AudioWaveform } from "../app/AudioWaveForm"
+import { Waveform } from "../app/Recorder"
+import * as audioLibrary from "../app/audiolibrary"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -762,6 +763,21 @@ const SoundPreview = () => {
     const focusPlayer = () => {
         playerRef.current?.focus()
     }
+    const [buffer, setBuffer] = useState<AudioBuffer | null>(null)
+    const [bufferReady, setBufferReady] = useState(false)
+
+    useEffect(() => {
+        setBufferReady(false)
+        if (!currentName) return
+        let cancelled = false
+        audioLibrary.getSound(currentName).then((sound) => {
+            if (!cancelled) {
+                setBuffer(sound.buffer)
+                setBufferReady(true)
+            }
+        })
+        return () => { cancelled = true }
+    }, [currentName])
 
     return (
         <div className="flex border border-blue mb-2 flex-col items-center justify-center bg-white dark:bg-transparent">
@@ -779,7 +795,11 @@ const SoundPreview = () => {
                 className="w-full max-w-4xl outline-none rounded-2xl focus-visible:ring-2 focus-visible:ring-black"
             >
                 <div className="flex items-center justify-center px-6">
-                    <AudioWaveform soundName={currentName} height={30} progress={undefined} isDarkMode={theme === "dark"} />
+                    {bufferReady && buffer
+                        ? <Waveform buffer={buffer} fluid height={40} />
+                        : <div style={{ width: "100%", height: 40 }} className="flex items-center justify-center text-xs text-gray-400">
+                            {currentName ? <i className="animate-spin es-spinner" /> : null}
+                        </div>}
                 </div>
 
                 <div className="flex items-center justify-center gap-8 mt-2">
