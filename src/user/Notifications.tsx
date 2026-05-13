@@ -8,6 +8,7 @@ import * as user from "./userState"
 import { useTranslation } from "react-i18next"
 import * as appState from "../app/appState"
 import * as request from "../request"
+import broadcastIcon from "./broadcast.svg"
 
 interface Message {
     text: string
@@ -155,14 +156,16 @@ const useNotificationLongPolling = () => {
     }, [isLoggedIn])
 }
 
-/** Small blue circular "!" indicator used for broadcast announcements. */
+/** Small blue bullhorn indicator used for broadcast announcements. */
 const BroadcastBadge = ({ className = "", ariaLabel }: { className?: string, ariaLabel?: string }) => (
-    <div
+    <img
+        src={broadcastIcon}
         role="status"
         aria-label={ariaLabel}
         data-test="broadcastIndicator"
-        className={`inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-blue-600 rounded-full leading-none ${className}`}
-    >!</div>
+        className={`inline-block w-4 h-4 ${className}`}
+        alt=""
+    />
 )
 
 /** Notification bell icon and dropdown menu for the header nav */
@@ -183,7 +186,7 @@ export const NotificationMenu = ({ openSharedScript }: { openSharedScript: (s: s
             <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-3 relative" title={t("ariaDescriptors:header.toggleNotifications")}>
                 <i className="icon icon-bell" />
                 {numUnread > 0 && <div role="status" aria-label={t("ariaDescriptors:header.unreadNotifications", { numUnread })} className="text-sm w-4 h-4 text-white bg-red-600 rounded-full absolute top-0 -right-1 leading-none" data-test="numUnreadNotifications">{numUnread}</div>}
-                {hasBroadcast && <BroadcastBadge className="absolute -bottom-1 -right-1" ariaLabel={t("ariaDescriptors:header.broadcastNotification")} />}
+                {hasBroadcast && numUnread === 0 && <BroadcastBadge className="absolute top-0 -right-1" ariaLabel={t("ariaDescriptors:header.broadcastNotification")} />}
             </Popover.Button>
             <div className="relative right-1">
                 <NotificationPopup />
