@@ -92,9 +92,10 @@ Cypress.Commands.add("createScript", (scriptName) => {
  */
 Cypress.Commands.add("login", (username = TEST_USER) => {
     // login with mock responses
+    cy.get('button[title="Login"]').click()
     cy.get("input[name='username']").type(username)
     cy.get("input[name='password']").type("not_a_real_password")
-    cy.get("button[title='Login']").click()
+    cy.get("input[value='LOGIN']").click()
 
     // wait for login to finish
     cy.get("button[title='Login']", { timeout: 15000 }).should("not.exist")

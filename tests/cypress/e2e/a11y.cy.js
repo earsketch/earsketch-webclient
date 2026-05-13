@@ -91,8 +91,8 @@ describe("Accessibility", () => {
     })
 
     function testCreateAccountModal() {
-        cy.get("button").contains("Create / Reset Account").click()
-        cy.get("button").contains("Register a New Account").click()
+        cy.get("button").contains("Login").click()
+        cy.get("button").contains("Register").click()
         // interacting with the form forces cypress to wait for css transitions to finish
         cy.get("div").contains("Create an account").parent().find("input[name='username']").type("test").clear()
         cy.checkA11y()
