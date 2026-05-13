@@ -630,7 +630,6 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
 const SoundPreview = () => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
-    const theme = useSelector(appState.selectColorTheme)
 
     const [recommendationMode, setRecommendationMode] = useState(0)
 
@@ -789,7 +788,7 @@ const SoundPreview = () => {
                 ref={playerRef}
                 tabIndex={0}
                 role="group"
-                aria-label="Sound preview player"
+                aria-label={t("ariaDescriptors:sounds.preview.player")}
                 onKeyDown={onPlayerKeyDown}
                 onMouseDown={focusPlayer}
                 className="w-full max-w-4xl outline-none rounded-2xl focus-visible:ring-2 focus-visible:ring-black"
@@ -807,7 +806,7 @@ const SoundPreview = () => {
                         type="button"
                         onClick={() => setRecommendationMode(1 - recommendationMode)}
                         aria-label={recommendationMode ? "Recommendation mode" : "Normal mode"}
-                        title={recommendationMode ? "Recommendation mode" : "Normal mode"}
+                        title={recommendationMode ? t("ariaDescriptors:sounds.preview.recommendationMode") : t("ariaDescriptors:sounds.preview.normalMode")}
                         className="sound-btn-ghost"
                     >
                         {recommendationMode ? <i className="icon icon-star"></i> : <i className="icon icon-list2"></i>}
@@ -817,8 +816,8 @@ const SoundPreview = () => {
                         type="button"
                         onClick={goPrev}
                         disabled={!canPrev}
-                        aria-label="Previous sound"
-                        title="Previous (Left Arrow)"
+                        aria-label={t("ariaDescriptors:sounds.preview.previousSound")}
+                        title={t("ariaDescriptors:sounds.preview.previousTitle")}
                         className="sound-btn-ghost"
                     >
                         <i className="icon icon-backward2"></i>
@@ -831,8 +830,8 @@ const SoundPreview = () => {
                             dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
                         }}
                         disabled={!currentName}
-                        aria-label={preview?.kind === "sound" && preview.name === currentName ? "Stop" : "Play"}
-                        title={preview?.kind === "sound" && preview.name === currentName ? "Stop" : "Play"}
+                        aria-label={preview?.kind === "sound" && preview.name === currentName ? t("ariaDescriptors:sounds.preview.stop") : t("ariaDescriptors:sounds.preview.play")}
+                        title={preview?.kind === "sound" && preview.name === currentName ? t("ariaDescriptors:sounds.preview.stop") : t("ariaDescriptors:sounds.preview.play")}
                         className="sound-btn-main"
                     >
                         {preview?.kind === "sound" && preview.name === currentName
@@ -854,8 +853,8 @@ const SoundPreview = () => {
                         type="button"
                         onClick={goNext}
                         disabled={!canNext}
-                        aria-label="Next sound"
-                        title="Next (Right Arrow)"
+                        aria-label={t("ariaDescriptors:sounds.preview.nextSound")}
+                        title={t("ariaDescriptors:sounds.preview.nextTitle")}
                         className="sound-btn-ghost"
                     >
                         <i className="icon icon-forward3"></i>
