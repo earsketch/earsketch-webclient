@@ -87,8 +87,7 @@ export const SortBySelector = () => {
     const dispatch = useDispatch()
     const sortBy = useSelector((state: any) => state.scripts.filters.sortBy)
     const { t } = useTranslation()
-    const fontSize = useSelector(appState.selectFontSize)
-    const scaledFontSize = (fontSize / 14) * 16
+    const scaledFontSize = useSelector(appState.selectScaledFontSize)
 
     // Local state for the selected option
     const [selectedId, setSelectedId] = useState<string>(

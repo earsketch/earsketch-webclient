@@ -65,8 +65,7 @@ interface DropdownMultiSelectorProps {
 
 export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const dispatch = useDispatch()
-    const fontSize = useSelector(appState.selectFontSize)
-    const scaledFontSize = (fontSize / 14) * 16
+    const scaledFontSize = useSelector(appState.selectScaledFontSize)
 
     const selectedValues = useAppSelector(
         (state) => state.scripts.filters[category]

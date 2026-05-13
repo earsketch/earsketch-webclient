@@ -156,8 +156,7 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
     const { t } = useTranslation()
     const caiHighlight = useSelector(cai.selectHighlight)
     const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
-    const fontSize = useSelector(appState.selectFontSize)
-    const scaledFontSize = (fontSize / 14) * 16
+    const scaledFontSize = useSelector(appState.selectScaledFontSize)
 
     return <Menu>
         <MenuButton
