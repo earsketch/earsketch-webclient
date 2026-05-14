@@ -18,6 +18,7 @@ const ideSlice = createSlice({
         playArrows: true,
         showBeatStringAnnotations: true,
         scriptMatchesDAW: false,
+        editorHoverLine: null as number | null,
     },
     reducers: {
         setBlocksMode(state, { payload }) {
@@ -41,6 +42,9 @@ const ideSlice = createSlice({
         setScriptMatchesDAW(state, { payload }) {
             state.scriptMatchesDAW = payload
         },
+        setEditorHoverLine(state, { payload }: { payload: number | null }) {
+            state.editorHoverLine = payload
+        },
     },
 })
 
@@ -59,6 +63,7 @@ export const {
     setPlayArrows,
     setShowBeatStringAnnotation,
     setScriptMatchesDAW,
+    setEditorHoverLine,
 } = ideSlice.actions
 
 export const selectBlocksMode = (state: RootState) => state.ide.blocksMode
@@ -67,3 +72,4 @@ export const selectAutocomplete = (state: RootState) => state.ide.autocomplete
 export const selectPlayArrows = (state: RootState) => state.ide.playArrows
 export const selectShowBeatStringAnnotation = (state: RootState) => state.ide.showBeatStringAnnotations
 export const selectScriptMatchesDAW = (state: RootState) => state.ide.scriptMatchesDAW
+export const selectEditorHoverLine = (state: RootState) => state.ide.editorHoverLine

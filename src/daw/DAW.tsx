@@ -17,7 +17,7 @@ import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
-import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
+import { selectEditorHoverLine, selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
 export const callbacks = {
@@ -394,11 +394,13 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const editorHoverLine = useSelector(selectEditorHoverLine)
     const { t } = useTranslation()
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef<HTMLDivElement>(null)
+    const sourceHighlight = scriptMatchesDAW && clip.sourceLine === editorHoverLine
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -408,7 +410,8 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     }, [clip, xScale, trackHeight])
 
     return <div
-        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
+        ref={element}
+        className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border${sourceHighlight ? " source-highlight" : ""}`}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
@@ -427,6 +430,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
     const xScale = useSelector(daw.selectXScale)
     const effectHeight = useSelector(daw.selectEffectHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const editorHoverLine = useSelector(selectEditorHoverLine)
     const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
@@ -462,17 +466,22 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
         {effect !== "TEMPO" && showName && <div className="clipName">{effect}</div>}
         <svg className="effectSvg">
             <path></path>
-            {envelope.map((point, i) => <React.Fragment key={i}>
-                <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
-                <circle
-                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
-                    onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, point.sourceLine) }}
-                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
-                >
-                    {/* eslint-disable-next-line react/jsx-indent */}
-                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
-                </circle>
-            </React.Fragment>)}
+            {envelope.map((point, i) => {
+                const sourceHighlight = scriptMatchesDAW && point.sourceLine === editorHoverLine
+                return <React.Fragment key={i}>
+                    <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
+                    <circle
+                        cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
+                        onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, point.sourceLine) }}
+                        onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
+                    >
+                        {/* eslint-disable-next-line react/jsx-indent */}
+                        <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
+                    </circle>
+                    {sourceHighlight &&
+                        <circle cx={x(point.measure)} cy={y(point.value)} r={7} fill="none" stroke="rgb(255, 153, 0)" strokeWidth={3} pointerEvents="none" />}
+                </React.Fragment>
+            })}
         </svg>
     </div>
 }

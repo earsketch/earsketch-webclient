@@ -23,7 +23,7 @@ import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorHoverLine, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
@@ -252,6 +252,9 @@ export function createSession(id: string, language: Language, contents: string) 
             EditorView.updateListener.of(update => {
                 sessions[id] = update.state
                 if (update.docChanged) onEdit(update)
+                if (update.selectionSet || update.docChanged) {
+                    syncCursorLine(update.state)
+                }
             }),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
@@ -279,6 +282,8 @@ export function setActiveSession(session: EditorSession) {
         view.setState(session)
         view.dispatch({ effects: themeConfig.reconfigure(getTheme()) })
         changeListeners.forEach(f => f())
+        lastDispatchedHoverLine = null
+        syncCursorLine(view.state)
     }
 }
 
@@ -391,6 +396,15 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
             return { color: p.color, pos: line.from }
         })),
     })
+}
+
+let lastDispatchedHoverLine: number | null = null
+
+function syncCursorLine(state: EditorState) {
+    const line = state.doc.lineAt(state.selection.main.head).number
+    if (line === lastDispatchedHoverLine) return
+    lastDispatchedHoverLine = line
+    store.dispatch(setEditorHoverLine(line))
 }
 
 // Callbacks
