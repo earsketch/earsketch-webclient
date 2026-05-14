@@ -402,6 +402,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const element = useRef<HTMLDivElement>(null)
     const sourceLines = clip.sourceLines ?? (clip.sourceLine ? [clip.sourceLine] : [])
     const sourceHighlight = scriptMatchesDAW && editorHoverLine != null && sourceLines.includes(editorHoverLine)
+    const lineTooltip = sourceLines.length > 1 ? `Lines: ${sourceLines.join(" ← ")}` : `Line: ${sourceLines[0] ?? clip.sourceLine}`
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -414,8 +415,8 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         ref={element}
         className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border${sourceHighlight ? " source-highlight" : ""}`}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
-        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, sourceLines)} onMouseLeave={clearDAWHoverLine}
+        title={scriptMatchesDAW ? lineTooltip : t("daw.needsSync")}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
@@ -470,15 +471,16 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
             {envelope.map((point, i) => {
                 const pointLines = point.sourceLines ?? (point.sourceLine ? [point.sourceLine] : [])
                 const sourceHighlight = scriptMatchesDAW && editorHoverLine != null && pointLines.includes(editorHoverLine)
+                const pointTooltip = pointLines.length > 1 ? `Lines: ${pointLines.join(" ← ")}` : `Line: ${pointLines[0] ?? point.sourceLine}`
                 return <React.Fragment key={i}>
                     <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                     <circle
                         cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
-                        onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, point.sourceLine) }}
+                        onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
                         onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
                     >
                         {/* eslint-disable-next-line react/jsx-indent */}
-                        <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
+                        <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? pointTooltip : t("daw.needsSync")}</title>
                     </circle>
                     {sourceHighlight &&
                         <circle cx={x(point.measure)} cy={y(point.value)} r={7} fill="none" stroke="rgb(255, 153, 0)" strokeWidth={3} pointerEvents="none" />}
