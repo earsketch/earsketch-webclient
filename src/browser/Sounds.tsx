@@ -15,6 +15,7 @@ import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
+import * as Tooltip from "@radix-ui/react-tooltip"
 
 import { SearchBar } from "./Utils"
 
@@ -448,25 +449,42 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const name = clip.name
+    const scaledFontSize = useSelector(appState.selectScaledFontSize)
 
-    let tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
-    ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
-    ${t("soundBrowser.clip.tooltip.artist")}: ${clip.artist}
-    ${t("soundBrowser.clip.tooltip.genre")}: ${clip.genre}
-    ${t("soundBrowser.clip.tooltip.instrument")}: ${clip.instrument}
-    ${t("soundBrowser.clip.tooltip.originalTempo")}: ${clip.tempo}
-    ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}`.replace(/\n\s+/g, "\n")
-
-    if (clip.keySignature) {
-        tooltip = tooltip.concat("\n", t("soundBrowser.clip.tooltip.key"), ": ", clip.keySignature)
-    }
+    const tooltipContent = (
+        <div>
+            <div>{t("soundBrowser.clip.tooltip.file")}: {name}</div>
+            <div>{t("soundBrowser.clip.tooltip.folder")}: {clip.folder}</div>
+            <div>{t("soundBrowser.clip.tooltip.artist")}: {clip.artist}</div>
+            <div>{t("soundBrowser.clip.tooltip.genre")}: {clip.genre}</div>
+            <div>{t("soundBrowser.clip.tooltip.instrument")}: {clip.instrument}</div>
+            <div>{t("soundBrowser.clip.tooltip.originalTempo")}: {clip.tempo}</div>
+            <div>{t("soundBrowser.clip.tooltip.year")}: {clip.year}</div>
+            {clip.keySignature && <div>{t("soundBrowser.clip.tooltip.key")}: {clip.keySignature}</div>}
+        </div>
+    )
 
     return (
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${borderColor}`}>
-                <div className="flex items-center min-w-0" title={tooltip}>
-                    <h5 className="scale:text-sm truncate pl-2">{name}</h5>
+                <div className="flex items-center min-w-0">
+                    <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                            <h5 className="scale:text-sm truncate pl-2 cursor-default">{name}</h5>
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                            <Tooltip.Content
+                                side="top"
+                                align="start"
+                                sideOffset={4}
+                                style={{ fontSize: `${scaledFontSize}px`}}
+                                className="scale:text-xs z-50 rounded bg-gray-800 px-3 py-2 text-white shadow-lg pointer-events-none"
+                            >
+                                {tooltipContent}
+                            </Tooltip.Content>
+                        </Tooltip.Portal>
+                    </Tooltip.Root>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
