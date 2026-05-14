@@ -150,7 +150,7 @@
     "default": "Par défaut",
     "importToEdit": "Importer pour édition",
     "notifications.title": "Notifications",
-    "notifications.pinned": "Notifications épinglées",
+    "notifications.broadcasts": "Notifications épinglées",
     "notifications.other": "Autres notifications",
     "notifications.refresh": "Refresh notifications",
     "notifications.viewAll": "Afficher tout",
@@ -359,6 +359,7 @@
     "header.shortcuts": "Show/Hide Keyboard Shortcuts",
     "header.toggleNotifications": "Show/Hide Notifications",
     "header.unreadNotifications": "You have {{numUnread}} unread notifications",
+    "header.broadcastNotification": "You have a broadcast announcement",
     "scriptBrowser.close": "Close {{scriptname}}",
     "scriptBrowser.delete": "Delete {{scriptname}}",
     "scriptBrowser.download": "Download {{scriptname}}",
@@ -435,7 +436,7 @@
     },
     "interpreter": {
       "runSuccess": "Script exécuté avec succès ! Cliquez sur le bouton de lecture pour écouter votre musique.",
-      "runFailed": "There are one or more errors in your script. Read below for details.",
+      "runFailed": "Il y a une ou plusieurs erreurs dans votre script. Consultez la console pour plus de détails.",
       "noimport": " est indéfini. Il est possible que \"from earsketch import *\" soit manquant."
     },
     "dawservice": {
@@ -523,7 +524,7 @@
       "success": "Le script a été exécuté avec succès",
       "overwrite": "Ce nom existe déjà. Veuillez fournir un nom unique ou renommer le script existant.",
       "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
-      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
+      "illegalname": "Veuillez utiliser uniquement des caractères réguliers, des chiffres ou « _ » pour les noms de fichiers.",
       "savefailed": "Le script n'a pas pu être sauvegardé dans le nuage. Veuillez enregistrer votre script hors ligne pour éviter de perdre des modifications.",
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "Certains scripts n'ont pas pu être sauvegardés dans le nuage. Veuillez enregistrer vos modifications hors ligne pour éviter de les perdre.",
