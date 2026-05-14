@@ -150,7 +150,7 @@
     "default": "Standart",
     "importToEdit": "Tahrirlash Uchun Import Qilish",
     "notifications.title": "Xabarnomalar",
-    "notifications.pinned": "Biriktirilgan Xabarnomalar",
+    "notifications.broadcasts": "Biriktirilgan Xabarnomalar",
     "notifications.other": "Boshqa Xabarnomalar",
     "notifications.refresh": "Refresh notifications",
     "notifications.viewAll": "Barchasini Ko'rish",
@@ -359,6 +359,7 @@
     "header.shortcuts": "Klaviatura qisqa yo'llarini ko'rsatish/berkitish",
     "header.toggleNotifications": "Xabarnomalarni ko'rsatish/berkitish",
     "header.unreadNotifications": "{{numUnread}} o'qilmagan xabarnomalar mavjud",
+    "header.broadcastNotification": "You have a broadcast announcement",
     "scriptBrowser.close": "{{scriptname}} ni yopish",
     "scriptBrowser.delete": "{{scriptname}} ni o'chirish",
     "scriptBrowser.download": "{{scriptname}} ni yuklab olish",
@@ -435,7 +436,7 @@
     },
     "interpreter": {
       "runSuccess": "Skript muvaffaqiyatli bajarildi! Musiqangizni tinglash uchun ijro tugmasini bosing.",
-      "runFailed": "There are one or more errors in your script. Read below for details.",
+      "runFailed": "Skriptingizda bir yoki bir nechta xatolik bor. Tafsilotlar uchun konsolga qarang.",
       "noimport": " aniqlanmagan. Ehtimol, \"from earsketch import *\" mavjud emas."
     },
     "dawservice": {
@@ -523,7 +524,7 @@
       "success": "Skript muvaffaqiyatli ishga tushdi",
       "overwrite": "Bu nom allaqachon mavjud. Iltimos, noyob nom bering yoki avval mavjud skript nomini o'zgartiring.",
       "overwriteDeleted": "Bu nom o'chirilgan skriptlarda mavjud. Iltimos, noyob nom tanlang yoki o'chirilgan skriptni qayta tiklab uning nomini o'zgartiring.",
-      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
+      "illegalname": "Fayl nomlashda faqat kichik harflar, raqamlar yoki _ dan foydalaning.",
       "savefailed": "Skriptni bulutli zaxiraga saqlab bo‘lmadi. O'zgarishlarni yo'qotmaslik uchun skriptingizni oflayn rejimda saqlang.",
       "blocksError": "{{error}} Blok rejimiga kira olmadik",
       "saveallfailed": "Ayrim skriptlarni bulutli zaxiraga saqlab bo‘lmadi. Iltimos, o'zgartirishlarni yo'qotmaslik uchun oflayn rejimda saqlang.",
