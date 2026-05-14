@@ -150,7 +150,7 @@
     "default": "ᐃᓕᖁᓯᑐᖃᖓ",
     "importToEdit": "ᐊᓯᐊᖑᕈᒪᒍᖕᓂ",
     "notifications.title": "ᖃᐅᔨᒪᔪᑏᑦ",
-    "notifications.pinned": "ᐊᑕᐃᓐᓇᕐᓂᐊᖅᑐᑦ ᖃᐅᔨᒪᔪᑏᑦ",
+    "notifications.broadcasts": "ᐊᑕᐃᓐᓇᕐᓂᐊᖅᑐᑦ ᖃᐅᔨᒪᔪᑏᑦ",
     "notifications.other": "ᐊᓯᖏ ᖃᐅᔨᒪᔪᑏᑦ",
     "notifications.refresh": "Refresh notifications",
     "notifications.viewAll": "ᑕᒪᕐᒥᒃ ᑕᑯᓗᒋᑦ",
@@ -359,6 +359,7 @@
     "header.shortcuts": "Show/Hide Keyboard Shortcuts",
     "header.toggleNotifications": "Show/Hide Notifications",
     "header.unreadNotifications": "You have {{numUnread}} unread notifications",
+    "header.broadcastNotification": "You have a broadcast announcement",
     "scriptBrowser.close": "Close {{scriptname}}",
     "scriptBrowser.delete": "Delete {{scriptname}}",
     "scriptBrowser.download": "Download {{scriptname}}",
@@ -435,7 +436,7 @@
     },
     "interpreter": {
       "runSuccess": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᔪᓯᑎᐊᖅᑐᖅ! ᓇᕿᓪᓗᒍ ᑐᓵᔪᒪᓐᓂᕈᖕᓂ ᓂᐱᓕᐅᖅᑕᐃᑦ.",
-      "runFailed": "There are one or more errors in your script. Read below for details.",
+      "runFailed": "ᐊᑕᐅᓯᕐᒥᒃ ᐅᖓᑕᓂᓗ ᑕᒻᒪᖅᓯᒪᔪᖅᑕᓕᒃ ᑎᑎᖃᒻᒥ ᐅᖃᕆᐊᓕᖕᒥ. ᑕᑯᓗᒋᑦ ᓈᓴᐅᑎᖏᑦ ᓱᓇᐅᓂᖓᓐᓂᒃ.",
       "noimport": " ᑐᑭᓕᐅᒐᐅᓯᒪᖏᑐᖅ. ᐃᒻᒪᖄ \"ᐅᕙᖓᑦ ᓯᐅᑎᒃᑯᑦ ᑐᓵᔭᒃᓴᒻᒥᑦ *\" ᐊᓯᐊᐅᓯᒪᖕᒪᑦ."
     },
     "dawservice": {
@@ -523,7 +524,7 @@
       "success": "ᑎᑎᖃᑦ ᐅᖃᒐᒃᓴᑦ ᑲᔪᓯᑎᐊᖅᐳᑦ",
       "overwrite": "ᐊᑎᖅ ᐊᑐᒐᐅᓕᐊᓂᒃᑐᖅ. ᐊᓯᐊᓂᒃ ᐊᑐᕐᓂᐊᖅᐳᑎᑦ ᑭᓯᕕᑦ ᖃᐅᔨᒪᔭᖓᓐᓂᒃ ᓄᑕᒻᒥᒃ ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᐅᑉ ᐊᑎᒃᓴᖓᓐᓂᒃ.",
       "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
-      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
+      "illegalname": "ᐊᑐᕐᓗᑎᑦ ᑎᑎᕋᒥᐊᓂᒃ, ᓈᓴᐅᑎᓐᓂᒃ, ᐅᕙᓘᓃᑦ _ ᑐᖁᕆᐊᓕᐅᑉ ᐊᑎᒃᓴᖓᓐᓄᑦ.",
       "savefailed": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᖅ. ᑭᓯᐊᓐᓂ ᐅᖃᕆᐊᓕᒃ ᓄᖑᑕᐃᓕᔪᑎᑕᖓᑕ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᐳᑎᑦ.",
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "ᐃᓚᖏᑦ ᑎᑎᖃᑦ ᐅᖃᕆᐊᓖᑦ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᑦ, ᑭᓯᐊᓐᓂ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᑐᑦ ᐊᓯᐊᑕᐃᓕᔪᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ.",
