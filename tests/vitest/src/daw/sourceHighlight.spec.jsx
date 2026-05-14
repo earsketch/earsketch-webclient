@@ -17,13 +17,14 @@ vi.mock("react-i18next")
 vi.mock("../../../../src/app/audiolibrary")
 vi.mock("../../../../src/data/recommendationData")
 
-function tracksWithClipOnLine(line) {
+function tracksWithClipOnLine(line, callStack) {
     return [
         { clips: [], effects: {}, visible: true },
         {
             clips: [{
                 filekey: "SOUND_A", measure: 1, start: 1, end: 2, track: 1,
-                sourceLine: line, loopChild: false, loop: false, scale: 1, silence: 0,
+                sourceLine: line, sourceLines: callStack ?? [line],
+                loopChild: false, loop: false, scale: 1, silence: 0,
             }],
             effects: {},
             visible: true,
@@ -73,4 +74,44 @@ it("does not apply source-highlight when scriptMatchesDAW is false", async () =>
         return el
     })
     expect(clip.classList.contains("source-highlight")).toBe(false)
+})
+
+it("highlights on any line in the call stack (wrapper-function case)", async () => {
+    // Clip's innermost line is 3, but it was called from line 7.
+    store.dispatch(setTracks(tracksWithClipOnLine(3, [3, 7])))
+    store.dispatch(setScriptMatchesDAW(true))
+
+    const select = container => container.querySelector(".dawAudioClipContainer")
+
+    // Hovering the innermost line (inside the wrapper) highlights.
+    store.dispatch(setEditorHoverLine(3))
+    const first = render(<Provider store={store}><DAW /></Provider>)
+    await waitFor(() => {
+        const el = select(first.container)
+        if (!el) throw new Error("clip not rendered yet")
+        return el
+    })
+    expect(select(first.container).classList.contains("source-highlight")).toBe(true)
+    first.unmount()
+
+    // Hovering the call site (line 7) also highlights, even though sourceLine is 3.
+    store.dispatch(setEditorHoverLine(7))
+    const second = render(<Provider store={store}><DAW /></Provider>)
+    await waitFor(() => {
+        const el = select(second.container)
+        if (!el) throw new Error("clip not rendered yet")
+        return el
+    })
+    expect(select(second.container).classList.contains("source-highlight")).toBe(true)
+    second.unmount()
+
+    // Unrelated line — no highlight.
+    store.dispatch(setEditorHoverLine(99))
+    const third = render(<Provider store={store}><DAW /></Provider>)
+    await waitFor(() => {
+        const el = select(third.container)
+        if (!el) throw new Error("clip not rendered yet")
+        return el
+    })
+    expect(select(third.container).classList.contains("source-highlight")).toBe(false)
 })

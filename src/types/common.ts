@@ -58,6 +58,7 @@ export interface Clip {
     loop: boolean
     scale: number
     sourceLine: number
+    sourceLines?: number[]
 }
 
 export type TransformedClip = SlicedClip | StretchedClip
@@ -80,6 +81,7 @@ interface AutomationPoint {
     value: number
     shape: "square" | "linear"
     sourceLine: number
+    sourceLines?: number[]
 }
 
 export type Effect = { [key: string]: Envelope }

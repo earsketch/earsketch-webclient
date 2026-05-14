@@ -97,6 +97,7 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
     for (const track of reference.tracks.concat(test.tracks)) {
         for (const clip of track.clips) {
             clip.sourceLine = 0
+            delete clip.sourceLines
         }
     }
 
@@ -106,6 +107,7 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
             for (const effectParam of Object.keys(track.effects[effect])) {
                 for (const paramValues in track.effects[effect][effectParam]) {
                     track.effects[effect][effectParam][paramValues].sourceLine = 0
+                    delete track.effects[effect][effectParam][paramValues].sourceLines
                 }
             }
         }

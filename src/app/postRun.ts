@@ -134,7 +134,7 @@ export function fixEffects(result: DAWData) {
                 envelope.sort((a, b) => a.measure - b.measure)
                 // If the automation start in the middle, fill the time before with the startValue of the earliest automation.
                 if (envelope[0].measure > 1) {
-                    envelope.unshift({ measure: 1, value: envelope[0].value, shape: "square", sourceLine: envelope[0].sourceLine })
+                    envelope.unshift({ measure: 1, value: envelope[0].value, shape: "square", sourceLine: envelope[0].sourceLine, sourceLines: envelope[0].sourceLines })
                 }
             }
         }

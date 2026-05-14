@@ -400,7 +400,8 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef<HTMLDivElement>(null)
-    const sourceHighlight = scriptMatchesDAW && clip.sourceLine === editorHoverLine
+    const sourceLines = clip.sourceLines ?? (clip.sourceLine ? [clip.sourceLine] : [])
+    const sourceHighlight = scriptMatchesDAW && editorHoverLine != null && sourceLines.includes(editorHoverLine)
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -467,7 +468,8 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
         <svg className="effectSvg">
             <path></path>
             {envelope.map((point, i) => {
-                const sourceHighlight = scriptMatchesDAW && point.sourceLine === editorHoverLine
+                const pointLines = point.sourceLines ?? (point.sourceLine ? [point.sourceLine] : [])
+                const sourceHighlight = scriptMatchesDAW && editorHoverLine != null && pointLines.includes(editorHoverLine)
                 return <React.Fragment key={i}>
                     <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                     <circle

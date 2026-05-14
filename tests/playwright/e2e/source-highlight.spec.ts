@@ -89,6 +89,42 @@ test.describe("DAW source highlight", () => {
         await expect(highlighted).toHaveCount(0)
     })
 
+    test("highlights from inside a wrapper function AND its call site", async ({ page }) => {
+        // fitMedia lives inside addBeat (line 6), and addBeat() is called from line 9.
+        const script = [
+            "from earsketch import *", // 1
+            "", // 2
+            "init()", // 3
+            "setTempo(120)", // 4
+            "def addBeat():", // 5
+            "    fitMedia(DUBSTEP_BASS_WOBBLE_002, 1, 1, 2)", // 6
+            "", // 7
+            "for i in range(1):", // 8
+            "    addBeat()", // 9
+            "finish()", // 10
+            "", // 11
+        ].join("\n")
+        await setupAndRun(page, script)
+
+        const highlighted = page.locator(".dawAudioClipContainer.source-highlight")
+        const editor = page.locator("#editor")
+        await editor.click()
+        await page.keyboard.press("Control+Home")
+
+        // Move to line 6 (the fitMedia call inside addBeat).
+        for (let i = 0; i < 5; i++) await page.keyboard.press("ArrowDown")
+        await expect.poll(() => highlighted.count()).toBeGreaterThan(0)
+
+        // Move to line 9 (the addBeat() call site). Should ALSO highlight.
+        for (let i = 0; i < 3; i++) await page.keyboard.press("ArrowDown")
+        await expect.poll(() => highlighted.count()).toBeGreaterThan(0)
+
+        // Move to line 4 (setTempo, unrelated to the fitMedia clip).
+        await page.keyboard.press("Control+Home")
+        for (let i = 0; i < 3; i++) await page.keyboard.press("ArrowDown")
+        await expect(highlighted).toHaveCount(0)
+    })
+
     test("does not highlight when the script has been edited since last run", async ({ page }) => {
         const script = [
             "from earsketch import *",
