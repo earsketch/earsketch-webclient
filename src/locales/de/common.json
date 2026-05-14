@@ -150,7 +150,7 @@
     "default": "Standard",
     "importToEdit": "Zum Bearbeiten importieren",
     "notifications.title": "Mitteilungen",
-    "notifications.pinned": "Angeheftete Mitteilungen",
+    "notifications.broadcasts": "Angeheftete Mitteilungen",
     "notifications.other": "Andere Mitteilungen",
     "notifications.refresh": "Refresh notifications",
     "notifications.viewAll": "Alle anzeigen",
@@ -359,6 +359,7 @@
     "header.shortcuts": "Tastaturkürzel ein-/ausblenden",
     "header.toggleNotifications": "Benachrichtigungen ein-/ausblenden",
     "header.unreadNotifications": "Du hast {{numUnread}} ungelesene Benachrichtigungen",
+    "header.broadcastNotification": "You have a broadcast announcement",
     "scriptBrowser.close": "{{scriptname}} schließen",
     "scriptBrowser.delete": "{{scriptname}} löschen",
     "scriptBrowser.download": "{{scriptname}} herunterladen",
@@ -435,7 +436,7 @@
     },
     "interpreter": {
       "runSuccess": "Skript erfolgreich ausgeführt! Klicke auf den Play-Button, um deine Musik zu hören.",
-      "runFailed": "There are one or more errors in your script. Read below for details.",
+      "runFailed": "Es gibt einen oder mehrere Fehler in deinem Skript. Wirf einen Blick in die Konsole für Details.",
       "noimport": " ist undefiniert. Möglicherweise fehlt \"from earsketch import *\"."
     },
     "dawservice": {
@@ -523,7 +524,7 @@
       "success": "Skript erfolgreich ausgeführt",
       "overwrite": "Dieser Name existiert bereits. Bitte gib einen eindeutigen Namen ein oder benenne zuerst das vorhandene Skript um.",
       "overwriteDeleted": "Dieser Name existiert bereits in deinen gelöschten Skripten. Bitte gebe einen eindeutigen Namen ein oder stelle das gelöschte Skript wieder her und benenne es um.",
-      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
+      "illegalname": "Bitte verwende in Dateinamen nur reguläre Zeichen, Zahlen oder „_“ (Unterstrich).",
       "savefailed": "Das Skript konnte nicht in der Cloud gespeichert werden. Bitte speichere dein Skript offline, um den Verlust von Änderungen zu vermeiden.",
       "blocksError": "Konnte den Block-Modus nicht betreten: {{error}}",
       "saveallfailed": "Einige Skripte konnten nicht in der Cloud gespeichert werden. Bitte speichere deine Änderungen offline, damit sie nicht verloren gehen.",
