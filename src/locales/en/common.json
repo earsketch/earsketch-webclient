@@ -310,6 +310,8 @@
     "shortcuts.zoomVertical": "Zoom (Vertical)",
     "shortcuts.escapeEditor": "Escape editor focus",
     "shortcuts.playPause": "Play / Pause",
+    "shortcuts.playPauseCurrSound": "Play / Pause most recent sound",
+    "shortcuts.InsertPrevious": "Paste most recent sound",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",

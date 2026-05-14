@@ -317,6 +317,7 @@ const KeyboardShortcuts = () => {
         comment: [modifier, "/"],
         playPause: ["Ctrl", "Space"],
         playPauseCurrSound: ["Ctrl", "Shift", "L"],
+        InsertPrevious: ["Ctrl", "Shift", "U"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,

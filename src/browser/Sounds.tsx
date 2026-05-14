@@ -822,7 +822,7 @@ export const SoundBrowser = () => {
 
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
-            if (event.ctrlKey && event.shiftKey && event.key === "Insert") {
+            if (event.ctrlKey && event.shiftKey && event.key === "U") {
                 event.preventDefault()
                 const name = preview?.kind === "sound" ? preview.name : lastPreviewNameRef.current
                 if (name) {
