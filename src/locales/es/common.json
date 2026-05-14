@@ -150,7 +150,7 @@
     "default": "Valor predeterminado",
     "importToEdit": "Importar para editar",
     "notifications.title": "Notificaciones",
-    "notifications.pinned": "Notificaciones ancladas",
+    "notifications.broadcasts": "Notificaciones ancladas",
     "notifications.other": "Otras notificaciones",
     "notifications.refresh": "Refresh notifications",
     "notifications.viewAll": "Ver todas",
@@ -359,6 +359,7 @@
     "header.shortcuts": "Show/Hide Keyboard Shortcuts",
     "header.toggleNotifications": "Show/Hide Notifications",
     "header.unreadNotifications": "You have {{numUnread}} unread notifications",
+    "header.broadcastNotification": "You have a broadcast announcement",
     "scriptBrowser.close": "Close {{scriptname}}",
     "scriptBrowser.delete": "Delete {{scriptname}}",
     "scriptBrowser.download": "Download {{scriptname}}",
@@ -435,7 +436,7 @@
     },
     "interpreter": {
       "runSuccess": "¡El script se ejecutó exitosamente! Haz clic en el botón de play para escuchar tu música.",
-      "runFailed": "There are one or more errors in your script. Read below for details.",
+      "runFailed": "Hay un error o más en tu script. Mira la consola para más detalles.",
       "noimport": "no está definido. Tal vez falta \"from earsketch import *\"."
     },
     "dawservice": {
@@ -523,7 +524,7 @@
       "success": "Script se ejecutó exitosamente",
       "overwrite": "Ese nombre ya existe. Por favor, crea un nombre único o renombra primero el script que existe.",
       "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
-      "illegalname": "Please use only regular characters, numbers, hyphens ( - ), or underscores ( _ ) in file names.",
+      "illegalname": "Por favor, sólo usa caracteres regulares, números, o _ para los nombres de los archivos.",
       "savefailed": "No se pudo guardar el script en la nube. Por favor, guarda tu script offline para evitar perder los cambios.",
       "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "No se pudo guardar algunos scripts en la nube. Por favor, guarda tus cambios offline para no perderlos.",
