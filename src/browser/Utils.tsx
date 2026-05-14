@@ -7,6 +7,7 @@ import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as caiState from "../cai/caiState"
 import * as student from "../cai/dialogue/student"
+import { TFunction } from "i18next"
 import { useAppSelector } from "../hooks"
 import * as scripts from "./scriptsState"
 import { MultiSelectFilterKey } from "./scriptsState"
@@ -206,4 +207,206 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
             </div>
         </button>
     )
+}
+
+export function analyzeJavaScriptCode(source: string, t: TFunction): string {
+    const lines = source.split("\n")
+    let readableText = ""
+
+    // simple literals: numbers, strings, booleans, null, undefined
+    const simpleLiteral =
+        String.raw`(?:-?\d+(?:\.\d+)?|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|true|false|null|undefined)`
+
+    for (const rawLine of lines) {
+        const line = rawLine.trim()
+        if (!line) continue
+
+        // JS single-line comment: // ...
+        const singleLineCommentMatch = line.match(/^\s*\/\/(.*)$/)
+
+        // JS variable declaration with optional assignment:
+        // let x = 5  const name = "a"  var ok = true
+        const variableDeclarationMatch = line.match(
+            /^\s*(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*(?:=\s*(.+?))?\s*?\s*$/
+        )
+
+        // JS assignment (without declaration):
+        // x = something  obj.prop = 1  arr[i] = foo()
+        const assignmentMatch = line.match(
+            /^\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\[[^\]]+\])*)\s*=\s*(.+?)\s*?\s*$/
+        )
+
+        // JS function call:
+        // foo(a, b)  console.log("hi")  obj.method(x)
+        const functionCallMatch = line.match(
+            /^\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\((.*)\)\s*?\s*$/
+        )
+
+        // Variable declaration with *simple literal* assignment:
+        // const x = 10 let s = "hi" var ok = false
+        const variableDeclarationLiteralMatch = line.match(
+            new RegExp(
+                String.raw`^\s*(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(${simpleLiteral})\s*?\s*$`,
+                "i"
+            )
+        )
+
+        // Comments
+        if (singleLineCommentMatch) {
+            readableText += t("ariaDescriptors:api.code.comment", { text: singleLineCommentMatch[1].trim() }) + " "
+            continue
+        }
+
+        // Variable declaration with a simple literal
+        if (variableDeclarationLiteralMatch) {
+            const varName = variableDeclarationLiteralMatch[1]
+            const varValue = variableDeclarationLiteralMatch[2]
+            readableText += t("ariaDescriptors:api.code.varDeclValue", { varName, varValue }) + " "
+            continue
+        }
+
+        // Variable declaration (general)
+        if (variableDeclarationMatch) {
+            const varName = variableDeclarationMatch[1]
+            const init = variableDeclarationMatch[2]
+
+            if (!init) {
+                readableText += t("ariaDescriptors:api.code.varDeclDeclared", { varName }) + " "
+                continue
+            }
+
+            // Function call in initializer: const x = foo(a,b)
+            const functionInDeclaration = init.trim().match(/^([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\((.*)\)\s*?\s*$/)
+            if (functionInDeclaration) {
+                const funcName = functionInDeclaration[1]
+                const funcArgs = functionInDeclaration[2]
+                readableText += t("ariaDescriptors:api.code.varDeclFuncAssign", { varName, funcName }) + " "
+                const argsArray = funcArgs.split(",")
+                argsArray.forEach((arg, index) => {
+                    readableText += t("ariaDescriptors:api.code.argument", { index: index + 1, arg }) + " "
+                })
+            } else {
+                readableText += t("ariaDescriptors:api.code.varDeclValue", { varName, varValue: init.trim() }) + " "
+            }
+            continue
+        }
+
+        // Assignment
+        if (assignmentMatch) {
+            const left = assignmentMatch[1]
+            const right = assignmentMatch[2].trim()
+
+            const functionInAssignment = right.match(
+                /^([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\((.*)\)\s*?\s*$/
+            )
+
+            if (functionInAssignment) {
+                const funcName = functionInAssignment[1]
+                const funcArgs = functionInAssignment[2]
+                readableText += t("ariaDescriptors:api.code.varAssignFunc", { left, funcName }) + " "
+                const argsArray = funcArgs.split(",")
+                argsArray.forEach((arg, index) => {
+                    readableText += t("ariaDescriptors:api.code.argument", { index: index + 1, arg }) + " "
+                })
+            } else {
+                readableText += t("ariaDescriptors:api.code.varAssignValue", { left, right }) + " "
+            }
+            continue
+        }
+
+        // Function call
+        if (functionCallMatch) {
+            const funcName = functionCallMatch[1].replace(/\s+/g, "")
+            const funcArgs = functionCallMatch[2]
+            readableText += t("ariaDescriptors:api.code.funcCall", { funcName }) + " "
+            const argsArray = funcArgs.split(",")
+            argsArray.forEach((arg, index) => {
+                readableText += t("ariaDescriptors:api.code.argument", { index: index + 1, arg }) + " "
+            })
+            continue
+        }
+
+        readableText += t("ariaDescriptors:api.code.codeLine", { line }) + " "
+    }
+
+    return readableText.trim() || t("ariaDescriptors:api.code.noCode")
+}
+
+export function analyzePythonCode(source: string, t: TFunction): string {
+    const lines = source.split("\n")
+    let readableText = ""
+
+    for (const rawLine of lines) {
+        const line = rawLine.trim()
+        if (!line) continue
+
+        // Matches a Python comment line starting with #
+        const commentMatch = line.match(/^#(.*)/)
+
+        // Matches a general Python variable assignment
+        // Example: x = 10, name = getUser()
+        const assignmentMatch = line.match(/^(\w+)\s*=\s*(.+)/)
+
+        // Matches a Python function call
+        // Example: print("Hello"), obj.method(a, b)
+        const functionCallMatch = line.match(/^([\w.]+)\((.*?)\)/)
+
+        // Matches a simple Python variable declaration with a literal value
+        // Example: x = 5, name = "John", flag = True
+        const variableDeclarationMatch = line.match(
+            /^(\w+)\s*=\s*(\d+|".*"|'.*'|True|False|None)/
+        )
+
+        // Single line comment. # ...
+        if (commentMatch) {
+            readableText += t("ariaDescriptors:api.code.comment", { text: commentMatch[1].trim() }) + " "
+            continue
+        }
+
+        // Variable declaration
+        if (variableDeclarationMatch) {
+            const varName = variableDeclarationMatch[1]
+            const varValue = variableDeclarationMatch[2]
+            readableText += t("ariaDescriptors:api.code.varDeclValue", { varName, varValue }) + " "
+            continue
+        }
+
+        // Assignment
+        if (assignmentMatch) {
+            const varName = assignmentMatch[1]
+            const assignedValue = assignmentMatch[2]
+
+            const functionInAssignment = assignedValue.match(/^(\w+)\((.*?)\)/)
+            if (functionInAssignment) {
+                const funcName = functionInAssignment[1]
+                const funcArgs = functionInAssignment[2]
+                readableText += t("ariaDescriptors:api.code.varAssignFunc", { left: varName, funcName }) + " "
+
+                const argsArray = funcArgs.split(",").map((arg) => arg.trim()).filter(Boolean)
+                argsArray.forEach((arg, index) => {
+                    readableText += t("ariaDescriptors:api.code.argument", { index: index + 1, arg }) + " "
+                })
+            } else {
+                readableText += t("ariaDescriptors:api.code.varAssignValue", { left: varName, right: assignedValue }) + " "
+            }
+            continue
+        }
+
+        // Function calll, fitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)
+        if (functionCallMatch) {
+            const funcName = functionCallMatch[1]
+            const funcArgs = functionCallMatch[2]
+            readableText += t("ariaDescriptors:api.code.funcCall", { funcName }) + " "
+
+            const argsArray = funcArgs.split(",").map((arg) => arg.trim()).filter(Boolean)
+            argsArray.forEach((arg, index) => {
+                readableText += t("ariaDescriptors:api.code.argument", { index: index + 1, arg }) + " "
+            })
+            continue
+        }
+
+        readableText += t("ariaDescriptors:api.code.codeLine", { line }) + " "
+    }
+
+    return readableText.trim() || t("ariaDescriptors:api.code.noCode")
 }

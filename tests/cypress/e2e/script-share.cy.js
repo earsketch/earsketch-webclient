@@ -1,10 +1,8 @@
-import { createServer } from "../support/wsServer"
 import * as MockSocket from "mock-socket"
 
-describe("shared script", () => {
+describe("shared scripts", () => {
     const apiHostname = "api-dev.ersktch.gatech.edu"
     const username = "cypress"
-    const wsServer = createServer(`wss://${apiHostname}/EarSketchWS/socket/${username}/`)
 
     const myScriptsShared = [{
         created: "2022-03-03 07:08:09.0",
@@ -33,7 +31,7 @@ describe("shared script", () => {
         username: "another_user",
     }
 
-    it.skip("imports a shared script with a name conflict", () => {
+    it("imports a shared script with a name conflict", () => {
         cy.interceptAudioStandard()
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
@@ -53,27 +51,30 @@ describe("shared script", () => {
         }])
         cy.interceptScriptsShared(myScriptsShared)
 
-        cy.intercept(
-            {
-                hostname: apiHostname,
-                method: "GET",
-                path: "EarSketchWS/scripts/byid?scriptid=4444444444444444444444",
-            },
-            {
-                body: newShared,
-            }
-        ).as("script_by_id_1C0A")
+        cy.interceptUsersNotifications([{
+            created: newShared.created,
+            id: 2,
+            message: {},
+            notification_type: "share_script",
+            script_name: newShared.name,
+            sender: newShared.username,
+            shareid: newShared.shareid,
+            unread: true,
+            username: "cypress",
+        }])
+
+        cy.interceptScriptById(newShared).as("script_by_id_4444")
 
         cy.intercept(
             {
                 hostname: apiHostname,
                 method: "POST",
-                path: "EarSketchWS/scripts/saveshared",
+                path: "/EarSketchWS/scripts/saveshared",
             },
             {
                 body: newShared,
             }
-        ).as("script_by_id_1C0A")
+        ).as("script_save_shared")
 
         cy.intercept(
             { method: "POST", hostname: apiHostname, path: "/EarSketchWS/scripts/import" },
@@ -85,37 +86,19 @@ describe("shared script", () => {
             { body: { ...newShared, creator: "another_user" } }
         ).as("script_rename")
 
+        // login will include one shared script from the database
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
         cy.skipTour()
-
-        // login will include one shared script from the database
         cy.login(username)
 
+        // notifications will include one new shared script, immediately imported
+        cy.get('button[title="Show/Hide Notifications"]').click()
+        cy.get('button[title="Refresh notifications"]').click()
+
+        // verify script browser
         cy.get("button[title='Open SCRIPTS Tab']").click()
 
-        myScriptsShared.push(newShared)
-
-        // notifications will include one shared script, not yet saved to the database
-        cy.incomingWebSocketMessage(
-            wsServer,
-            {
-                notification_type: "notifications",
-                notifications:
-                    [{
-                        created: "2022-03-28 17:56:44.0",
-                        id: 2,
-                        message: {},
-                        notification_type: "share_script",
-                        script_name: "bach_remix.py",
-                        sender: "another_user",
-                        shareid: "4444444444444444444444",
-                        unread: true,
-                        username: "cypress",
-                    }],
-            }
-        )
-
-        // view shared scripts, hide my scripts
+        // view shared scripts
         cy.contains("div", "MY SCRIPTS (1)").click() // collapse
         cy.contains("div", "SHARED SCRIPTS (2)").click() // expand
 
@@ -124,7 +107,7 @@ describe("shared script", () => {
         cy.contains("span", "IMPORT TO EDIT").click()
         cy.get("input[value=RENAME]").click()
 
-        // verify
+        // verify successful import, and name conflict handling
         cy.contains("div", "MY SCRIPTS (2)").click() // expand
         cy.contains("div", "SHARED SCRIPTS (1)").click() // collapse
         cy.contains("div", "mondays_1.py")

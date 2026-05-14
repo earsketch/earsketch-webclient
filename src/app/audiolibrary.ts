@@ -1,6 +1,6 @@
 // Fetch audio and metadata from the EarSketch library.
 import ctx from "../audio/context"
-import { SoundEntity } from "common"
+import { SoundEntity, SoundType } from "common"
 import esconsole from "../esconsole"
 import { getAuth } from "../request"
 import * as localSoundStorage from "../audio/localSoundStorage"
@@ -57,9 +57,8 @@ export async function getSound(name: string): Promise<Sound> {
 
 async function getSoundBuffer(sound: SoundEntity) {
     const name = sound.name
-
-    // For non-standard sounds, check IndexedDB first (for logged-out users with locally-stored sounds).
-    if (!sound.standard) {
+    // For user sounds, check IndexedDB first (for logged-out users with locally-stored sounds).
+    if (sound.type === SoundType.User) {
         const local = await localSoundStorage.getAudioData(name)
         if (local) {
             esconsole(`Decoding local ${name} buffer`, ["debug", "audiolibrary"])
@@ -67,29 +66,25 @@ async function getSoundBuffer(sound: SoundEntity) {
         }
     }
 
-    if (ES_WEB_STATIC && !sound.standard) {
-        // Non-standard sounds without a local copy can't be fetched in static mode.
+    if (ES_WEB_STATIC && sound.type === SoundType.User) {
+        // User sounds without a local copy can't be fetched in static mode.
         throw new Error(`Sound not available: ${name}`)
     }
-    const url = sound.standard
-        ? STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
-        : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
+    const url = sound.type === SoundType.User
+        ? URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
+        : STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
 
-    let data: ArrayBuffer
+    let response: Response
     try {
-        data = await (await fetch(url)).arrayBuffer()
+        response = await fetch(url)
     } catch (err: any) {
-        esconsole("Error getting " + name + " from the server", ["error", "audiolibrary"])
-        const status = err.status
-        if (status <= 0) {
-            throw new Error(`NetworkError: Could not retreive sound file ${name} due to network error`)
-        } else if (status >= 500 && status < 600) {
-            throw new Error(`ServerError: Could not retreive sound file ${name} due to server error`)
-        } else {
-            throw err
-        }
+        throw new Error(`Could not retrieve sound file ${name} due to network error`)
+    }
+    if (!response.ok) {
+        throw new Error(`Could not retrieve sound file ${name} due to server error (status code: ${response.status})`)
     }
 
+    const data = await response.arrayBuffer()
     // Need to do this before decodeAudioData() call, as that 'detaches' the ArrayBuffer.
     const bytes = new Uint8Array(data)
     // Check for MP3 file signatures.
@@ -144,7 +139,7 @@ export function getStandardSounds() {
 async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
-        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard_1.json"
+        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard_2.json"
         const response = await fetch(url)
         if (!response.ok) {
             throw Object.assign(new Error(`Failed to fetch standard sounds (code ${response.status}).`), { code: response.status })
@@ -154,14 +149,14 @@ async function _getStandardSounds() {
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
         // Populate cache with standard sound metadata so that we don't fetch it again later via `getMetadata()`.
         for (const sound of sounds) {
-            fixMetadata(sound, true)
+            fixMetadata(sound, sound.public === 1 ? SoundType.Public : SoundType.Hidden)
             if (!cache.sounds[sound.name]) {
                 cache.sounds[sound.name] = { metadata: Promise.resolve(sound) }
             }
         }
         // Filter out "non-public" sounds so that they don't appear in the sound browser, autocomplete, etc.
         // Note that we still cache their metadata above; this just prevents them from appearing in the standard set.)
-        sounds = sounds.filter(sound => sound.public)
+        sounds = sounds.filter(sound => sound.type === SoundType.Public)
         return { sounds, folders }
     } catch (err: any) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
@@ -174,7 +169,7 @@ export async function getUserSounds(username: string) {
     const sounds: SoundEntity[] = await getAuth("/audio/user", { username })
     // Populate cache with user sound metadata so that we don't fetch it again later via `getMetadata()`.
     for (const sound of sounds) {
-        fixMetadata(sound, false)
+        fixMetadata(sound, SoundType.User)
         if (!cache.sounds[sound.name]) {
             cache.sounds[sound.name] = { metadata: Promise.resolve(sound) }
         }
@@ -211,15 +206,18 @@ async function _getMetadata(name: string) {
         return null
     }
 
-    fixMetadata(metadata, false)
+    fixMetadata(metadata, metadata.public === 0 ? SoundType.User : SoundType.Hidden)
     return metadata
 }
 
-function fixMetadata(metadata: SoundEntity, standard: boolean) {
+function fixMetadata(metadata: SoundEntity, type: SoundType) {
     // Server uses -1 to indicate no tempo; for type safety, we remap this to undefined.
     if (metadata.tempo === -1) {
         metadata.tempo = undefined
     }
-    metadata.standard = standard
+    // TODO: After database update, we can unify `public` and `type`.
+    if (metadata.type === undefined) {
+        metadata.type = type
+    }
     return metadata
 }

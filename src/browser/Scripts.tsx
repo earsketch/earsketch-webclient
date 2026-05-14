@@ -1,8 +1,7 @@
 import React, { ChangeEvent, MouseEvent, useState, useEffect } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
-import { FixedSizeList as List } from "react-window"
-import AutoSizer from "react-virtualized-auto-sizer"
+import { Virtuoso } from "react-virtuoso"
 
 import type { Script, ScriptType } from "common"
 import * as appState from "../app/appState"
@@ -350,37 +349,26 @@ interface WindowedScriptCollectionProps {
     visible?: boolean
     initExpanded?: boolean
 }
-const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = true, initExpanded = true }: WindowedScriptCollectionProps) => (
-    <Collection
-        title={title}
-        visible={visible}
-        initExpanded={initExpanded}
-    >
-        <AutoSizer>
-            {({ height, width }: { height: number, width: number }) => (
-                <List
-                    height={height}
-                    width={width}
-                    itemCount={scriptIDs.length}
-                    itemSize={44}
-                >
-                    {({ index, style }) => {
-                        const ID = scriptIDs[index]
-                        return (
-                            <div style={style}
-                                className={index % 2 === 0
-                                    ? "bg-white dark:bg-gray-900"
-                                    : "bg-gray-300 dark:bg-gray-800" +
-                                    " hover:bg-blue-200 dark:hover:bg-blue-500"}>
-                                <ScriptEntry key={ID} script={entities[ID]} type={type} />
-                            </div>
-                        )
-                    }}
-                </List>
-            )}
-        </AutoSizer>
-    </Collection>
-)
+const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = true, initExpanded = true }: WindowedScriptCollectionProps) => {
+    return (
+        <Collection
+            title={title}
+            visible={visible}
+            initExpanded={initExpanded}
+        >
+            <Virtuoso
+                data={scriptIDs}
+                itemContent={(index, ID) => (
+                    <div className={index % 2 === 0
+                        ? "bg-white dark:bg-gray-900"
+                        : "bg-gray-300 dark:bg-gray-800 hover:bg-blue-200 dark:hover:bg-blue-500"}>
+                        <ScriptEntry script={entities[ID]} type={type} />
+                    </div>
+                )}
+            />
+        </Collection>
+    )
+}
 
 const RegularScriptCollection = () => {
     const entities = useSelector(scripts.selectFilteredActiveScripts)

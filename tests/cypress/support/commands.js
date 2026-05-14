@@ -47,7 +47,7 @@ Cypress.Commands.add("incomingWebSocketMessage", (wsServer, message) => {
  * @returns Chainable
  */
 Cypress.Commands.add("waitForHeadlessDialog", () => {
-    cy.get("div[id^='headlessui-dialog-']", { timeout: 10000 }).should("not.exist")
+    cy.get("div#root", { timeout: 10000 }).should("not.have.attr", "inert")
 })
 
 /**
@@ -119,7 +119,7 @@ Cypress.Commands.add("interceptAudioStandard", (sounds = []) => {
         {
             hostname: CLOUDFRONT_HOST,
             method: "GET",
-            path: "/backend-static/audio-standard_1.json",
+            path: "/backend-static/audio-standard_2.json",
         },
         {
             body: standardAudioLibrary,
@@ -172,6 +172,23 @@ Cypress.Commands.add("interceptUsersInfo", (username = TEST_USER) => {
         },
         { body: { created: "2019-04-22 16:13:06.0", email: "", isAdmin: true, username } }
     ).as("users_info")
+})
+
+/**
+ * @memberOf cy
+ * @method interceptUsersNotifications
+ * @param [notifications=[]]
+ * @returns Chainable
+ */
+Cypress.Commands.add("interceptUsersNotifications", (notifications = []) => {
+    cy.intercept(
+        {
+            hostname: API_HOST,
+            method: "GET",
+            path: "/EarSketchWS/users/notifications",
+        },
+        { body: notifications }
+    ).as("users_notifications")
 })
 
 /**
