@@ -44,7 +44,7 @@ test("hides broadcast indicator while unread non-broadcast notifications exist",
                 sender: "user3",
                 shareid: "abc123",
                 unread: true,
-                username: "cypress",
+                username: "e2e",
             },
         ],
     })

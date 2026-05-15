@@ -1,7 +1,6 @@
 {
   "threshold": 3,
   "ignore": [
-    "**/tests/cypress/component/**.results.js",
     "**/tests/playwright/fixtures/**",
     "**/tests/playwright/e2e/**",
     "**/tests/vitest/fixtures/**",
