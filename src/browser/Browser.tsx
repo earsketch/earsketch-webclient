@@ -141,7 +141,12 @@ export const Browser = () => {
                     <TitleBar />
                     <BrowserTabs />
                     {Object.entries(BrowserComponents).map(([type, TabBody]) =>
-                        <div key={type} className={"flex flex-col grow min-h-0" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
+                        <div
+                            key={type}
+                            id={"panel-" + type}
+                            role="tabpanel"
+                            className={"flex flex-col grow min-h-0" + (+type === kind ? "" : " hidden")}
+                        ><TabBody /></div>)}
                 </div>
                 : <Collapsed title={t("contentManager.title").toLocaleUpperCase()} position="west" />}
         </div>

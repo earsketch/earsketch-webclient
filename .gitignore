@@ -39,11 +39,9 @@ EarSketchRecommendations/*.json
 
 # Test reports
 tests/vitest/reports/
-tests/cypress/report.xml
-tests/cypress/reports/
-tests/cypress/screenshots/
-tests/cypress/videos/
-tests/cypress/downloads/
+tests/playwright/test-results/
+tests/playwright/reports/
+playwright-report/
 eslint_report.json
 stats.html
 .env.local
