@@ -35,6 +35,7 @@ reports:
     file-format: "JUNITXML"
 
 artifacts:
+  base-directory: playwright-report
   files:
-    - "playwright-report/**/*"
+    - "**/*"
   name: playwright-report-build-$CODEBUILD_BUILD_NUMBER
