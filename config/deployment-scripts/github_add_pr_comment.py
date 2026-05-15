@@ -20,7 +20,7 @@ pull_request_number = sys.argv[4].replace("pr-", "")
 commit_sha = sys.argv[5]
 
 url = (
-    "https://api.github.com/repos/GTCMT/earsketch-webclient/issues/"
+    "https://api.github.com/repos/earsketch/earsketch-webclient/issues/"
     + pull_request_number
     + "/comments"
 )

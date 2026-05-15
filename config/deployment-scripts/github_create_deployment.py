@@ -17,7 +17,7 @@ github_token = sys.argv[2]
 git_commit_sha = sys.argv[3]
 pull_request_number = sys.argv[4].replace("pr-", "")
 
-url = "https://api.github.com/repos/GTCMT/earsketch-webclient/"
+url = "https://api.github.com/repos/earsketch/earsketch-webclient/"
 
 environment = "review-" + pull_request_number
 environment_url = "https://earsketch-test.ersktch.gatech.edu/pr-" + pull_request_number

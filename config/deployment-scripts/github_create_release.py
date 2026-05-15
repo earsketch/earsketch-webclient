@@ -18,7 +18,7 @@ github_token = sys.argv[2]
 git_commit_sha = sys.argv[3]
 new_version_number = sys.argv[4]
 
-url = "https://api.github.com/repos/GTCMT/earsketch-webclient/releases"
+url = "https://api.github.com/repos/earsketch/earsketch-webclient/releases"
 
 auth = base64.b64encode(f"{github_user}:{github_token}".encode()).decode()
 req = Request(
