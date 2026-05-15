@@ -11,8 +11,6 @@ env:
 phases:
   install:
     commands:
-      - apt-get update -qq
-      - apt-get install -qq python3-requests
       - npm ci
   pre_build:
     commands:
