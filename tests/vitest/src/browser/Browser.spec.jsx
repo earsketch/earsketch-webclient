@@ -1,5 +1,5 @@
 import { beforeAll, expect, it, vi } from "vitest"
-import React from "react"
+import React, { act } from "react"
 import { render } from "@testing-library/react" // component rendering
 import { screen } from "@testing-library/dom" // find elements on screen
 import "@testing-library/jest-dom/vitest" // assertions
@@ -49,23 +49,23 @@ it("shows and hides content browsers on tab change", async () => {
     const buttonScriptsBrowser = screen.getByText("SCRIPT")
     const buttonApiBrowser = screen.getByText("API")
 
-    const divSoundBrowser = container.querySelector("#panel-0").parentNode
-    const divScriptBrowser = container.querySelector("#panel-1").parentNode
-    const divApiBrowser = container.querySelector("#panel-2").parentNode
+    const divSoundBrowser = container.querySelector("#panel-0")
+    const divScriptBrowser = container.querySelector("#panel-1")
+    const divApiBrowser = container.querySelector("#panel-2")
 
     // click tabs and verify background panes become hidden
     // note: toBeVisible() is not applicable here because we do not insert our css into jsdom
-    userEvent.click(buttonSoundsBrowser)
+    await act(async () => userEvent.click(buttonSoundsBrowser))
     expect(divSoundBrowser).not.toHaveClass("hidden")
     expect(divScriptBrowser).toHaveClass("hidden")
     expect(divApiBrowser).toHaveClass("hidden")
 
-    userEvent.click(buttonScriptsBrowser)
+    await act(async () => userEvent.click(buttonScriptsBrowser))
     expect(divSoundBrowser).toHaveClass("hidden")
     expect(divScriptBrowser).not.toHaveClass("hidden")
     expect(divApiBrowser).toHaveClass("hidden")
 
-    userEvent.click(buttonApiBrowser)
+    await act(async () => userEvent.click(buttonApiBrowser))
     expect(divSoundBrowser).toHaveClass("hidden")
     expect(divScriptBrowser).toHaveClass("hidden")
     expect(divApiBrowser).not.toHaveClass("hidden")
