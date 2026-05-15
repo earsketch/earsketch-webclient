@@ -14,7 +14,6 @@ phases:
       - apt-get update -qq
       - apt-get install -qq python3-requests
       - npm ci
-      - npx playwright install --with-deps chromium
   pre_build:
     commands:
       - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
