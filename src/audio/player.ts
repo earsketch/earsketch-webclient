@@ -94,11 +94,11 @@ export function play(startMes: number, delay = 0) {
         projectGraph = upcomingProjectGraph
         upcomingProjectGraph = null
         callbacks.onStartedCallback()
-        // if (loop.on) {
-        //     const timeElapsed = context.currentTime - waStartTime
-        //     const loopStart = loop.selection ? loop.start : 1
-        //     play(loopStart, endTime - startTime - timeElapsed)
-        // }
+        if (loop.on) {
+            const timeElapsed = context.currentTime - waStartTime
+            const loopStart = loop.selection ? loop.start : 1
+            play(loopStart, endTime - startTime - timeElapsed)
+        }
     }, delay * 1000)
 
     // schedule to call the onFinished callback
