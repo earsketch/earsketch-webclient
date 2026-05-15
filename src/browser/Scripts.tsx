@@ -382,7 +382,7 @@ const RegularScriptCollection = () => {
     const type: ScriptType = "regular"
     const title = `${t("scriptBrowser.myScripts").toLocaleUpperCase()} (${filtered ? numFilteredScripts + "/" : ""}${numScripts})`
     const initExpanded = !useSelector(scripts.selectFeatureSharedScript)
-    if (!loggedIn && numScripts === 0 && numDeleted === 0) {
+    if (ES_WEB_STATIC && !loggedIn && numScripts === 0 && numDeleted === 0) {
         return (
             <div className="text-center p-6 text-gray-500 dark:text-gray-400">
                 <p>{t("scriptBrowser.noScripts")}</p>

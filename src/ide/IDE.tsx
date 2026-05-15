@@ -84,7 +84,7 @@ export async function createScript() {
 
         // Show first-visit backup notice for logged-out users who have never been warned.
         const NOTICE_KEY = "earsketch_backup_notice_shown"
-        if (!user.selectLoggedIn(store.getState()) && !localStorage.getItem(NOTICE_KEY)) {
+        if (ES_WEB_STATIC && !user.selectLoggedIn(store.getState()) && !localStorage.getItem(NOTICE_KEY)) {
             localStorage.setItem(NOTICE_KEY, "1")
             if (backup.getLastExportTime() === null) {
                 userNotification.show(i18n.t("backup.firstVisitNotice"), "", 8)

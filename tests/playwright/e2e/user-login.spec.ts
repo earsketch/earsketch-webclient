@@ -58,5 +58,5 @@ test("logs in, shows owned and shared script counts, then logs out", async ({ pa
     await page.locator("button", { hasText: username }).first().click()
     await page.locator("button", { hasText: "Logout" }).click()
     await page.locator("button[title='Open SCRIPTS Tab']").click()
-    await expect(page.getByText("No scripts yet")).toBeVisible()
+    await expect(page.locator("div", { hasText: "MY SCRIPTS (0)" }).first()).toBeVisible()
 })
