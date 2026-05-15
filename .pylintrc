@@ -7,7 +7,7 @@ jobs=0
 
 # Ignoring Import Errors is desired as super-linter
 # does not support installing dependencies as it runs
-disable=import-error
+disable=import-error,duplicate-code
 
 [BASIC]
 

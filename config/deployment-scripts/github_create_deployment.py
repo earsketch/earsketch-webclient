@@ -1,3 +1,5 @@
+"""Create a GitHub Deployment + DeploymentStatus for a PR review app."""
+
 import base64
 import json
 import sys
@@ -6,9 +8,10 @@ from urllib.request import Request, urlopen
 if len(sys.argv) < 5:
     print("Error, no arguments given")
     print(
-        "Usage: github_create_release.py <GIT_USER> <GITHUB_TOKEN> <GIT_COMMIT_SHA> <PULL_REQUEST_NUMBER>"
+        "Usage: github_create_release.py <GIT_USER> <GITHUB_TOKEN> "
+        "<GIT_COMMIT_SHA> <PULL_REQUEST_NUMBER>"
     )
-    exit(1)
+    sys.exit(1)
 github_user = sys.argv[1]
 github_token = sys.argv[2]
 git_commit_sha = sys.argv[3]
@@ -28,6 +31,7 @@ common_headers = {
 
 
 def post(endpoint, body):
+    """POST a JSON body to the GitHub API and return the parsed response."""
     req = Request(
         url + endpoint,
         data=json.dumps(body).encode(),
@@ -50,7 +54,7 @@ new_deployment = post(
 new_deployment_id = new_deployment["id"]
 
 post(
-    "deployments/{}/statuses".format(new_deployment_id),
+    f"deployments/{new_deployment_id}/statuses",
     {
         "state": "success",
         "environment": environment,
