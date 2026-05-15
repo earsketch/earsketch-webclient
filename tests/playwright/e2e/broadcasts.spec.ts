@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { setupBackend } from "../helpers/mocks"
+import { setupBackend, TEST_USER } from "../helpers/mocks"
 import { skipTour, login } from "../helpers/actions"
 
 test("broadcast notification shows the broadcast indicator, not the unread badge", async ({ page }) => {
@@ -44,7 +44,7 @@ test("hides broadcast indicator while unread non-broadcast notifications exist",
                 sender: "user3",
                 shareid: "abc123",
                 unread: true,
-                username: "e2e",
+                username: TEST_USER,
             },
         ],
     })
