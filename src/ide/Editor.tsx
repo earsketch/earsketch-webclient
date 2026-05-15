@@ -23,7 +23,7 @@ import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorHoverLine, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorCursorLine, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
@@ -45,9 +45,25 @@ const dawPlayingLinesEffect = StateEffect.define<{ color: string, pos: number }[
 type DAWMarkerType = "hover" | "play"
 const MARKER_ICONS = { hover: "icon-arrow-right-thick", play: "icon-play4" }
 
+interface DAWMarkerOptions {
+    type: DAWMarkerType
+    color: string
+    visible?: boolean
+    primary?: boolean
+}
+
 class DAWMarker extends GutterMarker {
-    constructor(readonly type: DAWMarkerType, readonly color: string, readonly visible = true, readonly primary = true) {
+    readonly type: DAWMarkerType
+    readonly color: string
+    readonly visible: boolean
+    readonly primary: boolean
+
+    constructor({ type, color, visible = true, primary = true }: DAWMarkerOptions) {
         super()
+        this.type = type
+        this.color = color
+        this.visible = visible
+        this.primary = primary
     }
 
     override eq(other: DAWMarker) {
@@ -91,7 +107,7 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
             if (dawHoverUpdate.length > 0) {
                 const ranges = [...dawHoverUpdate]
                     .sort((a, b) => a.pos - b.pos)
-                    .map(h => new DAWMarker("hover", h.color, true, h.primary).range(h.pos))
+                    .map(h => new DAWMarker({ type: "hover", color: h.color, primary: h.primary }).range(h.pos))
                 set = set.update({ add: ranges })
             }
         }
@@ -115,7 +131,7 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
             }
             const add = dawPlayingUpdate
                 .sort((a, b) => a.pos - b.pos)
-                .map(line => new DAWMarker("play", line.color, !hoverPositions.has(line.pos)).range(line.pos))
+                .map(line => new DAWMarker({ type: "play", color: line.color, visible: !hoverPositions.has(line.pos) }).range(line.pos))
             set = set.update({ filter: (_from, _to, m) => m.type !== "play" }).update({ add })
         }
         return set
@@ -127,7 +143,7 @@ const dawMarkerGutter = [
     gutter({
         class: "daw-markers",
         markers: v => v.state.field(dawMarkerState),
-        initialSpacer: () => new DAWMarker("hover", ""),
+        initialSpacer: () => new DAWMarker({ type: "hover", color: "" }),
     }),
     EditorView.baseTheme({
         ".daw-markers .cm-gutterElement": {
@@ -290,7 +306,7 @@ export function setActiveSession(session: EditorSession) {
         view.setState(session)
         view.dispatch({ effects: themeConfig.reconfigure(getTheme()) })
         changeListeners.forEach(f => f())
-        lastDispatchedHoverLine = null
+        lastDispatchedCursorLine = null
         syncCursorLine(view.state)
     }
 }
@@ -410,13 +426,13 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
     })
 }
 
-let lastDispatchedHoverLine: number | null = null
+let lastDispatchedCursorLine: number | null = null
 
 function syncCursorLine(state: EditorState) {
     const line = state.doc.lineAt(state.selection.main.head).number
-    if (line === lastDispatchedHoverLine) return
-    lastDispatchedHoverLine = line
-    store.dispatch(setEditorHoverLine(line))
+    if (line === lastDispatchedCursorLine) return
+    lastDispatchedCursorLine = line
+    store.dispatch(setEditorCursorLine(line))
 }
 
 // Callbacks

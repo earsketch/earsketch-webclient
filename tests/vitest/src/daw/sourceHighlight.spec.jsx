@@ -8,7 +8,7 @@ import "../../AudioContextMock/AudioContext.mock"
 import store from "../../../../src/reducers"
 import { DAW } from "../../../../src/daw/DAW"
 import { setTracks, setPlayLength } from "../../../../src/daw/dawState"
-import { setEditorHoverLine, setScriptMatchesDAW } from "../../../../src/ide/ideState"
+import { setEditorCursorLine, setScriptMatchesDAW } from "../../../../src/ide/ideState"
 
 window.d3 = d3
 window.ResizeObserver = ResizeObserver
@@ -37,9 +37,9 @@ beforeEach(() => {
     store.dispatch(setTracks(tracksWithClipOnLine(5)))
 })
 
-it("applies source-highlight when editorHoverLine matches a frame in sourceLines", async () => {
+it("applies source-highlight when editorCursorLine matches a frame in sourceLines", async () => {
     store.dispatch(setScriptMatchesDAW(true))
-    store.dispatch(setEditorHoverLine(5))
+    store.dispatch(setEditorCursorLine(5))
 
     const { container } = render(<Provider store={store}><DAW /></Provider>)
     const clip = await waitFor(() => {
@@ -52,7 +52,7 @@ it("applies source-highlight when editorHoverLine matches a frame in sourceLines
 
 it("does not apply source-highlight when line doesn't match", async () => {
     store.dispatch(setScriptMatchesDAW(true))
-    store.dispatch(setEditorHoverLine(99))
+    store.dispatch(setEditorCursorLine(99))
 
     const { container } = render(<Provider store={store}><DAW /></Provider>)
     const clip = await waitFor(() => {
@@ -65,7 +65,7 @@ it("does not apply source-highlight when line doesn't match", async () => {
 
 it("does not apply source-highlight when scriptMatchesDAW is false", async () => {
     store.dispatch(setScriptMatchesDAW(false))
-    store.dispatch(setEditorHoverLine(5))
+    store.dispatch(setEditorCursorLine(5))
 
     const { container } = render(<Provider store={store}><DAW /></Provider>)
     const clip = await waitFor(() => {
@@ -84,7 +84,7 @@ it("highlights on any line in the call stack (wrapper-function case)", async () 
     const select = container => container.querySelector(".dawAudioClipContainer")
 
     // Hovering the innermost line (inside the wrapper) highlights.
-    store.dispatch(setEditorHoverLine(3))
+    store.dispatch(setEditorCursorLine(3))
     const first = render(<Provider store={store}><DAW /></Provider>)
     await waitFor(() => {
         const el = select(first.container)
@@ -95,7 +95,7 @@ it("highlights on any line in the call stack (wrapper-function case)", async () 
     first.unmount()
 
     // Hovering the call site (line 7) also highlights, since 7 is in the stack.
-    store.dispatch(setEditorHoverLine(7))
+    store.dispatch(setEditorCursorLine(7))
     const second = render(<Provider store={store}><DAW /></Provider>)
     await waitFor(() => {
         const el = select(second.container)
@@ -106,7 +106,7 @@ it("highlights on any line in the call stack (wrapper-function case)", async () 
     second.unmount()
 
     // Unrelated line — no highlight.
-    store.dispatch(setEditorHoverLine(99))
+    store.dispatch(setEditorCursorLine(99))
     const third = render(<Provider store={store}><DAW /></Provider>)
     await waitFor(() => {
         const el = select(third.container)
