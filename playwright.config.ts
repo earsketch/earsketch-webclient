@@ -3,10 +3,9 @@ import { defineConfig, devices } from "@playwright/test"
 export default defineConfig({
     testDir: "tests/playwright",
     fullyParallel: true,
-    forbidOnly: !!process.env.CI,
+    forbidOnly: true,
     retries: 0,
-    workers: process.env.CI ? 2 : undefined,
-    reporter: process.env.CI ? [["html", { open: "never" }], ["junit", { outputFile: "tests/playwright/reports/junit.xml" }]] : "list",
+    reporter: [["list"], ["html", { open: "never" }], ["junit", { outputFile: "tests/playwright/reports/junit.xml" }]],
     outputDir: "tests/playwright/test-results",
     use: {
         baseURL: "http://localhost:8888",
