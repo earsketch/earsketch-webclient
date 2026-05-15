@@ -44,7 +44,7 @@ export function init() {
         finish: false,
         length: 0,
         tracks: [{
-            effects: { TEMPO: { TEMPO: [{ measure: 1, value: 120, shape: "square", sourceLine: 1 }] } },
+            effects: { TEMPO: { TEMPO: [{ measure: 1, value: 120, shape: "square", sourceLines: [1] }] } },
             clips: [],
         }],
         transformedClips: {},
@@ -1022,7 +1022,6 @@ export const addClip = (result: DAWData, clip: Clip, silence: number | undefined
     }
 
     clip.sourceLines = getSourceLines()
-    clip.sourceLine = clip.sourceLines[0] ?? 0
     result.tracks[clip.track].clips.push(clip)
 }
 
@@ -1063,12 +1062,11 @@ export function addEffect(
     }
 
     const sourceLines = getSourceLines()
-    const sourceLine = sourceLines[0] ?? 0
     const automation = result.tracks[track].effects[name][parameter]
     if (endMeasure === 0) {
-        automation.push({ measure: startMeasure, value: startValue, shape: "square", sourceLine, sourceLines })
+        automation.push({ measure: startMeasure, value: startValue, shape: "square", sourceLines })
     } else {
-        automation.push({ measure: startMeasure, value: startValue, shape: "linear", sourceLine, sourceLines })
-        automation.push({ measure: endMeasure, value: endValue, shape: "square", sourceLine, sourceLines })
+        automation.push({ measure: startMeasure, value: startValue, shape: "linear", sourceLines })
+        automation.push({ measure: endMeasure, value: endValue, shape: "square", sourceLines })
     }
 }

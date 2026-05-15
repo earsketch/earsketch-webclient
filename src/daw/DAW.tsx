@@ -400,9 +400,9 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef<HTMLDivElement>(null)
-    const sourceLines = clip.sourceLines ?? (clip.sourceLine ? [clip.sourceLine] : [])
+    const sourceLines = clip.sourceLines
     const sourceHighlight = scriptMatchesDAW && editorHoverLine != null && sourceLines.includes(editorHoverLine)
-    const lineTooltip = sourceLines.length > 1 ? `Lines: ${sourceLines.join(" ← ")}` : `Line: ${sourceLines[0] ?? clip.sourceLine}`
+    const lineTooltip = sourceLines.length > 1 ? `Lines: ${sourceLines.join(" ← ")}` : `Line: ${sourceLines[0] ?? 0}`
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -469,9 +469,9 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
         <svg className="effectSvg">
             <path></path>
             {envelope.map((point, i) => {
-                const pointLines = point.sourceLines ?? (point.sourceLine ? [point.sourceLine] : [])
+                const pointLines = point.sourceLines
                 const sourceHighlight = scriptMatchesDAW && editorHoverLine != null && pointLines.includes(editorHoverLine)
-                const pointTooltip = pointLines.length > 1 ? `Lines: ${pointLines.join(" ← ")}` : `Line: ${pointLines[0] ?? point.sourceLine}`
+                const pointTooltip = pointLines.length > 1 ? `Lines: ${pointLines.join(" ← ")}` : `Line: ${pointLines[0] ?? 0}`
                 return <React.Fragment key={i}>
                     <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                     <circle
@@ -1044,7 +1044,9 @@ export const DAW = () => {
                     const end = clip.measure + clip.end - clip.start
                     if (start <= position && position <= end) {
                         const color = trackColors[index % trackColors.length]
-                        active.push({ color, lineNumber: clip.sourceLine })
+                        if (clip.sourceLines[0] !== undefined) {
+                            active.push({ color, lineNumber: clip.sourceLines[0] })
+                        }
                     }
                 }
             }

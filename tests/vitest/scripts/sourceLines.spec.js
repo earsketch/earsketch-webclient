@@ -15,7 +15,6 @@ describe("sourceLines call stack", () => {
         const userClips = result.tracks.flatMap(t => t.clips ?? []).filter(c => c.filekey === "OS_CLAP01")
         expect(userClips.length).toBeGreaterThan(0)
         for (const clip of userClips) {
-            expect(clip.sourceLine).toBe(3)
             expect(clip.sourceLines).toEqual([3, 5])
         }
     })
@@ -33,7 +32,6 @@ describe("sourceLines call stack", () => {
         const userClips = result.tracks.flatMap(t => t.clips ?? []).filter(c => c.filekey === "OS_CLAP01")
         expect(userClips.length).toBeGreaterThan(0)
         for (const clip of userClips) {
-            expect(clip.sourceLine).toBe(2)
             expect(clip.sourceLines).toEqual([2, 5])
         }
     })
@@ -44,7 +42,6 @@ describe("sourceLines call stack", () => {
         ].join("\n")
         const result = await runner.run("javascript", script)
         const tempo = result.tracks[0].effects.TEMPO.TEMPO.find(p => p.value === 99)
-        expect(tempo?.sourceLine).toBe(1)
         expect(tempo?.sourceLines).toEqual([1])
     })
 })

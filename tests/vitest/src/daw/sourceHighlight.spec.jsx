@@ -23,7 +23,7 @@ function tracksWithClipOnLine(line, callStack) {
         {
             clips: [{
                 filekey: "SOUND_A", measure: 1, start: 1, end: 2, track: 1,
-                sourceLine: line, sourceLines: callStack ?? [line],
+                sourceLines: callStack ?? [line],
                 loopChild: false, loop: false, scale: 1, silence: 0,
             }],
             effects: {},
@@ -37,7 +37,7 @@ beforeEach(() => {
     store.dispatch(setTracks(tracksWithClipOnLine(5)))
 })
 
-it("applies source-highlight when editorHoverLine matches clip sourceLine", async () => {
+it("applies source-highlight when editorHoverLine matches a frame in sourceLines", async () => {
     store.dispatch(setScriptMatchesDAW(true))
     store.dispatch(setEditorHoverLine(5))
 
@@ -94,7 +94,7 @@ it("highlights on any line in the call stack (wrapper-function case)", async () 
     expect(select(first.container).classList.contains("source-highlight")).toBe(true)
     first.unmount()
 
-    // Hovering the call site (line 7) also highlights, even though sourceLine is 3.
+    // Hovering the call site (line 7) also highlights, since 7 is in the stack.
     store.dispatch(setEditorHoverLine(7))
     const second = render(<Provider store={store}><DAW /></Provider>)
     await waitFor(() => {

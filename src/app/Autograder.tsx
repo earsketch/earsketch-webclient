@@ -93,21 +93,18 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
         reference.tracks = grep(reference.tracks, (_: any, i: number) => testTracks[i])
         test.tracks = grep(test.tracks, (_: any, i: number) => testTracks[i])
     }
-    // remove sourceLine property
+    // clear source-line attribution so it doesn't affect equality
     for (const track of reference.tracks.concat(test.tracks)) {
         for (const clip of track.clips) {
-            clip.sourceLine = 0
-            delete clip.sourceLines
+            clip.sourceLines = []
         }
     }
 
-    // remove sourceLine property from effects
     for (const track of reference.tracks.concat(test.tracks)) {
         for (const effect of Object.keys(track.effects)) {
             for (const effectParam of Object.keys(track.effects[effect])) {
                 for (const paramValues in track.effects[effect][effectParam]) {
-                    track.effects[effect][effectParam][paramValues].sourceLine = 0
-                    delete track.effects[effect][effectParam][paramValues].sourceLines
+                    track.effects[effect][effectParam][paramValues].sourceLines = []
                 }
             }
         }
