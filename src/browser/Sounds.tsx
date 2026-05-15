@@ -778,7 +778,14 @@ export const SoundBrowser = () => {
     const dispatch = useDispatch()
     const preview = useSelector(sounds.selectPreview)
     const previewNodes = useSelector(sounds.selectPreviewNodes)
+    const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    const folders = useSelector(sounds.selectFilteredRegularFolders)
     const lastPreviewNameRef = useRef<string | null>(null)
+
+    const firstSoundName = useMemo(() => {
+        const firstFolder = folders[0]
+        return firstFolder ? namesByFolders[firstFolder]?.[0] ?? null : null
+    }, [folders, namesByFolders])
 
     useEffect(() => {
         if (preview?.kind === "sound") {
@@ -786,27 +793,31 @@ export const SoundBrowser = () => {
         }
     }, [preview])
 
+    const getTargetName = useCallback(() =>
+        preview?.kind === "sound"
+            ? preview.name
+            : lastPreviewNameRef.current ?? firstSoundName
+    , [preview, firstSoundName])
+
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
             if (event.ctrlKey && event.shiftKey && event.key === "L") {
                 event.preventDefault()
-                const name = preview?.kind === "sound" ? preview.name : lastPreviewNameRef.current
+                const name = getTargetName()
                 if (name) {
                     dispatch(soundsThunks.togglePreview({ name, kind: "sound" }))
                 }
             }
         }
         window.addEventListener("keydown", handleKeyPress)
-        return () => {
-            window.removeEventListener("keydown", handleKeyPress)
-        }
-    }, [preview, previewNodes])
+        return () => { window.removeEventListener("keydown", handleKeyPress) }
+    }, [getTargetName, previewNodes])
 
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
             if (event.ctrlKey && event.shiftKey && event.key === "U") {
                 event.preventDefault()
-                const name = preview?.kind === "sound" ? preview.name : lastPreviewNameRef.current
+                const name = getTargetName()
                 if (name) {
                     editor.pasteCode(name)
                     addUIClick("sound copy - " + name)
@@ -814,10 +825,8 @@ export const SoundBrowser = () => {
             }
         }
         window.addEventListener("keydown", handleKeyPress)
-        return () => {
-            window.removeEventListener("keydown", handleKeyPress)
-        }
-    }, [preview])
+        return () => { window.removeEventListener("keydown", handleKeyPress) }
+    }, [getTargetName])
 
     return (
         <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
