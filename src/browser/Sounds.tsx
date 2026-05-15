@@ -801,7 +801,7 @@ export const SoundBrowser = () => {
 
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
-            if (event.ctrlKey && event.shiftKey && event.key === "L") {
+            if (event.ctrlKey && event.shiftKey && event.key.toUpperCase() === "L") {
                 event.preventDefault()
                 const name = getTargetName()
                 if (name) {
@@ -815,7 +815,7 @@ export const SoundBrowser = () => {
 
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
-            if (event.ctrlKey && event.shiftKey && event.key === "U") {
+            if (event.ctrlKey && event.shiftKey && event.key.toUpperCase() === "U") {
                 event.preventDefault()
                 const name = getTargetName()
                 if (name) {
