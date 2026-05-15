@@ -78,12 +78,13 @@ export async function postBasicAuth(endpoint: string, username: string, password
 }
 
 export async function postForm(endpoint: string, data: { [key: string]: string | Blob; }) {
+    // Note: don't set Content-Type — fetch sets multipart/form-data with the correct boundary
+    // automatically when the body is a FormData. Setting it manually breaks the boundary.
     return fetchAPI(endpoint, {
         method: "POST",
         body: form(data),
         headers: {
             Authorization: "Bearer " + user.selectToken(store.getState()),
-            "Content-Type": "multipart/form-data",
         },
     })
 }

@@ -44,3 +44,4 @@ tests/playwright/reports/
 playwright-report/
 eslint_report.json
 stats.html
+.env.local

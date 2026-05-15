@@ -10,6 +10,7 @@ import * as scriptsThunks from "./scriptsThunks"
 import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as user from "../user/userState"
+import { loadAndOpenImport } from "../app/ImportModal"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { ScriptDropdownMenu } from "./ScriptsMenus"
@@ -373,12 +374,37 @@ const RegularScriptCollection = () => {
     const entities = useSelector(scripts.selectFilteredActiveScripts)
     const scriptIDs = useSelector(scripts.selectFilteredActiveScriptIDs)
     const numScripts = useSelector(scripts.selectActiveScriptIDs).length
+    const numDeleted = useSelector(scripts.selectDeletedScriptIDs).length
+    const loggedIn = useSelector(user.selectLoggedIn)
     const { t } = useTranslation()
     const numFilteredScripts = scriptIDs.length
     const filtered = numFilteredScripts !== numScripts
     const type: ScriptType = "regular"
     const title = `${t("scriptBrowser.myScripts").toLocaleUpperCase()} (${filtered ? numFilteredScripts + "/" : ""}${numScripts})`
     const initExpanded = !useSelector(scripts.selectFeatureSharedScript)
+    if (ES_WEB_STATIC && !loggedIn && numScripts === 0 && numDeleted === 0) {
+        return (
+            <div className="text-center p-6 text-gray-500 dark:text-gray-400">
+                <p>{t("scriptBrowser.noScripts")}</p>
+                <label className="inline-block mt-3 py-1 px-3 text-sm bg-sky-700 text-white rounded cursor-pointer hover:bg-sky-800">
+                    {t("backup.loadBackup")}
+                    <input
+                        type="file"
+                        accept=".earsketch"
+                        className="hidden"
+                        onChange={e => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                                loadAndOpenImport(file)
+                                e.target.value = ""
+                            }
+                        }}
+                    />
+                </label>
+            </div>
+        )
+    }
+
     const props = { title, entities, scriptIDs, type, initExpanded }
     return <WindowedScriptCollection {...props} />
 }

@@ -32,7 +32,8 @@ import * as scriptsThunks from "../browser/scriptsThunks"
 import * as sounds from "../browser/Sounds"
 import * as soundsState from "../browser/soundsState"
 import * as soundsThunks from "../browser/soundsThunks"
-import { SoundUploader } from "./SoundUploader"
+import { SoundUploader, LOCAL_SOUND_PREFIX } from "./SoundUploader"
+import * as localSoundStorage from "../audio/localSoundStorage"
 import store, { persistor } from "../reducers"
 import * as tabs from "../ide/tabState"
 import * as tabThunks from "../ide/tabThunks"
@@ -46,6 +47,9 @@ import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
+import { BackupBanner } from "./BackupBanner"
+import { loadAndOpenImport } from "./ImportModal"
+import * as backup from "./backup"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -69,11 +73,13 @@ function renameSound(sound: SoundEntity) {
 
 async function deleteSound(sound: SoundEntity) {
     if (await confirm({ textKey: "messages:confirm.deleteSound", textReplacements: { soundName: sound.name }, okKey: "script.delete", type: "danger" })) {
-        try {
-            await request.postAuth("/audio/delete", { name: sound.name })
-            esconsole("Deleted sound: " + sound.name, ["debug", "user"])
-        } catch (err) {
-            esconsole(err, ["error", "userproject"])
+        if (user.selectLoggedIn(store.getState())) {
+            try {
+                await request.postAuth("/audio/delete", { name: sound.name })
+                esconsole("Deleted sound: " + sound.name, ["debug", "user"])
+            } catch (err) {
+                esconsole(err, ["error", "userproject"])
+            }
         }
         store.dispatch(soundsThunks.deleteLocalUserSound(sound.name))
         audioLibrary.clearCache() // TODO: This is probably overkill.
@@ -81,11 +87,7 @@ async function deleteSound(sound: SoundEntity) {
 }
 
 function openUploadWindow() {
-    if (user.selectLoggedIn(store.getState())) {
-        openModal(SoundUploader)
-    } else {
-        userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
-    }
+    openModal(SoundUploader)
 }
 
 sounds.callbacks.rename = renameSound
@@ -95,11 +97,11 @@ sounds.callbacks.upload = openUploadWindow
 function loadLocalScripts() {
     // Migration code: if any anonymous users have saved scripts from before PR #198, bring them in to Redux state.
     const LS_SCRIPTS_KEY = "scripts_v1"
-    const scriptData = window.localStorage.getItem(LS_SCRIPTS_KEY)
+    const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
     if (scriptData !== null) {
         const scripts = JSON.parse(scriptData) as { [key: string]: Script }
         store.dispatch(scriptsState.setRegularScripts(Object.assign({}, scriptsState.selectRegularScripts(store.getState()), scripts)))
-        window.localStorage.removeItem(LS_SCRIPTS_KEY)
+        localStorage.removeItem(LS_SCRIPTS_KEY)
     }
 
     // Back up active tab. (See comment below re. setActiveTabAndEditor.)
@@ -153,43 +155,112 @@ async function postLogin(username: string) {
     const saved = scriptsState.selectRegularScripts(state)
     const openTabs = tabs.selectOpenTabs(state)
 
-    // Fetch the user's scripts now that they're logged in.
-    // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
+    const localSounds = await localSoundStorage.getAllSounds()
+    const userPrefix = username.toUpperCase() + "_"
+    const soundRenameMap: { [oldName: string]: string } = {}
+    for (const sound of localSounds) {
+        if (sound.name.startsWith(LOCAL_SOUND_PREFIX)) {
+            const suffix = sound.name.slice(LOCAL_SOUND_PREFIX.length)
+            soundRenameMap[sound.name] = userPrefix + suffix
+        }
+    }
+
+    // refreshScriptBrowser must run before migration: anonymous scripts may collide with server-side names.
+    // It clears regularScripts from Redux; the `saved` snapshot above lets failed migrations be restored.
     await refreshScriptBrowser()
 
-    const promises = []
+    const serverScripts = scriptsState.selectRegularScripts(store.getState())
+    const serverByName = new Map(Object.values(serverScripts).filter(s => !s.soft_delete).map(s => [s.name, s]))
+
+    const tasksToMigrate: { script: Script; reopen: boolean; promise: Promise<Script> }[] = []
+    const skippedReopens: string[] = []
     for (const script of Object.values(saved)) {
-        if (script.soft_delete) {
-            // Don't migrate scripts the user deleted while logged out.
-            continue
+        if (script.soft_delete) continue
+        let source = script.source_code
+        for (const [oldName, newName] of Object.entries(soundRenameMap)) {
+            // Sound names are [A-Z0-9_], so they don't need regex escaping.
+            // TODO: switch to replaceAll() once TS target includes ES2021.
+            source = source.replace(new RegExp(oldName, "g"), newName)
         }
-        let promise
-        if (script.original_id !== undefined) {
-            promise = scriptsThunks.importSharedScript(script.original_id)
-        } else {
-            promise = store.dispatch(scriptsThunks.saveScript({
+        const reopen = openTabs.includes(script.shareid)
+        // Shared-script imports go through importSharedScript and are deduped by the server,
+        // so identical-content skip only applies to original (non-shared) scripts.
+        if (script.original_id === undefined) {
+            const existing = serverByName.get(script.name)
+            if (existing && existing.source_code === source) {
+                if (reopen) skippedReopens.push(existing.shareid)
+                continue
+            }
+        }
+        const promise = script.original_id !== undefined
+            ? scriptsThunks.importSharedScript(script.original_id)
+            : store.dispatch(scriptsThunks.saveScript({
                 name: script.name,
-                source: script.source_code,
+                source,
                 overwrite: false,
                 ...(script.creator === "earsketch" && { creator: "earsketch" }),
             })).unwrap()
-        }
-        const reopen = openTabs.includes(script.shareid)
-        promise = promise.then(script => ({ script, reopen }))
-        promises.push(promise)
+        tasksToMigrate.push({ script, reopen, promise })
     }
 
-    if (promises.length > 0) {
+    if (tasksToMigrate.length > 0 || skippedReopens.length > 0) {
         store.dispatch(tabThunks.resetTabs())
 
-        const results = await Promise.all(promises)
-        // Re-open scripts that were opened before login (which now have new IDs).
-        // TODO: Ideally, we would preserve the order of the open tabs.
-        for (const { script, reopen } of results) {
-            if (reopen) {
-                store.dispatch(tabThunks.setActiveTabAndEditor(script.shareid))
+        const results = await Promise.allSettled(tasksToMigrate.map(t => t.promise))
+        const failed: { [shareid: string]: Script } = {}
+        for (let i = 0; i < results.length; i++) {
+            const result = results[i]
+            const task = tasksToMigrate[i]
+            if (result.status === "fulfilled") {
+                // Re-open scripts that were opened before login (which now have new IDs).
+                // TODO: Ideally, we would preserve the order of the open tabs.
+                if (task.reopen) {
+                    store.dispatch(tabThunks.setActiveTabAndEditor(result.value.shareid))
+                }
+            } else {
+                failed[task.script.shareid] = task.script
+                esconsole(`Failed to migrate script ${task.script.name}: ${result.reason}`, ["error", "user"])
             }
         }
+        for (const shareid of skippedReopens) {
+            store.dispatch(tabThunks.setActiveTabAndEditor(shareid))
+        }
+        if (Object.keys(failed).length > 0) {
+            const current = scriptsState.selectRegularScripts(store.getState())
+            store.dispatch(scriptsState.setRegularScripts({ ...current, ...failed }))
+            userNotification.show(i18n.t("backup.scriptMigrationFailed", { count: Object.keys(failed).length }), "failure1")
+        }
+    }
+
+    const uploadResults = await Promise.allSettled(localSounds.map(async sound => {
+        const suffix = sound.name.startsWith(LOCAL_SOUND_PREFIX) ? sound.name.slice(LOCAL_SOUND_PREFIX.length) : sound.name
+        await request.postForm("/audio/upload", {
+            file: new Blob([sound.audioData]),
+            name: suffix,
+            filename: `${suffix}.flac`,
+            tempo: String(sound.metadata.tempo ?? -1),
+        })
+        return sound.name
+    }))
+    const uploadedSoundNames: string[] = []
+    let soundUploadFailures = 0
+    for (let i = 0; i < uploadResults.length; i++) {
+        const result = uploadResults[i]
+        if (result.status === "fulfilled") {
+            uploadedSoundNames.push(result.value)
+        } else {
+            esconsole("Failed to upload local sound " + localSounds[i].name + ": " + result.reason, ["error", "user"])
+            soundUploadFailures++
+        }
+    }
+    // Failed uploads stay in IndexedDB so the user doesn't lose them.
+    await Promise.all(uploadedSoundNames.map(name => localSoundStorage.deleteSound(name)))
+    if (uploadedSoundNames.length > 0) {
+        audioLibrary.clearCache()
+        store.dispatch(soundsThunks.getUserSounds(username))
+    }
+    if (soundUploadFailures > 0) {
+        userNotification.show(i18n.t("backup.soundMigrationFailed", { count: soundUploadFailures }), "failure1")
     }
 
     const shareID = ESUtils.getURLParameter("sharing")
@@ -392,9 +463,21 @@ const SwitchThemeButton = () => {
 const MiscActionMenu = () => {
     const { t } = useTranslation()
 
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const triggerImport = () => fileInputRef.current?.click()
+    const handleExport = async () => {
+        try {
+            await backup.exportBackup()
+        } catch (err: any) {
+            userNotification.show(err.message ?? "Failed to save backup", "failure1")
+        }
+    }
+
     const actions = [
         { nameKey: "startQuickTour", action: resumeQuickTour },
-        { nameKey: "reportError", action: reportError },
+        ...(ES_WEB_STATIC ? [] : [{ nameKey: "reportError", action: reportError }]),
+        { nameKey: "backup.saveButton", action: handleExport },
+        { nameKey: "backup.loadBackup", action: triggerImport },
     ]
 
     const links = [
@@ -403,35 +486,50 @@ const MiscActionMenu = () => {
         { nameKey: "footer.help", linkUrl: "https://earsketch.gatech.edu/landing/#/contact" },
     ]
 
-    return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
-            <div className="flex flex-row items-center">
-                <div><i className="icon icon-info" /></div>
-                <div className="ml-1"><span className="caret" /></div>
-            </div>
-        </Menu.Button>
-        <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-            {actions.map(({ nameKey, action }) =>
-                <Menu.Item key={nameKey}>
-                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>
-                        {t(nameKey)}
-                    </button>}
-                </Menu.Item>)}
-            {links.map(({ nameKey, linkUrl }) =>
-                <Menu.Item key={nameKey}>
-                    {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} href={linkUrl} target="_blank" rel="noreferrer">
-                        {t(nameKey)} <span className="icon icon-new-tab ml-1"></span>
-                    </a>}
-                </Menu.Item>)}
-            <Menu.Item>
-                <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200">
-                    <a className="text-gray-700" href="https://earsketch.gatech.edu/landing/#/releases" target="_blank" rel="noreferrer">
-                        V{`${BUILD_NUM}`.split("-")[0]}
-                    </a>
+    return <>
+        <input
+            ref={fileInputRef}
+            type="file"
+            accept=".earsketch"
+            className="hidden"
+            onChange={e => {
+                const file = e.target.files?.[0]
+                if (file) {
+                    loadAndOpenImport(file)
+                    e.target.value = ""
+                }
+            }}
+        />
+        <Menu as="div" className="relative inline-block text-left mx-3">
+            <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
+                <div className="flex flex-row items-center">
+                    <div><i className="icon icon-info" /></div>
+                    <div className="ml-1"><span className="caret" /></div>
                 </div>
-            </Menu.Item>
-        </Menu.Items>
-    </Menu>
+            </Menu.Button>
+            <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                {actions.map(({ nameKey, action }) =>
+                    <Menu.Item key={nameKey}>
+                        {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>
+                            {t(nameKey)}
+                        </button>}
+                    </Menu.Item>)}
+                {links.map(({ nameKey, linkUrl }) =>
+                    <Menu.Item key={nameKey}>
+                        {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} href={linkUrl} target="_blank" rel="noreferrer">
+                            {t(nameKey)} <span className="icon icon-new-tab ml-1"></span>
+                        </a>}
+                    </Menu.Item>)}
+                <Menu.Item>
+                    <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200">
+                        <a className="text-gray-700" href="https://earsketch.gatech.edu/landing/#/releases" target="_blank" rel="noreferrer">
+                            V{`${BUILD_NUM}`.split("-")[0]}
+                        </a>
+                    </div>
+                </Menu.Item>
+            </Menu.Items>
+        </Menu>
+    </>
 }
 
 type LoginState = "logged-out" | "logging-in" | "logged-in"
@@ -519,7 +617,7 @@ let email = ""
 
 // Defunct localStorage key that contained username and password
 const USER_STATE_KEY = "userstate"
-const userstate = window.localStorage.getItem(USER_STATE_KEY)
+const userstate = localStorage.getItem(USER_STATE_KEY)
 const savedLoginInfo = userstate === null ? undefined : JSON.parse(userstate)
 
 export const App = () => {
@@ -556,23 +654,28 @@ export const App = () => {
         (async () => {
             document.getElementById("loading-screen")!.style.display = "none"
 
+            // Load local sounds for logged-out users before login attempt.
+            await store.dispatch(soundsThunks.getLocalUserSounds())
+
             // Attempt to load userdata from a previous session.
-            if (savedLoginInfo) {
-                await login({ username, password }).then(() => {
-                    // Remove defunct localStorage key
-                    window.localStorage.removeItem(USER_STATE_KEY)
-                }).catch((error: Error) => {
-                    if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
-                        window.localStorage.clear()
-                        window.location.reload()
-                        esconsole(error, ["error"])
-                        reporter.exception("Auto-login failed. Clearing localStorage.")
+            if (!ES_WEB_STATIC) {
+                if (savedLoginInfo) {
+                    await login({ username, password }).then(() => {
+                        // Remove defunct localStorage key
+                        localStorage.removeItem(USER_STATE_KEY)
+                    }).catch((error: Error) => {
+                        if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
+                            localStorage.clear()
+                            window.location.reload()
+                            esconsole(error, ["error"])
+                            reporter.exception("Auto-login failed. Clearing localStorage.")
+                        }
+                    })
+                } else {
+                    const token = user.selectToken(store.getState())
+                    if (token !== null) {
+                        await login({ token })
                     }
-                })
-            } else {
-                const token = user.selectToken(store.getState())
-                if (token !== null) {
-                    await login({ token })
                 }
             }
 
@@ -592,6 +695,19 @@ export const App = () => {
                 }
             }
         })()
+
+        const onDragOver = (e: DragEvent) => e.preventDefault()
+        const onDrop = (e: DragEvent) => {
+            e.preventDefault()
+            const file = [...(e.dataTransfer?.files ?? [])].find(f => f.name.endsWith(".earsketch"))
+            if (file) loadAndOpenImport(file)
+        }
+        document.addEventListener("dragover", onDragOver)
+        document.addEventListener("drop", onDrop)
+        return () => {
+            document.removeEventListener("dragover", onDragOver)
+            document.removeEventListener("drop", onDrop)
+        }
     }, [])
 
     useEffect(() => {
@@ -697,7 +813,7 @@ export const App = () => {
             }
         }
 
-        window.localStorage.clear()
+        localStorage.clear()
         if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
@@ -805,8 +921,9 @@ export const App = () => {
                     <FontSizeMenu />
                     <SwitchThemeButton />
                     <MiscActionMenu />
+                    {ES_WEB_STATIC && <BackupBanner />}
                     <NotificationMenu openSharedScript={openSharedScript} />
-                    <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />
+                    {!ES_WEB_STATIC && <LoginMenu {...{ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }} />}
                 </div>
             </header>}
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
@@ -884,6 +1001,13 @@ window.onbeforeunload = () => {
         const promise = scriptsThunks.saveAll()
         if (promise) {
             promise.then(() => userNotification.show(i18n.t("messages:user.allscriptscloud"), "success"))
+            return ""
+        }
+    } else {
+        const hasData = Object.keys(scriptsState.selectActiveScripts(store.getState())).length > 0
+        const syncConnected = store.getState().sync.status === "connected"
+        if (hasData && !syncConnected && !backup.hasExportedThisSession()) {
+            persistor.flush()
             return ""
         }
     }

@@ -106,6 +106,10 @@ These are injected via Vite `define` and declared in `src/types/global.d.ts`. Th
 
 All user-facing text must use `i18next`. In React components, use the `useTranslation` hook and the `t()` function. Keys live in `src/locales/en/common.json` and other locale folders. Placeholders use `{{variableName}}` syntax. See `INTERNATIONALIZATION.md` for full details.
 
+### Sync (logged-out user persistence)
+
+`src/sync/` contains the cloud/folder sync system for logged-out users, auto-pushes scripts and sounds to Google Drive's appDataFolder or a user-picked local directory (File System Access API, Chromium-only). The `SyncBackend` interface (`syncBackend.ts`) is implemented by `driveBackend.ts` and `fsaBackend.ts`. Orchestration lives in `syncEngine.ts` (Redux subscription, debounced per-script writes, merge-on-connect). The sync folder layout is the same as the `.earsketch` ZIP backup format: `manifest.json` + `scripts/{name}` + `sounds/{name}.{ext}`. Pure manifest types/helpers are in `src/app/backupFormat.ts` so they can be imported in tests without dragging in Redux. UI: `SyncUI.tsx` (button) and `SyncInspector.tsx` (file listing modal).
+
 ### CAI (Co-Creative AI)
 
 `src/cai/` contains an experimental AI assistant for research studies. It analyzes user scripts for complexity/creativity, generates dialogue, and handles error help. Controlled by `ES_WEB_SHOW_CAI`. See `src/cai/README.md`.

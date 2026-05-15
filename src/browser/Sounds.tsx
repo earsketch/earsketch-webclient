@@ -13,7 +13,7 @@ import * as editor from "../ide/Editor"
 import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
-import type { SoundEntity } from "common"
+import { SoundType, type SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
@@ -413,15 +413,12 @@ const ShowOnlyFavorites = () => {
 
 const AddSound = () => {
     const { t } = useTranslation()
-    const loggedIn = useSelector(user.selectLoggedIn)
-    const tooltip = `${loggedIn ? t("soundBrowser.button.addSound") : "Log in to add sounds"}`
 
     return (
         <button
-            className={`flex items-center rounded-full px-2 ${loggedIn ? "bg-black text-white cursor-pointer" : "text-gray-200 border-gray-200"}`}
+            className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer"
             onClick={callbacks.upload}
-            disabled={!loggedIn}
-            title={tooltip}
+            title={t("soundBrowser.button.addSound")}
         >
             <i className="icon icon-plus2 text-xs mr-1" />
             <div className="text-sm">
@@ -504,7 +501,7 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                                 <i className="icon icon-paste2" />
                             </button>
                         )}
-                    {(loggedIn && isUserOwned) &&
+                    {isUserOwned &&
                         (
                             <>
                                 <button
@@ -562,7 +559,7 @@ const ClipList = ({ names }: { names: string[] }) => {
                         previewState={previewState}
                         loggedIn={loggedIn}
                         isFavorite={loggedIn && favorites.includes(v)}
-                        isUserOwned={loggedIn && clip.folder === upperUserName}
+                        isUserOwned={loggedIn ? clip.folder === upperUserName : clip.type === SoundType.User}
                         tabsOpen={tabsOpen}
                     />
                 )

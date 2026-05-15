@@ -75,7 +75,7 @@ test.describe("add a sound", () => {
         await page.locator("button", { hasText: "Add sound" }).click()
 
         const fixturePath = path.resolve(__dirname, "..", "fixtures", fileName)
-        await page.locator("input[type='file']").setInputFiles(fixturePath)
+        await page.getByRole("dialog").locator("input[type='file']").setInputFiles(fixturePath)
 
         await expect(page.getByRole("dialog").getByText("Add a New Sound")).toBeVisible()
         await page.locator("#name").fill("_UNIQUE_STRING_GOES_HERE")

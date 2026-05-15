@@ -3,6 +3,7 @@ import ctx from "../audio/context"
 import { SoundEntity, SoundType } from "common"
 import esconsole from "../esconsole"
 import { getAuth } from "../request"
+import * as localSoundStorage from "../audio/localSoundStorage"
 
 const STATIC_AUDIO_URL_DOMAIN = URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
     ? "https://earsketch.gatech.edu/backend-static"
@@ -56,6 +57,19 @@ export async function getSound(name: string): Promise<Sound> {
 
 async function getSoundBuffer(sound: SoundEntity) {
     const name = sound.name
+    // For user sounds, check IndexedDB first (for logged-out users with locally-stored sounds).
+    if (sound.type === SoundType.User) {
+        const local = await localSoundStorage.getAudioData(name)
+        if (local) {
+            esconsole(`Decoding local ${name} buffer`, ["debug", "audiolibrary"])
+            return ctx.decodeAudioData(local.slice(0))
+        }
+    }
+
+    if (ES_WEB_STATIC && sound.type === SoundType.User) {
+        // User sounds without a local copy can't be fetched in static mode.
+        throw new Error(`Sound not available: ${name}`)
+    }
     const url = sound.type === SoundType.User
         ? URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
         : STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
@@ -174,6 +188,10 @@ export async function getMetadata(name: string) {
 }
 
 async function _getMetadata(name: string) {
+    if (ES_WEB_STATIC) {
+        // No backend to look up metadata for unknown sound names.
+        return null
+    }
     const url = URL_DOMAIN + "/audio/metadata?" + new URLSearchParams({ name })
     const response = await fetch(url)
     const text = await response.text()
