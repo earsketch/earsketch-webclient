@@ -446,10 +446,10 @@ const Clip = ({ color, clip, loopFamilyEnd }: { color: daw.Color, clip: types.Cl
     }
     const clipDescription = t("ariaDescriptors:daw.clipDescription", { track: clip.track, start: fullStart, end: fullEnd, type: clipType, filekey: clip.filekey })
 
-//    const announceToLiveRegion = (text: string) => {
-//       const liveRegion = document.getElementById("daw-live-region")
-//        if (liveRegion) liveRegion.textContent = text
-//    }
+    //    const announceToLiveRegion = (text: string) => {
+    //       const liveRegion = document.getElementById("daw-live-region")
+    //        if (liveRegion) liveRegion.textContent = text
+    //    }
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
