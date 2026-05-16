@@ -30,6 +30,7 @@ phases:
     commands:
       - apt-get update -qq
       - apt-get install -qq python3-requests
+      - npm ci
   pre_build:
     commands:
       - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
@@ -48,10 +49,8 @@ phases:
       - du -sh $CODEBUILD_SRC_DIR
       - echo "Entered the build phase..."
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
-      - npm ci
-      - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
-      - npm run test-vitest
-      - npm run test
+      - npm test
+      - npm run test:scripts
       - ES_NEWRELIC_CONFIG=$ES_BUILD_ENVIRONMENT npm run build -- --mode $ES_BUILD_ENVIRONMENT
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
@@ -65,7 +64,7 @@ phases:
     commands:
       - if [ "$ES_BUILD_TYPE" == "review" ] && [ "$CODEBUILD_BUILD_SUCCEEDING" == "1" ]; then python3 "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_RESOLVED_SOURCE_VERSION" "$LOCAL_STAGING_DIR_NAME"; fi
 
-reports: # TODO cypress component test reports?
+reports:
   vitest-reports:
     files:
       - "tests/vitest/reports/*.xml"
@@ -74,7 +73,7 @@ reports: # TODO cypress component test reports?
 artifacts:
   base-directory: $LOCAL_STAGING_DIR_NAME
   files:
-    - '**/*'
+    - "**/*"
   secondary-artifacts:
     artifact_index_html:
       base-directory: $LOCAL_STAGING_DIR_NAME
@@ -85,5 +84,5 @@ artifacts:
     artifact_web_minus_index_html:
       base-directory: $LOCAL_STAGING_CACHED_DIR
       files:
-        - '**/*'
+        - "**/*"
       name: $LOCAL_STAGING_DIR_NAME
