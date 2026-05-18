@@ -469,22 +469,24 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${borderColor}`}>
                 <div className="flex items-center min-w-0">
-                    <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                            <h5 className="scale:text-sm truncate pl-2 cursor-default">{name}</h5>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                            <Tooltip.Content
-                                side="top"
-                                align="start"
-                                sideOffset={4}
-                                style={{ fontSize: `${scaledFontSize}px` }}
-                                className="scale:text-xs z-50 rounded bg-gray-800 px-3 py-2 text-white shadow-lg pointer-events-none"
-                            >
-                                {tooltipContent}
-                            </Tooltip.Content>
-                        </Tooltip.Portal>
-                    </Tooltip.Root>
+                    <Tooltip.Provider delayDuration={600} disableHoverableContent>
+                        <Tooltip.Root>
+                            <Tooltip.Trigger asChild>
+                                <h5 className="scale:text-sm truncate pl-2 cursor-default">{name}</h5>
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                                <Tooltip.Content
+                                    side="top"
+                                    align="start"
+                                    sideOffset={4}
+                                    style={{ fontSize: `${scaledFontSize}px` }}
+                                    className="scale:text-xs z-50 rounded bg-gray-800 px-3 py-2 text-white shadow-lg pointer-events-none"
+                                >
+                                    {tooltipContent}
+                                </Tooltip.Content>
+                            </Tooltip.Portal>
+                        </Tooltip.Root>
+                    </Tooltip.Provider>
                 </div>
                 <div className="pl-2 pr-4">
                     <button

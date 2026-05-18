@@ -42,7 +42,6 @@ import * as user from "../user/userState"
 import type { DAWData } from "common"
 import classNames from "classnames"
 import { cloneDAWDataForComparison, getDAWDataDifferences } from "./dawDataDescriptions"
-import * as Tooltip from "@radix-ui/react-tooltip"
 
 const STATUS_SUCCESSFUL = 1
 const STATUS_UNSUCCESSFUL = 2
@@ -430,9 +429,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
             >
                 <div id="sidebar-container" style={bubbleActive && [5, 6, 7, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     <div className="overflow-hidden" id="sidebar"> {/* re:overflow, split.js width calculation can cause the width to spill over the parent width */}
-                        <Tooltip.Provider delayDuration={600} disableHoverableContent>
-                            <Browser />
-                        </Tooltip.Provider>
+                        <Browser />
                     </div>
                 </div>
 
