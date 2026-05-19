@@ -1,0 +1,16 @@
+[MASTER]
+
+# Use multiple processes to speed up Pylint.
+jobs=0
+
+[MESSAGES CONTROL]
+
+# Ignoring Import Errors is desired as super-linter
+# does not support installing dependencies as it runs
+disable=import-error
+
+[BASIC]
+
+# Don't demand UPPER_CASE for module-level "constants"; they're often just
+# script-scoped locals. Other invalid-name checks remain on.
+const-naming-style=any
