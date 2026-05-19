@@ -84,7 +84,7 @@
     "skulpt": "file:lib/skulpt",
     "tslib": "^2.3.1",
     "ua-parser-js": "^1.0.33",
-    "uuid": "^8.3.2"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.2",
