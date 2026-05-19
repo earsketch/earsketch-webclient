@@ -28,8 +28,6 @@ batch:
 phases:
   install:
     commands:
-      - apt-get update -qq
-      - apt-get install -qq python3-requests
       - npm ci
   pre_build:
     commands:
@@ -62,7 +60,7 @@ phases:
       - find . -type f > MANIFEST
   post_build:
     commands:
-      - if [ "$ES_BUILD_TYPE" == "review" ] && [ "$CODEBUILD_BUILD_SUCCEEDING" == "1" ]; then python3 "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_RESOLVED_SOURCE_VERSION" "$LOCAL_STAGING_DIR_NAME"; fi
+      - if [ "$ES_BUILD_TYPE" == "review" ] && [ "$CODEBUILD_BUILD_SUCCEEDING" == "1" ]; then python3 "$ES_SCRIPT_HOME/github_create_deployment.py" "$CODEBUILD_RESOLVED_SOURCE_VERSION" "$LOCAL_STAGING_DIR_NAME"; fi
 
 reports:
   vitest-reports:
