@@ -781,7 +781,7 @@ const SoundPreview = () => {
         if (!currentName) return
         let cancelled = false
         audioLibrary.getSound(currentName).then((sound) => {
-            if (!cancelled) {
+            if (!cancelled && sound) {
                 setBuffer(sound.buffer)
                 setBufferReady(true)
             }
