@@ -94,11 +94,11 @@ export function play(startMes: number, delay = 0) {
         projectGraph = upcomingProjectGraph
         upcomingProjectGraph = null
         callbacks.onStartedCallback()
-        // if (loop.on) {
-        //     const timeElapsed = context.currentTime - waStartTime
-        //     const loopStart = loop.selection ? loop.start : 1
-        //     play(loopStart, endTime - startTime - timeElapsed)
-        // }
+        if (loop.on) {
+            const timeElapsed = context.currentTime - waStartTime
+            const loopStart = loop.selection ? loop.start : 1
+            play(loopStart, endTime - startTime - timeElapsed)
+        }
     }, delay * 1000)
 
     // schedule to call the onFinished callback
@@ -146,19 +146,19 @@ export function setLoop(loop_: typeof loop) {
     const currentTime = tempoMap.measureToTime(currentMeasure)
 
     if (loop.on) {
-        if (loop.selection) {
-            if (currentMeasure >= loop.start && currentMeasure < loop.end) {
-                if (currentMeasure < loop.end - 1) {
-                    play(Math.ceil(currentMeasure), tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
-                } else {
-                    play(loop.start, tempoMap.measureToTime(loop.end) - currentTime)
-                }
-            } else {
-                play(loop.start, tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
-            }
-        } else {
-            play(1, tempoMap.measureToTime(dawData!.length + 1) - currentTime)
-        }
+        // if (loop.selection) {
+        //     if (currentMeasure >= loop.start && currentMeasure < loop.end) {
+        //         if (currentMeasure < loop.end - 1) {
+        //             play(Math.ceil(currentMeasure), tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
+        //         } else {
+        //             play(loop.start, tempoMap.measureToTime(loop.end) - currentTime)
+        //         }
+        //     } else {
+        //         play(loop.start, tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
+        //     }
+        // } else {
+        //     play(1, tempoMap.measureToTime(dawData!.length + 1) - currentTime)
+        // }
     } else if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (dawData!.length + 1)) {
         window.clearTimeout(timers.playStart)
         window.clearTimeout(timers.playEnd)
