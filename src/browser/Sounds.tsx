@@ -480,7 +480,7 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                                     align="start"
                                     sideOffset={4}
                                     style={{ fontSize: `${scaledFontSize}px` }}
-                                    className="scale:text-xs z-50 rounded bg-gray-800 px-3 py-2 text-white shadow-lg dark:outline dark:outline-1  pointer-events-none"
+                                    className="scale:text-xs z-50 rounded bg-gray-800 px-3 py-2 text-white shadow-lg outline outline-1 outline-gray-400 pointer-events-none"
                                 >
                                     {tooltipContent}
                                 </Tooltip.Content>
