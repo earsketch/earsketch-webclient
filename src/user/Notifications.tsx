@@ -1,14 +1,15 @@
 import React, { useRef, useState } from "react"
-import { Popover } from "@headlessui/react"
 import { useSelector } from "react-redux"
+import { Popover } from "@headlessui/react"
 
-import * as ESUtils from "../esutils"
-import * as userNotification from "./notification"
-import * as user from "./userState"
 import { useTranslation } from "react-i18next"
 import * as appState from "../app/appState"
+import * as ESUtils from "../esutils"
+import { getAuth } from "../request"
 import broadcastIcon from "./broadcast.svg"
+import * as userNotification from "./notification"
 import { useNotificationLongPolling } from "./useNotificationLongPolling"
+import * as user from "./userState"
 
 interface Message {
     text: string
