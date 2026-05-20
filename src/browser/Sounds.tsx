@@ -3,6 +3,8 @@ import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "..
 import { useTranslation } from "react-i18next"
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
 import classNames from "classnames"
+import store from "../reducers"
+import { recommend } from "../app/recommender"
 
 import { addUIClick } from "../cai/dialogue/student"
 import * as sounds from "./soundsState"
@@ -17,6 +19,10 @@ import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
+import { Waveform } from "../app/Recorder"
+import * as audioLibrary from "../app/audiolibrary"
+import { Transition } from "@headlessui/react"
+import { usePopper } from "react-popper"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -431,6 +437,64 @@ const AddSound = () => {
     )
 }
 
+const playCopyEarcon = () => {
+    const ctx = new window.AudioContext()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = "sine"
+    osc.frequency.setValueAtTime(880, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.08)
+    gain.gain.setValueAtTime(0.2, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.15)
+    osc.onended = () => ctx.close()
+}
+
+const useCopyToClipboard = () => {
+    const [copied, setCopied] = useState(false)
+    const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null)
+    const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
+    const { styles, attributes } = usePopper(referenceElement, popperElement, {
+        placement: "top",
+        modifiers: [{ name: "offset", options: { offset: [0, 8] } }],
+    })
+
+    const copy = (text: string) => {
+        window.navigator.clipboard.writeText(text).then(() => {
+            setCopied(true)
+            playCopyEarcon()
+            console.log(`Copied ${text} sound constant to clipboard`)
+            window.setTimeout(() => setCopied(false), 1000)
+        })
+    }
+
+    const popover = (
+        <Transition
+            show={copied}
+            as="div"
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 scale-95 translate-y-1"
+            enterTo="opacity-100 scale-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 scale-100 translate-y-0"
+            leaveTo="opacity-0 scale-95 translate-y-1"
+            className="origin-bottom-left"
+            style={styles.popper}
+            {...attributes.popper}
+            ref={setPopperElement}
+        >
+            <div className="bg-white p-2 rounded-md shadow-md">
+                Copied!
+            </div>
+        </Transition>
+    )
+
+    return { copied, copy, setReferenceElement, popover }
+}
+
 type ClipPreviewState = "play" | "loading" | "stop"
 
 interface ClipProps {
@@ -461,12 +525,26 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
         tooltip = tooltip.concat("\n", t("soundBrowser.clip.tooltip.key"), ": ", clip.keySignature)
     }
 
+    const { copied, copy, setReferenceElement, popover } = useCopyToClipboard()
+
     return (
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${borderColor}`}>
-                <div className="flex items-center min-w-0" title={tooltip}>
-                    <h5 className="text-sm truncate pl-2">{name}</h5>
+                <div className="flex items-center min-w-0">
+                    {popover}
+                    <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+                        {copied ? `Copied ${name} to clipboard` : ""}
+                    </span>
+                    <div
+                        ref={setReferenceElement}
+                        className="flex items-center min-w-0 cursor-pointer"
+                        title={tooltip}
+                        onClick={() => copy(name)}
+                        aria-label={`Copy ${name} to clipboard`}
+                    >
+                        <h5 className="text-sm truncate pl-2">{name}</h5>
+                    </div>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -597,6 +675,8 @@ interface SoundSearchAndFiltersProps {
 }
 
 const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndFiltersProps) => {
+    const [showPreview, setShowPreview] = useState(false)
+    const loggedIn = useSelector(user.selectLoggedIn)
     return (
         <div className="pb-1">
             <div className="pb-1">
@@ -605,8 +685,328 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndF
                     setCurrentFilterTab={setCurrentFilterTab}/>
             </div>
             <div className="flex justify-between px-1.5 py-1 mb-0.5">
-                <ShowOnlyFavorites />
+                {loggedIn && <ShowOnlyFavorites />}
                 <AddSound />
+            </div>
+            <button
+                type="button"
+                onClick={() => setShowPreview(prev => !prev)}
+                aria-expanded={showPreview}
+                aria-controls="sound-preview-panel"
+                title={showPreview ? "Hide preview" : "Show preview"}
+                aria-label={showPreview ? "Hide preview" : "Show preview"}
+                className="flex bg-blue text-white w-full justify-center items-center gap-1 text-sm p-1"
+            >
+                <span>SOUND PREVIEW</span>
+                <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
+            </button>
+            <div
+                id="sound-preview-panel"
+                aria-hidden={!showPreview}
+                style={{ display: showPreview ? undefined : "none" }}
+                className="bg-blue"
+            >
+                <SoundPreview />
+            </div>
+        </div>
+    )
+}
+
+const SoundPreview = () => {
+    const { t } = useTranslation()
+    const dispatch = useDispatch()
+
+    const [recommendationMode, setRecommendationMode] = useState(0)
+
+    // folder-structured filtered data
+    const folders = useSelector(sounds.selectFilteredRegularFolders)
+    const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    const filters = useSelector(sounds.selectFilters)
+
+    // preview state
+    const preview = useSelector(sounds.selectPreview)
+    const previewNodes = useSelector(sounds.selectPreviewNodes)
+
+    const loggedIn = useSelector(user.selectLoggedIn)
+    const favorites = useSelector(sounds.selectFavorites)
+    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+
+    // Build a folder-first queue: [{folder, name}, ...]
+    const [queue, setQueue] = useState<Array<{ folder: string; name: string }>>([])
+
+    useEffect(() => {
+        (async () => {
+            setQueue([])
+            const out: Array<{ folder: string; name: string }> = []
+            if (recommendationMode) {
+                console.log(filters.artists)
+                const recommendations = await recommend([], 1, 1, filters.genres, filters.instruments, [], 100, filters.keys, filters.artists)
+                for (const name of recommendations) out.push({ folder: "", name })
+            } else {
+                for (const folder of folders) {
+                    const names: string[] = namesByFolders?.[folder] ?? []
+                    for (const name of names) out.push({ folder, name })
+                }
+            }
+            setQueue(out)
+        })()
+    }, [folders, namesByFolders, recommendationMode, filters])
+
+    const [index, setIndex] = useState(0)
+
+    // Reset to the first sound whenever filters/search change the queue
+    useEffect(() => {
+        setIndex(0)
+    }, [queue.map((x) => `${x.folder}/${x.name}`).join("|")])
+
+    const current = queue[index] ?? null
+    const currentName = current?.name ?? null
+
+    const isFavorite = useMemo(() => {
+        if (!loggedIn || !currentName) return false
+        return favorites.includes(currentName)
+    }, [loggedIn, favorites, currentName])
+
+    const canPrev = index > 0
+    const canNext = index < queue.length - 1
+
+    const stopIfPlaying = (name: string | null) => {
+        if (!name) return
+        if (preview?.kind === "sound" && preview.name === name) {
+            dispatch(soundsThunks.togglePreview({ name, kind: "sound" })) // OFF
+        }
+    }
+
+    const playNow = (name: string | null) => {
+        if (!name) return
+
+        if (preview?.kind === "sound" && preview.name && preview.name !== name) {
+            dispatch(soundsThunks.togglePreview({ name: preview.name, kind: "sound" })) // OFF old
+        }
+
+        if (!(preview?.kind === "sound" && preview.name === name)) {
+            dispatch(soundsThunks.togglePreview({ name, kind: "sound" })) // ON new
+        }
+    }
+
+    const goTo = (nextIndex: number) => {
+        const next = queue[nextIndex]
+        if (!next) return
+        stopIfPlaying(currentName)
+        setIndex(nextIndex)
+        playNow(next.name)
+    }
+
+    const goPrev = () => canPrev && goTo(index - 1)
+    const goNext = () => canNext && goTo(index + 1)
+
+    // stop reliably on unmount (no stale preview)
+    useEffect(() => {
+        return () => {
+            const state = store.getState()
+            const p = state.sounds?.preview?.value ?? state.sounds?.preview
+            if (p?.kind === "sound" && p.name) {
+                dispatch(soundsThunks.togglePreview({ name: p.name, kind: "sound" }))
+            }
+        }
+    }, [dispatch])
+
+    /**
+     * Keyboard navigation (ONLY when player is focused)
+     */
+    const playerRef = useRef<HTMLDivElement>(null)
+
+    const onPlayerKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const tag = (e.target as HTMLElement)?.tagName
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return
+
+        switch (e.key) {
+            case "j":
+            case "J":
+            case "ArrowLeft":
+                e.preventDefault()
+                goPrev()
+                break
+
+            case "l":
+            case "L":
+            case "ArrowRight":
+                e.preventDefault()
+                goNext()
+                break
+
+            case "k":
+            case "K":
+                e.preventDefault()
+                if (!currentName) return
+                dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
+                break
+        }
+    }
+
+    const focusPlayer = () => {
+        playerRef.current?.focus()
+    }
+    const [buffer, setBuffer] = useState<AudioBuffer | null>(null)
+    const [bufferReady, setBufferReady] = useState(false)
+
+    useEffect(() => {
+        setBufferReady(false)
+        if (!currentName) return
+        let cancelled = false
+        audioLibrary.getSound(currentName).then((sound) => {
+            if (!cancelled && sound) {
+                setBuffer(sound.buffer)
+                setBufferReady(true)
+            }
+        })
+        return () => { cancelled = true }
+    }, [currentName])
+
+    const entities = useSelector(sounds.selectAllEntities)
+    const currentEntity = currentName ? entities[currentName] : null
+    const tooltip = currentEntity
+        ? `${t("soundBrowser.clip.tooltip.file")}: ${currentEntity.name}
+    ${t("soundBrowser.clip.tooltip.folder")}: ${currentEntity.folder}
+    ${t("soundBrowser.clip.tooltip.artist")}: ${currentEntity.artist}
+    ${t("soundBrowser.clip.tooltip.genre")}: ${currentEntity.genre}
+    ${t("soundBrowser.clip.tooltip.instrument")}: ${currentEntity.instrument}
+    ${t("soundBrowser.clip.tooltip.originalTempo")}: ${currentEntity.tempo}
+    ${t("soundBrowser.clip.tooltip.year")}: ${currentEntity.year}${currentEntity.keySignature ? `\n${t("soundBrowser.clip.tooltip.key")}: ${currentEntity.keySignature}` : ""}`
+        : undefined
+
+    const { copied, copy, setReferenceElement, popover } = useCopyToClipboard()
+
+    return (
+        <div className="flex border border-blue mb-2 flex-col items-center justify-center bg-white dark:bg-transparent">
+            <div className="flex justify-center mt-2">
+                {popover}
+                <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+                    {copied ? `Copied ${currentName} to clipboard` : ""}
+                </span>
+                <div
+                    ref={setReferenceElement}
+                    className={`text-sm truncate text-center ${currentName ? "cursor-pointer" : ""}`}
+                    onClick={() => currentName && copy(currentName)}
+                    title={tooltip}
+                >
+                    <h5 className="text-sm">{currentName ?? t("soundBrowser.noSoundsFound")}</h5>
+                </div>
+            </div>
+
+            <div
+                ref={playerRef}
+                tabIndex={0}
+                role="group"
+                aria-label={t("ariaDescriptors:sounds.preview.player")}
+                onKeyDown={onPlayerKeyDown}
+                onMouseDown={focusPlayer}
+                className="w-full max-w-4xl outline-none rounded-2xl focus-visible:ring-2 focus-visible:ring-black"
+            >
+                <div className="flex items-center justify-center px-6">
+                    {bufferReady && buffer
+                        ? <Waveform buffer={buffer} fluid height={40} />
+                        : <div style={{ width: "100%", height: 40 }} className="flex items-center justify-center text-xs text-gray-400">
+                            {currentName ? <i className="animate-spin es-spinner" /> : null}
+                        </div>}
+                </div>
+
+                <div className="flex items-center justify-center gap-8 mt-2">
+                    <button
+                        type="button"
+                        onClick={() => setRecommendationMode(1 - recommendationMode)}
+                        aria-label={recommendationMode ? "Recommendation mode" : "Normal mode"}
+                        title={recommendationMode ? t("ariaDescriptors:sounds.preview.recommendationMode") : t("ariaDescriptors:sounds.preview.normalMode")}
+                        className="sound-btn-ghost"
+                    >
+                        {recommendationMode ? <i className="icon icon-star"></i> : <i className="icon icon-list2"></i>}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={goPrev}
+                        disabled={!canPrev}
+                        aria-label={t("ariaDescriptors:sounds.preview.previousSound")}
+                        title={t("ariaDescriptors:sounds.preview.previousTitle")}
+                        className="sound-btn-ghost"
+                    >
+                        <i className="icon icon-backward2"></i>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (!currentName) return
+                            dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
+                        }}
+                        disabled={!currentName}
+                        aria-label={preview?.kind === "sound" && preview.name === currentName ? t("ariaDescriptors:sounds.preview.stop") : t("ariaDescriptors:sounds.preview.play")}
+                        title={preview?.kind === "sound" && preview.name === currentName ? t("ariaDescriptors:sounds.preview.stop") : t("ariaDescriptors:sounds.preview.play")}
+                        className="sound-btn-main"
+                    >
+                        {preview?.kind === "sound" && preview.name === currentName
+                            ? (
+                                previewNodes
+                                    ? (
+                                        <i className="icon icon-stop2"></i>
+                                    )
+                                    : (
+                                        <div className="animate-spin w-6 h-6 border-2 border-black border-t-transparent rounded-full" />
+                                    )
+                            )
+                            : (
+                                <i className="icon icon-play4"></i>
+                            )}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={goNext}
+                        disabled={!canNext}
+                        aria-label={t("ariaDescriptors:sounds.preview.nextSound")}
+                        title={t("ariaDescriptors:sounds.preview.nextTitle")}
+                        className="sound-btn-ghost"
+                    >
+                        <i className="icon icon-forward3"></i>
+                    </button>
+
+                    {loggedIn && (
+                        <button
+                            className="text-xs px-1.5"
+                            onClick={() => {
+                                if (!currentName) return
+                                dispatch(soundsThunks.markFavorite({ name: currentName, isFavorite }))
+                            }}
+                            title={t("soundBrowser.clip.tooltip.markFavorite")}
+                            aria-label={t("soundBrowser.clip.tooltip.markFavorite")}
+                            disabled={!currentName}
+                        >
+                            {isFavorite
+                                ? (
+                                    <i className="icon icon-star-full2 text-orange-600" />
+                                )
+                                : (
+                                    <i className="icon icon-star-empty3 text-orange-600" />
+                                )}
+                        </button>
+                    )}
+
+                    {tabsOpen && (
+                        <button
+                            className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
+                            onClick={() => {
+                                if (!currentName) return
+                                editor.pasteCode(currentName)
+                                addUIClick("sound copy - " + currentName)
+                            }}
+                            title={t("soundBrowser.clip.tooltip.paste")}
+                            aria-label={t("ariaDescriptors:sounds.paste", { name: currentName })}
+                            disabled={!currentName}
+                        >
+                            <i className="icon icon-paste2" />
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     )
