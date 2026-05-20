@@ -217,7 +217,7 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
 
         // Fetch the latest notifications and immediately update the state
         try {
-            const result = await request.getAuth("/users/notifications")
+            const result = await getAuth("/users/notifications")
             if (result && Array.isArray(result)) {
                 userNotification.loadHistory(result)
             }
