@@ -102,8 +102,8 @@ export const NotificationPopup = () => {
 
 /** Automatically fetch notifications every X minutes when logged in */
 const useNotificationLongPolling = () => {
-    // Polling interval sequence, repeating the final value forever
-    const NOTIFICATION_POLL_INTERVALS_MS = [5, 5, 5, 30, 60].map(minutes => minutes * 60 * 1000)
+    // Polling interval sequence, stopping after the final interval
+    const NOTIFICATION_POLL_INTERVALS_MS = [5, 5, 5, 30, 60, 60].map(min => min * 60 * 1000)
 
     const isLoggedIn = useSelector(user.selectLoggedIn)
 
@@ -140,8 +140,12 @@ const useNotificationLongPolling = () => {
 
         const scheduleNextPoll = () => {
             if (!isPolling || timeoutId != null) return
+            if (intervalIndex >= NOTIFICATION_POLL_INTERVALS_MS.length) {
+                isPolling = false
+                return
+            }
 
-            const interval = NOTIFICATION_POLL_INTERVALS_MS[Math.min(intervalIndex, NOTIFICATION_POLL_INTERVALS_MS.length - 1)]
+            const interval = NOTIFICATION_POLL_INTERVALS_MS[intervalIndex]
             timeoutId = window.setTimeout(async () => {
                 timeoutId = null
                 intervalIndex += 1
