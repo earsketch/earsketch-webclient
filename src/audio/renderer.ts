@@ -41,8 +41,7 @@ export async function renderBuffer(dawData: DAWData) {
     }
 
     out.gain.setValueAtTime(1, duration - fadeOutDuration)
-    out.gain.linearRampToValueAtTime(0.1, duration)
-    out.gain.setValueAtTime(0, duration)
+    out.gain.linearRampToValueAtTime(0, duration)
 
     const buffer = await context.startRendering()
     esconsole("Render to buffer completed.", ["debug", "renderer"])
