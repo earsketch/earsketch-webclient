@@ -1,9 +1,7 @@
-import React, { useRef, useEffect, ChangeEvent, useState, useLayoutEffect, useContext, useMemo } from "react"
+import React, { useRef, useEffect, ChangeEvent, useState, useMemo, useCallback } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
-
-import { VariableSizeList as List } from "react-window"
-import AutoSizer from "react-virtualized-auto-sizer"
+import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
 import classNames from "classnames"
 import store from "../reducers"
 import { recommend } from "../app/recommender"
@@ -21,7 +19,8 @@ import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
-import { AudioWaveform } from "../app/AudioWaveForm"
+import { Waveform } from "../app/Recorder"
+import * as audioLibrary from "../app/audiolibrary"
 import { Transition } from "@headlessui/react"
 import { usePopper } from "react-popper"
 
@@ -496,13 +495,23 @@ const useCopyToClipboard = () => {
     return { copied, copy, setReferenceElement, popover }
 }
 
-const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
+type ClipPreviewState = "play" | "loading" | "stop"
+
+interface ClipProps {
+    clip: SoundEntity
+    bgcolor: string
+    borderColor: string
+    previewState: ClipPreviewState
+    loggedIn: boolean
+    isFavorite: boolean
+    isUserOwned: boolean
+    tabsOpen: boolean
+}
+
+const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, isFavorite, isUserOwned, tabsOpen }: ClipProps) => {
     const dispatch = useDispatch()
-    const preview = useSelector(sounds.selectPreview)
-    const previewNodes = useSelector(sounds.selectPreviewNodes)
-    const name = clip.name
-    const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
+    const name = clip.name
 
     let tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
     ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
@@ -518,16 +527,10 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
 
     const { copied, copy, setReferenceElement, popover } = useCopyToClipboard()
 
-    const loggedIn = useSelector(user.selectLoggedIn)
-    const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(name)
-    const userName = useSelector(user.selectUserName) as string
-    const isUserOwned = loggedIn && clip.folder === userName.toUpperCase()
-    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
-
     return (
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-8 border-blue-300" />
-            <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
+            <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${borderColor}`}>
                 <div className="flex items-center min-w-0">
                     {popover}
                     <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
@@ -546,13 +549,15 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 <div className="pl-2 pr-4">
                     <button
                         className="text-xs pr-1.5"
-                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
+                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewState !== "play" ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
-                        {preview?.kind === "sound" && preview.name === name
-                            ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
-                            : <i className="icon icon-play4" />}
+                        {previewState === "stop"
+                            ? <i className="icon icon-stop2" />
+                            : previewState === "loading"
+                                ? <i className="animate-spin es-spinner" />
+                                : <i className="icon icon-play4" />}
                     </button>
                     {loggedIn &&
                         (
@@ -600,20 +605,46 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             </div>
         </div>
     )
-}
+})
+Clip.displayName = "Clip"
 
 const ClipList = ({ names }: { names: string[] }) => {
     const entities = useSelector(sounds.selectAllEntities)
     const theme = useSelector(appState.selectColorTheme)
+    const preview = useSelector(sounds.selectPreview)
+    const previewNodes = useSelector(sounds.selectPreviewNodes)
+    const loggedIn = useSelector(user.selectLoggedIn)
+    const favorites = useSelector(sounds.selectFavorites)
+    const userName = useSelector(user.selectUserName) as string
+    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+
+    const bgcolor = theme === "light" ? "bg-white" : "bg-gray-900"
+    const borderColor = theme === "light" ? "border-gray-300" : "border-gray-700"
+    const upperUserName = userName?.toUpperCase() ?? ""
 
     return (
-        <div className="flex flex-col mb-4">
-            {names?.map((v: string) =>
-                entities[v] && <Clip
-                    key={v} clip={entities[v]}
-                    bgcolor={theme === "light" ? "bg-white" : "bg-gray-900"}
-                />
-            )}
+        <div className="flex flex-col">
+            {names?.map((v: string) => {
+                if (!entities[v]) return null
+                const clip = entities[v]
+                const isThisClipPlaying = preview?.kind === "sound" && preview.name === v
+                const previewState: ClipPreviewState = isThisClipPlaying
+                    ? (previewNodes ? "stop" : "loading")
+                    : "play"
+                return (
+                    <Clip
+                        key={v}
+                        clip={clip}
+                        bgcolor={bgcolor}
+                        borderColor={borderColor}
+                        previewState={previewState}
+                        loggedIn={loggedIn}
+                        isFavorite={loggedIn && favorites.includes(v)}
+                        isUserOwned={loggedIn && clip.folder === upperUserName}
+                        tabsOpen={tabsOpen}
+                    />
+                )
+            })}
         </div>
     )
 }
@@ -622,7 +653,6 @@ interface FolderProps {
     folder: string,
     names: string[],
     index: number,
-    listRef: React.RefObject<any>
 }
 
 const Folder = ({ folder, names }: FolderProps) => {
@@ -642,56 +672,39 @@ const Folder = ({ folder, names }: FolderProps) => {
 interface SoundSearchAndFiltersProps {
     currentFilterTab: keyof sounds.Filters,
     setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
-    setFilterHeight: React.Dispatch<React.SetStateAction<number>>
 }
 
-const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
-    const filterRef = useRef<HTMLDivElement>(null)
+const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndFiltersProps) => {
     const [showPreview, setShowPreview] = useState(false)
     const loggedIn = useSelector(user.selectLoggedIn)
-    useLayoutEffect(() => {
-        const el = filterRef.current
-        if (!el) return
-        // Seed the initial height immediately.
-        setFilterHeight(el.offsetHeight)
-        // Only call setFilterHeight again when the height actually changes,
-        // so we don't trigger a parent re-render (and steal focus) on every render.
-        const observer = new ResizeObserver(() => {
-            setFilterHeight(el.offsetHeight)
-        })
-        observer.observe(el)
-        return () => observer.disconnect()
-    }, [])
-
     return (
-        <div ref={filterRef} className="pb-1">
+        <div className="pb-1">
             <div className="pb-1">
                 <Filters
                     currentFilterTab={currentFilterTab}
                     setCurrentFilterTab={setCurrentFilterTab}/>
             </div>
             <div className="flex justify-between px-1.5 py-1 mb-0.5">
-                <div className="flex items-center gap-2">
-                    {loggedIn && <ShowOnlyFavorites />}
-                    <button
-                        type="button"
-                        onClick={() => setShowPreview(prev => !prev)}
-                        aria-expanded={showPreview}
-                        aria-controls="sound-preview-panel"
-                        title={showPreview ? "Hide preview" : "Show preview"}
-                        aria-label={showPreview ? "Hide preview" : "Show preview"}
-                        className="flex items-center gap-1 text-sm"
-                    >
-                        <h4 className="text-sm">Sound Preview</h4>
-                        <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
-                    </button>
-                </div>
+                {loggedIn && <ShowOnlyFavorites />}
                 <AddSound />
             </div>
+            <button
+                type="button"
+                onClick={() => setShowPreview(prev => !prev)}
+                aria-expanded={showPreview}
+                aria-controls="sound-preview-panel"
+                title={showPreview ? "Hide preview" : "Show preview"}
+                aria-label={showPreview ? "Hide preview" : "Show preview"}
+                className="flex bg-blue text-white w-full justify-center items-center gap-1 text-sm p-1"
+            >
+                <span>SOUND PREVIEW</span>
+                <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
+            </button>
             <div
                 id="sound-preview-panel"
                 aria-hidden={!showPreview}
                 style={{ display: showPreview ? undefined : "none" }}
+                className="bg-blue"
             >
                 <SoundPreview />
             </div>
@@ -702,7 +715,6 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
 const SoundPreview = () => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
-    const theme = useSelector(appState.selectColorTheme)
 
     const [recommendationMode, setRecommendationMode] = useState(0)
 
@@ -835,6 +847,21 @@ const SoundPreview = () => {
     const focusPlayer = () => {
         playerRef.current?.focus()
     }
+    const [buffer, setBuffer] = useState<AudioBuffer | null>(null)
+    const [bufferReady, setBufferReady] = useState(false)
+
+    useEffect(() => {
+        setBufferReady(false)
+        if (!currentName) return
+        let cancelled = false
+        audioLibrary.getSound(currentName).then((sound) => {
+            if (!cancelled && sound) {
+                setBuffer(sound.buffer)
+                setBufferReady(true)
+            }
+        })
+        return () => { cancelled = true }
+    }, [currentName])
 
     const entities = useSelector(sounds.selectAllEntities)
     const currentEntity = currentName ? entities[currentName] : null
@@ -851,7 +878,7 @@ const SoundPreview = () => {
     const { copied, copy, setReferenceElement, popover } = useCopyToClipboard()
 
     return (
-        <div className="flex border mt-1 mb-2 ml-2 flex-col items-center justify-center">
+        <div className="flex border border-blue mb-2 flex-col items-center justify-center bg-white dark:bg-transparent">
             <div className="flex justify-center mt-2">
                 {popover}
                 <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
@@ -871,13 +898,17 @@ const SoundPreview = () => {
                 ref={playerRef}
                 tabIndex={0}
                 role="group"
-                aria-label="Sound preview player"
+                aria-label={t("ariaDescriptors:sounds.preview.player")}
                 onKeyDown={onPlayerKeyDown}
                 onMouseDown={focusPlayer}
                 className="w-full max-w-4xl outline-none rounded-2xl focus-visible:ring-2 focus-visible:ring-black"
             >
                 <div className="flex items-center justify-center px-6">
-                    <AudioWaveform soundName={currentName} height={30} progress={undefined} isDarkMode={theme === "dark"} />
+                    {bufferReady && buffer
+                        ? <Waveform buffer={buffer} fluid height={40} />
+                        : <div style={{ width: "100%", height: 40 }} className="flex items-center justify-center text-xs text-gray-400">
+                            {currentName ? <i className="animate-spin es-spinner" /> : null}
+                        </div>}
                 </div>
 
                 <div className="flex items-center justify-center gap-8 mt-2">
@@ -885,7 +916,7 @@ const SoundPreview = () => {
                         type="button"
                         onClick={() => setRecommendationMode(1 - recommendationMode)}
                         aria-label={recommendationMode ? "Recommendation mode" : "Normal mode"}
-                        title={recommendationMode ? "Recommendation mode" : "Normal mode"}
+                        title={recommendationMode ? t("ariaDescriptors:sounds.preview.recommendationMode") : t("ariaDescriptors:sounds.preview.normalMode")}
                         className="sound-btn-ghost"
                     >
                         {recommendationMode ? <i className="icon icon-star"></i> : <i className="icon icon-list2"></i>}
@@ -895,8 +926,8 @@ const SoundPreview = () => {
                         type="button"
                         onClick={goPrev}
                         disabled={!canPrev}
-                        aria-label="Previous sound"
-                        title="Previous (Left Arrow)"
+                        aria-label={t("ariaDescriptors:sounds.preview.previousSound")}
+                        title={t("ariaDescriptors:sounds.preview.previousTitle")}
                         className="sound-btn-ghost"
                     >
                         <i className="icon icon-backward2"></i>
@@ -909,8 +940,8 @@ const SoundPreview = () => {
                             dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
                         }}
                         disabled={!currentName}
-                        aria-label={preview?.kind === "sound" && preview.name === currentName ? "Stop" : "Play"}
-                        title={preview?.kind === "sound" && preview.name === currentName ? "Stop" : "Play"}
+                        aria-label={preview?.kind === "sound" && preview.name === currentName ? t("ariaDescriptors:sounds.preview.stop") : t("ariaDescriptors:sounds.preview.play")}
+                        title={preview?.kind === "sound" && preview.name === currentName ? t("ariaDescriptors:sounds.preview.stop") : t("ariaDescriptors:sounds.preview.play")}
                         className="sound-btn-main"
                     >
                         {preview?.kind === "sound" && preview.name === currentName
@@ -932,8 +963,8 @@ const SoundPreview = () => {
                         type="button"
                         onClick={goNext}
                         disabled={!canNext}
-                        aria-label="Next sound"
-                        title="Next (Right Arrow)"
+                        aria-label={t("ariaDescriptors:sounds.preview.nextSound")}
+                        title={t("ariaDescriptors:sounds.preview.nextTitle")}
                         className="sound-btn-ghost"
                     >
                         <i className="icon icon-forward3"></i>
@@ -981,13 +1012,10 @@ const SoundPreview = () => {
     )
 }
 
-// Context to pass SoundFilters props into the stable innerElementType without
-// recreating it (which would cause react-window to remount).
+// Context to pass SoundFilters props into the stable Virtuoso Header component.
 interface SoundFiltersContextValue {
     currentFilterTab: keyof sounds.Filters
     setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
-    setFilterHeight: React.Dispatch<React.SetStateAction<number>>
-    filterHeight: number
 }
 const SoundFiltersContext = React.createContext<SoundFiltersContextValue | null>(null)
 
@@ -997,92 +1025,67 @@ const SoundFiltersContext = React.createContext<SoundFiltersContextValue | null>
 // filterHeight so that react-window's absolute-positioned items are pushed down
 // to start below the filters. SoundFilters is never touched by react-window so
 // focus inside it is completely stable.
-const SoundListInner = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ children, ...rest }, ref) => {
-        const ctx = useContext(SoundFiltersContext)!
-        const { t } = useTranslation()
-        return (
-            <div
-                ref={ref}
-                style={{ ...rest.style, paddingTop: ctx.filterHeight }}
-                {...rest}
-            >
-                <h3 className="sr-only">
-                    {t("soundBrowser.filterHeader")}
-                </h3>
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0 }}>
-                    <SoundFilters
-                        currentFilterTab={ctx.currentFilterTab}
-                        setCurrentFilterTab={ctx.setCurrentFilterTab}
-                        setFilterHeight={ctx.setFilterHeight}
-                    />
-                </div>
-                <h3 className="sr-only">
-                    {t("soundBrowser.soundHeader")}
-                </h3>
-                {children}
-            </div>
-        )
-    }
+const SoundListHeader = ({ currentFilterTab, setCurrentFilterTab, t }: {
+    currentFilterTab: keyof sounds.Filters,
+    setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>,
+    t: (key: string) => string
+}) => (
+    <>
+        <h3 className="sr-only">{t("soundBrowser.filterHeader")}</h3>
+        <SoundFilters
+            currentFilterTab={currentFilterTab}
+            setCurrentFilterTab={setCurrentFilterTab}
+        />
+        <h3 className="sr-only">{t("soundBrowser.soundHeader")}</h3>
+    </>
 )
-SoundListInner.displayName = "SoundListInner"
 
 const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
     title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }) => {
     const { t } = useTranslation()
+    const fontSize = useSelector(appState.selectFontSize)
+    const scalar = fontSize / 14
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
     const searchText = useSelector(sounds.selectSearchText)
     const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
     const clearClassnames = classNames({
-        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
+        "text-sm flex items-center rounded pl-1 pr-1.5 border whitespace-nowrap": true,
         "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
         "text-gray-200 border-gray-200": !clearButtonEnabled,
     })
-    const listRef = useRef<List>(null)
     const scrollToTopRef = useRef<HTMLDivElement>(null)
-    const [filterHeight, setFilterHeight] = useState(0)
 
     const soundListClassnames = "grow"
     const extraFilterControlsClassnames = "sticky top-0 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
     const scrolltoTopClassnames = "absolute bottom-4 right-4 z-10 opacity-0 transform translate-y-full transition-all duration-300 pointer-events-none"
 
-    useEffect(() => {
-        if (listRef?.current) {
-            listRef.current.resetAfterIndex(0)
-        }
-    }, [folders, namesByFolders])
+    const virtuosoRef = useRef<VirtuosoHandle>(null)
 
-    useLayoutEffect(() => {
-        listRef.current?.resetAfterIndex(0)
-    }, [filterHeight])
+    const Header = useMemo(() => {
+        const SoundBrowserHeader = () => (
+            <SoundListHeader
+                currentFilterTab={currentFilterTab}
+                setCurrentFilterTab={setCurrentFilterTab}
+                t={t}
+            />
+        )
+        SoundBrowserHeader.displayName = "SoundBrowserHeader"
+        return SoundBrowserHeader
+    }, [currentFilterTab, setCurrentFilterTab])
 
-    const getItemSize = (index: number) => {
-        const folderHeight = 25
-        const clipHeight = 30
-        if (index === folders.length - 1) {
-            // add extra space for the last folder to scroll above the scroll to top button
-            return folderHeight + (clipHeight * namesByFolders[folders[index]].length) + (clipHeight * 2)
-        } else {
-            return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
-        }
-    }
+    const overscanSize = Math.round(2500 * scalar)
+    const increaseViewportSize = Math.round(3500 * scalar)
 
-    const handleScroll = ({ scrollOffset }: { scrollOffset: number }) => {
-        if (scrollToTopRef.current) {
-            if (scrollOffset > 0) {
-                scrollToTopRef.current.style.opacity = "1"
-                scrollToTopRef.current.style.transform = "translateY(0)"
-                scrollToTopRef.current.style.pointerEvents = "auto"
-            } else {
-                scrollToTopRef.current.style.opacity = "0"
-                scrollToTopRef.current.style.transform = "translateY(100%)"
-                scrollToTopRef.current.style.pointerEvents = "none"
-            }
-        }
-    }
+    const itemContent = useCallback((index: number, folder: string) => (
+        <Folder
+            folder={folder}
+            names={namesByFolders[folder]}
+            index={index}
+        />
+    ), [namesByFolders])
 
     return (
         <div className="flex flex-col grow relative">
@@ -1102,41 +1105,38 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                 </button>
                 <NumberOfSounds/>
             </div>
-
-            <SoundFiltersContext.Provider value={{ currentFilterTab, setCurrentFilterTab, setFilterHeight, filterHeight }}>
+            <SoundFiltersContext.Provider value={{ currentFilterTab, setCurrentFilterTab }}>
                 <div className={soundListClassnames}>
-                    <AutoSizer>
-                        {({ height, width }: { height: number, width: number }) => (
-                            <List
-                                ref={listRef}
-                                innerElementType={SoundListInner}
-                                height={height}
-                                width={width}
-                                itemCount={folders.length}
-                                itemSize={getItemSize}
-                                onScroll={handleScroll}
-                            >
-                                {({ index, style }) => {
-                                    const names = namesByFolders[folders[index]]
-                                    return (
-                                        <div style={{ ...style, top: (style.top as number) + filterHeight }}>
-                                            <Folder
-                                                folder={folders[index]}
-                                                names={names}
-                                                index={index}
-                                                listRef={listRef}
-                                            />
-                                        </div>
-                                    )
-                                }}
-                            </List>
-                        )}
-                    </AutoSizer>
+                    <Virtuoso
+                        ref={virtuosoRef}
+                        overscan={overscanSize}
+                        increaseViewportBy={{ top: increaseViewportSize, bottom: increaseViewportSize }}
+                        data={folders}
+                        onScroll={(e) => {
+                            const scrollOffset = (e.target as HTMLElement).scrollTop
+                            if (scrollToTopRef.current) {
+                                if (scrollOffset > 0) {
+                                    scrollToTopRef.current.style.opacity = "1"
+                                    scrollToTopRef.current.style.transform = "translateY(0)"
+                                    scrollToTopRef.current.style.pointerEvents = "auto"
+                                } else {
+                                    scrollToTopRef.current.style.opacity = "0"
+                                    scrollToTopRef.current.style.transform = "translateY(100%)"
+                                    scrollToTopRef.current.style.pointerEvents = "none"
+                                }
+                            }
+                        }}
+                        components={{
+                            Header,
+                        }}
+                        itemContent={itemContent}
+                    />
                 </div>
             </SoundFiltersContext.Provider>
+
             <div ref={scrollToTopRef} className={scrolltoTopClassnames}>
                 <button className="px-3 py-2 rounded text-white bg-blue text-sm  shadow-lg transition-all duration-200 hover:text-amber hover:shadow-xl"
-                    onClick={() => listRef.current?.scrollToItem(0)} title={t("soundBrowser.button.backToTop")}>
+                    onClick={() => virtuosoRef.current?.scrollToIndex({ index: 0, behavior: "smooth" })} title={t("soundBrowser.button.backToTop")}>
                     <i className="icon icon-arrow-up3"></i>
                 </button>
             </div>

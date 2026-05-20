@@ -1,45 +1,24 @@
+"""Post a Playwright failure-report comment on a pull request."""
+
 import sys
 
-import requests
-from requests.auth import HTTPBasicAuth
+from github_helpers import post
 
-if len(sys.argv) < 6:
+if len(sys.argv) < 4:
     print("Error, not enough arguments given")
     print(
-        "Usage: github_create_release.py <GIT_USER> <GITHUB_TOKEN> <BUILD_NUMBER> <PULL_REQUEST_NUMBER> "
-        "<GIT_COMMIT_SHA> "
+        "Usage: github_add_pr_comment.py <BUILD_NUMBER> "
+        "<PULL_REQUEST_NUMBER> <GIT_COMMIT_SHA>"
     )
-    exit(1)
-github_user = sys.argv[1]
-github_token = sys.argv[2]
-build_number = sys.argv[3]
-pull_request_number = sys.argv[4].replace("pr-", "")
-commit_sha = sys.argv[5]
+    sys.exit(1)
+build_number = sys.argv[1]
+pull_request_number = sys.argv[2].replace("pr-", "")
+commit_sha = sys.argv[3]
 
-url = (
-    "https://api.github.com/repos/GTCMT/earsketch-webclient/issues/"
-    + pull_request_number
+report_url = (
+    "https://earsketch-cicd.s3.us-east-1.amazonaws.com/playwright-reports/"
+    f"playwright-report-build-{build_number}/index.html"
 )
-headers = {"Accept": "application/vnd.github+json"}
-auth = HTTPBasicAuth(github_user, github_token)
+body = f"### Playwright failure report for commit <sub>{commit_sha[:7]}</sub>\r\n{report_url}"
 
-body = (
-    "### Cypress failure report for commit "
-    + "<sub>{}</sub>\r\n".format(commit_sha[:7])
-    + "https://earsketch-cicd.s3.us-east-1.amazonaws.com/cypress-reports/cypress-report-build-"
-    + build_number
-    + "/index.html"
-)
-
-createCommentParams = {
-    "body": body,
-}
-r = requests.post(
-    url + "/comments", headers=headers, auth=auth, json=createCommentParams
-)
-new_comment = r.json()
-try:
-    r.raise_for_status()
-except requests.exceptions.HTTPError:
-    print("Create Release HTTP Error Exception message: " + new_comment["message"])
-    sys.exit()
+post(f"issues/{pull_request_number}/comments", {"body": body})
