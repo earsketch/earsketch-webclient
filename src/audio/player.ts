@@ -159,7 +159,7 @@ export function setLoop(loop_: typeof loop) {
         } else {
             play(1, tempoMap.measureToTime(dawData!.length + 1) - currentTime)
         }
-    } else if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (dawData!.length + 1)) {
+    } else if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= Math.ceil((dawData!.length + 1))) {
         window.clearTimeout(timers.playStart)
         window.clearTimeout(timers.playEnd)
         // User switched off loop while playing.
