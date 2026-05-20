@@ -11,8 +11,6 @@ env:
 phases:
   install:
     commands:
-      - apt-get update -qq
-      - apt-get install -qq python3-requests
       - npm ci
   pre_build:
     commands:
@@ -26,7 +24,7 @@ phases:
       - kill $(cat pidfile)
   post_build:
     commands:
-      - if [ "$CODEBUILD_BUILD_SUCCEEDING" == "0" ]; then python3 "$ES_SCRIPT_HOME/github_add_pr_comment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_BUILD_NUMBER" "$LOCAL_STAGING_DIR_NAME" "$CODEBUILD_RESOLVED_SOURCE_VERSION"; fi
+      - if [ "$CODEBUILD_BUILD_SUCCEEDING" == "0" ]; then python3 "$ES_SCRIPT_HOME/github_add_pr_comment.py" "$CODEBUILD_BUILD_NUMBER" "$LOCAL_STAGING_DIR_NAME" "$CODEBUILD_RESOLVED_SOURCE_VERSION"; fi
 
 reports:
   playwright-reports:
