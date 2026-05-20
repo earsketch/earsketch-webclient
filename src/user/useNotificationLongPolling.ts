@@ -84,7 +84,7 @@ export const useNotificationLongPolling = () => {
             }
         }
 
-        // start based on initial visibility
+        // Start based on initial visibility
         onVisibilityChange()
 
         document.addEventListener("visibilitychange", onVisibilityChange)
