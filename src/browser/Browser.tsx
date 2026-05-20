@@ -3,6 +3,7 @@ import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "..
 import { useTranslation } from "react-i18next"
 
 import * as layout from "../ide/layoutState"
+import * as appState from "../app/appState"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { SoundBrowser } from "./Sounds"
@@ -23,7 +24,7 @@ export const TitleBar = () => {
             className="flex items-center p-2"
             style={{ minHeight: "fit-content" }} // Safari-specific issue
         >
-            <div className="pl-2 pr-4 font-semibold truncate">
+            <div className="text-base pl-2 pr-4 font-semibold truncate">
                 <h2>{t("contentManager.title").toLocaleUpperCase()}</h2>
             </div>
             <button
@@ -79,7 +80,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
             aria-selected={isSelected ? "true" : "false"}
             aria-controls={"panel-" + type}
         >
-            <h3 className="text-sm truncate">
+            <h3 className="scale:text-sm truncate">
                 {children}
                 {name}
             </h3>
@@ -125,6 +126,7 @@ const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
 
 export const Browser = () => {
     const open = useSelector((state: RootState) => state.layout.west.open)
+    const scaledFontSize = useSelector(appState.selectScaledFontSize)
     const { t } = useTranslation()
     let kind: BrowserTabType = useSelector(layout.selectWestKind)
 
@@ -135,6 +137,7 @@ export const Browser = () => {
     return (
         <div
             className="flex flex-col h-full w-full text-left font-sans bg-white text-black dark:bg-gray-900 dark:text-white"
+            style={{ fontSize: `${scaledFontSize}px` }}
             id="content-manager">
             {open
                 ? <div className="flex flex-col h-full">

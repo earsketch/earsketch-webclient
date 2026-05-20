@@ -59,7 +59,7 @@ import { downloadScript, shareScript } from "./scriptActions"
     return (await openModal(PromptChoice, { message, choices, allowMultiple: true })) ?? []
 }
 
-const FONT_SIZES = [10, 12, 14, 18, 24, 36]
+const FONT_SIZES = [10, 12, 14, 18, 24, 36, 40]
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
 
