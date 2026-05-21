@@ -50,6 +50,10 @@ function reset() {
     }
 }
 
+function getProjectEndMeasure() {
+    return Math.ceil(dawData!.length + 1)
+}
+
 function clearAllTimers() {
     window.clearTimeout(timers.playStart)
     window.clearTimeout(timers.playEnd)
@@ -57,7 +61,7 @@ function clearAllTimers() {
 
 export function play(startMes: number, delay = 0) {
     const minStartMes = (loop.on && loop.selection) ? loop.start : 1
-    const endMes = (loop.on && loop.selection) ? loop.end : Math.ceil(dawData!.length + 1)
+    const endMes = (loop.on && loop.selection) ? loop.end : getProjectEndMeasure()
     if (startMes < minStartMes || (loop.on && startMes >= endMes)) {
         startMes = minStartMes
     }
@@ -157,9 +161,9 @@ export function setLoop(loop_: typeof loop) {
                 play(loop.start, tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
             }
         } else {
-            play(1, tempoMap.measureToTime(dawData!.length + 1) - currentTime)
+            play(1, tempoMap.measureToTime(getProjectEndMeasure()) - currentTime)
         }
-    } else if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= Math.ceil((dawData!.length + 1))) {
+    } else if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= getProjectEndMeasure()) {
         window.clearTimeout(timers.playStart)
         window.clearTimeout(timers.playEnd)
         // User switched off loop while playing.
