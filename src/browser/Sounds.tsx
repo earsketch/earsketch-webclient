@@ -773,6 +773,10 @@ const SoundPreview = () => {
     const focusPlayer = () => {
         playerRef.current?.focus()
     }
+
+    const copyToClipboard = (value: string) => {
+        window.navigator.clipboard.writeText(value)
+    }
     const [buffer, setBuffer] = useState<AudioBuffer | null>(null)
     const [bufferReady, setBufferReady] = useState(false)
 
@@ -793,6 +797,9 @@ const SoundPreview = () => {
         <div className="flex border border-blue mb-2 flex-col items-center justify-center bg-white dark:bg-transparent">
             <div className="text-sm mt-2 truncate text-center">
                 {currentName ?? t("soundBrowser.noSoundsFound")}
+                {currentName && <button aria-label={t("scriptShare.copyClipboard")} onClick={() => { copyToClipboard(currentName) }} className="text-blue-400 hover:text-blue-600 active:text-blue-950 text-sm p-2" title={t("scriptShare.copyClipboard")}>
+                    <i className="icon icon-copy"></i>
+                </button>}
             </div>
 
             <div
