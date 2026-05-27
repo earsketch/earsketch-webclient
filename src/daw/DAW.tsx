@@ -435,7 +435,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
     const xScale = useSelector(daw.selectXScale)
     const effectHeight = useSelector(daw.selectEffectHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
-    const editorCursorLine = useSelector(selectEditorCursorLine)
+    // const editorCursorLine = useSelector(selectEditorCursorLine)
     const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
@@ -484,9 +484,8 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                         {/* eslint-disable-next-line react/jsx-indent */}
                         <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? formatSourceLines(pointLines) : t("daw.needsSync")}</title>
                     </circle>
-                    {/* TODO: re-enable once accessible styling is decided
-                     {sourceHighlight &&
-                        <circle cx={x(point.measure)} cy={y(point.value)} r={7} fill="none" stroke="rgb(255, 153, 0)" strokeWidth={3} pointerEvents="none" />} */}
+                    {/* TODO: re-enable once accessible styling is decided */}
+                    {/* {sourceHighlight && <circle cx={x(point.measure)} cy={y(point.value)} r={7} fill="none" stroke="rgb(255, 153, 0)" strokeWidth={3} pointerEvents="none" />} */}
                 </React.Fragment>
             })}
         </svg>
