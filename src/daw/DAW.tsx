@@ -17,7 +17,7 @@ import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
-import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
+import { selectEditorCursorLine, selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
 export const callbacks = {
@@ -26,6 +26,10 @@ export const callbacks = {
 
 // Width of track control box
 const X_OFFSET = 110
+
+function formatSourceLines(sourceLines: number[]): string {
+    return sourceLines.length > 1 ? `Lines: ${sourceLines.join(" ← ")}` : `Line: ${sourceLines[0] ?? 0}`
+}
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void }) => {
     const dispatch = useDispatch()
@@ -394,11 +398,14 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const editorCursorLine = useSelector(selectEditorCursorLine)
     const { t } = useTranslation()
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef<HTMLDivElement>(null)
+    const sourceLines = clip.sourceLines
+    const sourceHighlight = scriptMatchesDAW && editorCursorLine != null && sourceLines.includes(editorCursorLine)
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -408,10 +415,11 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     }, [clip, xScale, trackHeight])
 
     return <div
-        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
+        ref={element}
+        className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border${sourceHighlight ? " source-highlight" : ""}`}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
-        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, sourceLines)} onMouseLeave={clearDAWHoverLine}
+        title={scriptMatchesDAW ? formatSourceLines(sourceLines) : t("daw.needsSync")}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
@@ -427,6 +435,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
     const xScale = useSelector(daw.selectXScale)
     const effectHeight = useSelector(daw.selectEffectHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    // const editorCursorLine = useSelector(selectEditorCursorLine)
     const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
@@ -462,17 +471,23 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
         {effect !== "TEMPO" && showName && <div className="clipName">{effect}</div>}
         <svg className="effectSvg">
             <path></path>
-            {envelope.map((point, i) => <React.Fragment key={i}>
-                <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
-                <circle
-                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
-                    onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, point.sourceLine) }}
-                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
-                >
-                    {/* eslint-disable-next-line react/jsx-indent */}
-                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
-                </circle>
-            </React.Fragment>)}
+            {envelope.map((point, i) => {
+                const pointLines = point.sourceLines
+                // const sourceHighlight = scriptMatchesDAW && editorCursorLine != null && pointLines.includes(editorCursorLine)
+                return <React.Fragment key={i}>
+                    <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
+                    <circle
+                        cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
+                        onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
+                        onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
+                    >
+                        {/* eslint-disable-next-line react/jsx-indent */}
+                        <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? formatSourceLines(pointLines) : t("daw.needsSync")}</title>
+                    </circle>
+                    {/* TODO: re-enable once accessible styling is decided */}
+                    {/* {sourceHighlight && <circle cx={x(point.measure)} cy={y(point.value)} r={7} fill="none" stroke="rgb(255, 153, 0)" strokeWidth={3} pointerEvents="none" />} */}
+                </React.Fragment>
+            })}
         </svg>
     </div>
 }
@@ -1031,7 +1046,9 @@ export const DAW = () => {
                     const end = clip.measure + clip.end - clip.start
                     if (start <= position && position <= end) {
                         const color = trackColors[index % trackColors.length]
-                        active.push({ color, lineNumber: clip.sourceLine })
+                        if (clip.sourceLines[0] !== undefined) {
+                            active.push({ color, lineNumber: clip.sourceLines[0] })
+                        }
                     }
                 }
             }
