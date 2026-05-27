@@ -213,6 +213,34 @@ const keyBindings: { key: string, run: () => boolean }[] = []
 let resolveReady: () => void
 let droplet: any
 
+let srLineEl: HTMLElement | null = null
+let lastAnnouncedLine = -1
+
+function announceLineNumber(lineNumber: number) {
+    if (!srLineEl) {
+        srLineEl = document.createElement("div")
+        srLineEl.setAttribute("aria-live", "assertive")
+        srLineEl.setAttribute("aria-atomic", "true")
+        srLineEl.style.cssText = "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)"
+        document.body.appendChild(srLineEl)
+    }
+    srLineEl.textContent = ""
+    window.setTimeout(() => {
+        const line = view.state.doc.line(lineNumber)
+        if (srLineEl) srLineEl.textContent = line.text
+            ? i18n.t("editor.lineAnnouncement", { number: lineNumber, text: line.text })
+            : i18n.t("editor.emptyLineAnnouncement", { number: lineNumber })
+    }, 10)
+}
+
+const lineAnnouncementExtension = EditorView.updateListener.of(update => {
+    if (!update.selectionSet) return
+    const line = update.state.doc.lineAt(update.state.selection.main.head)
+    if (line.number === lastAnnouncedLine) return
+    lastAnnouncedLine = line.number
+    announceLineNumber(line.number)
+})
+
 // External API
 export type EditorSession = EditorState
 
@@ -253,6 +281,7 @@ export function createSession(id: string, language: Language, contents: string) 
                 sessions[id] = update.state
                 if (update.docChanged) onEdit(update)
             }),
+            lineAnnouncementExtension,
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
             EditorView.contentAttributes.of({ "aria-label": i18n.t("editor.title") }),
@@ -297,7 +326,19 @@ export function setReadOnly(value: boolean) {
 }
 
 export function focus() {
+    const { from } = view.state.selection.main
+    const line = view.state.doc.lineAt(from)
+    const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
+    const announcement = line.text
+        ? i18n.t("editor.lineAnnouncement", { number: line.number, text: line.text })
+        : i18n.t("editor.emptyLineAnnouncement", { number: line.number })
+
+    view.contentDOM.setAttribute("aria-label", announcement)
+    view.dispatch({ selection: { anchor: from }, scrollIntoView: true })
     view.focus()
+
+    // eslint-disable-next-line no-restricted-globals
+    setTimeout(() => view.contentDOM.setAttribute("aria-label", originalLabel), 1000)
 }
 
 export function getSelection() {

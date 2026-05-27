@@ -17,10 +17,12 @@ interface SearchBarProps {
     aria?: string
     id?: string
     highlight?: boolean
+    liveMessage?: string
+    firstResultSelector?: string
     dispatchSearch: ChangeEventHandler<HTMLInputElement>
     dispatchReset: MouseEventHandler<HTMLElement>
 }
-export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highlight }: SearchBarProps) => {
+export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria, highlight, liveMessage, firstResultSelector }: SearchBarProps) => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
@@ -28,11 +30,17 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
     return (
         <form
             className={`p-1.5 pb-1 ${(highlight ? "border-yellow-500 border-4" : "")}`}
-            onSubmit={e => e.preventDefault()}
+            onSubmit={e => {
+                e.preventDefault()
+                if (firstResultSelector) {
+                    (document.querySelector(firstResultSelector) as HTMLElement | null)?.focus()
+                }
+            }}
         >
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
                 <input
                     id={id}
+                    aria-label={aria}
                     className="w-full outline-none p-1 bg-transparent font-normal scale:text-sm"
                     type="text"
                     placeholder={t("search")}
@@ -49,6 +57,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
                         />
                     )}
             </label>
+            {liveMessage && <div aria-live="polite" className="sr-only">{liveMessage}</div>}
         </form>
     )
 }
@@ -162,7 +171,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     title={title}
                     onClick={() => setExpanded(v => !v)}
                 >
-                    <h4 className="flex items-center truncate py-1">
+                    <h4 className="flex items-center truncate py-1" tabIndex={-1}>
                         <i className="icon-album pr-1.5" />
                         <div className="truncate">{title}</div>
                     </h4>

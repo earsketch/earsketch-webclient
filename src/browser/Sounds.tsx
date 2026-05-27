@@ -28,10 +28,13 @@ export const callbacks = {
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const searchText = useSelector(sounds.selectSearchText)
+    const count = useSelector(sounds.selectFilteredRegularNames).length
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(sounds.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(sounds.setSearchText(""))
-    const props = { id: "soundSearchBar", searchText, dispatchSearch, dispatchReset }
+    const liveMessage = count > 0 ? t("soundsFoundWithJump", { count }) : t("soundsFound", { count })
+    const props = { id: "soundSearchBar", aria: t("ariaDescriptors:sounds.searchBar"), liveMessage, firstResultSelector: "#panel-0 h5", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -472,7 +475,7 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                     <Tooltip.Provider delayDuration={600} disableHoverableContent>
                         <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                                <h5 className="scale:text-sm truncate pl-2 cursor-default">{name}</h5>
+                                <h5 className="scale:text-sm truncate pl-2 cursor-default" tabIndex={-1}>{name}</h5>
                             </Tooltip.Trigger>
                             <Tooltip.Portal>
                                 <Tooltip.Content

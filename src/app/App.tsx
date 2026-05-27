@@ -46,6 +46,8 @@ import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
+import { BrowserTabType } from "../browser/BrowserTab"
+import * as editor from "../ide/Editor"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -60,6 +62,22 @@ import { downloadScript, shareScript } from "./scriptActions"
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36, 40]
+
+type PanelEntry =
+    | { panel: "west"; kind: BrowserTabType; elementSelector: string }
+    | { panel: "daw"; elementSelector: string }
+    | { panel: "editor" }
+    | { panel: "east"; kind: "CURRICULUM"; elementSelector: string }
+    | { panel: "utility"; elementSelector: string }
+
+const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
+    1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
+    2: { panel: "west", kind: BrowserTabType.Script, elementSelector: "#scriptSearchBar" },
+    3: { panel: "west", kind: BrowserTabType.API, elementSelector: "#apiSearchBar" },
+    4: { panel: "daw", elementSelector: "#daw-play-button button" },
+    5: { panel: "editor" },
+    6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
+}
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
 
@@ -321,6 +339,12 @@ const KeyboardShortcuts = () => {
         </>,
         zoomVertical: [modifier, "Shift", "Wheel"],
         escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
+        jumpToSounds: ["Ctrl", "1"],
+        jumpToScripts: ["Ctrl", "2"],
+        jumpToApi: ["Ctrl", "3"],
+        jumpToDaw: ["Ctrl", "4"],
+        jumpToEditor: ["Ctrl", "5"],
+        jumpToCurriculum: ["Ctrl", "6"],
     }
 
     return <Popover>
@@ -617,6 +641,37 @@ export const App = () => {
             changeLanguage(ENGLISH_LOCALE.localeCode)
         }
     }, [currentLocale])
+
+    useEffect(() => {
+        const focusEl = (selector: string) =>
+            setTimeout(() => (document.querySelector(selector) as HTMLElement | null)?.focus(), 50)
+
+        const navigateTo = (entry: PanelEntry) => {
+            if (entry.panel === "west") {
+                dispatch(layout.setWest({ open: true, kind: entry.kind }))
+            } else if (entry.panel === "east") {
+                dispatch(layout.setEast({ open: true, kind: entry.kind }))
+            }
+            if (entry.panel === "editor") {
+                editor.focus()
+            } else if ("elementSelector" in entry) {
+                focusEl(entry.elementSelector)
+            }
+        }
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+                const entry = PANEL_SHORTCUTS[e.key]
+                if (entry) {
+                    e.preventDefault()
+                    navigateTo(entry)
+                }
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [dispatch])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
         if (loginInProgressRef.current) {
