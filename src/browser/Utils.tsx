@@ -33,7 +33,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
                 <input
                     id={id}
-                    className="w-full outline-none p-1 bg-transparent font-normal text-sm"
+                    className="w-full outline-none p-1 bg-transparent font-normal scale:text-sm"
                     type="text"
                     placeholder={t("search")}
                     value={searchText}
@@ -65,6 +65,7 @@ interface DropdownMultiSelectorProps {
 
 export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const dispatch = useDispatch()
+    const scaledFontSize = useSelector(appState.selectScaledFontSize)
 
     const selectedValues = useAppSelector(
         (state) => state.scripts.filters[category]
@@ -93,17 +94,18 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
         <Listbox value={selectedValues} multiple onChange={handleChange}>
             <div className="relative w-1/3">
                 <ListboxButton
-                    className={`flex justify-between w-full border-b-2 ${margin} border-black dark:border-white`}
+                    className={`flex justify-between w-full scale:text-base border-b-2 ${margin} border-black dark:border-white`}
                     aria-label={aria}
                 >
                     <span className="truncate">
                         {title} {numSelected ? `(${numSelected})` : ""}
                     </span>
-                    <i className="icon icon-arrow-down2 text-xs p-1" />
+                    <i className="icon icon-arrow-down2 scale:text-xs p-1" />
                 </ListboxButton>
 
                 <ListboxOptions
                     anchor="bottom start"
+                    style={{ fontSize: `${scaledFontSize}px` }}
                     className={`z-50 [--anchor-max-height:24rem] [--anchor-gap:4px] overflow-y-auto border pt-1 p-2 focus:outline-none
                       bg-white text-black dark:bg-black dark:text-white border-black`}
                 >
@@ -125,7 +127,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
                             type="button"
                             key={item}
                             value={item}
-                            className="w-full block text-left p-0 m-0 bg-transparent border-0 focus:outline-none"
+                            className="scale:text-sm w-full block text-left p-0 m-0 bg-transparent border-0 focus:outline-none"
                         >
                             {({ active, selected }) => (
                                 <FilterItem
