@@ -71,10 +71,17 @@ async function handleSoundConstantsPython(code: string) {
     }
 }
 
+function _getSourceLines(): number[] {
+    throw new Error("Called getSourceLines() outside of script execution")
+}
 function _getLineNumber(): number {
     throw new Error("Called getLineNumber() outside of script execution")
 }
-export let getLineNumber = _getLineNumber
+// User-meaningful call stack (innermost first). Used for source→DAW highlighting.
+export let getSourceLines: () => number[] = _getSourceLines
+// Current statement line. Used for error attribution; matches getSourceLines()[0] in the
+// normal case but stays defined when the top of stack is not a CallExpression.
+export let getLineNumber: () => number = _getLineNumber
 
 function findFutureImportsPython(code: string) {
     const lines = code.split("\n")
@@ -142,14 +149,18 @@ async function runPython(code: string) {
     esconsole("Running " + lines + " lines of Python", ["debug", "runner"])
 
     esconsole("Running script using Skulpt.", ["debug", "runner"])
-    let lineNumber = 0
-    getLineNumber = () => lineNumber
+    let sourceLines: number[] = []
+    getSourceLines = () => [...sourceLines]
+    getLineNumber = () => sourceLines[0] ?? 0
     const promiseHandler = (susp: any) => {
-        // Follow the suspension chain to the top of the call stack.
+        // Walk the suspension chain (outermost frame to innermost via .child) and
+        // collect user-frame line numbers innermost-first.
+        const lines: number[] = []
         while (susp !== undefined) {
-            lineNumber = susp.$lineno ?? lineNumber
+            if (susp.$lineno != null) lines.unshift(susp.$lineno)
             susp = susp.child
         }
+        sourceLines = lines
         return null // fallback to default behavior
     }
     const yieldHandler = (susp: any) => new Promise((resolve, reject) => {
@@ -178,7 +189,10 @@ async function runPython(code: string) {
             esconsole(err, ["error", "runner"])
             throw err
         }
-    }, { "Sk.yield": yieldHandler, "Sk.promise": promiseHandler }).finally(() => (getLineNumber = _getLineNumber))
+    }, { "Sk.yield": yieldHandler, "Sk.promise": promiseHandler }).finally(() => {
+        getSourceLines = _getSourceLines
+        getLineNumber = _getLineNumber
+    })
 
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
     return Sk.ffi.remapToJs(pythonAPI.dawData)
@@ -239,11 +253,29 @@ async function runJavaScript(code: string) {
     await handleSoundConstantsJavaScript(code, mainInterpreter)
     getLineNumber = () => {
         const stateStack = mainInterpreter.stateStack
-        return stateStack[stateStack.length - 1].node.loc.start.line
+        return stateStack[stateStack.length - 1].node?.loc?.start?.line ?? 0
+    }
+    getSourceLines = () => {
+        const stateStack = mainInterpreter.stateStack
+        // Walk top-of-stack (innermost) downward, keeping one entry per CallExpression
+        // frame (call sites are the user-meaningful frames; block/program nodes are noise).
+        const lines: number[] = []
+        let prevLine: number | undefined
+        for (let i = stateStack.length - 1; i >= 0; i--) {
+            const node = stateStack[i].node
+            if (node?.type !== "CallExpression") continue
+            const line = node.loc?.start?.line
+            if (line != null && line !== prevLine) {
+                lines.push(line)
+                prevLine = line
+            }
+        }
+        return lines
     }
     try {
         return await runJsInterpreter(mainInterpreter)
     } finally {
+        getSourceLines = _getSourceLines
         getLineNumber = _getLineNumber
     }
 }

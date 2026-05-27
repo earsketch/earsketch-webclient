@@ -398,6 +398,10 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
         }
     }, [logs])
 
+    useEffect(() => {
+        dispatch(layout.setWestSizeForFontSize(fontSize))
+    }, [fontSize])
+
     const gutterSize = hideEditor ? 0 : 9
     const isWestOpen = useSelector(layout.isWestOpen)
     const isEastOpen = useSelector(layout.isEastOpen)
@@ -471,7 +475,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                     </div>
 
                     <div ref={consoleContainer} id="console-frame" aria-live="assertive" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
-                        <div className="row">
+                        <div className="w-fit">
                             <div id="console">
                                 {logs.length === 0 && <span>&nbsp;</span> /* hack for screen readers */}
                                 {logs.map((msg: ide.Log, index: number) => {
