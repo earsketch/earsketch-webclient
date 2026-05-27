@@ -473,7 +473,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
             <path></path>
             {envelope.map((point, i) => {
                 const pointLines = point.sourceLines
-                const sourceHighlight = scriptMatchesDAW && editorCursorLine != null && pointLines.includes(editorCursorLine)
+                // const sourceHighlight = scriptMatchesDAW && editorCursorLine != null && pointLines.includes(editorCursorLine)
                 return <React.Fragment key={i}>
                     <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                     <circle
@@ -484,8 +484,8 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                         {/* eslint-disable-next-line react/jsx-indent */}
                         <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? formatSourceLines(pointLines) : t("daw.needsSync")}</title>
                     </circle>
-                    {sourceHighlight &&
-                        <circle cx={x(point.measure)} cy={y(point.value)} r={7} fill="none" stroke="rgb(255, 153, 0)" strokeWidth={3} pointerEvents="none" />}
+                    {/* {sourceHighlight &&
+                        <circle cx={x(point.measure)} cy={y(point.value)} r={7} fill="none" stroke="rgb(255, 153, 0)" strokeWidth={3} pointerEvents="none" />} */}
                 </React.Fragment>
             })}
         </svg>
