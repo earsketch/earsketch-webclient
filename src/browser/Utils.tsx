@@ -38,9 +38,9 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria,
             }}
         >
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
+                {aria && <span className="sr-only">{aria}</span>}
                 <input
                     id={id}
-                    aria-label={aria}
                     className="w-full outline-none p-1 bg-transparent font-normal scale:text-sm"
                     type="text"
                     placeholder={t("search")}
@@ -160,7 +160,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
     const { t } = useTranslation()
 
     return (
-        <Disclosure as="div" defaultOpen={initExpanded} className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className}`}>
+        <Disclosure as="div" defaultOpen={initExpanded} className={`${visible ? "flex" : "hidden"} flex-col justify-start data-[open]:grow ${className}`}>
             {({ open }) => (
                 <>
                     <div className={`flex flex-row grow-0 justify-start ${open ? "grow-0" : ""}`}>
