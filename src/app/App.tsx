@@ -646,8 +646,7 @@ export const App = () => {
 
     useEffect(() => {
         const focusEl = (selector: string) =>
-            // eslint-disable-next-line no-restricted-globals
-            setTimeout(() => (document.querySelector(selector) as HTMLElement | null)?.focus(), 50)
+            window.setTimeout(() => (document.querySelector(selector) as HTMLElement | null)?.focus(), 50)
 
         const navigateTo = (entry: PanelEntry) => {
             if (entry.panel === "west") {

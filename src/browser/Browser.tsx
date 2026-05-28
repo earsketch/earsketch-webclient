@@ -119,9 +119,9 @@ export const Browser = () => {
                         <BrowserTabButton name="API" type={BrowserTabType.API} icon="icon-book" />
                     </TabList>
                     <TabPanels className="flex flex-col grow min-h-0">
-                        <TabPanel unmount={false} id="panel-0" className="flex flex-col grow min-h-0"><SoundBrowser /></TabPanel>
-                        <TabPanel unmount={false} id="panel-1" className="flex flex-col grow min-h-0"><ScriptBrowser /></TabPanel>
-                        <TabPanel unmount={false} id="panel-2" className="flex flex-col grow min-h-0"><APIBrowser /></TabPanel>
+                        <TabPanel unmount={false} id="panel-0" className={`flex flex-col grow min-h-0 ${kind !== BrowserTabType.Sound ? "hidden" : ""}`}><SoundBrowser /></TabPanel>
+                        <TabPanel unmount={false} id="panel-1" className={`flex flex-col grow min-h-0 ${kind !== BrowserTabType.Script ? "hidden" : ""}`}><ScriptBrowser /></TabPanel>
+                        <TabPanel unmount={false} id="panel-2" className={`flex flex-col grow min-h-0 ${kind !== BrowserTabType.API ? "hidden" : ""}`}><APIBrowser /></TabPanel>
                     </TabPanels>
                 </TabGroup>
                 : <Collapsed title={t("contentManager.title").toLocaleUpperCase()} position="west" />}
