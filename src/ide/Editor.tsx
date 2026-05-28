@@ -227,9 +227,11 @@ function announceLineNumber(lineNumber: number) {
     srLineEl.textContent = ""
     window.setTimeout(() => {
         const line = view.state.doc.line(lineNumber)
-        if (srLineEl) srLineEl.textContent = line.text
-            ? i18n.t("editor.lineAnnouncement", { number: lineNumber, text: line.text })
-            : i18n.t("editor.emptyLineAnnouncement", { number: lineNumber })
+        if (srLineEl) {
+            srLineEl.textContent = line.text
+                ? i18n.t("editor.lineAnnouncement", { number: lineNumber, text: line.text })
+                : i18n.t("editor.emptyLineAnnouncement", { number: lineNumber })
+        }
     }, 10)
 }
 

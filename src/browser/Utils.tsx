@@ -1,7 +1,7 @@
-import React, { ChangeEventHandler, MouseEventHandler, useState } from "react"
+import React, { ChangeEventHandler, MouseEventHandler } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react"
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
 
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
@@ -156,36 +156,35 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
 export const Collection = ({ title, visible = true, initExpanded = true, className = "", children }: {
     title: string, visible: boolean, initExpanded: boolean, className?: string, children: React.ReactNode
 }) => {
-    const [expanded, setExpanded] = useState(initExpanded)
     const filteredTitle = title.replace(/\([^)]*\)/g, "")
     const { t } = useTranslation()
 
     return (
-        <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "grow" : "grow-0"}`}>
-            <div className="flex flex-row grow-0 justify-start" tabIndex={-1}>
-                {expanded &&
-                    (<div className="h-auto border-l-4 border-amber" />)}
-                {/* TODO: Should this have an ARIA role such as "treegrid"? */}
-                <div
-                    className="flex grow justify-between items-center py-1 pl-2 text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
-                    title={title}
-                    onClick={() => setExpanded(v => !v)}
-                >
-                    <h4 className="flex items-center truncate py-1" tabIndex={-1}>
-                        <i className="icon-album pr-1.5" />
-                        <div className="truncate">{title}</div>
-                    </h4>
-                    <div className="w-1/12">
-                        {expanded
-                            ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { name: filteredTitle })} aria-expanded={true} aria-label={t("thing.collapse", { name: filteredTitle })}> </button>
-                            : <button className="icon icon-arrow-right2" title={t("thing.expand", { name: filteredTitle })} aria-expanded={false} aria-label={t("thing.expand", { name: filteredTitle })}> </button>}
+        <Disclosure as="div" defaultOpen={initExpanded} className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className}`}>
+            {({ open }) => (
+                <>
+                    <div className={`flex flex-row grow-0 justify-start ${open ? "grow-0" : ""}`}>
+                        {open && <div className="h-auto border-l-4 border-amber" />}
+                        <DisclosureButton
+                            className="flex grow justify-between items-center py-1 pl-2 text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
+                            title={open ? t("thing.collapse", { name: filteredTitle }) : t("thing.expand", { name: filteredTitle })}
+                            aria-label={open ? t("thing.collapse", { name: filteredTitle }) : t("thing.expand", { name: filteredTitle })}
+                        >
+                            <h4 className="flex items-center truncate py-1">
+                                <i className="icon-album pr-1.5" />
+                                <div className="truncate">{title}</div>
+                            </h4>
+                            <div className="w-1/12">
+                                <i className={`icon ${open ? "icon-arrow-down2" : "icon-arrow-right2"}`} />
+                            </div>
+                        </DisclosureButton>
                     </div>
-                </div>
-            </div>
-            <div className="grow">
-                {expanded && children}
-            </div>
-        </div>
+                    <DisclosurePanel className="grow">
+                        {children}
+                    </DisclosurePanel>
+                </>
+            )}
+        </Disclosure>
     )
 }
 

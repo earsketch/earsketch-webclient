@@ -77,6 +77,7 @@ const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
     4: { panel: "daw", elementSelector: "#daw-play-button button" },
     5: { panel: "editor" },
     6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
+    7: { panel: "utility", elementSelector: "#utilityPanelAnchor" },
 }
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
@@ -345,10 +346,11 @@ const KeyboardShortcuts = () => {
         jumpToDaw: ["Ctrl", "4"],
         jumpToEditor: ["Ctrl", "5"],
         jumpToCurriculum: ["Ctrl", "6"],
+        jumpToUtility: ["Ctrl", "7"],
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
+        <Popover.Button id="utilityPanelAnchor" className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
         <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-1/2 w-max">
@@ -644,6 +646,7 @@ export const App = () => {
 
     useEffect(() => {
         const focusEl = (selector: string) =>
+            // eslint-disable-next-line no-restricted-globals
             setTimeout(() => (document.querySelector(selector) as HTMLElement | null)?.focus(), 50)
 
         const navigateTo = (entry: PanelEntry) => {
