@@ -23,7 +23,7 @@ import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorCursorLine, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
@@ -34,8 +34,8 @@ import * as scripts from "../browser/scriptsState"
 
 Object.assign(window, { Sk, ace }) // for droplet
 
-const dawHoverLinesEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
-    map: (val, mapping) => (val ? { color: val.color, pos: mapping.mapPos(val.pos) } : undefined),
+const dawHoverLinesEffect = StateEffect.define<{ color: string, pos: number, primary: boolean }[]>({
+    map: (val, mapping) => val.map(line => ({ color: line.color, pos: mapping.mapPos(line.pos), primary: line.primary })),
 })
 
 const dawPlayingLinesEffect = StateEffect.define<{ color: string, pos: number }[]>({
@@ -45,19 +45,36 @@ const dawPlayingLinesEffect = StateEffect.define<{ color: string, pos: number }[
 type DAWMarkerType = "hover" | "play"
 const MARKER_ICONS = { hover: "icon-arrow-right-thick", play: "icon-play4" }
 
+interface DAWMarkerOptions {
+    type: DAWMarkerType
+    color: string
+    visible?: boolean
+    primary?: boolean
+}
+
 class DAWMarker extends GutterMarker {
-    constructor(readonly type: DAWMarkerType, readonly color: string, readonly visible = true) {
+    readonly type: DAWMarkerType
+    readonly color: string
+    readonly visible: boolean
+    readonly primary: boolean
+
+    constructor({ type, color, visible = true, primary = true }: DAWMarkerOptions) {
         super()
+        this.type = type
+        this.color = color
+        this.visible = visible
+        this.primary = primary
     }
 
     override eq(other: DAWMarker) {
-        return this.type === other.type && this.color === other.color && this.visible === other.visible
+        return this.type === other.type && this.color === other.color && this.visible === other.visible && this.primary === other.primary
     }
 
     override toDOM() {
         const node = document.createElement("i")
         if (!this.visible) return node
         node.classList.add(MARKER_ICONS[this.type], `daw-marker-${this.type}`)
+        if (!this.primary) node.classList.add(`daw-marker-${this.type}-secondary`)
         node.style.color = this.color
         return node
     }
@@ -75,7 +92,7 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
         // - If an item is both currently playing *and* the user is hovering over it,
         //   the "hover" marker takes precedence, and the playing marker is hidden.
         set = set.map(transaction.changes)
-        let dawHoverUpdate = null // `null` indicates no update, `undefined` indicates "update: no hover".
+        let dawHoverUpdate: { color: string, pos: number, primary: boolean }[] | null = null
         let dawPlayingUpdate = null
         // Determine most recent update for hover & playing lines
         for (const e of transaction.effects) {
@@ -85,10 +102,14 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
                 dawPlayingUpdate = e.value
             }
         }
-        if (dawHoverUpdate) {
-            set = set.update({ add: [new DAWMarker("hover", dawHoverUpdate.color).range(dawHoverUpdate.pos)] })
-        } else if (dawHoverUpdate === undefined) {
+        if (dawHoverUpdate !== null) {
             set = set.update({ filter: (_from, _to, m) => m.type !== "hover" })
+            if (dawHoverUpdate.length > 0) {
+                const ranges = [...dawHoverUpdate]
+                    .sort((a, b) => a.pos - b.pos)
+                    .map(h => new DAWMarker({ type: "hover", color: h.color, primary: h.primary }).range(h.pos))
+                set = set.update({ add: ranges })
+            }
         }
         if (dawPlayingUpdate === null && dawHoverUpdate !== null) {
             // Kinda gross: need to recreate play markers in case hover marker has moved.
@@ -101,16 +122,16 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
             }
         }
         if (dawPlayingUpdate !== null) {
-            // Don't show a playback marker on the line where we're already showing a hover marker.
-            let hoverPos: number | null = null
+            // Don't show a playback marker on a line where we're already showing a hover marker.
+            const hoverPositions = new Set<number>()
             for (let iter = set.iter(); iter.value !== null; iter.next()) {
                 if (iter.value.type === "hover") {
-                    hoverPos = iter.from
+                    hoverPositions.add(iter.from)
                 }
             }
             const add = dawPlayingUpdate
                 .sort((a, b) => a.pos - b.pos)
-                .map(line => new DAWMarker("play", line.color, line.pos !== hoverPos).range(line.pos))
+                .map(line => new DAWMarker({ type: "play", color: line.color, visible: !hoverPositions.has(line.pos) }).range(line.pos))
             set = set.update({ filter: (_from, _to, m) => m.type !== "play" }).update({ add })
         }
         return set
@@ -122,7 +143,7 @@ const dawMarkerGutter = [
     gutter({
         class: "daw-markers",
         markers: v => v.state.field(dawMarkerState),
-        initialSpacer: () => new DAWMarker("hover", ""),
+        initialSpacer: () => new DAWMarker({ type: "hover", color: "" }),
     }),
     EditorView.baseTheme({
         ".daw-markers .cm-gutterElement": {
@@ -135,6 +156,9 @@ const dawMarkerGutter = [
             },
             "& .daw-marker-hover": {
                 left: "5px",
+            },
+            "& .daw-marker-hover-secondary": {
+                opacity: "0.45",
             },
             "& .daw-marker-play": {
                 transform: "translateX(8.5px) scale(0.8, 1.2)",
@@ -282,6 +306,9 @@ export function createSession(id: string, language: Language, contents: string) 
             EditorView.updateListener.of(update => {
                 sessions[id] = update.state
                 if (update.docChanged) onEdit(update)
+                if (update.selectionSet || update.docChanged) {
+                    syncCursorLine(update.state)
+                }
             }),
             lineAnnouncementExtension,
             themeConfig.of(getTheme()),
@@ -310,6 +337,8 @@ export function setActiveSession(session: EditorSession) {
         view.setState(session)
         view.dispatch({ effects: themeConfig.reconfigure(getTheme()) })
         changeListeners.forEach(f => f())
+        lastDispatchedCursorLine = null
+        syncCursorLine(view.state)
     }
 }
 
@@ -418,13 +447,17 @@ export function clearErrors() {
     view.dispatch(setDiagnostics(view.state, []))
 }
 
-export function setDAWHoverLine(color: string, lineNumber: number) {
-    const line = view.state.doc.line(lineNumber)
-    view.dispatch({ effects: dawHoverLinesEffect.of({ color, pos: line.from }) })
+export function setDAWHoverLine(color: string, lineNumbers: number[]) {
+    // First entry is the innermost (primary) frame; the rest are outer call-site frames.
+    const payload = lineNumbers.map((lineNumber, i) => {
+        const line = view.state.doc.line(lineNumber)
+        return { color, pos: line.from, primary: i === 0 }
+    })
+    view.dispatch({ effects: dawHoverLinesEffect.of(payload) })
 }
 
 export function clearDAWHoverLine() {
-    view.dispatch({ effects: dawHoverLinesEffect.of(undefined) })
+    view.dispatch({ effects: dawHoverLinesEffect.of([]) })
 }
 
 export function setDAWPlayingLines(playing: { color: string, lineNumber: number }[]) {
@@ -434,6 +467,15 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
             return { color: p.color, pos: line.from }
         })),
     })
+}
+
+let lastDispatchedCursorLine: number | null = null
+
+function syncCursorLine(state: EditorState) {
+    const line = state.doc.lineAt(state.selection.main.head).number
+    if (line === lastDispatchedCursorLine) return
+    lastDispatchedCursorLine = line
+    store.dispatch(setEditorCursorLine(line))
 }
 
 // Callbacks
