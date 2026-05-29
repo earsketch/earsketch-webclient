@@ -76,8 +76,6 @@
     "scriptsFound_plural": "{{count}} scripts found.",
     "soundsFound": "{{count}} sound found.",
     "soundsFound_plural": "{{count}} sounds found.",
-    "soundsFoundWithJump": "{{count}} sound found. Jumped to the first sound.",
-    "soundsFoundWithJump_plural": "{{count}} sounds found. Jumped to the first sound.",
     "script_plural": "Scripts",
     "scriptBrowser.myScripts": "My Scripts",
     "scriptBrowser.sharedScripts": "Shared Scripts",
