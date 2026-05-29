@@ -68,7 +68,7 @@ type PanelEntry =
     | { panel: "daw"; elementSelector: string }
     | { panel: "editor" }
     | { panel: "east"; kind: "CURRICULUM"; elementSelector: string }
-    | { panel: "utility"; elementSelector: string }
+    | { panel: "utilities"; elementSelector: string }
 
 const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
     1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
@@ -77,7 +77,7 @@ const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
     4: { panel: "daw", elementSelector: "#daw-play-button button" },
     5: { panel: "editor" },
     6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
-    7: { panel: "utility", elementSelector: "#utilityPanelAnchor" },
+    7: { panel: "utilities", elementSelector: "#utilityPanelAnchor" },
 }
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
