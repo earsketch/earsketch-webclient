@@ -423,7 +423,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, sourceLines)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? formatSourceLines(sourceLines) : t("daw.needsSync")}
     >
-        <h4 className="sr-only">{t("ariaDescriptors:daw.clip", { filekey: clip.filekey, measure: clip.measure, end: clip.end, sourceLine: clip.sourceLine })}</h4>
+        <h4 className="sr-only">{t("ariaDescriptors:daw.clip", { filekey: clip.filekey, measure: clip.measure, end: clip.end, sourceLine: sourceLines.join(", ") })}</h4>
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
