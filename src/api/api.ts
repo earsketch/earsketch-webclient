@@ -28,6 +28,7 @@ export const API_FUNCTIONS = {
     reverseString: { async: false, mod: false, return: true },
     shuffleList: { async: false, mod: false, return: true },
     shuffleString: { async: false, mod: false, return: true },
+    sliceInto: { async: false, mod: false, return: true },
     // Both return a value and modify DAW data.
     createAudioSlice: { async: false, mod: true, return: true },
     createAudioStretch: { async: false, mod: true, return: true },
@@ -239,6 +240,14 @@ const rawDoc: { [key: string]: Item[] } = {
                 default: "16",
             },
         },
+    },
+    {
+        parameters: {
+            sound: "soundConstant",
+            track: "integer",
+            start: "float",
+            beat: "string",
+        },
     }],
     print: [{
         parameters: {
@@ -364,6 +373,12 @@ const rawDoc: { [key: string]: Item[] } = {
             string: "string",
         },
         returns: "string",
+    }],
+    sliceInto: [{
+        parameters: {
+            nSlices: "integer",
+        },
+        returns: "listArray",
     }],
 }
 

@@ -289,16 +289,28 @@ export function makeBeat(result: DAWData, soundConstant: string | string[], trac
     return result
 }
 
+// Generate n slice-start positions spaced 1/nSlices of a measure apart
+export function sliceInto(_result: DAWData, nSlices: number) {
+    const args = [...arguments].slice(1)
+    esconsole("Calling sliceInto with parameters" + args.join(", "), ["debug", "PT"])
+
+    checkArgCount("sliceInto", args, 1, 1)
+    checkType("nSlices", "number", nSlices)
+    
+    return Array.from({ length: nSlices }, (_, x) => 1 + x / nSlices)
+}
+
 // Make a beat from media clip slices.
-export function makeBeatSlice(result: DAWData, soundConstant: string, track: number, start: number, beat: string, sliceStarts: number[], stepsPerMeasure: number = 16) {
+export function makeBeatSlice(result: DAWData, soundConstant: string, track: number, start: number, beat: string, sliceStarts?: number[], stepsPerMeasure: number = 16) {
     const args = [...arguments].slice(1)
     esconsole("Calling makeBeatSlice with parameters" + args.join(", "), ["debug", "PT"])
 
-    checkArgCount("makeBeatSlice", args, 5, 6)
+    checkArgCount("makeBeatSlice", args, 4, 6)
     checkType("sound", "string", soundConstant)
     checkType("track", "int", track)
     checkType("start", "number", start)
     checkType("beat", "string", beat)
+    if (!sliceStarts) sliceStarts = sliceInto(result, 16)
     checkType("sliceStarts", "array", sliceStarts)
     checkType("stepsPerMeasure", "number", stepsPerMeasure)
 
