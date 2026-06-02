@@ -16,7 +16,7 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
-import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
+import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines, jumpToLine } from "../ide/Editor"
 import { selectEditorCursorLine, selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
@@ -351,7 +351,25 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 </div>}
             </div>
             <div className={trackClasses}>
-                {track.clips.map((clip: types.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
+                {(() => {
+                    // Group clips by primary source line to compute the full family extent for preview playback.
+                    const familyRanges: Record<number, { start: number, end: number }> = {}
+                    for (const c of track.clips) {
+                        const key = c.sourceLines[0]
+                        if (key === undefined) continue
+                        const cStart = c.measure
+                        const cEnd = c.measure + c.end - c.start
+                        if (!familyRanges[key]) {
+                            familyRanges[key] = { start: cStart, end: cEnd }
+                        } else {
+                            familyRanges[key].start = Math.min(familyRanges[key].start, cStart)
+                            familyRanges[key].end = Math.max(familyRanges[key].end, cEnd)
+                        }
+                    }
+                    return track.clips.map((clip: types.Clip, index: number) => (
+                        <Clip key={index} color={color} clip={clip} familyRange={familyRanges[clip.sourceLines[0]]} />
+                    ))
+                })()}
             </div>
         </div>
         {showEffects &&
@@ -394,7 +412,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
+const Clip = ({ color, clip, familyRange }: { color: daw.Color, clip: types.Clip, familyRange?: { start: number, end: number } }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
@@ -403,9 +421,12 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
-    const element = useRef<HTMLDivElement>(null)
+    const element = useRef<HTMLButtonElement>(null)
     const sourceLines = clip.sourceLines
+    const primaryLine = sourceLines[0]
     const sourceHighlight = scriptMatchesDAW && editorCursorLine != null && sourceLines.includes(editorCursorLine)
+    const playStart = familyRange?.start ?? clip.measure
+    const playEnd = familyRange?.end ?? (clip.measure + clip.end - clip.start)
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -414,18 +435,37 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         }
     }, [clip, xScale, trackHeight])
 
-    return <div
+    return <button
         ref={element}
         className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border${sourceHighlight ? " source-highlight" : ""}`}
+        data-source-line={primaryLine}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, sourceLines)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? formatSourceLines(sourceLines) : t("daw.needsSync")}
+        aria-label={t("ariaDescriptors:daw.clip", { track: clip.track, start: playStart, end: playEnd, filekey: clip.filekey, line: primaryLine })}
+        onClick={() => {
+            player.setPreview(clip.track)
+            player.callbacks.onStartedCallback = () => {
+                store.dispatch(daw.setPlaying(true))
+                store.dispatch(daw.setPendingPosition(null))
+            }
+            player.callbacks.onFinishedCallback = () => {
+                store.dispatch(daw.setPlaying(false))
+                _setPlayPosition?.(1)
+            }
+            player.play(playStart, 0, playEnd)
+        }}
+        onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.ctrlKey && e.key === "i") {
+                jumpToLine(primaryLine)
+            }
+        }}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
         </div>
-    </div>
+    </button>
 }
 
 const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName }: {

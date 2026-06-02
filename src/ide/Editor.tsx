@@ -17,7 +17,7 @@ import { gutter, GutterMarker, keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setPreview, previewPlugin, setAppLocale, setShowBeatStringAnnotation } from "./EditorWidgets"
-
+import { playEarcon, SINE_BUMP } from "../audio/earcon"
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
@@ -233,7 +233,16 @@ const pythonAutocomplete: CompletionSource = (context) => autocompleteEnabled ? 
 // Internal state
 let view: EditorView = null as unknown as EditorView
 let sessions: { [key: string]: EditorSession } = {}
-const keyBindings: { key: string, run: () => boolean }[] = []
+const keyBindings: { key: string, run: () => boolean }[] = [
+    {
+        key: "Ctrl-i",
+        run: () => {
+            const currentLine = view.state.doc.lineAt(view.state.selection.main.head)
+            jumpToDAWClip(currentLine.number)
+            return true
+        },
+    },
+]
 let resolveReady: () => void
 let droplet: any
 
@@ -280,6 +289,7 @@ export function createSession(id: string, language: Language, contents: string) 
                     syncCursorLine(update.state)
                 }
             }),
+            lineAnnouncementExtension,
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
             EditorView.contentAttributes.of({ "aria-label": i18n.t("editor.title") }),
@@ -325,8 +335,42 @@ export function setReadOnly(value: boolean) {
     droplet.setReadOnly(value)
 }
 
+let srLineEl: HTMLElement | null = null
+let lastAnnouncedLine = -1
+
+function announceLineNumber(lineNumber: number) {
+    if (!srLineEl) {
+        srLineEl = document.createElement("div")
+        srLineEl.setAttribute("aria-live", "assertive")
+        srLineEl.setAttribute("aria-atomic", "true")
+        srLineEl.style.cssText = "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)"
+        document.body.appendChild(srLineEl)
+    }
+    srLineEl.textContent = ""
+    window.setTimeout(() => {
+        const line = view.state.doc.line(lineNumber)
+        if (srLineEl) {
+            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") })
+        }
+    }, 10)
+}
+
+const lineAnnouncementExtension = EditorView.updateListener.of((update) => {
+    if (!update.selectionSet) return
+    const line = update.state.doc.lineAt(update.state.selection.main.head)
+    if (line.number === lastAnnouncedLine) return
+    lastAnnouncedLine = line.number
+    announceLineNumber(line.number)
+})
+
 export function focus() {
+    const { from } = view.state.selection.main
+    const line = view.state.doc.lineAt(from)
+    const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
+    view.contentDOM.setAttribute("aria-label", i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: line.number, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") }))
+    view.dispatch({ selection: { anchor: from }, scrollIntoView: true })
     view.focus()
+    window.setTimeout(() => view.contentDOM.setAttribute("aria-label", originalLabel), 1000)
 }
 
 export function getSelection() {
@@ -424,6 +468,31 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
             return { color: p.color, pos: line.from }
         })),
     })
+}
+
+export function jumpToLine(lineNumber: number) {
+    const line = view.state.doc.line(lineNumber)
+    const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
+    view.contentDOM.setAttribute("aria-label", i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") }))
+    view.dispatch({ selection: { anchor: line.from }, scrollIntoView: true })
+    view.focus()
+    window.setTimeout(() => view.contentDOM.setAttribute("aria-label", originalLabel), 1000)
+}
+
+function jumpToDAWClip(lineNumber: number) {
+    // Prefer the parent clip (non-loopChild) so fitMedia/insertMedia jumps land on the representative button.
+    const clipButton = (
+        document.querySelector(`button[data-source-line="${lineNumber}"]:not(.loop)`) ??
+        document.querySelector(`button[data-source-line="${lineNumber}"]`)
+    ) as HTMLButtonElement | null
+    if (clipButton) {
+        const originalLabel = clipButton.getAttribute("aria-label") ?? ""
+        clipButton.setAttribute("aria-label", `Focus shifted to DAW, ${originalLabel}`)
+        clipButton.focus()
+        window.setTimeout(() => clipButton.setAttribute("aria-label", originalLabel), 1000)
+    } else {
+        void playEarcon(SINE_BUMP, 0.3)
+    }
 }
 
 let lastDispatchedCursorLine: number | null = null
