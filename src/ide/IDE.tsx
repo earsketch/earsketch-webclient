@@ -277,12 +277,17 @@ curriculum.callbacks.import = importExample
 async function runScript() {
     if (isWaitingForServerResponse) return
 
+    const state = store.getState()
+    if (!appState.selectHideEditor(state) && tabs.selectOpenTabs(state).length === 0) {
+        store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("editor.noScriptsLoaded") }))
+        return
+    }
+
     isWaitingForServerResponse = true
 
     setLoading(true)
 
     const startTime = Date.now()
-    const state = store.getState()
     const hideEditor = appState.selectHideEditor(state)
     const scriptName = (hideEditor ? appState.selectEmbeddedScriptName(state) : tabs.selectActiveTabScript(state)!.name)!
     const language = ESUtils.parseLanguage(scriptName)

@@ -48,6 +48,7 @@ import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
 import { BrowserTabType } from "../browser/BrowserTab"
 import * as editor from "../ide/Editor"
+import * as ide from "../ide/ideState"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -666,6 +667,10 @@ export const App = () => {
                 const entry = PANEL_SHORTCUTS[e.key]
                 if (entry) {
                     e.preventDefault()
+                    if (entry.panel === "editor" && tabs.selectOpenTabs(store.getState()).length === 0) {
+                        store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("editor.noScriptsLoaded") }))
+                        return
+                    }
                     navigateTo(entry)
                 }
             }
