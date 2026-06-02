@@ -195,7 +195,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                             </div>
                         </DisclosureButton>
                     </div>
-                    <DisclosurePanel className="grow">
+                    <DisclosurePanel className="grow min-h-0">
                         {children}
                     </DisclosurePanel>
                 </>

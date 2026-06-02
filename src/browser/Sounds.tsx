@@ -681,7 +681,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     })
     const scrollToTopRef = useRef<HTMLDivElement>(null)
 
-    const soundListClassnames = "grow"
+    const soundListClassnames = "grow min-h-0 overflow-hidden"
     const extraFilterControlsClassnames = "sticky top-0 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
     const scrolltoTopClassnames = "absolute bottom-4 right-4 z-10 opacity-0 transform translate-y-full transition-all duration-300 pointer-events-none"
 
@@ -711,7 +711,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     ), [namesByFolders])
 
     return (
-        <div className="flex flex-col grow relative">
+        <div className="flex flex-col grow min-h-0 relative">
             <SoundSearchBar />
             <div className={extraFilterControlsClassnames}>
                 <button
@@ -799,7 +799,7 @@ const DefaultSoundCollection = () => {
 
 export const SoundBrowser = () => {
     return (
-        <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
+        <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
             <DefaultSoundCollection />
         </div>
     )
