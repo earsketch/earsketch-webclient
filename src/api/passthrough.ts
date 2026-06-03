@@ -296,7 +296,7 @@ export function sliceInto(_result: DAWData, nSlices: number) {
 
     checkArgCount("sliceInto", args, 1, 1)
     checkType("nSlices", "number", nSlices)
-    
+
     return Array.from({ length: nSlices }, (_, x) => 1 + x / nSlices)
 }
 
