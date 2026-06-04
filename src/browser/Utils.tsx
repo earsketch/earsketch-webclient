@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, MouseEventHandler, useState } from "react"
+import React, { ChangeEventHandler, MouseEventHandler } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
@@ -11,6 +11,7 @@ import { TFunction } from "i18next"
 import { useAppSelector } from "../hooks"
 import * as scripts from "./scriptsState"
 import { MultiSelectFilterKey } from "./scriptsState"
+import * as ideConsole from "../ide/console"
 
 interface SearchBarProps {
     searchText: string
@@ -26,30 +27,20 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria,
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
-    const [announcement, setAnnouncement] = useState("")
 
     return (
         <form
             className={`p-1.5 pb-1 ${(highlight ? "border-yellow-500 border-4" : "")}`}
             onSubmit={e => {
                 e.preventDefault()
-                if (liveMessage) {
-                    const firstEl = firstResultSelector
-                        ? document.querySelector(firstResultSelector) as HTMLElement | null
-                        : null
-                    if (firstEl) {
-                        const name = firstEl.textContent?.trim() ?? ""
-                        setAnnouncement(`${liveMessage} ${name}`)
-                        firstEl.focus()
-                    } else {
-                        // No results: polite aria-live won't fire while focus stays on the
-                        // input, so move focus to the announcement div so the screen reader
-                        // reads it directly.
-                        setAnnouncement(liveMessage)
-                        window.setTimeout(() => {
-                            document.getElementById(`${id}-announcement`)?.focus()
-                        }, 0)
-                    }
+                const firstEl = firstResultSelector
+                    ? document.querySelector(firstResultSelector) as HTMLElement | null
+                    : null
+                if (firstEl) {
+                    ideConsole.log(`${liveMessage} "${firstEl.textContent?.trim()}"`)
+                    firstEl.focus()
+                } else if (liveMessage) {
+                    ideConsole.log(liveMessage)
                 }
             }}
         >
@@ -61,7 +52,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria,
                     type="text"
                     placeholder={t("search")}
                     value={searchText}
-                    onChange={e => { setAnnouncement(""); dispatchSearch(e) }}
+                    onChange={e => { dispatchSearch(e) }}
                     onKeyDown={(e) => { student.addUIClick(id + ": " + e.key) }}
                     onFocus={() => { if (highlight) { dispatch(caiState.setHighlight({ zone: null })) } }}
                 />
@@ -69,11 +60,10 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria,
                     (
                         <i
                             className="icon-cross2 pr-1 cursor-pointer"
-                            onClick={(e) => { setAnnouncement(""); dispatchReset(e) }}
+                            onClick={(e) => { dispatchReset(e) }}
                         />
                     )}
             </label>
-            <div id={`${id}-announcement`} tabIndex={-1} aria-live="polite" aria-atomic="true" className="sr-only">{announcement}</div>
         </form>
     )
 }
