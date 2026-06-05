@@ -36,11 +36,11 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria,
                 const firstEl = firstResultSelector
                     ? document.querySelector(firstResultSelector) as HTMLElement | null
                     : null
-                if (firstEl) {
-                    ideConsole.log(`${liveMessage} "${firstEl.textContent?.trim()}"`)
-                    firstEl.focus()
-                } else if (liveMessage) {
+                if (liveMessage) {
                     ideConsole.log(liveMessage)
+                }
+                if (firstEl) {
+                    firstEl.focus()
                 }
             }}
         >
