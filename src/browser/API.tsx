@@ -175,11 +175,14 @@ const EntryList = () => {
 
 const APISearchBar = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const searchText = useSelector(api.selectSearchText)
+    const count = useSelector(api.selectFilteredEntries).length
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(api.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(api.setSearchText(""))
     const caiHighlight = useSelector(cai.selectHighlight)
-    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", highlight: caiHighlight.zone === "apiSearchBar" }
+    const liveMessage = t("searchResults", { count })
+    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", aria: t("ariaDescriptors:api.searchBar"), liveMessage, firstResultSelector: "#panel-2 button", highlight: caiHighlight.zone === "apiSearchBar" }
 
     return <SearchBar {...props} />
 }

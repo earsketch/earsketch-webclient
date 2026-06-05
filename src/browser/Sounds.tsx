@@ -28,10 +28,13 @@ export const callbacks = {
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const searchText = useSelector(sounds.selectSearchText)
+    const count = useSelector(sounds.selectFilteredRegularNames).length
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(sounds.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(sounds.setSearchText(""))
-    const props = { id: "soundSearchBar", searchText, dispatchSearch, dispatchReset }
+    const liveMessage = t("soundsFound", { count })
+    const props = { id: "soundSearchBar", aria: t("ariaDescriptors:sounds.searchBar"), liveMessage, firstResultSelector: "#panel-0 h5", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -472,7 +475,7 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                     <Tooltip.Provider delayDuration={600} disableHoverableContent>
                         <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                                <h5 className="scale:text-sm truncate pl-2 cursor-default">{name}</h5>
+                                <h5 className="scale:text-sm truncate pl-2 cursor-default" tabIndex={-1}>{name}</h5>
                             </Tooltip.Trigger>
                             <Tooltip.Portal>
                                 <Tooltip.Content
@@ -678,7 +681,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     })
     const scrollToTopRef = useRef<HTMLDivElement>(null)
 
-    const soundListClassnames = "grow"
+    const soundListClassnames = "grow min-h-0 overflow-hidden"
     const extraFilterControlsClassnames = "sticky top-0 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
     const scrolltoTopClassnames = "absolute bottom-4 right-4 z-10 opacity-0 transform translate-y-full transition-all duration-300 pointer-events-none"
 
@@ -708,7 +711,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     ), [namesByFolders])
 
     return (
-        <div className="flex flex-col grow relative">
+        <div className="flex flex-col grow min-h-0 relative">
             <SoundSearchBar />
             <div className={extraFilterControlsClassnames}>
                 <button
@@ -796,7 +799,7 @@ const DefaultSoundCollection = () => {
 
 export const SoundBrowser = () => {
     return (
-        <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
+        <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
             <DefaultSoundCollection />
         </div>
     )
