@@ -49,6 +49,8 @@ import { downloadScript, shareScript } from "./scriptActions"
 import { BrowserTabType } from "../browser/BrowserTab"
 import * as editor from "../ide/Editor"
 import * as ide from "../ide/ideState"
+import { ExtensionLoader } from "../extensions/ExtensionLoader"
+import { clearExtension } from "../extensions/extensionState"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -318,6 +320,10 @@ function reportError() {
     openModal(ErrorForm, { email })
 }
 
+function loadExtension() {
+    openModal(ExtensionLoader)
+}
+
 function forgotPass() {
     openModal(ForgotPassword)
 }
@@ -422,6 +428,7 @@ const MiscActionMenu = () => {
     const actions = [
         { nameKey: "startQuickTour", action: resumeQuickTour },
         { nameKey: "reportError", action: reportError },
+        { nameKey: "extensions", action: loadExtension },
     ]
 
     const links = [
@@ -800,6 +807,8 @@ export const App = () => {
         dispatch(soundsState.resetUserSounds())
         dispatch(soundsState.resetFavorites())
         dispatch(soundsState.resetAllFilters())
+        dispatch(clearExtension())
+        dispatch(appState.setEastContent("curriculum"))
 
         // Clear out all the values set at login.
         setUsername("")
@@ -871,7 +880,7 @@ export const App = () => {
                             </i>
                         </button>}
 
-                    {ES_WEB_SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
+                    <LocaleSelector handleSelection={changeLanguage}/>
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />
