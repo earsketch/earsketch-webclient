@@ -11,6 +11,7 @@ export interface ExtensionState {
     description: string
     permissions: string[]
     icon32: string
+    icon128: string
     extensionApiVersion: string
 }
 
@@ -21,6 +22,7 @@ const initialExtensionState: ExtensionState = {
     description: "",
     permissions: [],
     icon32: "",
+    icon128: "",
     extensionApiVersion: "1",
 }
 
@@ -35,6 +37,7 @@ const extensionSlice = createSlice({
             state.description = payload.description
             state.permissions = payload.permissions
             state.icon32 = payload.icon32
+            state.icon128 = payload.icon128
             state.extensionApiVersion = payload.extensionApiVersion
         },
         clearExtension(state) {
@@ -44,6 +47,7 @@ const extensionSlice = createSlice({
             state.description = ""
             state.permissions = []
             state.icon32 = ""
+            state.icon128 = ""
             state.extensionApiVersion = "1"
         },
     },
@@ -64,4 +68,5 @@ export const selectExtensionVersion = (state: RootState) => state.extension.vers
 export const selectExtensionDescription = (state: RootState) => state.extension.description
 export const selectExtensionPermissions = (state: RootState) => state.extension.permissions
 export const selectExtensionIcon32 = (state: RootState) => state.extension.icon32
+export const selectExtensionIcon128 = (state: RootState) => state.extension.icon128
 export const selectExtensionApiVersion = (state: RootState) => state.extension.extensionApiVersion

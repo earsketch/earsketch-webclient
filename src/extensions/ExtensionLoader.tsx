@@ -6,7 +6,7 @@ import parse from "html-react-parser"
 import { setEastContent } from "../app/appState"
 import store from "../reducers"
 import { useAppSelector } from "../hooks"
-import { setExtension, clearExtension, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon32 } from "./extensionState"
+import { setExtension, clearExtension, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon128 } from "./extensionState"
 
 interface ExtensionManifest {
     manifest_version: number
@@ -37,7 +37,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
     const currentExtensionVersion = useAppSelector(selectExtensionVersion)
     const currentExtensionDescription = useAppSelector(selectExtensionDescription)
     const currentExtensionPermissions = useAppSelector(selectExtensionPermissions)
-    const currentExtensionIcon32 = useAppSelector(selectExtensionIcon32)
+    const currentExtensionIcon128 = useAppSelector(selectExtensionIcon128)
 
     const loadExtension = () => {
         if (!manifest?.side_panel?.default_path) {
@@ -48,9 +48,12 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
         // Construct the full extension URL using URL constructor
         const extensionUrl = new URL(manifest.side_panel.default_path, url).href
 
-        // Construct the 32px icon URL if available
+        // Construct icon URLs if available
         const icon32Url = manifest.icons?.["32"]
             ? new URL(manifest.icons["32"], url).href
+            : ""
+        const icon128Url = manifest.icons?.["128"]
+            ? new URL(manifest.icons["128"], url).href
             : ""
 
         // Dispatch all extension metadata to Redux in a single action
@@ -61,6 +64,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
             description: manifest.description,
             permissions: manifest.permissions || [],
             icon32: icon32Url,
+            icon128: icon128Url,
             extensionApiVersion: manifest.extension_api_version ?? "1",
         }))
         store.dispatch(setEastContent("extension"))
@@ -118,12 +122,12 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
                 {currentExtensionUrl && (
                     <div className="mb-4 p-4 border border-gray-300 dark:border-gray-600 rounded-md bg-blue-50 dark:bg-blue-900/20">
                         <div className="flex items-start gap-4">
-                            {currentExtensionIcon32 && (
+                            {currentExtensionIcon128 && (
                                 <div className="flex-shrink-0">
                                     <img
-                                        src={currentExtensionIcon32}
+                                        src={currentExtensionIcon128}
                                         alt={currentExtensionName}
-                                        className="w-12 h-12 rounded border border-gray-300 dark:border-gray-400"
+                                        className="w-16 h-16 rounded"
                                         onError={(e) => {
                                             (e.target as HTMLImageElement).style.display = "none"
                                         }}
