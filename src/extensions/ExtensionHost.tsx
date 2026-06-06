@@ -88,7 +88,7 @@ export const ExtensionHost = () => {
         },
         getCurrentUser() {
             if (!userState.selectLoggedIn(store.getState())) {
-                return ""
+                return null
             } else {
                 const currentUser = userState.selectUserName(store.getState())
                 return currentUser
