@@ -196,6 +196,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
                         className="form-input flex-1 dark:bg-transparent placeholder:text-gray-300"
                         value={url}
                         onChange={e => setUrl(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); previewExtension() } }}
                         autoFocus
                         required
                     />
