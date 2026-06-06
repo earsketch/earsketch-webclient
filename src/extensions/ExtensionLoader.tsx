@@ -10,6 +10,7 @@ import { setExtension, clearExtension, selectExtensionUrl, selectExtensionName, 
 
 interface ExtensionManifest {
     manifest_version: number
+    extension_api_version?: string
     name: string
     version: string
     description: string
@@ -60,6 +61,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
             description: manifest.description,
             permissions: manifest.permissions || [],
             icon32: icon32Url,
+            extensionApiVersion: manifest.extension_api_version ?? "1",
         }))
         store.dispatch(setEastContent("extension"))
         close()

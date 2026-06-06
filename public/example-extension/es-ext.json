@@ -1,5 +1,6 @@
 {
   "manifest_version": 1,
+  "extension_api_version": "1",
   "name": "Side panel extension",
   "version": "1.0",
   "description": "Extension with a default side panel.",
