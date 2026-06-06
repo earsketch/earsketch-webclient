@@ -1,7 +1,7 @@
-import React, { ChangeEventHandler, MouseEventHandler, useState } from "react"
+import React, { ChangeEventHandler, MouseEventHandler } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react"
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
 
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
@@ -11,16 +11,19 @@ import { TFunction } from "i18next"
 import { useAppSelector } from "../hooks"
 import * as scripts from "./scriptsState"
 import { MultiSelectFilterKey } from "./scriptsState"
+import * as ideConsole from "../ide/console"
 
 interface SearchBarProps {
     searchText: string
     aria?: string
     id?: string
     highlight?: boolean
+    liveMessage?: string
+    firstResultSelector?: string
     dispatchSearch: ChangeEventHandler<HTMLInputElement>
     dispatchReset: MouseEventHandler<HTMLElement>
 }
-export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highlight }: SearchBarProps) => {
+export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria, highlight, liveMessage, firstResultSelector }: SearchBarProps) => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
@@ -28,16 +31,28 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
     return (
         <form
             className={`p-1.5 pb-1 ${(highlight ? "border-yellow-500 border-4" : "")}`}
-            onSubmit={e => e.preventDefault()}
+            onSubmit={e => {
+                e.preventDefault()
+                const firstEl = firstResultSelector
+                    ? document.querySelector(firstResultSelector) as HTMLElement | null
+                    : null
+                if (liveMessage) {
+                    ideConsole.log(liveMessage)
+                }
+                if (firstEl) {
+                    firstEl.focus()
+                }
+            }}
         >
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
+                {aria && <span className="sr-only">{aria}</span>}
                 <input
                     id={id}
-                    className="w-full outline-none p-1 bg-transparent font-normal text-sm"
+                    className="w-full outline-none p-1 bg-transparent font-normal scale:text-sm"
                     type="text"
                     placeholder={t("search")}
                     value={searchText}
-                    onChange={dispatchSearch}
+                    onChange={e => { dispatchSearch(e) }}
                     onKeyDown={(e) => { student.addUIClick(id + ": " + e.key) }}
                     onFocus={() => { if (highlight) { dispatch(caiState.setHighlight({ zone: null })) } }}
                 />
@@ -45,7 +60,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
                     (
                         <i
                             className="icon-cross2 pr-1 cursor-pointer"
-                            onClick={dispatchReset}
+                            onClick={(e) => { dispatchReset(e) }}
                         />
                     )}
             </label>
@@ -65,6 +80,7 @@ interface DropdownMultiSelectorProps {
 
 export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const dispatch = useDispatch()
+    const scaledFontSize = useSelector(appState.selectScaledFontSize)
 
     const selectedValues = useAppSelector(
         (state) => state.scripts.filters[category]
@@ -93,17 +109,18 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
         <Listbox value={selectedValues} multiple onChange={handleChange}>
             <div className="relative w-1/3">
                 <ListboxButton
-                    className={`flex justify-between w-full border-b-2 ${margin} border-black dark:border-white`}
+                    className={`flex justify-between w-full scale:text-base border-b-2 ${margin} border-black dark:border-white`}
                     aria-label={aria}
                 >
                     <span className="truncate">
                         {title} {numSelected ? `(${numSelected})` : ""}
                     </span>
-                    <i className="icon icon-arrow-down2 text-xs p-1" />
+                    <i className="icon icon-arrow-down2 scale:text-xs p-1" />
                 </ListboxButton>
 
                 <ListboxOptions
                     anchor="bottom start"
+                    style={{ fontSize: `${scaledFontSize}px` }}
                     className={`z-50 [--anchor-max-height:24rem] [--anchor-gap:4px] overflow-y-auto border pt-1 p-2 focus:outline-none
                       bg-white text-black dark:bg-black dark:text-white border-black`}
                 >
@@ -125,7 +142,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
                             type="button"
                             key={item}
                             value={item}
-                            className="w-full block text-left p-0 m-0 bg-transparent border-0 focus:outline-none"
+                            className="scale:text-sm w-full block text-left p-0 m-0 bg-transparent border-0 focus:outline-none"
                         >
                             {({ active, selected }) => (
                                 <FilterItem
@@ -145,36 +162,35 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
 export const Collection = ({ title, visible = true, initExpanded = true, className = "", children }: {
     title: string, visible: boolean, initExpanded: boolean, className?: string, children: React.ReactNode
 }) => {
-    const [expanded, setExpanded] = useState(initExpanded)
     const filteredTitle = title.replace(/\([^)]*\)/g, "")
     const { t } = useTranslation()
 
     return (
-        <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "grow" : "grow-0"}`}>
-            <div className="flex flex-row grow-0 justify-start" tabIndex={-1}>
-                {expanded &&
-                    (<div className="h-auto border-l-4 border-amber" />)}
-                {/* TODO: Should this have an ARIA role such as "treegrid"? */}
-                <div
-                    className="flex grow justify-between items-center py-1 pl-2 text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
-                    title={title}
-                    onClick={() => setExpanded(v => !v)}
-                >
-                    <h4 className="flex items-center truncate py-1">
-                        <i className="icon-album pr-1.5" />
-                        <div className="truncate">{title}</div>
-                    </h4>
-                    <div className="w-1/12">
-                        {expanded
-                            ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { name: filteredTitle })} aria-expanded={true} aria-label={t("thing.collapse", { name: filteredTitle })}> </button>
-                            : <button className="icon icon-arrow-right2" title={t("thing.expand", { name: filteredTitle })} aria-expanded={false} aria-label={t("thing.expand", { name: filteredTitle })}> </button>}
+        <Disclosure as="div" defaultOpen={initExpanded} className={`${visible ? "flex" : "hidden"} flex-col justify-start data-[open]:grow ${className}`}>
+            {({ open }) => (
+                <>
+                    <div className={`flex flex-row grow-0 justify-start ${open ? "grow-0" : ""}`}>
+                        {open && <div className="h-auto border-l-4 border-amber" />}
+                        <DisclosureButton
+                            className="flex grow justify-between items-center py-1 pl-2 text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
+                            title={open ? t("thing.collapse", { name: filteredTitle }) : t("thing.expand", { name: filteredTitle })}
+                            aria-label={open ? t("thing.collapse", { name: filteredTitle }) : t("thing.expand", { name: filteredTitle })}
+                        >
+                            <h4 className="flex items-center truncate py-1">
+                                <i className="icon-album pr-1.5" />
+                                <div className="truncate">{title}</div>
+                            </h4>
+                            <div className="w-1/12">
+                                <i className={`icon ${open ? "icon-arrow-down2" : "icon-arrow-right2"}`} />
+                            </div>
+                        </DisclosureButton>
                     </div>
-                </div>
-            </div>
-            <div className="grow">
-                {expanded && children}
-            </div>
-        </div>
+                    <DisclosurePanel className="grow min-h-0">
+                        {children}
+                    </DisclosurePanel>
+                </>
+            )}
+        </Disclosure>
     )
 }
 

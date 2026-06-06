@@ -29,12 +29,18 @@ if (process.env.NODE_ENV === "production") {
 }
 const nrConfig = process.env.ES_NEWRELIC_CONFIG ?? "dev"
 
+const isTest = !!process.env.VITEST
+
 // https://vite.dev/config/
 export default ({ mode }: { mode: string }) => {
     const env = loadEnv(mode, process.cwd(), ["ES_WEB_"])
     return defineConfig({
         base: baseURL,
-        plugins: [splitVendorChunkPlugin(), react(), adapter(analyzer({ analyzerMode: "static" }))],
+        plugins: [
+            splitVendorChunkPlugin(),
+            react(),
+            ...(isTest ? [] : [adapter(analyzer({ analyzerMode: "static" }))]),
+        ],
         // https://vite.dev/guide/dep-pre-bundling.html#monorepos-and-linked-dependencies
         optimizeDeps: {
             include: ["droplet", "skulpt"],
@@ -52,7 +58,30 @@ export default ({ mode }: { mode: string }) => {
             sourcemap: buildType === "review",
         },
         test: {
-            environment: "jsdom",
+            projects: [
+                {
+                    extends: true,
+                    test: {
+                        name: "unit",
+                        environment: "jsdom",
+                        include: ["tests/vitest/src/**/*.spec.{js,ts,jsx,tsx}"],
+                    },
+                },
+                {
+                    extends: true,
+                    test: {
+                        name: "scripts",
+                        include: ["tests/vitest/scripts/**/*.spec.{js,ts,jsx,tsx}"],
+                        setupFiles: ["./tests/vitest/scripts/setup.js"],
+                        browser: {
+                            enabled: true,
+                            provider: "playwright",
+                            headless: true,
+                            instances: [{ browser: "chromium" }],
+                        },
+                    },
+                },
+            ],
         },
         server: {
             port,
@@ -72,7 +101,7 @@ export default ({ mode }: { mode: string }) => {
             URL_DOMAIN: JSON.stringify(`${apiHost}/EarSketchWS`),
             URL_WEBSOCKET: JSON.stringify(URL_WEBSOCKET),
             SITE_BASE_URI: JSON.stringify(SITE_BASE_URI),
-            "import.meta.env.ES_NEWRELIC_CONFIG": nrConfig,
+            "import.meta.env.ES_NEWRELIC_CONFIG": JSON.stringify(nrConfig),
             ...env,
         },
     })
