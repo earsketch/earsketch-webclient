@@ -68,7 +68,7 @@ export const ExtensionHost = () => {
         getEditorContents() {
             const activeTab = tabState.selectActiveTabID(store.getState())
             const script = scriptsState.selectAllScripts(store.getState())[activeTab!]
-            return script.source_code
+            return script ? script.source_code : ""
         },
         getScriptExecutionResult() {
             const currentLogs = logsRef.current
