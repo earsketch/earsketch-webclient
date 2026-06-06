@@ -228,12 +228,12 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
                     <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
                 </button>
             </div>
-            <div className="ltr:ml-auto rtl:mr-auto">
+            <div className="flex items-center ltr:ml-auto rtl:mr-auto">
                 {isCurriculumPane && <>
                     <button className="px-2 -my-1 text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
                         <i className="icon icon-link" />
                     </button>
-                    <button className="border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-middle"
+                    <button className="h-fit border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-middle"
                         title={t("ariaDescriptors:curriculum.switchScriptLanguage", { language: language === "python" ? "javascript" : "python" })}
                         onClick={() => {
                             const newLanguage = (language === "python" ? "javascript" : "python")
