@@ -252,7 +252,7 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
                 </>}
                 {!isCurriculumPane && (
                     <button
-                        className="inline-flex items-center px-3 py-1 text-xs font-semibold rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700 ml-2"
+                        className="inline-flex items-center p-1 text-xs rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700 ml-2"
                         title={t("curriculum.title")}
                         onClick={() => { dispatch(appState.setEastContent("curriculum")) }}>
                         {t("curriculum.title").toLocaleUpperCase()}
