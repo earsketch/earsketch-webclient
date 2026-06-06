@@ -64,7 +64,7 @@ export const ExtensionHost = () => {
         }
     }, [currentUser, extensionPermissions])
 
-    const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
+    const extensionFunctions = {
         getEditorContents() {
             const activeTab = tabState.selectActiveTabID(store.getState())
             if (!activeTab) return ""
@@ -96,6 +96,8 @@ export const ExtensionHost = () => {
         },
     }
 
+    const isExtensionFunction = (fn: string): fn is keyof typeof extensionFunctions => fn in extensionFunctions
+
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {
             const isFromLocalOriginIframe = event.source === iframeRef.current?.contentWindow
@@ -108,49 +110,13 @@ export const ExtensionHost = () => {
                 let result: any
                 const permissions = extensionPermissionsRef.current
 
-                switch (data.fn) {
-                    case "getEditorContents":
-                        if (!permissions.includes("getEditorContents")) {
-                            result = { error: "Permission denied: getEditorContents" }
-                            break
-                        }
-                        result = extensionFunctions.getEditorContents()
-                        break
-
-                    case "getScriptExecutionResult":
-                        if (!permissions.includes("getScriptExecutionResult")) {
-                            result = { error: "Permission denied: getScriptExecutionResult" }
-                            break
-                        }
-                        result = extensionFunctions.getScriptExecutionResult()
-                        break
-
-                    case "getDawState":
-                        if (!permissions.includes("getDawState")) {
-                            result = { error: "Permission denied: getDawState" }
-                            break
-                        }
-                        result = extensionFunctions.getDawState()
-                        break
-
-                    case "getColorTheme":
-                        if (!permissions.includes("getColorTheme")) {
-                            result = { error: "Permission denied: getColorTheme" }
-                            break
-                        }
-                        result = extensionFunctions.getColorTheme()
-                        break
-
-                    case "getCurrentUser":
-                        if (!permissions.includes("getCurrentUser")) {
-                            result = { error: "Permission denied: getCurrentUser" }
-                            break
-                        }
-                        result = extensionFunctions.getCurrentUser()
-                        break
-
-                    default:
-                        result = { error: `Unknown function: ${data.fn}` }
+                const fn: string = data.fn
+                if (isExtensionFunction(fn)) {
+                    result = permissions.includes(fn)
+                        ? extensionFunctions[fn]()
+                        : { error: `Permission denied: ${fn}` }
+                } else {
+                    result = { error: `Unknown function: ${fn}` }
                 }
 
                 if (iframeRef.current?.contentWindow) {
