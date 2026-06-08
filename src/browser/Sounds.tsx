@@ -21,6 +21,9 @@ import { BrowserTabType } from "./BrowserTab"
 import { SearchBar } from "./Utils"
 import { Waveform } from "../app/Recorder"
 import * as audioLibrary from "../app/audiolibrary"
+import { Transition } from "@headlessui/react"
+import { usePopper } from "react-popper"
+import { Tooltip } from "radix-ui"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -510,6 +513,8 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const name = clip.name
+    // const scaledFontSize = useSelector(appState.selectScaledFontSize)
+
     const scaledFontSize = useSelector(appState.selectScaledFontSize)
 
     const tooltipContent = (
@@ -524,7 +529,6 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
             {clip.keySignature && <div>{t("soundBrowser.clip.tooltip.key")}: {clip.keySignature}</div>}
         </div>
     )
-
     const { copied, copy, setReferenceElement, popover } = useCopyToClipboard()
 
     return (
@@ -536,15 +540,31 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                     <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
                         {copied ? `Copied ${name} to clipboard` : ""}
                     </span>
-                    <div
-                        ref={setReferenceElement}
-                        className="flex items-center min-w-0 cursor-pointer"
-                        title={tooltip}
-                        onClick={() => copy(name)}
-                        aria-label={`Copy ${name} to clipboard`}
-                    >
-                        <h5 className="text-sm truncate pl-2">{name}</h5>
-                    </div>
+                    <Tooltip.Provider delayDuration={600} disableHoverableContent>
+                        <Tooltip.Root>
+                            <Tooltip.Trigger asChild>
+                                <div
+                                    ref={setReferenceElement}
+                                    className="flex items-center min-w-0 cursor-pointer"
+                                    onClick={() => copy(name)}
+                                    aria-label={`Copy ${name} to clipboard`}
+                                >
+                                    <h5 className="scale:text-sm truncate pl-2">{name}</h5>
+                                </div>
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                                <Tooltip.Content
+                                    side="top"
+                                    align="start"
+                                    sideOffset={4}
+                                    style={{ fontSize: `${scaledFontSize}px` }}
+                                    className="scale:text-xs z-50 rounded bg-gray-500 dark:bg-gray-700 px-3 py-2 text-white shadow-lg outline outline-1 outline-gray-400 dark:outline-gray-500 pointer-events-none"
+                                >
+                                    {tooltipContent}
+                                </Tooltip.Content>
+                            </Tooltip.Portal>
+                        </Tooltip.Root>
+                    </Tooltip.Provider>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
