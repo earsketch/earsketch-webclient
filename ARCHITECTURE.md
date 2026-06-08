@@ -17,27 +17,27 @@ This is an overview of the webclient directory structure and important files.
 
 - `public/`
 
-    - `index.html` - Outermost entry point, calls index.tsx
+  - `index.html` - Outermost entry point, calls index.tsx
 
 - `src/`
 
-    - `index.tsx` - JavaScript entry point
+  - `index.tsx` - JavaScript entry point
 
-    - `api/` - EarSketch API built-in functions
+  - `api/` - EarSketch API built-in functions
 
-    - `app/`, `brower/`, `ide/`, `daw/`, ... - EarSketch components
+  - `app/`, `brower/`, `ide/`, `daw/`, ... - EarSketch components
 
-    - `audio/` - Web Audio API sound output
+  - `audio/` - Web Audio API sound output
 
-    - `data/` - JSON data for recommendation
+  - `data/` - JSON data for recommendation
 
-    - `locales/` - Language translation files
+  - `locales/` - Language translation files
 
 - `css/` - CSS and LESS files
 
 - `lib/` - Customized libraries and those needing to be separate
 
-- `tests/` - Unit, component, and e2e tests
+- `tests/` - Unit, component, and end-to-end tests
 
 ## Getting started
 

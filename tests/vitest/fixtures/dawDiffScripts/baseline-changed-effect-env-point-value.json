@@ -11,13 +11,13 @@
               "measure": 1,
               "value": 120,
               "shape": "square",
-              "sourceLine": 1
+              "sourceLines": [1]
             },
             {
               "measure": 1,
               "value": 120,
               "shape": "square",
-              "sourceLine": 7
+              "sourceLines": [7]
             }
           ]
         }
@@ -420,7 +420,7 @@
           "scale": false,
           "loop": true,
           "silence": 0,
-          "sourceLine": 10,
+          "sourceLines": [10],
           "tempo": 120,
           "sourceAudio": {},
           "audio": {},
@@ -435,7 +435,7 @@
           "scale": false,
           "loop": true,
           "silence": 0,
-          "sourceLine": 10,
+          "sourceLines": [10],
           "tempo": 120,
           "sourceAudio": {},
           "audio": {},
@@ -455,7 +455,7 @@
           "scale": false,
           "loop": true,
           "silence": 0,
-          "sourceLine": 11,
+          "sourceLines": [11],
           "tempo": 120,
           "sourceAudio": {},
           "audio": {},
@@ -470,7 +470,7 @@
           "scale": false,
           "loop": true,
           "silence": 0,
-          "sourceLine": 11,
+          "sourceLines": [11],
           "tempo": 120,
           "sourceAudio": {},
           "audio": {},
@@ -484,13 +484,13 @@
               "measure": 1,
               "value": -21,
               "shape": "linear",
-              "sourceLine": 18
+              "sourceLines": [18]
             },
             {
               "measure": 5,
               "value": 7,
               "shape": "square",
-              "sourceLine": 18
+              "sourceLines": [18]
             }
           ]
         }
@@ -507,7 +507,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 24,
+          "sourceLines": [24],
           "sourceAudio": {},
           "audio": {},
           "loopChild": false
@@ -521,7 +521,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 24,
+          "sourceLines": [24],
           "sourceAudio": {},
           "audio": {},
           "loopChild": false
@@ -535,7 +535,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 24,
+          "sourceLines": [24],
           "sourceAudio": {},
           "audio": {},
           "loopChild": false
@@ -549,7 +549,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 24,
+          "sourceLines": [24],
           "sourceAudio": {},
           "audio": {},
           "loopChild": false
@@ -563,7 +563,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 24,
+          "sourceLines": [24],
           "sourceAudio": {},
           "audio": {},
           "loopChild": false
@@ -577,7 +577,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 24,
+          "sourceLines": [24],
           "sourceAudio": {},
           "audio": {},
           "loopChild": false
@@ -591,7 +591,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 24,
+          "sourceLines": [24],
           "sourceAudio": {},
           "audio": {},
           "loopChild": false
@@ -605,7 +605,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 24,
+          "sourceLines": [24],
           "sourceAudio": {},
           "audio": {},
           "loopChild": false
@@ -619,7 +619,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 24,
+          "sourceLines": [24],
           "sourceAudio": {},
           "audio": {},
           "loopChild": false
@@ -633,7 +633,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 25,
+          "sourceLines": [25],
           "tempo": 91,
           "sourceAudio": {},
           "audio": {},
@@ -648,7 +648,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 25,
+          "sourceLines": [25],
           "tempo": 91,
           "sourceAudio": {},
           "audio": {},
@@ -663,7 +663,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 25,
+          "sourceLines": [25],
           "tempo": 91,
           "sourceAudio": {},
           "audio": {},
@@ -678,7 +678,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 25,
+          "sourceLines": [25],
           "tempo": 91,
           "sourceAudio": {},
           "audio": {},
@@ -693,7 +693,7 @@
           "scale": false,
           "loop": false,
           "silence": 0,
-          "sourceLine": 25,
+          "sourceLines": [25],
           "tempo": 91,
           "sourceAudio": {},
           "audio": {},
@@ -708,7 +708,7 @@
           "scale": false,
           "loop": false,
           "silence": 0.0625,
-          "sourceLine": 25,
+          "sourceLines": [25],
           "tempo": 91,
           "sourceAudio": {},
           "audio": {},
@@ -728,7 +728,7 @@
           "scale": false,
           "loop": true,
           "silence": 0,
-          "sourceLine": 12,
+          "sourceLines": [12],
           "tempo": 96,
           "sourceAudio": {},
           "audio": {},
@@ -743,7 +743,7 @@
           "scale": false,
           "loop": true,
           "silence": 0,
-          "sourceLine": 12,
+          "sourceLines": [12],
           "tempo": 96,
           "sourceAudio": {},
           "audio": {},
@@ -763,7 +763,7 @@
           "scale": false,
           "loop": true,
           "silence": 0,
-          "sourceLine": 13,
+          "sourceLines": [13],
           "tempo": 105,
           "sourceAudio": {},
           "audio": {},
@@ -783,7 +783,7 @@
           "scale": false,
           "loop": true,
           "silence": 0,
-          "sourceLine": 14,
+          "sourceLines": [14],
           "tempo": 100,
           "sourceAudio": {},
           "audio": {},
@@ -803,7 +803,7 @@
           "scale": false,
           "loop": true,
           "silence": 0,
-          "sourceLine": 15,
+          "sourceLines": [15],
           "tempo": 120,
           "sourceAudio": {},
           "audio": {},

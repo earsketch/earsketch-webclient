@@ -24,6 +24,7 @@ const appSlice = createSlice({
         embedMode,
         hideDAW,
         hideEditor,
+        eastContent: "curriculum" as "curriculum" | "extension",
         doNotDisturb: false,
         embeddedScriptName: null as string | null,
         embeddedScriptUsername: null as string | null,
@@ -52,6 +53,9 @@ const appSlice = createSlice({
         },
         setHideEditor(state, { payload }) {
             state.hideEditor = payload
+        },
+        setEastContent(state, { payload }) {
+            state.eastContent = payload
         },
         setDoNotDisturb(state, { payload }) {
             state.doNotDisturb = payload
@@ -91,6 +95,7 @@ export const {
     setEmbedMode,
     setHideDAW,
     setHideEditor,
+    setEastContent,
     setDoNotDisturb,
     setEmbeddedScriptUsername,
     setEmbeddedScriptName,
@@ -104,9 +109,16 @@ export const selectScriptLanguage = (state: RootState) => state.app.scriptLangua
 export const selectColorTheme = (state: RootState) => state.app.colorTheme
 // TODO: Figure out the right way to do this with redux-persist.
 export const selectFontSize = (state: RootState) => state.app.fontSize || 14
+// Convert from the interface's 14px base to Tailwind's 16px rem base,
+// so that em units in scaled components adjust correctly.
+export const selectScaledFontSize = (state: RootState) => {
+    const fontSize = selectFontSize(state)
+    return (fontSize / 14) * 16
+}
 export const selectEmbedMode = (state: RootState) => state.app.embedMode
 export const selectHideDAW = (state: RootState) => state.app.hideDAW
 export const selectHideEditor = (state: RootState) => state.app.hideEditor
+export const selectEastContent = (state: RootState) => state.app.eastContent
 export const selectDoNotDisturb = (state: RootState) => state.app.doNotDisturb
 export const selectEmbeddedScriptUsername = (state: RootState) => state.app.embeddedScriptUsername
 export const selectEmbeddedScriptName = (state: RootState) => state.app.embeddedScriptName
