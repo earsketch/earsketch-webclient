@@ -57,7 +57,7 @@ export interface Clip {
     tempo?: number
     loop: boolean
     scale: number
-    sourceLine: number
+    sourceLines: number[]
 }
 
 export type TransformedClip = SlicedClip | StretchedClip
@@ -79,7 +79,7 @@ interface AutomationPoint {
     measure: number
     value: number
     shape: "square" | "linear"
-    sourceLine: number
+    sourceLines: number[]
 }
 
 export type Effect = { [key: string]: Envelope }

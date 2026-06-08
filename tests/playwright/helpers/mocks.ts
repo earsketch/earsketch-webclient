@@ -99,6 +99,7 @@ export class RouteCounter {
     bump(key: string) {
         this.map.set(key, (this.map.get(key) ?? 0) + 1)
     }
+
     count(key: string) {
         return this.map.get(key) ?? 0
     }
@@ -126,15 +127,18 @@ export async function setupBackend(page: Page, opts: MockOptions = {}): Promise<
         })
     }
 
-    // Audio sample (.wav) — return the clink fixture
+    // Audio sample (.wav) — return the clink fixture, or countdown.wav for DUBSTEP_BASS_WOBBLE_002
     if (opts.interceptAudioSample) {
-        const audio = readFixture("clink.wav")
+        const clinkAudio = readFixture("clink.wav")
+        const countdownAudio = readFixture("countdown.wav")
         await page.route(`https://${CLOUDFRONT_HOST}/backend-static/standard-library/**`, (route) => {
             counter.bump("audio_sample")
+            const url = route.request().url()
+            const body = url.includes("DUBSTEP_BASS_WOBBLE_002") ? countdownAudio : clinkAudio
             return route.fulfill({
                 status: 200,
                 contentType: "application/octet-stream",
-                body: audio,
+                body,
             })
         })
     }
