@@ -785,11 +785,12 @@ export function setDAWData(result: types.DAWData) {
 
     // sanity checks
     const newLoop = Object.assign({}, state.daw.loop)
-    if (state.daw.loop.start > playLength) {
+    const maxLoopMeasure = Math.ceil(playLength)
+    if (state.daw.loop.start > maxLoopMeasure) {
         newLoop.start = 1
     }
-    if (state.daw.loop.end > playLength) {
-        newLoop.end = playLength
+    if (state.daw.loop.end > maxLoopMeasure) {
+        newLoop.end = maxLoopMeasure
     }
     dispatch(daw.setLoop(newLoop))
 }
