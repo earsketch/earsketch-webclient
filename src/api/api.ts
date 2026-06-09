@@ -225,6 +225,14 @@ const rawDoc: { [key: string]: Item[] } = {
             track: "integer",
             start: "float",
             beat: "string",
+        },
+    },
+    {
+        parameters: {
+            sound: "soundConstant",
+            track: "integer",
+            start: "float",
+            beat: "string",
             sliceStarts: "listArray",
         },
     },
@@ -239,14 +247,6 @@ const rawDoc: { [key: string]: Item[] } = {
                 type: "floatOptional",
                 default: "16",
             },
-        },
-    },
-    {
-        parameters: {
-            sound: "soundConstant",
-            track: "integer",
-            start: "float",
-            beat: "string",
         },
     }],
     print: [{
