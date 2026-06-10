@@ -858,6 +858,7 @@ export const DAW = () => {
     const [loop, setLoop] = useState(_loop)
     // It is synchronized with the loop state in the Redux store when the latter is updated (e.g. on mouse up):
     useEffect(() => setLoop(_loop), [_loop])
+    const maxLoopMeasure = Math.ceil(playLength)
 
     const onMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
         // calculate x position of the bar from mouse position
@@ -872,8 +873,8 @@ export const DAW = () => {
         // round to nearest measure
         const measure = Math.round(xScale.invert(x))
 
-        // Do not drag if beyond playLength
-        if (measure > playLength) {
+        // Do not drag if beyond the rounded project end.
+        if (measure > maxLoopMeasure) {
             setDragStart(null)
         } else {
             setDragStart(measure)
@@ -893,7 +894,7 @@ export const DAW = () => {
             x -= X_OFFSET
         }
         // round to nearest measure
-        const measure = Math.min(Math.round(xScale.invert(x)), playLength)
+        const measure = Math.min(Math.round(xScale.invert(x)), maxLoopMeasure)
 
         setDragStart(null)
 
@@ -931,12 +932,12 @@ export const DAW = () => {
         // round to nearest measure
         const measure = Math.round(xScale.invert(x))
 
-        if (measure <= playLength && measure > 0) {
+        if (measure <= maxLoopMeasure && measure > 0) {
             setCursorPosition(xScale(measure))
         }
 
-        // Prevent dragging beyond playLength
-        if (dragStart === null || measure > playLength) {
+        // Prevent dragging beyond the rounded project end
+        if (dragStart === null || measure > maxLoopMeasure) {
             return
         }
 
