@@ -624,7 +624,8 @@ interface SoundSearchAndFiltersProps {
 }
 
 const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndFiltersProps) => {
-    const [showPreview, setShowPreview] = useState(false)
+    const dispatch = useDispatch()
+    const showPreview = useSelector(appState.selectShowSoundPreviewWidget)
     const loggedIn = useSelector(user.selectLoggedIn)
     return (
         <div className="pb-1">
@@ -639,7 +640,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndF
             </div>
             <button
                 type="button"
-                onClick={() => setShowPreview(prev => !prev)}
+                onClick={() => dispatch(appState.setShowSoundPreviewWidget(!showPreview))}
                 aria-expanded={showPreview}
                 aria-controls="sound-preview-panel"
                 title={showPreview ? "Hide preview" : "Show preview"}
