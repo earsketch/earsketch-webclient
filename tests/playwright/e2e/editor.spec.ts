@@ -2,6 +2,12 @@ import { test, expect } from "@playwright/test"
 import { setupBackend, TEST_USER, type Script } from "../helpers/mocks"
 import { skipTour, login, waitForHeadlessDialog } from "../helpers/actions"
 
+const TEST_SOUND_META_1 = {
+    folder: "STUB FOLDER",
+    name: "OS_CLAP00",
+    public: 1 as const,
+    path: "standard-library/filename/placeholder/here.wav",
+}
 const TEST_SOUND_META = {
     folder: "STUB FOLDER",
     name: "OS_CLAP01",
@@ -14,7 +20,7 @@ test.describe("Editor", () => {
 
     test.beforeEach(async ({ page }) => {
         await setupBackend(page, {
-            standardAudio: [TEST_SOUND_META],
+            standardAudio: [TEST_SOUND_META_1, TEST_SOUND_META],
             standardAudioMeta: TEST_SOUND_META,
             interceptAudioSample: true,
         })
