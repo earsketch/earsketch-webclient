@@ -20,7 +20,7 @@ setTempo(tempo)
                 effects: {
                     TEMPO: {
                         TEMPO: expect.arrayContaining([
-                            { measure: 1, value: 99, shape: "square", sourceLine: 3 },
+                            { measure: 1, value: 99, shape: "square", sourceLines: [3] },
                         ]),
                     },
                 },

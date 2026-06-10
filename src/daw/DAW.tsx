@@ -17,7 +17,7 @@ import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
-import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
+import { selectEditorCursorLine, selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
 export const callbacks = {
@@ -26,6 +26,10 @@ export const callbacks = {
 
 // Width of track control box
 const X_OFFSET = 110
+
+function formatSourceLines(sourceLines: number[]): string {
+    return sourceLines.length > 1 ? `Lines: ${sourceLines.join(" ← ")}` : `Line: ${sourceLines[0] ?? 0}`
+}
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void }) => {
     const dispatch = useDispatch()
@@ -187,6 +191,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     }, [el])
 
     return <div ref={el} id="dawHeader" className="grow-0 bg-white dark:bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+        <h1 className="sr-only">{t("ariaDescriptors:daw.transportControls")}</h1>
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div id="daw-label">
@@ -339,6 +344,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
             <div className="dawTrackCtrl flex sticky left-0 border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50">
+                <h3 className="sr-only">{t("ariaDescriptors:daw.track", { label: track.label })}</h3>
                 <div className="dawTrackName text-gray-700 dark:text-gray-400 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <div className="justify-center items-center flex space-x-3 w-4/5">
@@ -394,11 +400,14 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const editorCursorLine = useSelector(selectEditorCursorLine)
     const { t } = useTranslation()
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef<HTMLDivElement>(null)
+    const sourceLines = clip.sourceLines
+    const sourceHighlight = scriptMatchesDAW && editorCursorLine != null && sourceLines.includes(editorCursorLine)
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -408,11 +417,13 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     }, [clip, xScale, trackHeight])
 
     return <div
-        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
+        ref={element}
+        className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border${sourceHighlight ? " source-highlight" : ""}`}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
-        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, sourceLines)} onMouseLeave={clearDAWHoverLine}
+        title={scriptMatchesDAW ? formatSourceLines(sourceLines) : t("daw.needsSync")}
     >
+        <h4 className="sr-only">{t("ariaDescriptors:daw.clip", { filekey: clip.filekey, measure: clip.measure, end: clip.end, sourceLine: sourceLines.join(", ") })}</h4>
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
@@ -427,6 +438,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
     const xScale = useSelector(daw.selectXScale)
     const effectHeight = useSelector(daw.selectEffectHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    // const editorCursorLine = useSelector(selectEditorCursorLine)
     const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
@@ -462,17 +474,23 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
         {effect !== "TEMPO" && showName && <div className="clipName">{effect}</div>}
         <svg className="effectSvg">
             <path></path>
-            {envelope.map((point, i) => <React.Fragment key={i}>
-                <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
-                <circle
-                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
-                    onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, point.sourceLine) }}
-                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
-                >
-                    {/* eslint-disable-next-line react/jsx-indent */}
-                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
-                </circle>
-            </React.Fragment>)}
+            {envelope.map((point, i) => {
+                const pointLines = point.sourceLines
+                // const sourceHighlight = scriptMatchesDAW && editorCursorLine != null && pointLines.includes(editorCursorLine)
+                return <React.Fragment key={i}>
+                    <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
+                    <circle
+                        cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
+                        onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
+                        onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
+                    >
+                        {/* eslint-disable-next-line react/jsx-indent */}
+                        <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? formatSourceLines(pointLines) : t("daw.needsSync")}</title>
+                    </circle>
+                    {/* TODO: re-enable once accessible styling is decided */}
+                    {/* {sourceHighlight && <circle cx={x(point.measure)} cy={y(point.value)} r={7} fill="none" stroke="rgb(255, 153, 0)" strokeWidth={3} pointerEvents="none" />} */}
+                </React.Fragment>
+            })}
         </svg>
     </div>
 }
@@ -563,11 +581,35 @@ const SchedPlayhead = () => {
     return pendingPosition === null ? null : <div className="daw-sched-marker" style={{ left: xScale(pendingPosition) }}></div>
 }
 
-const Measureline = () => {
+const Measureline = ({ setCursorPosition }: { setCursorPosition: (pos: number) => void }) => {
+    const dispatch = useDispatch()
     const xScale = useSelector(daw.selectXScale)
     const intervals = useSelector(daw.selectMeasurelineZoomIntervals)
     const playLength = useSelector(daw.selectPlayLength)
+    const playing = useSelector(daw.selectPlaying)
     const element = useRef<HTMLDivElement>(null)
+    const [focusedMeasure, setFocusedMeasure] = useState(1)
+    const { t } = useTranslation()
+
+    const moveTo = (measure: number) => {
+        setFocusedMeasure(measure)
+        setCursorPosition(xScale(measure))
+    }
+
+    const handleSliderKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "ArrowRight") {
+            e.preventDefault()
+            moveTo(Math.min(focusedMeasure + 1, playLength))
+        } else if (e.key === "ArrowLeft") {
+            e.preventDefault()
+            moveTo(Math.max(focusedMeasure - 1, 1))
+        } else if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            player.setPosition(focusedMeasure)
+            _setPlayPosition?.(focusedMeasure)
+            dispatch(daw.setPendingPosition(playing ? focusedMeasure : null))
+        }
+    }
 
     useEffect(() => {
         let n = 1
@@ -636,11 +678,28 @@ const Measureline = () => {
         }
     })
 
-    return <div ref={element} id="daw-measureline" className="relative w-full" style={{ top: "-1px", minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
-        <svg className="axis">
-            <g></g>
-        </svg>
-    </div>
+    return <>
+        <h2 id="daw-measureline-heading" className="sr-only">{t("ariaDescriptors:daw.timeline")}</h2>
+        <div
+            ref={element}
+            id="daw-measureline"
+            role="slider"
+            aria-labelledby="daw-measureline-heading"
+            aria-label={t("ariaDescriptors:daw.measurelineLabel")}
+            aria-valuenow={focusedMeasure}
+            aria-valuemin={1}
+            aria-valuemax={playLength}
+            aria-valuetext={t("ariaDescriptors:daw.measureValueText", { measure: focusedMeasure, total: playLength })}
+            tabIndex={0}
+            className="relative w-full"
+            style={{ top: "-1px", minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}
+            onKeyDown={handleSliderKeyDown}
+        >
+            <svg className="axis">
+                <g></g>
+            </svg>
+        </div>
+    </>
 }
 
 const Timeline = () => {
@@ -1031,7 +1090,9 @@ export const DAW = () => {
                     const end = clip.measure + clip.end - clip.start
                     if (start <= position && position <= end) {
                         const color = trackColors[index % trackColors.length]
-                        active.push({ color, lineNumber: clip.sourceLine })
+                        if (clip.sourceLines[0] !== undefined) {
+                            active.push({ color, lineNumber: clip.sourceLines[0] })
+                        }
                     }
                 }
             }
@@ -1093,6 +1154,7 @@ export const DAW = () => {
     }, [playing, xScale, autoScroll])
 
     return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
+        <div id="daw-live-region" aria-live="polite" aria-atomic="true" className="sr-only"></div>
         {hideEditor &&
         <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
@@ -1113,7 +1175,7 @@ export const DAW = () => {
                     <div className="relative">
                         <div className="sticky top-0 z-10">
                             <Timeline />
-                            <Measureline />
+                            <Measureline setCursorPosition={setCursorPosition} />
                         </div>
 
                         <div className="daw-track-group-container" style={{ marginBottom: "14px" }}>

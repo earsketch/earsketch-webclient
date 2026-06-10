@@ -5,7 +5,7 @@ export async function getMetadata(_name: string) {
 }
 
 export function getSound(_filekey: string) {
-    return null
+    return Promise.resolve(null)
 }
 
 export async function getStandardSounds() {
