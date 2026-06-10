@@ -772,6 +772,8 @@ const SoundPreview = () => {
         const tag = (e.target as HTMLElement)?.tagName
         if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return
 
+        if (e.ctrlKey || e.metaKey || e.altKey) return 
+
         switch (e.key) {
             case "j":
             case "J":
@@ -831,7 +833,7 @@ const SoundPreview = () => {
             <div
                 ref={playerRef}
                 tabIndex={0}
-                role="group"
+                role="application"
                 aria-label={t("ariaDescriptors:sounds.preview.player")}
                 onKeyDown={onPlayerKeyDown}
                 onMouseDown={focusPlayer}
