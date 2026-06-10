@@ -772,6 +772,8 @@ const SoundPreview = () => {
         const tag = (e.target as HTMLElement)?.tagName
         if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return
 
+        if (e.ctrlKey || e.metaKey || e.altKey) return
+
         switch (e.key) {
             case "j":
             case "J":
@@ -831,7 +833,7 @@ const SoundPreview = () => {
             <div
                 ref={playerRef}
                 tabIndex={0}
-                role="group"
+                role="application"
                 aria-label={t("ariaDescriptors:sounds.preview.player")}
                 onKeyDown={onPlayerKeyDown}
                 onMouseDown={focusPlayer}
@@ -1109,6 +1111,59 @@ const DefaultSoundCollection = () => {
 }
 
 export const SoundBrowser = () => {
+    const dispatch = useDispatch()
+    const preview = useSelector(sounds.selectPreview)
+    const previewNodes = useSelector(sounds.selectPreviewNodes)
+    const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    const folders = useSelector(sounds.selectFilteredRegularFolders)
+    const lastPreviewNameRef = useRef<string | null>(null)
+
+    const firstSoundName = useMemo(() => {
+        const firstFolder = folders[0]
+        return firstFolder ? namesByFolders[firstFolder]?.[0] ?? null : null
+    }, [folders, namesByFolders])
+
+    useEffect(() => {
+        if (preview?.kind === "sound") {
+            lastPreviewNameRef.current = preview.name
+        }
+    }, [preview])
+
+    const getTargetName = useCallback(() =>
+        preview?.kind === "sound"
+            ? preview.name
+            : lastPreviewNameRef.current ?? firstSoundName
+    , [preview, firstSoundName])
+
+    useEffect(() => {
+        const handleKeyPress = (event: KeyboardEvent) => {
+            if (event.ctrlKey && event.shiftKey && event.key.toUpperCase() === "L") {
+                event.preventDefault()
+                const name = getTargetName()
+                if (name) {
+                    dispatch(soundsThunks.togglePreview({ name, kind: "sound" }))
+                }
+            }
+        }
+        window.addEventListener("keydown", handleKeyPress)
+        return () => { window.removeEventListener("keydown", handleKeyPress) }
+    }, [getTargetName, previewNodes])
+
+    useEffect(() => {
+        const handleKeyPress = (event: KeyboardEvent) => {
+            if (event.ctrlKey && event.shiftKey && event.key.toUpperCase() === "U") {
+                event.preventDefault()
+                const name = getTargetName()
+                if (name) {
+                    editor.pasteCode(name)
+                    addUIClick("sound copy - " + name)
+                }
+            }
+        }
+        window.addEventListener("keydown", handleKeyPress)
+        return () => { window.removeEventListener("keydown", handleKeyPress) }
+    }, [getTargetName])
+
     return (
         <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
             <DefaultSoundCollection />

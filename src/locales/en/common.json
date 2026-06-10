@@ -348,6 +348,8 @@
     "shortcuts.zoomVertical": "Zoom (Vertical)",
     "shortcuts.escapeEditor": "Escape editor focus",
     "shortcuts.playPause": "Play / Pause",
+    "shortcuts.playPauseCurrSound": "Play / Pause most recent sound",
+    "shortcuts.InsertPrevious": "Paste most recent sound",
     "shortcuts.jumpToSounds": "Jump to Sounds",
     "shortcuts.jumpToScripts": "Jump to Scripts",
     "shortcuts.jumpToApi": "Jump to API",
