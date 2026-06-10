@@ -65,6 +65,11 @@ export function play(startMes: number, delay = 0) {
     if (startMes < minStartMes || (loop.on && startMes >= endMes)) {
         startMes = minStartMes
     }
+    // Empty projects have no interval to schedule; looping would otherwise reschedule zero-duration starts forever.
+    if (startMes >= endMes && delay <= 0) {
+        reset()
+        return
+    }
     const tempoMap = new TempoMap(dawData!)
     const startTime = tempoMap.measureToTime(startMes)
     const endTime = tempoMap.measureToTime(endMes)
