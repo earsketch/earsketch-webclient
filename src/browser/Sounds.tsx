@@ -628,7 +628,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndF
     const showPreview = useSelector(appState.selectShowSoundPreviewWidget)
     const loggedIn = useSelector(user.selectLoggedIn)
     return (
-        <div className="pb-1">
+        <div>
             <div className="pb-1">
                 <Filters
                     currentFilterTab={currentFilterTab}
@@ -818,7 +818,7 @@ const SoundPreview = () => {
     }, [currentName])
 
     return (
-        <div className="flex border border-blue mb-2 flex-col items-center justify-center bg-white dark:bg-transparent">
+        <div className="flex border border-blue flex-col items-center justify-center bg-white dark:bg-transparent">
             <div className="text-sm mt-2 truncate text-center">
                 {currentName ?? t("soundBrowser.noSoundsFound")}
                 {currentName && <button aria-label={t("scriptShare.copyClipboard")} onClick={() => { copyToClipboard(currentName) }} className="text-blue-400 hover:text-blue-600 active:text-blue-950 text-sm p-2" title={t("scriptShare.copyClipboard")}>
@@ -843,7 +843,7 @@ const SoundPreview = () => {
                         </div>}
                 </div>
 
-                <div className="flex items-center justify-center gap-8 mt-2">
+                <div className="flex items-center justify-evenly mt-2">
                     <button
                         type="button"
                         onClick={() => setRecommendationMode(1 - recommendationMode)}
