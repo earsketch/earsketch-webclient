@@ -627,6 +627,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndF
     const dispatch = useDispatch()
     const showPreview = useSelector(appState.selectShowSoundPreviewWidget)
     const loggedIn = useSelector(user.selectLoggedIn)
+    const { t } = useTranslation()
     return (
         <div>
             <div className="pb-1">
@@ -638,16 +639,17 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndF
                 {loggedIn && <ShowOnlyFavorites />}
                 <AddSound />
             </div>
+            <h4 className="sr-only">{t("sounds.preview.title").toLocaleUpperCase()}</h4>
             <button
                 type="button"
                 onClick={() => dispatch(appState.setShowSoundPreviewWidget(!showPreview))}
                 aria-expanded={showPreview}
                 aria-controls="sound-preview-panel"
-                title={showPreview ? "Hide preview" : "Show preview"}
-                aria-label={showPreview ? "Hide preview" : "Show preview"}
+                title={showPreview ? t("ariaDescriptors:sounds.preview.close") : t("ariaDescriptors:sounds.preview.open")}
+                aria-label={showPreview ? t("ariaDescriptors:sounds.preview.close") : t("ariaDescriptors:sounds.preview.open")}
                 className="flex bg-blue text-white w-full justify-center items-center gap-1 text-sm p-1"
             >
-                <span>SOUND PREVIEW</span>
+                <span>{t("sounds.preview.title").toLocaleUpperCase()}</span>
                 <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
             </button>
             <div
@@ -819,8 +821,8 @@ const SoundPreview = () => {
 
     return (
         <div className="flex border border-blue flex-col items-center justify-center bg-white dark:bg-transparent">
-            <div className="text-sm mt-2 truncate text-center">
-                {currentName ?? t("soundBrowser.noSoundsFound")}
+            <div className="flex items-center text-sm mt-2 text-center">
+                <div className="max-w-52 truncate" title={currentName ?? t("soundBrowser.noSoundsFound")}>{currentName ?? t("soundBrowser.noSoundsFound")}</div>
                 {currentName && <button aria-label={t("scriptShare.copyClipboard")} onClick={() => { copyToClipboard(currentName) }} className="text-blue-400 hover:text-blue-600 active:text-blue-950 text-sm p-2" title={t("scriptShare.copyClipboard")}>
                     <i className="icon icon-copy"></i>
                 </button>}
@@ -847,11 +849,11 @@ const SoundPreview = () => {
                     <button
                         type="button"
                         onClick={() => setRecommendationMode(1 - recommendationMode)}
-                        aria-label={recommendationMode ? "Recommendation mode" : "Normal mode"}
-                        title={recommendationMode ? t("ariaDescriptors:sounds.preview.recommendationMode") : t("ariaDescriptors:sounds.preview.normalMode")}
+                        aria-label={recommendationMode ? t("ariaDescriptors:sounds.preview.switchToOrderedMode") : t("ariaDescriptors:sounds.preview.switchToRecommendationMode")}
+                        title={recommendationMode ? t("ariaDescriptors:sounds.preview.switchToOrderedMode") : t("ariaDescriptors:sounds.preview.switchToRecommendationMode")}
                         className="sound-btn-ghost"
                     >
-                        {recommendationMode ? <i className="icon icon-star"></i> : <i className="icon icon-list2"></i>}
+                        {recommendationMode ? <i className="icon icon-star" /> : <i className="icon icon-list2" />}
                     </button>
 
                     <button

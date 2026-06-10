@@ -365,7 +365,8 @@
     "hardware.wheel": "Mouse Wheel",
     "hardware.esc": "Esc",
     "hardware.tab": "Tab",
-    "errorReport.header": "Report an error"
+    "errorReport.header": "Report an error",
+    "sounds.preview.title": "Audition"
   },
   "ariaDescriptors": {
     "api.searchBar": "API",
@@ -428,10 +429,12 @@
     "scriptBrowser.share": "Share {{scriptname}}",
     "sounds.clearFilter": "Clear sound browser search and filters",
     "sounds.paste": "Paste {{name}} to the code editor",
+    "sounds.preview.open": "Open Audition panel",
+    "sounds.preview.close": "Close Audition panel",
     "sounds.preview": "Preview sound {{name}}",
     "sounds.preview.player": "Sound preview player",
-    "sounds.preview.recommendationMode": "Recommendation mode",
-    "sounds.preview.normalMode": "Normal mode",
+    "sounds.preview.switchToRecommendationMode": "Switch to Recommendation Mode",
+    "sounds.preview.switchToOrderedMode": "Switch to Ordered Mode",
     "sounds.preview.previousSound": "Previous sound",
     "sounds.preview.previousTitle": "Previous (Left Arrow)",
     "sounds.preview.nextSound": "Next sound",
