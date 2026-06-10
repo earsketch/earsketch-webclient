@@ -15,7 +15,6 @@ declare const ES_WEB_FEATURED_ARTISTS: string[]
 declare const ES_WEB_SHOW_CAI: boolean
 declare const ES_WEB_UPLOAD_CAI_HISTORY: boolean
 declare const ES_WEB_SHOW_CHAT: boolean
-declare const ES_WEB_SHOW_LOCALE_SWITCHER: boolean
 
 declare const Kali: any
 
