@@ -31,6 +31,7 @@ const appSlice = createSlice({
         embeddedShareID: null as string | null,
         modal: null as { Modal: Modal, resolve: (_: any) => void } | null,
         confetti: false,
+        showSoundPreviewWidget: false,
     },
     reducers: {
         setScriptLanguage(state, { payload }) {
@@ -78,6 +79,9 @@ const appSlice = createSlice({
         setConfetti(state, { payload }) {
             state.confetti = payload
         },
+        setShowSoundPreviewWidget(state, { payload }: { payload: boolean }) {
+            state.showSoundPreviewWidget = payload
+        },
     },
 })
 
@@ -103,6 +107,7 @@ export const {
     setLocaleCode,
     setModal,
     setConfetti,
+    setShowSoundPreviewWidget,
 } = appSlice.actions
 
 export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage
@@ -126,6 +131,7 @@ export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedSha
 export const selectLocaleCode = (state: RootState) => state.app.locale
 export const selectModal = (state: RootState) => state.app.modal
 export const selectConfetti = (state: RootState) => state.app.confetti
+export const selectShowSoundPreviewWidget = (state: RootState) => state.app.showSoundPreviewWidget
 
 export const selectLocale = createSelector(
     [selectLocaleCode],
