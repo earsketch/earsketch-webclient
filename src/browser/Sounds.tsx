@@ -861,7 +861,7 @@ const SoundPreview = () => {
                         title={t("ariaDescriptors:sounds.preview.previousTitle")}
                         className="sound-btn-ghost"
                     >
-                        <i className="icon icon-backward2"></i>
+                        <i className="icon icon-first"></i>
                     </button>
 
                     <button
@@ -898,7 +898,7 @@ const SoundPreview = () => {
                         title={t("ariaDescriptors:sounds.preview.nextTitle")}
                         className="sound-btn-ghost"
                     >
-                        <i className="icon icon-forward3"></i>
+                        <i className="icon icon-last"></i>
                     </button>
 
                     {loggedIn && (
