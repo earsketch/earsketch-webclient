@@ -191,7 +191,6 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     }, [el])
 
     return <div ref={el} id="dawHeader" className="grow-0 bg-white dark:bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-        <h1 className="sr-only">{t("ariaDescriptors:daw.transportControls")}</h1>
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div id="daw-label">
@@ -204,7 +203,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             <a target="_blank" href={shareScriptLink} rel="noreferrer"> Click here to view in EarSketch </a>
         </div>}
         {/* Transport Buttons */}
-        <div className="daw-transport-container space-x-5">
+        <nav className="daw-transport-container space-x-5" aria-label={t("ariaDescriptors:daw.transportControls")}>
             {/* Beginning */}
             <span className="daw-transport-button">
                 <button aria-label={t("daw.tooltip.reset")} type="submit" className="dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.reset")} onClick={reset}>
@@ -261,7 +260,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                     <input id="dawVolumeSlider" type="range" min={minVolume} max="0" value={volumeMuted ? minVolume : volume} onChange={e => changeVolume(+e.target.value)} title="Volume Control" aria-label="Volume Control"/>
                 </span>
             </span>
-        </div>
+        </nav>
     </div>
 }
 
@@ -590,6 +589,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
     const hideMixTrackLabel = trackWidth < 950
 
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
+        <h3 className="sr-only">{track.label}</h3>
         <div className="dawTrackContainer" style={{ height: mixTrackHeight + "px" }}>
             <div className="dawTrackCtrl border-gray-300 border-b" style={{ left: xScroll + "px" }}>
                 <div className="mixTrackFiller text-gray-700 dark:text-gray-400">{track.label}</div>
@@ -1232,7 +1232,7 @@ export const DAW = () => {
         }
     }, [playing, xScale, autoScroll])
 
-    return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
+    return <section className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`} aria-label={t("daw.title")}>
         <div id="daw-live-region" aria-live="polite" aria-atomic="true" className="sr-only"></div>
         {hideEditor &&
         <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
@@ -1320,5 +1320,5 @@ export const DAW = () => {
                 </div>
             </div>
         </div>}
-    </div>
+    </section>
 }

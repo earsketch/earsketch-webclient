@@ -369,6 +369,8 @@
     "sounds.preview.title": "Audition"
   },
   "ariaDescriptors": {
+    "daw.transportControls": "Transport controls",
+    "daw.track": "Track {{label}}",
     "api.searchBar": "API",
     "scripts.searchBar": "Scripts",
     "sounds.searchBar": "Sounds",
