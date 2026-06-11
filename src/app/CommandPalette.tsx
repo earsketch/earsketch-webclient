@@ -15,6 +15,7 @@ import { API_DOC, API_FUNCTIONS } from "../api/api"
 import * as tabs from "../ide/tabState"
 import * as tabThunks from "../ide/tabThunks"
 import * as bubble from "../bubble/bubbleState"
+
 import * as user from "../user/userState"
 import * as exporter from "./exporter"
 import { ProfileEditor } from "./ProfileEditor"
@@ -188,7 +189,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     subtitle: isMac ? "Cmd+Enter" : "Ctrl+Enter",
                     category: "Commands",
                     action: () => {
-                        (document.querySelector('[data-test="run-button"]') as HTMLButtonElement | null)?.click()
+                        callbacks.runScript()
                         onCloseRef.current()
                     },
                     icon: "icon-arrow-right22",
@@ -693,6 +694,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             </Dialog>
         </Transition>
     )
+}
+
+// ─── Callbacks ───────────────────────────────────────────────────────────────
+// Set by IDE.tsx after it initializes, same pattern as bubble/Bubble.tsx
+export const callbacks = {
+    runScript: () => {},
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
