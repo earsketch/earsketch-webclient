@@ -8,6 +8,7 @@ import * as scriptsThunks from "../browser/scriptsThunks"
 import * as curriculum from "../browser/curriculumState"
 import * as apiState from "../browser/apiState"
 import * as layout from "../ide/layoutState"
+import * as soundsState from "../browser/soundsState"
 import * as daw from "../daw/dawState"
 
 import { BrowserTabType } from "../browser/BrowserTab"
@@ -533,8 +534,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     subtitle: `${s.artist} – ${s.genre} (${s.instrument})`,
                     category: "Sounds",
                     action: () => {
-                        const editor = (window as any).ace?.edit?.("coder")
-                        if (editor) editor.insert(s.name)
+                        dispatch(layout.setWest({ open: true, kind: BrowserTabType.Sound }))
+                        dispatch(soundsState.setAuditionRequest(s.name))
                         onCloseRef.current()
                     },
                     icon: "icon-music",
@@ -555,8 +556,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     subtitle: "Your uploaded sound",
                     category: "My Sounds",
                     action: () => {
-                        const editor = (window as any).ace?.edit?.("coder")
-                        if (editor) editor.insert(s.name)
+                        dispatch(layout.setWest({ open: true, kind: BrowserTabType.Sound }))
+                        dispatch(soundsState.setAuditionRequest(s.name))
                         onCloseRef.current()
                     },
                     icon: "icon-music",
