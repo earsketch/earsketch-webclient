@@ -249,6 +249,23 @@ let droplet: any
 let srLineEl: HTMLElement | null = null
 let lastAnnouncedLine = -1
 
+function getIndentLevel(lineText: string): number {
+    const trimmed = lineText.trimStart()
+    if (!trimmed) return 0
+    const leading = lineText.length - trimmed.length
+    if (leading === 0) return 0
+    // Find the smallest non-zero indent in the document to use as the unit.
+    const doc = view.state.doc
+    let unit = 0
+    for (let i = 1; i <= doc.lines; i++) {
+        const t = doc.line(i).text
+        if (!t.trim()) continue
+        const n = t.length - t.trimStart().length
+        if (n > 0 && (unit === 0 || n < unit)) unit = n
+    }
+    return unit > 0 ? Math.round(leading / unit) : 0
+}
+
 function announceLineNumber(lineNumber: number) {
     if (!srLineEl) {
         srLineEl = document.createElement("div")
@@ -261,7 +278,12 @@ function announceLineNumber(lineNumber: number) {
     window.setTimeout(() => {
         const line = view.state.doc.line(lineNumber)
         if (srLineEl) {
-            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") })
+            const indentLevel = getIndentLevel(line.text)
+            const content = line.text.trim() || i18n.t("ariaDescriptors:editor.emptyLine")
+            const text = indentLevel > 0
+                ? i18n.t("ariaDescriptors:editor.indentLevel", { count: indentLevel }) + ", " + content
+                : content
+            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text })
         }
     }, 10)
 }

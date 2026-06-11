@@ -408,6 +408,7 @@
     "daw.clipSourceLine": "source line {{line}}",
     "editor.lineAnnouncement": "Line {{number}}: {{text}}",
     "editor.emptyLine": "empty line",
+    "editor.indentLevel": "indent {{count}}",
     "daw.transportControls": "DAW Transport Controls",
     "daw.track": "Track {{label}}",
 
