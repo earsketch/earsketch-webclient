@@ -261,9 +261,7 @@ function announceLineNumber(lineNumber: number) {
     window.setTimeout(() => {
         const line = view.state.doc.line(lineNumber)
         if (srLineEl) {
-            srLineEl.textContent = line.text
-                ? i18n.t("editor.lineAnnouncement", { number: lineNumber, text: line.text })
-                : i18n.t("editor.emptyLineAnnouncement", { number: lineNumber })
+            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") })
         }
     }, 10)
 }
@@ -364,34 +362,6 @@ export function setReadOnly(value: boolean) {
     view.dispatch({ effects: readOnly.reconfigure(EditorState.readOnly.of(value)) })
     droplet.setReadOnly(value)
 }
-
-let srLineEl: HTMLElement | null = null
-let lastAnnouncedLine = -1
-
-function announceLineNumber(lineNumber: number) {
-    if (!srLineEl) {
-        srLineEl = document.createElement("div")
-        srLineEl.setAttribute("aria-live", "assertive")
-        srLineEl.setAttribute("aria-atomic", "true")
-        srLineEl.style.cssText = "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)"
-        document.body.appendChild(srLineEl)
-    }
-    srLineEl.textContent = ""
-    window.setTimeout(() => {
-        const line = view.state.doc.line(lineNumber)
-        if (srLineEl) {
-            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") })
-        }
-    }, 10)
-}
-
-const lineAnnouncementExtension = EditorView.updateListener.of((update) => {
-    if (!update.selectionSet) return
-    const line = update.state.doc.lineAt(update.state.selection.main.head)
-    if (line.number === lastAnnouncedLine) return
-    lastAnnouncedLine = line.number
-    announceLineNumber(line.number)
-})
 
 export function focus() {
     const { from } = view.state.selection.main
