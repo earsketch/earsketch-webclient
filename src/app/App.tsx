@@ -597,7 +597,8 @@ export const App = () => {
     // Command Palette keyboard shortcut
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === "P") {
+            console.log(event.key)
+            if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "p") {
                 event.preventDefault()
                 openCommandPalette()
             }
