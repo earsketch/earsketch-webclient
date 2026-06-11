@@ -348,6 +348,7 @@
     "shortcuts.zoomVertical": "Zoom (Vertical)",
     "shortcuts.escapeEditor": "Escape editor focus",
     "shortcuts.playPause": "Play / Pause",
+    "shortcuts.jumpToCodeDaw": "Jump to code / DAW clip",
     "shortcuts.jumpToSounds": "Jump to Sounds",
     "shortcuts.jumpToScripts": "Jump to Scripts",
     "shortcuts.jumpToApi": "Jump to API",
