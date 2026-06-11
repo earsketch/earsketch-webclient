@@ -40,10 +40,13 @@ const CreateScriptButton = () => {
 
 const ScriptSearchBar = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const searchText = useSelector(scripts.selectSearchText)
+    const count = useSelector(scripts.selectFilteredActiveScriptIDs).length
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(scripts.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(scripts.setSearchText(""))
-    const props = { id: "scriptSearchBar", searchText, dispatchSearch, dispatchReset }
+    const liveMessage = t("scriptsFound", { count })
+    const props = { id: "scriptSearchBar", aria: t("ariaDescriptors:scripts.searchBar"), liveMessage, firstResultSelector: "#panel-1 button", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -426,7 +429,7 @@ export const ScriptBrowser = () => {
                 <CreateScriptButton />
             </div>
 
-            <div className="h-full flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Script}>
+            <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Script}>
                 <RegularScriptCollection />
                 <SharedScriptCollection />
                 <DeletedScriptCollection />

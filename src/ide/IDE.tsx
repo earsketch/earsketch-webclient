@@ -19,6 +19,7 @@ import * as editor from "./Editor"
 import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
+import { ExtensionHost } from "../extensions/ExtensionHost"
 import { setReady } from "../bubble/bubbleState"
 import { dismiss } from "../bubble/bubbleThunks"
 import { callbacks as bubbleCallbacks } from "../bubble/Bubble"
@@ -277,12 +278,17 @@ curriculum.callbacks.import = importExample
 async function runScript() {
     if (isWaitingForServerResponse) return
 
+    const state = store.getState()
+    if (!appState.selectHideEditor(state) && tabs.selectOpenTabs(state).length === 0) {
+        store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("editor.noScriptsLoaded") }))
+        return
+    }
+
     isWaitingForServerResponse = true
 
     setLoading(true)
 
     const startTime = Date.now()
-    const state = store.getState()
     const hideEditor = appState.selectHideEditor(state)
     const scriptName = (hideEditor ? appState.selectEmbeddedScriptName(state) : tabs.selectActiveTabScript(state)!.name)!
     const language = ESUtils.parseLanguage(scriptName)
@@ -405,6 +411,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
     const gutterSize = hideEditor ? 0 : 9
     const isWestOpen = useSelector(layout.isWestOpen)
     const isEastOpen = useSelector(layout.isEastOpen)
+    const eastContent = useSelector(appState.selectEastContent)
     const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
     const maxWidths = embedMode ? [0, Infinity, 0] : [isWestOpen ? Infinity : layout.COLLAPSED_WIDTH, Infinity, isEastOpen ? Infinity : layout.COLLAPSED_WIDTH]
     const minHeights = embedMode ? [layout.MIN_DAW_HEIGHT, 0, 0] : [layout.MIN_DAW_HEIGHT, layout.MIN_EDITOR_HEIGHT, layout.MIN_DAW_HEIGHT]
@@ -475,33 +482,31 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                     </div>
 
                     <div ref={consoleContainer} id="console-frame" aria-live="assertive" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
-                        <div className="w-fit">
-                            <div id="console">
-                                {logs.length === 0 && <span>&nbsp;</span> /* hack for screen readers */}
-                                {logs.map((msg: ide.Log, index: number) => {
-                                    const consoleLineClass = classNames({
-                                        "console-line": true,
-                                        "console-warn": msg.level === "warn",
-                                        "console-error": msg.level === "error",
-                                    })
-                                    return <div key={index} className={consoleLineClass} style={{ fontSize }}>
-                                        {["warn", "error"].includes(msg.level) && (msg.level === "error"
-                                            ? <span title={t("console:error")} className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
-                                            : <span title={t("console:warning")} className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
-                                        <span>
-                                            {msg.text}{" "}
-                                            {msg.level === "error" && <>
-                                                —{" "}
-                                                <a className="cursor-pointer" onClick={() => {
-                                                    dispatch(curriculum.openErrorPage(msg.text))
-                                                }}>
-                                                    Click here for more information.
-                                                </a>
-                                            </>}
-                                        </span>
-                                    </div>
-                                })}
-                            </div>
+                        <div id="console">
+                            {logs.length === 0 && <span>&nbsp;</span> /* hack for screen readers */}
+                            {logs.map((msg: ide.Log, index: number) => {
+                                const consoleLineClass = classNames({
+                                    "console-line": true,
+                                    "console-warn": msg.level === "warn",
+                                    "console-error": msg.level === "error",
+                                })
+                                return <div key={index} className={consoleLineClass} style={{ fontSize }}>
+                                    {["warn", "error"].includes(msg.level) && (msg.level === "error"
+                                        ? <span title={t("console:error")} className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
+                                        : <span title={t("console:warning")} className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
+                                    <span>
+                                        {msg.text}{" "}
+                                        {msg.level === "error" && <>
+                                            —{" "}
+                                            <a className="cursor-pointer" onClick={() => {
+                                                dispatch(curriculum.openErrorPage(msg.text))
+                                            }}>
+                                                Click here for more information.
+                                            </a>
+                                        </>}
+                                    </span>
+                                </div>
+                            })}
                         </div>
                     </div>
                 </Split>
@@ -514,7 +519,8 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                 : <CAI />)}
                         </div>)}
                     <div className={showCai ? "h-full hidden" : "h-full"}>
-                        <Curriculum />
+                        <div className={eastContent !== "curriculum" ? "hidden" : "h-full"}><Curriculum /></div>
+                        <div className={eastContent === "curriculum" ? "hidden" : "h-full"}><ExtensionHost /></div>
                     </div>
                 </div>
             </Split>
