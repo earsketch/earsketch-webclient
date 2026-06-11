@@ -1,8 +1,8 @@
-import { test, expect } from "@playwright/test"
+import { test, expect, Page } from "@playwright/test"
 import { setupBackend } from "../helpers/mocks"
 import { skipTour } from "../helpers/actions"
 
-test.describe("Collapsible panes", () => {
+test.describe("Layout", () => {
     test.beforeEach(async ({ page }) => {
         await setupBackend(page)
         await page.goto("/")
@@ -31,4 +31,5 @@ test.describe("Collapsible panes", () => {
         const curWidth = await page.locator("div#curriculum-container").evaluate((el) => (el as HTMLElement).offsetWidth)
         expect(curWidth).toBeLessThanOrEqual(45)
     })
+
 })
