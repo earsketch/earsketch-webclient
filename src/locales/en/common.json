@@ -406,12 +406,11 @@
     "daw.clipLength": "clip, {{count}} measure long",
     "daw.clipLength_plural": "clip, {{count}} measures long",
     "daw.clipSourceLine": "source line {{line}}",
-    "daw.clipCallStack": "{{count}} source lines, outermost call at line {{outerLine}}",
     "editor.lineAnnouncement": "Line {{number}}: {{text}}",
     "editor.emptyLine": "empty line",
     "daw.transportControls": "DAW Transport Controls",
     "daw.track": "Track {{label}}",
-    "daw.clip": "{{filekey}}, measure {{measure}} to {{end}}, line {{sourceLine}}",
+
     "daw.timeline": "DAW Timeline",
     "daw.measurelineLabel": "Navigate measures. Use arrow keys to browse, Enter or Space to set playback start.",
     "daw.measureValueText": "Measure {{measure}} of {{total}}",
