@@ -352,13 +352,16 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
             </div>
             <div className={trackClasses}>
                 {(() => {
-                    // Group clips by primary source line to compute the full family extent for preview playback.
+                    // Group clips by primary source line to compute family extents, sizes,
+                    // and per-clip positions (for beat pattern aria descriptions).
                     const familyRanges: Record<number, { start: number, end: number }> = {}
+                    const familyCounts: Record<number, number> = {}
                     for (const c of track.clips) {
                         const key = c.sourceLines[0]
                         if (key === undefined) continue
                         const cStart = c.measure
                         const cEnd = c.measure + c.end - c.start
+                        familyCounts[key] = (familyCounts[key] ?? 0) + 1
                         if (!familyRanges[key]) {
                             familyRanges[key] = { start: cStart, end: cEnd }
                         } else {
@@ -366,9 +369,17 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                             familyRanges[key].end = Math.max(familyRanges[key].end, cEnd)
                         }
                     }
-                    return track.clips.map((clip: types.Clip, index: number) => (
-                        <Clip key={index} color={color} clip={clip} familyRange={familyRanges[clip.sourceLines[0]]} />
-                    ))
+                    const familyIndexCounters: Record<number, number> = {}
+                    return track.clips.map((clip: types.Clip, index: number) => {
+                        const key = clip.sourceLines[0]
+                        familyIndexCounters[key] = (familyIndexCounters[key] ?? 0) + 1
+                        return <Clip
+                            key={index} color={color} clip={clip}
+                            familyRange={familyRanges[key]}
+                            familyIndex={familyIndexCounters[key]}
+                            familySize={familyCounts[key] ?? 1}
+                        />
+                    })
                 })()}
             </div>
         </div>
@@ -412,7 +423,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip, familyRange }: { color: daw.Color, clip: types.Clip, familyRange?: { start: number, end: number } }) => {
+const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: daw.Color, clip: types.Clip, familyRange?: { start: number, end: number }, familyIndex: number, familySize: number }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
@@ -428,6 +439,23 @@ const Clip = ({ color, clip, familyRange }: { color: daw.Color, clip: types.Clip
     const playStart = familyRange?.start ?? clip.measure
     const playEnd = familyRange?.end ?? (clip.measure + clip.end - clip.start)
 
+    // Classify clip type for aria-label.
+    const singleClipEnd = clip.measure + clip.end - clip.start
+    const actuallyLoops = clip.loop && playEnd > singleClipEnd + 0.01
+    const isBeatPattern = !clip.loop
+    const clipLengthMeasures = clip.end - clip.start
+    let clipType: string
+    if (actuallyLoops) {
+        clipType = t("ariaDescriptors:daw.clipLooping", { end: playEnd.toFixed(2) })
+    } else if (isBeatPattern) {
+        clipType = t("ariaDescriptors:daw.clipBeatPattern", { index: familyIndex, count: familySize })
+    } else {
+        clipType = t("ariaDescriptors:daw.clipLength", { count: clipLengthMeasures })
+    }
+    const callStackDesc = sourceLines.length > 1
+        ? t("ariaDescriptors:daw.clipCallStack", { count: sourceLines.length, outerLine: sourceLines[sourceLines.length - 1] })
+        : t("ariaDescriptors:daw.clipSourceLine", { line: primaryLine })
+
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
             const waveform = WaveformCache.get(clip)
@@ -439,10 +467,16 @@ const Clip = ({ color, clip, familyRange }: { color: daw.Color, clip: types.Clip
         ref={element}
         className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border${sourceHighlight ? " source-highlight" : ""}`}
         data-source-line={primaryLine}
+        data-source-lines={sourceLines.join(",")}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, sourceLines)} onMouseLeave={clearDAWHoverLine}
+        onMouseEnter={() => {
+            if (sourceLines.length > 1) {
+                console.log(`Clip "${clip.filekey}" (track ${clip.track}, measure ${clip.measure.toFixed(2)}) generated by call stack:`, sourceLines.map((line, i) => `line ${line}${i === 0 ? " (innermost)" : ""}`).join(" ← "))
+            }
+            scriptMatchesDAW && setDAWHoverLine(color, sourceLines)
+        }} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? formatSourceLines(sourceLines) : t("daw.needsSync")}
-        aria-label={t("ariaDescriptors:daw.clip", { track: clip.track, start: playStart, end: playEnd, filekey: clip.filekey, line: primaryLine })}
+        aria-label={t("ariaDescriptors:daw.clipDescription", { track: clip.track, start: playStart.toFixed(2), end: playEnd.toFixed(2), type: clipType, filekey: clip.filekey, callStack: callStackDesc })}
         onClick={() => {
             player.setPreview(clip.track)
             player.callbacks.onStartedCallback = () => {
@@ -518,8 +552,13 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                     <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                     <circle
                         cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
+                        tabIndex={0}
+                        data-source-line={pointLines[0]}
+                        data-source-lines={pointLines.join(",")}
                         onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
                         onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
+                        onFocus={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
+                        onBlur={() => { setFocusedPoint(null); clearDAWHoverLine() }}
                     >
                         {/* eslint-disable-next-line react/jsx-indent */}
                         <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? formatSourceLines(pointLines) : t("daw.needsSync")}</title>
@@ -1150,6 +1189,7 @@ export const DAW = () => {
     }, [playing, xScale, autoScroll])
 
     return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
+        <div id="daw-live-region" role="status" aria-atomic="true" className="sr-only"></div>
         {hideEditor &&
         <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
