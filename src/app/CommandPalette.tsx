@@ -26,6 +26,7 @@ import { SoundUploader } from "./SoundUploader"
 import { openScriptHistory, openCodeIndicator, renameScript, shareScript, downloadScript, deleteScript, deleteSharedScript, submitToCompetition } from "./scriptActions"
 import { importScript } from "../browser/scriptsThunks"
 import { saveScript, openShare, createScript } from "../ide/IDE"
+import { PANEL_SHORTCUTS, navigateTo } from "./App"
 import * as editor from "../ide/Editor"
 import * as ESUtils from "../esutils"
 
@@ -391,6 +392,30 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             }
         )
 
+        // ── Panel navigation commands ────────────────────────────────────────
+        const panelLabels: Record<string, { title: string, icon: string, searchKey: string }> = {
+            1: { title: t("soundBrowser.title"), icon: "icon-music", searchKey: "sounds browser panel navigate" },
+            2: { title: t("scriptBrowser.myScripts"), icon: "icon-file-text2", searchKey: "scripts browser panel navigate" },
+            3: { title: t("contentManager.openTab", { name: "API" }), icon: "icon-code", searchKey: "api browser panel navigate" },
+            4: { title: t("daw.title"), icon: "icon-music", searchKey: "daw digital audio workstation panel navigate" },
+            5: { title: t("editor.title"), icon: "icon-pencil2", searchKey: "editor code panel navigate" },
+            6: { title: t("curriculum.title"), icon: "icon-book", searchKey: "curriculum panel navigate" },
+            7: { title: t("ariaDescriptors:skipLink.daw"), icon: "icon-equalizer", searchKey: "utilities panel navigate" },
+        }
+        Object.entries(PANEL_SHORTCUTS).forEach(([key, entry]) => {
+            const label = panelLabels[key]
+            if (!label) return
+            cmds.push({
+                id: `navigate-panel-${key}`,
+                title: `${t("thing.open")}: ${label.title}`,
+                subtitle: `Ctrl+${key}`,
+                category: "Navigate",
+                action: () => { navigateTo(entry); onCloseRef.current() },
+                icon: label.icon,
+                searchKey: `${label.searchKey} ctrl ${key} navigate go to commands`,
+            })
+        })
+
         if (!loggedIn) {
             cmds.push(
                 {
@@ -583,7 +608,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             groups[cmd.category].push(cmd)
         }
         // Sort so Commands always appears first, then all other categories alphabetically
-        const CATEGORY_ORDER: Record<string, number> = { "Open Tabs": 0, Commands: 1 }
+        const CATEGORY_ORDER: Record<string, number> = { "Open Tabs": 0, Commands: 1, Navigate: 2 }
         return Object.fromEntries(
             Object.entries(groups).sort(([a], [b]) => {
                 const aOrder = CATEGORY_ORDER[a] ?? 2
@@ -600,8 +625,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 
     // ── Render ─────────────────────────────────────────────────────────────
     return (
-        <Transition appear show={isOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-50" onClose={onClose}>
+        <Dialog as="div" className="relative z-50" open={isOpen} onClose={onClose} unmount={false}>
+            <Transition appear show={isOpen} as={Fragment}>
                 {/* Backdrop */}
                 <Transition.Child
                     as={Fragment}
@@ -691,8 +716,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                         </Transition.Child>
                     </div>
                 </div>
-            </Dialog>
-        </Transition>
+            </Transition>
+        </Dialog>
     )
 }
 
