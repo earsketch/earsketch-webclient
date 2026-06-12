@@ -35,7 +35,6 @@ export interface SoundEntity {
     folder: string
     artist: string
     year: string
-    public: number // TODO: Currently: 0 or 1. Soon: 0, 1, or 2 (corresponding to `SoundType` enum).
     genre: string
     instrument: string
     keySignature?: string

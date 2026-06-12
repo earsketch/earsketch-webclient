@@ -135,12 +135,12 @@ async function _getStandardSounds() {
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
         // Populate cache with standard sound metadata so that we don't fetch it again later via `getMetadata()`.
         for (const sound of sounds) {
-            fixMetadata(sound, sound.public === 1 ? SoundType.Public : SoundType.Hidden)
+            fixMetadata(sound)
             if (!cache.sounds[sound.name]) {
                 cache.sounds[sound.name] = { metadata: Promise.resolve(sound) }
             }
         }
-        // Filter out "non-public" sounds so that they don't appear in the sound browser, autocomplete, etc.
+        // Filter out sounds that should not appear in the sound browser, autocomplete, etc.
         // Note that we still cache their metadata above; this just prevents them from appearing in the standard set.)
         sounds = sounds.filter(sound => sound.type === SoundType.Public)
         return { sounds, folders }
@@ -155,7 +155,7 @@ export async function getUserSounds(username: string) {
     const sounds: SoundEntity[] = await getAuth("/audio/user", { username })
     // Populate cache with user sound metadata so that we don't fetch it again later via `getMetadata()`.
     for (const sound of sounds) {
-        fixMetadata(sound, SoundType.User)
+        fixMetadata(sound)
         if (!cache.sounds[sound.name]) {
             cache.sounds[sound.name] = { metadata: Promise.resolve(sound) }
         }
@@ -188,18 +188,14 @@ async function _getMetadata(name: string) {
         return null
     }
 
-    fixMetadata(metadata, metadata.public === 0 ? SoundType.User : SoundType.Hidden)
+    fixMetadata(metadata)
     return metadata
 }
 
-function fixMetadata(metadata: SoundEntity, type: SoundType) {
+function fixMetadata(metadata: SoundEntity) {
     // Server uses -1 to indicate no tempo; for type safety, we remap this to undefined.
     if (metadata.tempo === -1) {
         metadata.tempo = undefined
-    }
-    // TODO: After database update, we can unify `public` and `type`.
-    if (metadata.type === undefined) {
-        metadata.type = type
     }
     return metadata
 }
