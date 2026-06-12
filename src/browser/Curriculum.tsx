@@ -246,7 +246,7 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
                             className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
                             title={t("extension.switchToExtension", { extensionName })}
                             onClick={() => { dispatch(appState.setEastContent("extension")) }}>
-                            <img src={extensionIcon32} alt="" className="w-5 h-5" />
+                            <img src={extensionIcon32} alt={t("extension.iconAlt", { extensionName })} className="w-5 h-5" />
                         </button>
                     )}
                 </>}
@@ -254,7 +254,8 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
                     <button
                         className="inline-flex items-center p-1 text-xs rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700 ml-2"
                         title={t("curriculum.title")}
-                        onClick={() => { dispatch(appState.setEastContent("curriculum")) }}>
+                        onClick={() => { dispatch(appState.setEastContent("curriculum")) }}
+                        type="button">
                         {t("curriculum.title").toLocaleUpperCase()}
                     </button>
                 )}
