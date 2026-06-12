@@ -686,8 +686,8 @@ export const App = () => {
                         store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("editor.noScriptsLoaded") }))
                         return
                     }
-                    if ("elementSelector" in entry && entry.elementSelector === "#sound-preview-play-button"
-                        && soundsState.selectFilteredRegularNames(store.getState()).length === 0) {
+                    if ("elementSelector" in entry && entry.elementSelector === "#sound-preview-play-button" &&
+                        soundsState.selectFilteredRegularNames(store.getState()).length === 0) {
                         store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("soundBrowser.noResultsToPreview") }))
                         return
                     }
