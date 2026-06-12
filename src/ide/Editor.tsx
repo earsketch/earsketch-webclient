@@ -17,7 +17,7 @@ import { gutter, GutterMarker, keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setPreview, previewPlugin, setAppLocale, setShowBeatStringAnnotation } from "./EditorWidgets"
-
+import { playEarcon, SINE_BUMP } from "../audio/earcon"
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
@@ -233,12 +233,38 @@ const pythonAutocomplete: CompletionSource = (context) => autocompleteEnabled ? 
 // Internal state
 let view: EditorView = null as unknown as EditorView
 let sessions: { [key: string]: EditorSession } = {}
-const keyBindings: { key: string, run: () => boolean }[] = []
+const keyBindings: { key: string, run: () => boolean }[] = [
+    {
+        key: "Ctrl-i",
+        run: () => {
+            const currentLine = view.state.doc.lineAt(view.state.selection.main.head)
+            jumpToDAWClip(currentLine.number)
+            return true
+        },
+    },
+]
 let resolveReady: () => void
 let droplet: any
 
 let srLineEl: HTMLElement | null = null
 let lastAnnouncedLine = -1
+
+function getIndentLevel(lineText: string): number {
+    const trimmed = lineText.trimStart()
+    if (!trimmed) return 0
+    const leading = lineText.length - trimmed.length
+    if (leading === 0) return 0
+    // Find the smallest non-zero indent in the document to use as the unit.
+    const doc = view.state.doc
+    let unit = 0
+    for (let i = 1; i <= doc.lines; i++) {
+        const t = doc.line(i).text
+        if (!t.trim()) continue
+        const n = t.length - t.trimStart().length
+        if (n > 0 && (unit === 0 || n < unit)) unit = n
+    }
+    return unit > 0 ? Math.round(leading / unit) : 0
+}
 
 function announceLineNumber(lineNumber: number) {
     if (!srLineEl) {
@@ -252,9 +278,12 @@ function announceLineNumber(lineNumber: number) {
     window.setTimeout(() => {
         const line = view.state.doc.line(lineNumber)
         if (srLineEl) {
-            srLineEl.textContent = line.text
-                ? i18n.t("editor.lineAnnouncement", { number: lineNumber, text: line.text })
-                : i18n.t("editor.emptyLineAnnouncement", { number: lineNumber })
+            const indentLevel = getIndentLevel(line.text)
+            const content = line.text.trim() || i18n.t("ariaDescriptors:editor.emptyLine")
+            const text = indentLevel > 0
+                ? i18n.t("ariaDescriptors:editor.indentLevel", { count: indentLevel }) + ", " + content
+                : content
+            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text })
         }
     }, 10)
 }
@@ -467,6 +496,43 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
             return { color: p.color, pos: line.from }
         })),
     })
+}
+
+export function jumpToLine(lineNumber: number) {
+    const line = view.state.doc.line(lineNumber)
+    const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
+    view.contentDOM.setAttribute("aria-label", i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") }))
+    view.dispatch({ selection: { anchor: line.from }, scrollIntoView: true })
+    view.focus()
+    window.setTimeout(() => view.contentDOM.setAttribute("aria-label", originalLabel), 1000)
+}
+
+function jumpToDAWClip(lineNumber: number) {
+    // Prefer the parent clip (non-loopChild) so fitMedia/insertMedia jumps land on the representative button.
+    // Searches both clip buttons and automation point circles (both carry data-source-line).
+    let target = (
+        document.querySelector(`[data-source-line="${lineNumber}"]:not(.loop)`) ??
+        document.querySelector(`[data-source-line="${lineNumber}"]`)
+    ) as HTMLElement | null
+
+    // Fall back: cursor may be on an outer call site — search full call stack on all DAW elements.
+    if (!target) {
+        const allElements = Array.from(document.querySelectorAll("[data-source-lines]")) as HTMLElement[]
+        const matches = allElements.filter(el => {
+            const lines = (el.getAttribute("data-source-lines") ?? "").split(",").map(Number)
+            return lines.includes(lineNumber)
+        })
+        target = matches.find(el => !el.classList.contains("loop")) ?? matches[0] ?? null
+    }
+
+    if (target) {
+        const originalLabel = target.getAttribute("aria-label") ?? ""
+        target.setAttribute("aria-label", `Focus shifted to DAW, ${originalLabel}`)
+        target.focus()
+        window.setTimeout(() => target!.setAttribute("aria-label", originalLabel), 1000)
+    } else {
+        playEarcon(SINE_BUMP, 0.3)
+    }
 }
 
 let lastDispatchedCursorLine: number | null = null
