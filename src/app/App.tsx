@@ -672,7 +672,7 @@ export const App = () => {
             if (entry.panel === "editor") {
                 editor.focus()
             } else if ("elementSelector" in entry) {
-                entry.onBeforeFocus?.()
+                if (entry.panel === "west") entry.onBeforeFocus?.()
                 focusEl(entry.elementSelector)
             }
         }
