@@ -68,7 +68,7 @@ import { clearExtension } from "../extensions/extensionState"
 const FONT_SIZES = [10, 12, 14, 18, 24, 36, 40]
 
 type PanelEntry =
-    | { panel: "west"; kind: BrowserTabType; elementSelector: string }
+    | { panel: "west"; kind: BrowserTabType; elementSelector: string; onBeforeFocus?: () => void }
     | { panel: "daw"; elementSelector: string }
     | { panel: "editor" }
     | { panel: "east"; kind: "CURRICULUM"; elementSelector: string }
@@ -82,6 +82,12 @@ export const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
     5: { panel: "editor" },
     6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
     7: { panel: "utilities", elementSelector: "#utilityPanelAnchor" },
+    8: {
+        panel: "west",
+        kind: BrowserTabType.Sound,
+        elementSelector: "#sound-preview-play-button",
+        onBeforeFocus: () => store.dispatch(appState.setShowSoundPreviewWidget(true)),
+    },
 }
 
 export function navigateTo(entry: PanelEntry) {
@@ -373,6 +379,7 @@ const KeyboardShortcuts = () => {
         jumpToEditor: ["Ctrl", "5"],
         jumpToCurriculum: ["Ctrl", "6"],
         jumpToUtility: ["Ctrl", "7"],
+        jumpToSoundPreview: ["Ctrl", "8"],
     }
 
     return <Popover>
@@ -689,6 +696,23 @@ export const App = () => {
     }, [currentLocale])
 
     useEffect(() => {
+        const focusEl = (selector: string) =>
+            window.setTimeout(() => (document.querySelector(selector) as HTMLElement | null)?.focus(), 50)
+
+        const navigateTo = (entry: PanelEntry) => {
+            if (entry.panel === "west") {
+                dispatch(layout.setWest({ open: true, kind: entry.kind }))
+            } else if (entry.panel === "east") {
+                dispatch(layout.setEast({ open: true, kind: entry.kind }))
+            }
+            if (entry.panel === "editor") {
+                editor.focus()
+            } else if ("elementSelector" in entry) {
+                if (entry.panel === "west") entry.onBeforeFocus?.()
+                focusEl(entry.elementSelector)
+            }
+        }
+
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
                 const entry = PANEL_SHORTCUTS[e.key]
@@ -696,6 +720,11 @@ export const App = () => {
                     e.preventDefault()
                     if (entry.panel === "editor" && tabs.selectOpenTabs(store.getState()).length === 0) {
                         store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("editor.noScriptsLoaded") }))
+                        return
+                    }
+                    if ("elementSelector" in entry && entry.elementSelector === "#sound-preview-play-button" &&
+                        soundsState.selectFilteredRegularNames(store.getState()).length === 0) {
+                        store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("soundBrowser.noResultsToPreview") }))
                         return
                     }
                     navigateTo(entry)

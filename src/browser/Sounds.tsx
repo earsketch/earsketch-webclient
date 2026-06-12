@@ -882,6 +882,7 @@ const SoundPreview = () => {
                     </button>
 
                     <button
+                        id="sound-preview-play-button"
                         type="button"
                         onClick={() => {
                             if (!currentName) return
