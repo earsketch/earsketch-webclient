@@ -429,6 +429,9 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
     const editorCursorLine = useSelector(selectEditorCursorLine)
+    const tracks = useSelector(daw.selectTracks)
+    const soloMute = useSelector(daw.selectSoloMute)
+    const metronome = useSelector(daw.selectMetronome)
     const { t } = useTranslation()
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
@@ -471,6 +474,14 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
         onMouseEnter={() => {
             scriptMatchesDAW && setDAWHoverLine(color, sourceLines)
         }} onMouseLeave={clearDAWHoverLine}
+        onFocus={() => {
+            // Jumping here from the editor (Ctrl+I) isolates this clip's track
+            // so the listener can hear and see just what they jumped to.
+            if (savedSoloMute === null) savedSoloMute = soloMute
+            const isolated = { [clip.track]: "solo" as const }
+            store.dispatch(daw.setSoloMute(isolated))
+            player.setMutedTracks(daw.getMuted(tracks, isolated, metronome))
+        }}
         title={scriptMatchesDAW ? formatSourceLines(sourceLines) : t("daw.needsSync")}
         aria-label={t("ariaDescriptors:daw.clipDescription", { track: clip.track, start: playStart.toFixed(2), end: playEnd.toFixed(2), type: clipType, filekey: clip.filekey, callStack: sourceLineDesc })}
         onClick={() => {
@@ -487,6 +498,11 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
         }}
         onKeyDown={(e: React.KeyboardEvent) => {
             if (e.ctrlKey && e.key === "i") {
+                // Jumping back to the editor restores normal playback and visuals.
+                const restored = savedSoloMute ?? soloMute
+                store.dispatch(daw.setSoloMute(restored))
+                player.setMutedTracks(daw.getMuted(tracks, restored, metronome))
+                savedSoloMute = null
                 jumpToLine(primaryLine)
             }
         }}
@@ -851,6 +867,10 @@ const prepareWaveforms = (tracks: types.Track[], tempoMap: TempoMap) => {
 let lastTab: string | null = null
 // TODO: Temporary hack:
 let _setPlayPosition: ((a: number) => void) | null = null
+
+// Solo/mute state saved when Ctrl+I focus-isolates a clip's track, so it can be restored
+// when jumping back to the editor. null means no isolation is currently active.
+let savedSoloMute: Record<number, daw.SoloMute> | null = null
 
 export function setDAWData(result: types.DAWData) {
     const { dispatch, getState } = store
