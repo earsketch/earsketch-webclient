@@ -722,6 +722,20 @@ const SoundPreview = () => {
     const canPrev = index > 0
     const canNext = index < queue.length - 1
 
+    // Respond to audition requests from the command palette
+    const auditionRequest = useSelector(sounds.selectAuditionRequest)
+    useEffect(() => {
+        if (!auditionRequest) return
+        const idx = queue.findIndex(q => q.name === auditionRequest)
+        if (idx !== -1) {
+            stopIfPlaying(currentName)
+            setIndex(idx)
+            playNow(auditionRequest)
+            dispatch(sounds.setAuditionRequest(null))
+            window.requestAnimationFrame(() => playerRef.current?.focus())
+        }
+    }, [auditionRequest, queue])
+
     const stopIfPlaying = (name: string | null) => {
         if (!name) return
         if (preview?.kind === "sound" && preview.name === name) {
