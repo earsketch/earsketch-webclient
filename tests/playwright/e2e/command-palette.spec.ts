@@ -15,9 +15,16 @@ const TECHNO_SOUND: AudioMeta = {
 
 test.describe("Command Palette", () => {
     test.beforeEach(async ({ page }) => {
-        await setupBackend(page, { standardAudio: [TECHNO_SOUND] })
+        const counter = await setupBackend(page, {
+            standardAudio: [TECHNO_SOUND],
+            standardAudioMeta: TECHNO_SOUND,
+            interceptAudioSample: true,
+        })
         await page.goto("/")
         await skipTour(page)
+
+        // Wait for the standard audio library to load
+        await expect.poll(() => counter.count("audio_standard")).toBeGreaterThan(0)
     })
 
     test("opens with keyboard shortcut and closes with Escape", async ({ page }) => {
@@ -91,6 +98,18 @@ test.describe("Command Palette", () => {
 
         await expect(page.locator("#curriculum-header")).toBeVisible()
         await expect(page.locator("#curriculumSearchBar")).toBeFocused()
+    })
+
+    test("toggle theme command switches the color theme", async ({ page }) => {
+        // Default theme is light — palette should offer switching to dark
+        await page.keyboard.press("Meta+Shift+P")
+        await page.keyboard.type("dark")
+        await page.getByRole("option", { name: /Switch to dark color theme/ }).first().click()
+
+        // Re-open: now in dark mode, should offer switching back to light
+        await page.keyboard.press("Meta+Shift+P")
+        await expect(page.getByRole("option", { name: /Switch to light color theme/ })).toBeVisible()
+        await expect(page.getByRole("option", { name: /Switch to dark color theme/ })).not.toBeVisible()
     })
 
     test("open tabs group shows scripts that are open", async ({ page }) => {
