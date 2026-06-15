@@ -72,6 +72,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
         <button
             className={tabButtonClass}
             key={scriptID}
+            id={`${scriptID}-tab`}
             onClick={() => {
                 if (activeTabID !== scriptID) {
                     dispatch(tabThunks.setActiveTabAndEditor(scriptID))
@@ -79,6 +80,8 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             }}
             title={script.name}
             aria-label={script.name}
+            role="tab"
+            aria-selected={active}
         >
             <ScriptDropdownMenu
                 className="flex justify-between items-center truncate p-2 pr-6 w-full"
@@ -129,7 +132,7 @@ const MainTabGroup = ({ create }: { create: () => void }) => {
     const visibleTabs = useSelector(tabs.selectVisibleTabs)
     const allScripts = useSelector(scripts.selectAllScripts)
 
-    return <div className="flex items-center truncate">
+    return <div className="flex items-center truncate" role="tablist">
         {visibleTabs.map((ID: string) => allScripts[ID] &&
         <Tab key={ID} scriptID={ID} scriptName={allScripts[ID].name} inMenu={false} />
         )}
