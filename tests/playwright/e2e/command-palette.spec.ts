@@ -1,10 +1,21 @@
 import { test, expect } from "@playwright/test"
-import { setupBackend } from "../helpers/mocks"
+import { setupBackend, type AudioMeta } from "../helpers/mocks"
 import { createScript, skipTour } from "../helpers/actions"
+
+const TECHNO_SOUND: AudioMeta = {
+    artist: "TEST_ARTIST",
+    folder: "TECHNO_TEST",
+    genre: "TECHNO",
+    name: "TECHNO_LOOP_001",
+    path: "standard-library/TECHNO_TEST/TECHNO_LOOP_001.wav",
+    public: 1,
+    tempo: 140,
+    year: 2020,
+}
 
 test.describe("Command Palette", () => {
     test.beforeEach(async ({ page }) => {
-        await setupBackend(page)
+        await setupBackend(page, { standardAudio: [TECHNO_SOUND] })
         await page.goto("/")
         await skipTour(page)
     })
@@ -21,17 +32,17 @@ test.describe("Command Palette", () => {
 
     test("shows default commands when opened with no query", async ({ page }) => {
         await page.keyboard.press("Meta+Shift+P")
-        await expect(page.locator(".font-medium", { hasText: "Play" }).first()).toBeVisible()
-        await expect(page.locator(".font-medium", { hasText: "Toggle Metronome" }).first()).toBeVisible()
+        await expect(page.getByRole("option", { name: /Play/ }).first()).toBeVisible()
+        await expect(page.getByRole("option", { name: /Toggle Metronome/ }).first()).toBeVisible()
     })
 
     test("filters results as user types", async ({ page }) => {
         await page.keyboard.press("Meta+Shift+P")
         await page.keyboard.type("fitMedia")
 
-        await expect(page.locator(".font-medium", { hasText: "fitMedia()" })).toBeVisible()
+        await expect(page.getByRole("option", { name: /fitMedia/ }).first()).toBeVisible()
         // Results should be filtered — unrelated commands should not appear
-        await expect(page.locator(".font-medium", { hasText: "Toggle Metronome" })).not.toBeVisible()
+        await expect(page.getByRole("option", { name: /Toggle Metronome/ })).not.toBeVisible()
     })
 
     test("shows no results message for unmatched query", async ({ page }) => {
@@ -43,7 +54,7 @@ test.describe("Command Palette", () => {
     test("API entry opens API browser, expands entry, and scrolls it to the top", async ({ page }) => {
         await page.keyboard.press("Meta+Shift+P")
         await page.keyboard.type("importImage")
-        await page.locator(".font-medium", { hasText: "importImage()" }).first().click()
+        await page.getByRole("option", { name: /importImage/ }).first().click()
 
         // API panel should be open
         await expect(page.locator("[data-api-scroll]")).toBeVisible()
@@ -66,7 +77,7 @@ test.describe("Command Palette", () => {
     test("navigate command opens the correct panel", async ({ page }) => {
         await page.keyboard.press("Meta+Shift+P")
         await page.keyboard.type("Open: API")
-        await page.locator(".font-medium", { hasText: "Open: API" }).first().click()
+        await page.getByRole("option", { name: /Open: API/ }).first().click()
 
         await expect(page.locator("[data-api-scroll]")).toBeVisible()
         // Focus should land in the API search bar
@@ -76,7 +87,7 @@ test.describe("Command Palette", () => {
     test("navigate command opens the curriculum panel", async ({ page }) => {
         await page.keyboard.press("Meta+Shift+P")
         await page.keyboard.type("Open: Curriculum")
-        await page.locator(".font-medium", { hasText: "Open: Curriculum" }).first().click()
+        await page.getByRole("option", { name: /Open: Curriculum/ }).first().click()
 
         await expect(page.locator("#curriculum-header")).toBeVisible()
         await expect(page.locator("#curriculumSearchBar")).toBeFocused()
@@ -87,7 +98,7 @@ test.describe("Command Palette", () => {
 
         await page.keyboard.press("Meta+Shift+P")
         // The open script should appear in the Open Tabs group
-        await expect(page.locator(".font-medium", { hasText: "my_test_script" }).first()).toBeVisible()
+        await expect(page.getByRole("option", { name: /my_test_script/ }).first()).toBeVisible()
         // The category header should be present
         await expect(page.locator("text=Open Tabs")).toBeVisible()
     })
@@ -99,16 +110,17 @@ test.describe("Command Palette", () => {
         // Both scripts should be open; switch to script_one via command palette
         await page.keyboard.press("Meta+Shift+P")
         await page.keyboard.type("script_one")
-        await page.locator(".font-medium", { hasText: "script_one" }).first().click()
+        await page.getByRole("option", { name: /script_one/ }).first().click()
 
         // Editor should be focused
-        await expect(page.locator("#coder")).toBeFocused()
+        await expect(page.locator(".cm-editor")).toContainClass("cm-focused")
+        await expect(page.getByRole("tab", { name: /script_one/ })).toHaveAttribute("aria-selected", "true")
     })
 
     test("sound result opens the sound browser", async ({ page }) => {
         await page.keyboard.press("Meta+Shift+P")
         await page.keyboard.type("TECHNO")
-        await page.locator(".font-medium").filter({ hasText: /TECHNO/ }).first().click()
+        await page.getByRole("option", { name: /TECHNO/ }).first().click()
 
         // Sound browser panel should be open
         await expect(page.locator("#panel-0")).toBeVisible()
@@ -119,8 +131,7 @@ test.describe("Command Palette", () => {
         await page.keyboard.type("for loop")
         // Wait for curriculum results to appear
         await expect(page.locator("text=Curriculum").first()).toBeVisible({ timeout: 5000 })
-        const curriculumResult = page.locator("[data-open]").locator(".font-medium").first()
-        await curriculumResult.click()
+        await page.getByRole("option", { name: /for loop/i }).first().click()
 
         await expect(page.locator("#curriculum-header")).toBeVisible()
         await expect(page.locator("#curriculum-body")).toBeVisible()
