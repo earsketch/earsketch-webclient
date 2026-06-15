@@ -61,6 +61,20 @@ const DEBOUNCE_MS = 150
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, email }) => {
     const { t } = useTranslation()
+    const categoryLabel = (cat: string): string => {
+        const labels: Record<string, string> = {
+            Commands: t("commandPalette.category.commands"),
+            Navigate: t("commandPalette.category.navigate"),
+            "Open Tabs": t("commandPalette.category.openTabs"),
+            API: t("commandPalette.category.api"),
+            Scripts: t("script_plural"),
+            "Shared Scripts": t("scriptBrowser.sharedScripts"),
+            Sounds: t("soundBrowser.title"),
+            "My Sounds": t("commandPalette.category.mySounds"),
+            Curriculum: t("curriculum.title"),
+        }
+        return labels[cat] ?? cat
+    }
     const dispatch = useDispatch()
     const [query, setQuery] = useState("")
     const [debouncedQuery, setDebouncedQuery] = useState("")
@@ -153,7 +167,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     })
                 },
                 icon: "icon-code",
-                searchKey: `api function earsketch ${funcName} ${description}`.toLowerCase(),
+                searchKey: `${t("commandPalette.searchKey.apiPrefix")} ${funcName} ${description}`.toLowerCase(),
             })
         }
 
@@ -170,11 +184,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             {
                 id: "toggle-metronome",
                 title: t("daw.tooltip.toggleMetronome"),
-                subtitle: t("daw.tooltip.toggleMetronome"),
+                subtitle: "Turn on/off the metronome",
                 category: "Commands",
                 action: () => { dawCallbacks.toggleMetronome(); onCloseRef.current() },
                 icon: "icon-meter",
-                searchKey: "toggle metronome daw commands",
+                searchKey: t("commandPalette.searchKey.toggleMetronome"),
             },
             {
                 id: "toggle-loop",
@@ -183,34 +197,34 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                 category: "Commands",
                 action: () => { dawCallbacks.toggleLoop(); onCloseRef.current() },
                 icon: "icon-loop",
-                searchKey: "toggle loop project daw commands",
+                searchKey: t("commandPalette.searchKey.toggleLoop"),
             },
             {
                 id: "toggle-mute",
                 title: t("daw.tooltip.toggleVolume"),
-                subtitle: t("daw.tooltip.toggleVolume"),
+                subtitle: "Mute/unmute the volume",
                 category: "Commands",
                 action: () => { dawCallbacks.toggleMute(); onCloseRef.current() },
                 icon: "icon-volume-high",
-                searchKey: "toggle mute volume daw commands",
+                searchKey: t("commandPalette.searchKey.toggleMute"),
             },
             {
                 id: "focus-volume",
-                title: "DAW Volume",
-                subtitle: "Adjust volume with slider",
+                title: t("commandPalette.command.dawVolume"),
+                subtitle: t("commandPalette.command.adjustVolume"),
                 category: "Commands",
                 action: () => { onCloseRef.current(); window.requestAnimationFrame(() => dawCallbacks.focusVolumeSlider()) },
                 icon: "icon-volume-high",
-                searchKey: "volume slider daw commands",
+                searchKey: t("commandPalette.searchKey.dawVolume"),
             },
             {
                 id: "daw-reset",
                 title: t("daw.tooltip.reset"),
-                subtitle: "Rewind DAW to the beginning",
+                subtitle: t("commandPalette.command.rewindDaw"),
                 category: "Commands",
                 action: () => { dawCallbacks.reset(); onCloseRef.current() },
                 icon: "icon-first",
-                searchKey: "reset rewind daw commands",
+                searchKey: t("commandPalette.searchKey.dawReset"),
             }
         )
 
@@ -226,7 +240,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                 onCloseRef.current()
             },
             icon: isPlaying ? "icon-pause2" : "icon-play4",
-            searchKey: "play pause daw audio commands",
+            searchKey: t("commandPalette.searchKey.playPause"),
         })
 
         // Script-dependent commands — only shown when a script tab is open
@@ -242,7 +256,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                         onCloseRef.current()
                     },
                     icon: "icon-arrow-right22",
-                    searchKey: `run execute script code commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.runScript")} ${scriptName}`.toLowerCase(),
                 },
                 {
                     id: "save-script",
@@ -254,7 +268,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                         onCloseRef.current()
                     },
                     icon: "icon-floppy-disk",
-                    searchKey: `save script file commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.saveScript")} ${scriptName}`.toLowerCase(),
                 },
                 {
                     id: "download-script",
@@ -263,7 +277,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Commands",
                     action: () => { downloadScript(activeTabScript); onCloseRef.current() },
                     icon: "icon-cloud-download",
-                    searchKey: `download script export commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.downloadScript")} ${scriptName}`.toLowerCase(),
                 },
                 {
                     id: "print-script",
@@ -272,7 +286,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Commands",
                     action: () => { exporter.print(activeTabScript); onCloseRef.current() },
                     icon: "icon-printer",
-                    searchKey: `print script commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.printScript")} ${scriptName}`.toLowerCase(),
                 },
                 {
                     id: "script-analysis",
@@ -281,7 +295,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Commands",
                     action: () => { openCodeIndicator(activeTabScript); onCloseRef.current() },
                     icon: "icon-info",
-                    searchKey: `code indicator analysis analyze complexity commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.scriptAnalysis")} ${scriptName}`.toLowerCase(),
                 }
             )
 
@@ -297,7 +311,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                         onCloseRef.current()
                     },
                     icon: "icon-copy",
-                    searchKey: `copy duplicate script commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.copyScript")} ${scriptName}`.toLowerCase(),
                 })
             }
 
@@ -310,7 +324,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Commands",
                     action: () => { renameScript(activeTabScript); onCloseRef.current() },
                     icon: "icon-pencil2",
-                    searchKey: `rename script commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.renameScript")} ${scriptName}`.toLowerCase(),
                 })
             }
 
@@ -323,7 +337,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Commands",
                     action: () => { shareScript(activeTabScript); onCloseRef.current() },
                     icon: "icon-share32",
-                    searchKey: `share script collaborate commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.shareScript")} ${scriptName}`.toLowerCase(),
                 })
             }
 
@@ -336,7 +350,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Commands",
                     action: () => { openScriptHistory(activeTabScript, !activeTabScript.isShared); onCloseRef.current() },
                     icon: "icon-history",
-                    searchKey: `history version revert script commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.scriptHistory")} ${scriptName}`.toLowerCase(),
                 })
             }
 
@@ -349,7 +363,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Commands",
                     action: () => { importScript(activeTabScript); onCloseRef.current() },
                     icon: "icon-import",
-                    searchKey: `import script commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.importScript")} ${scriptName}`.toLowerCase(),
                 })
             }
 
@@ -366,7 +380,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                         onCloseRef.current()
                     },
                     icon: "icon-bin",
-                    searchKey: `delete remove script commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.deleteScript")} ${scriptName}`.toLowerCase(),
                 })
             }
 
@@ -379,7 +393,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Commands",
                     action: () => { submitToCompetition(activeTabScript); onCloseRef.current() },
                     icon: "icon-earth",
-                    searchKey: `submit competition script commands ${scriptName}`.toLowerCase(),
+                    searchKey: `${t("commandPalette.searchKey.submitCompetition")} ${scriptName}`.toLowerCase(),
                 })
             }
         }
@@ -393,7 +407,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                 category: "Commands",
                 action: () => { openModal(ProfileEditor, { username, email }); onCloseRef.current() },
                 icon: "icon-user",
-                searchKey: "edit profile account settings commands",
+                searchKey: t("commandPalette.searchKey.editProfile"),
             })
         }
 
@@ -406,16 +420,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                 category: "Commands",
                 action: () => { createScript(); onCloseRef.current() },
                 icon: "icon-plus2",
-                searchKey: "new script create file commands",
+                searchKey: t("commandPalette.searchKey.newScript"),
             },
             {
                 id: "toggle-theme",
-                title: t("switchThemeLight"),
+                title: colorTheme === "light" ? t("switchThemeLight") : t("switchThemeDark"),
                 subtitle: colorTheme === "light" ? t("switchThemeLight") : t("switchThemeDark"),
                 category: "Commands",
                 action: () => { dispatch(appState.setColorTheme(colorTheme === "light" ? "dark" : "light")); onCloseRef.current() },
                 icon: "icon-brightness-contrast",
-                searchKey: "toggle theme dark light appearance settings commands",
+                searchKey: t("commandPalette.searchKey.toggleTheme"),
             },
             {
                 id: "start-tutorial",
@@ -424,7 +438,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                 category: "Commands",
                 action: () => { dispatch(bubble.reset()); dispatch(bubble.resume()); onCloseRef.current() },
                 icon: "icon-info",
-                searchKey: "start quick tour tutorial help guide commands",
+                searchKey: t("commandPalette.searchKey.startTour"),
             },
             {
                 id: "upload-sound",
@@ -436,19 +450,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     onCloseRef.current()
                 },
                 icon: "icon-plus2",
-                searchKey: "upload add sound audio file commands",
+                searchKey: t("commandPalette.searchKey.uploadSound"),
             }
         )
 
         // ── Panel navigation commands ────────────────────────────────────────
         const panelLabels: Record<string, { title: string, icon: string, searchKey: string }> = {
-            1: { title: t("soundBrowser.title"), icon: "icon-music", searchKey: "sounds browser panel navigate" },
-            2: { title: t("scriptBrowser.myScripts"), icon: "icon-file-text2", searchKey: "scripts browser panel navigate" },
-            3: { title: "API", icon: "icon-code", searchKey: "api browser panel navigate" },
-            4: { title: t("daw.title"), icon: "icon-music", searchKey: "daw digital audio workstation panel navigate" },
-            5: { title: t("editor.title"), icon: "icon-pencil2", searchKey: "editor code panel navigate" },
-            6: { title: t("curriculum.title"), icon: "icon-book", searchKey: "curriculum panel navigate" },
-            7: { title: t("ariaDescriptors:skipLink.daw"), icon: "icon-equalizer", searchKey: "utilities panel navigate" },
+            1: { title: t("soundBrowser.title"), icon: "icon-music", searchKey: t("commandPalette.searchKey.navigateSounds") },
+            2: { title: t("scriptBrowser.myScripts"), icon: "icon-file-text2", searchKey: t("commandPalette.searchKey.navigateScripts") },
+            3: { title: "API", icon: "icon-code", searchKey: t("commandPalette.searchKey.navigateApi") },
+            4: { title: t("daw.title"), icon: "icon-music", searchKey: t("commandPalette.searchKey.navigateDaw") },
+            5: { title: t("editor.title"), icon: "icon-pencil2", searchKey: t("commandPalette.searchKey.navigateEditor") },
+            6: { title: t("curriculum.title"), icon: "icon-book", searchKey: t("commandPalette.searchKey.navigateCurriculum") },
+            7: { title: t("ariaDescriptors:skipLink.daw"), icon: "icon-equalizer", searchKey: t("commandPalette.searchKey.navigateUtilities") },
         }
         Object.entries(PANEL_SHORTCUTS).forEach(([key, entry]) => {
             const label = panelLabels[key]
@@ -460,7 +474,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                 category: "Navigate",
                 action: () => { navigateTo(entry); onCloseRef.current() },
                 icon: label.icon,
-                searchKey: `${label.searchKey} ctrl ${key} navigate go to commands`,
+                searchKey: `${label.searchKey} ctrl ${key} ${t("commandPalette.searchKey.navigateSuffix")}`.toLowerCase(),
             })
         })
 
@@ -473,7 +487,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Commands",
                     action: () => { openModal(AccountCreator); onCloseRef.current() },
                     icon: "icon-user-plus",
-                    searchKey: "create account signup register commands",
+                    searchKey: t("commandPalette.searchKey.createAccount"),
                 },
                 {
                     id: "forgot-password",
@@ -482,7 +496,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Commands",
                     action: () => { openModal(ForgotPassword); onCloseRef.current() },
                     icon: "icon-key",
-                    searchKey: "forgot password reset recover account commands",
+                    searchKey: t("commandPalette.searchKey.forgotPassword"),
                 }
             )
         }
@@ -499,7 +513,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             return [{
                 id: `open-tab-${id}`,
                 title: script.name,
-                subtitle: script.isShared ? `Shared by ${script.username}` : `by ${script.creator || script.username}`,
+                subtitle: script.isShared
+                    ? t("scriptBrowser.shared.sharedBy", { username: script.username })
+                    : t("commandPalette.openTab.by", { username: script.creator || script.username }),
                 category: "Open Tabs",
                 action: () => {
                     dispatch(tabThunks.setActiveTabAndEditor(id))
@@ -508,10 +524,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     window.requestAnimationFrame(() => editor.focus())
                 },
                 icon: "icon-file-text2",
-                searchKey: `open tab script ${script.name} ${script.creator ?? ""} ${script.username}`.toLowerCase(),
+                searchKey: `${t("commandPalette.searchKey.openTabItem")} ${script.name} ${script.creator ?? ""} ${script.username}`.toLowerCase(),
             }]
         })
-    }, [openTabIDs, allScripts, dispatch])
+    }, [openTabIDs, allScripts, dispatch, t])
 
     // ── Filtered results ───────────────────────────────────────────────────
     // When query is empty, show open tabs + all app commands as the default list.
@@ -538,12 +554,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             if (script.soft_delete) continue
             // Skip scripts already shown in Open Tabs
             if (openTabIDs.includes(script.shareid)) continue
-            const key = `scripts script file code ${script.name} ${script.creator ?? ""} ${script.username}`.toLowerCase()
+            const key = `${t("commandPalette.searchKey.scriptItem")} ${script.name} ${script.creator ?? ""} ${script.username}`.toLowerCase()
             if (key.includes(q)) {
                 results.push({
                     id: `script-${script.shareid}`,
                     title: script.name,
-                    subtitle: `by ${script.creator || script.username}`,
+                    subtitle: t("commandPalette.openTab.by", { username: script.creator || script.username }),
                     category: "Scripts",
                     action: () => { dispatch(tabThunks.setActiveTabAndEditor(script.shareid)); onCloseRef.current() },
                     icon: "icon-file-text2",
@@ -556,12 +572,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
         // Shared scripts (skip those already in Open Tabs)
         for (const script of Object.values(sharedScripts)) {
             if (openTabIDs.includes(script.shareid)) continue
-            const key = `shared scripts script file ${script.name} ${script.username}`.toLowerCase()
+            const key = `${t("commandPalette.searchKey.sharedScriptItem")} ${script.name} ${script.username}`.toLowerCase()
             if (key.includes(q)) {
                 results.push({
                     id: `shared-${script.shareid}`,
                     title: script.name,
-                    subtitle: `Shared by ${script.username}`,
+                    subtitle: t("scriptBrowser.shared.sharedBy", { username: script.username }),
                     category: "Shared Scripts",
                     action: async () => { await openShare(script.shareid); dispatch(tabThunks.setActiveTabAndEditor(script.shareid)); onCloseRef.current() },
                     icon: "icon-share2",
@@ -604,7 +620,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                 results.push({
                     id: `user-sound-${name}`,
                     title: s.name,
-                    subtitle: "Your uploaded sound",
+                    subtitle: t("commandPalette.command.yourUploadedSound"),
                     category: "My Sounds",
                     action: () => {
                         dispatch(layout.setWest({ open: true, kind: BrowserTabType.Sound }))
@@ -650,7 +666,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
         standardSoundNames, standardSoundEntities,
         userSoundNames, userSoundEntities,
         curriculumResults,
-        dispatch,
+        dispatch, t,
     ])
 
     // ── Group for display ──────────────────────────────────────────────────
@@ -706,7 +722,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                                                 ref={inputRef}
                                                 data-testid="command-palette-input"
                                                 className="h-12 w-full border-0 bg-transparent pl-0 pr-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:ring-0 outline-none"
-                                                placeholder="Search scripts, sounds, API, curriculum…"
+                                                placeholder={t("commandPalette.placeholder")}
                                                 value={query}
                                                 onChange={e => setQuery(e.target.value)}
                                                 onKeyDown={handleKeyDown}
@@ -718,13 +734,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                                             {Object.keys(groupedCommands).length === 0
                                                 ? (
                                                     <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                                        No results for &quot;{debouncedQuery}&quot;
+                                                        {t("commandPalette.noResultsFor", { query: debouncedQuery })}
                                                     </div>
                                                 )
                                                 : Object.entries(groupedCommands).map(([category, items]) => (
                                                     <div key={category} className="mb-2">
                                                         <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                                            {category}
+                                                            {categoryLabel(category)}
                                                         </div>
                                                         {items.map(item => (
                                                             <Combobox.Option
