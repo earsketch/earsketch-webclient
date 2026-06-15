@@ -444,7 +444,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
         const panelLabels: Record<string, { title: string, icon: string, searchKey: string }> = {
             1: { title: t("soundBrowser.title"), icon: "icon-music", searchKey: "sounds browser panel navigate" },
             2: { title: t("scriptBrowser.myScripts"), icon: "icon-file-text2", searchKey: "scripts browser panel navigate" },
-            3: { title: t("contentManager.openTab", { name: "API" }), icon: "icon-code", searchKey: "api browser panel navigate" },
+            3: { title: "API", icon: "icon-code", searchKey: "api browser panel navigate" },
             4: { title: t("daw.title"), icon: "icon-music", searchKey: "daw digital audio workstation panel navigate" },
             5: { title: t("editor.title"), icon: "icon-pencil2", searchKey: "editor code panel navigate" },
             6: { title: t("curriculum.title"), icon: "icon-book", searchKey: "curriculum panel navigate" },
@@ -519,12 +519,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
         if (!debouncedQuery.trim()) return [...openTabCommands, ...appCommandIndex]
         const q = debouncedQuery.toLowerCase()
 
+        // Helper: match against searchKey or title (title catches dynamic content like script names)
+        const matches = (item: CommandItem) => item.searchKey.includes(q) || item.title.toLowerCase().includes(q)
+
         // 1. App commands + API: cheap substring filter on pre-built keys
-        const results: CommandItem[] = appCommandIndex.filter(item => item.searchKey.includes(q))
+        const results: CommandItem[] = appCommandIndex.filter(matches)
 
         // 2. Open tabs — always searched first since they're the most likely target
         for (const cmd of openTabCommands) {
-            if (cmd.searchKey.includes(q)) results.push(cmd)
+            if (matches(cmd)) results.push(cmd)
         }
 
         // 3. Scripts: filter lazily, capped to avoid iterating thousands of entries
@@ -708,15 +711,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                                                 onChange={e => setQuery(e.target.value)}
                                                 onKeyDown={handleKeyDown}
                                             />
-                                            {query && (
-                                                <button
-                                                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0 ml-2"
-                                                    onClick={() => setQuery("")}
-                                                    tabIndex={-1}
-                                                >
-                                                    <i className="icon icon-cross2 text-sm" />
-                                                </button>
-                                            )}
                                         </div>
 
                                         {/* Results */}

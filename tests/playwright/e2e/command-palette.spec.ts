@@ -34,16 +34,6 @@ test.describe("Command Palette", () => {
         await expect(page.locator(".font-medium", { hasText: "Toggle Metronome" })).not.toBeVisible()
     })
 
-    test("clears query with the clear button", async ({ page }) => {
-        await page.keyboard.press("Meta+Shift+P")
-        await page.keyboard.type("fitMedia")
-        await expect(page.locator(".font-medium", { hasText: "fitMedia()" })).toBeVisible()
-
-        await page.locator("button i.icon-cross2").click()
-        // After clearing, default commands should be visible again
-        await expect(page.locator(".font-medium", { hasText: "Play" }).first()).toBeVisible()
-    })
-
     test("shows no results message for unmatched query", async ({ page }) => {
         await page.keyboard.press("Meta+Shift+P")
         await page.keyboard.type("xyzzy_no_match_12345")
