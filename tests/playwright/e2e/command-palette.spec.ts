@@ -19,6 +19,7 @@ test.describe("Command Palette", () => {
             standardAudio: [TECHNO_SOUND],
             standardAudioMeta: TECHNO_SOUND,
             interceptAudioSample: true,
+            interceptCurriculum: true,
         })
         await page.goto("/")
         await skipTour(page)
