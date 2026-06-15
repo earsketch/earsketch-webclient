@@ -382,6 +382,7 @@
     "commandPalette.command.rewindDaw": "Rewind DAW to the beginning",
     "commandPalette.command.yourUploadedSound": "Your uploaded sound",
     "commandPalette.openTab.by": "by {{username}}",
+    "commandPalette.command.closeAllTabs": "Close All Tabs",
     "commandPalette.searchKey.apiPrefix": "api function earsketch",
     "commandPalette.searchKey.toggleMetronome": "toggle metronome daw commands",
     "commandPalette.searchKey.toggleLoop": "toggle loop project daw commands",
@@ -418,7 +419,8 @@
     "commandPalette.searchKey.navigateSuffix": "navigate go to commands",
     "commandPalette.searchKey.scriptItem": "scripts script file code",
     "commandPalette.searchKey.sharedScriptItem": "shared scripts script file",
-    "commandPalette.searchKey.openTabItem": "open tab script"
+    "commandPalette.searchKey.openTabItem": "open tab script",
+    "commandPalette.searchKey.closeAllTabs": "close all tabs scripts commands"
   },
   "ariaDescriptors": {
     "api.searchBar": "API",

@@ -28,7 +28,7 @@ import { SoundUploader } from "./SoundUploader"
 import { openScriptHistory, openCodeIndicator, renameScript, shareScript, downloadScript, deleteScript, deleteSharedScript, submitToCompetition } from "./scriptActions"
 import { importScript } from "../browser/scriptsThunks"
 import { saveScript, openShare, createScript } from "../ide/IDE"
-import { PANEL_SHORTCUTS, navigateTo } from "./App"
+import { PANEL_SHORTCUTS, navigateTo, closeAllTabs } from "./App"
 import * as editor from "../ide/Editor"
 import * as ESUtils from "../esutils"
 
@@ -398,6 +398,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             }
         }
 
+        // Close all tabs (only shown when at least one tab is open)
+        if (openTabIDs.length > 0) {
+            cmds.push({
+                id: "close-all-tabs",
+                title: t("commandPalette.command.closeAllTabs"),
+                subtitle: t("commandPalette.command.closeAllTabs"),
+                category: "Commands",
+                action: () => { closeAllTabs(); onCloseRef.current() },
+                icon: "icon-cross",
+                searchKey: t("commandPalette.searchKey.closeAllTabs"),
+            })
+        }
+
         // Edit Profile (logged in only)
         if (loggedIn) {
             cmds.push({
@@ -502,7 +515,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
         }
 
         return cmds
-    }, [loggedIn, username, email, isPlaying, activeTabScript, colorTheme, dispatch, t])
+    }, [loggedIn, username, email, isPlaying, activeTabScript, colorTheme, openTabIDs, dispatch, t])
 
     // ── Open tabs index ────────────────────────────────────────────────────
     // Built separately so it can be shown at the top with no query typed.

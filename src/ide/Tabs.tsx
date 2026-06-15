@@ -68,21 +68,27 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             "hover:bg-gray-300": active,
         })
 
-    return <div className={tabDivClass}>
-        <button
-            className={tabButtonClass}
-            key={scriptID}
-            id={`${scriptID}-tab`}
-            onClick={() => {
-                if (activeTabID !== scriptID) {
-                    dispatch(tabThunks.setActiveTabAndEditor(scriptID))
-                }
-            }}
-            title={script.name}
-            aria-label={script.name}
-            role="tab"
-            aria-selected={active}
-        >
+    return <div
+        className={tabDivClass}
+        id={`${scriptID}-tab`}
+        role="tab"
+        title={script.name}
+        aria-selected={active}
+        aria-label={script.name}
+        tabIndex={0}
+        key={scriptID}
+        onClick={() => {
+            if (activeTabID !== scriptID) {
+                dispatch(tabThunks.setActiveTabAndEditor(scriptID))
+            }
+        }}
+        onKeyDown={(event) => {
+            if (event.key === "Delete" || event.key === "Backspace") {
+                dispatch(tabThunks.closeAndSwitchTab(scriptID))
+                event.preventDefault()
+            }
+        }}>
+        <div className={tabButtonClass}>
             <ScriptDropdownMenu
                 className="flex justify-between items-center truncate p-2 pr-6 w-full"
                 script={script}
@@ -95,9 +101,9 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
                 </div>
             </ScriptDropdownMenu>
             {active && (<div className="w-full border-b-4 border-amber absolute bottom-0"/>)}
-        </button>
+        </div>
         <div className="flex items-center absolute top-0 bottom-0 right-0 my-auto mr-2">
-            <button
+            <div
                 className={closeButtonClass}
                 onClick={(event) => {
                     dispatch(tabThunks.closeAndSwitchTab(scriptID))
@@ -107,9 +113,10 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
                 }}
                 title={t("ariaDescriptors:scriptBrowser.close", { scriptname: scriptName })}
                 aria-label={t("ariaDescriptors:scriptBrowser.close", { scriptname: scriptName })}
+                tabIndex={-1}
             >
                 <i className="icon-cross2 cursor-pointer"/>
-            </button>
+            </div>
         </div>
     </div>
 }
@@ -132,10 +139,12 @@ const MainTabGroup = ({ create }: { create: () => void }) => {
     const visibleTabs = useSelector(tabs.selectVisibleTabs)
     const allScripts = useSelector(scripts.selectAllScripts)
 
-    return <div className="flex items-center truncate" role="tablist">
-        {visibleTabs.map((ID: string) => allScripts[ID] &&
-        <Tab key={ID} scriptID={ID} scriptName={allScripts[ID].name} inMenu={false} />
-        )}
+    return <div className="flex items-center truncate">
+        <div role="tablist" className="flex items-center truncate">
+            {visibleTabs.map((ID: string) => allScripts[ID] &&
+                <Tab key={ID} scriptID={ID} scriptName={allScripts[ID].name} inMenu={false} />
+            )}
+        </div>
         <CreateScriptButton create={create} />
     </div>
 }
