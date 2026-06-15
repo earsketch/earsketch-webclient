@@ -159,7 +159,7 @@ from earsketch import *
 makeBeat(OS_CLAP01, 1, 1, "0000", 4)
 `)
         await page.locator("button", { hasText: "RUN" }).click()
-        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator("#console-frame", { hasText: "Script ran successfully" })).toBeVisible()
 
         // Expect 3 sample fetches: METRONOME01, METRONOME02, OS_CLAP01
         expect(counter.count("audio_sample")).toBe(3)
@@ -233,7 +233,7 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
 
         await page.locator("button", { hasText: "RUN" }).click()
         await expect(page.locator("#console-frame", { hasText: message })).toBeVisible()
-        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator("#console-frame", { hasText: "Script ran successfully" })).toBeVisible()
 
         // Save via keyboard shortcut
         const message2 = "another message"
