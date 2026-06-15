@@ -778,7 +778,15 @@ export const App = () => {
             const el = e.target as Element | null
             if (!el || el === document.body) return
             const record = getFocusRecord(el)
-            const newer = selectNewerFocus(store.getState())
+            let newer = selectNewerFocus(store.getState())
+            // Cursor movement within the editor doesn't re-trigger focusin, so a stale
+            // "editor" entry's line can lag behind the actual cursor position. Refresh
+            // it before it gets demoted to "older" by a focus change to another panel.
+            if (newer?.type === "editor" && newer.panelId !== record.panelId) {
+                const line = editor.getEditorLine()
+                newer = { ...newer, line, label: `Line ${line}` }
+                store.dispatch(updateNewerFocus(newer))
+            }
             // Skip exact duplicate.
             if (newer && newer.type === record.type && (
                 (newer.type === "editor" && record.type === "editor" && newer.line === record.line) ||
