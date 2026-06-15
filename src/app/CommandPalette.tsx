@@ -701,6 +701,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                                             <i className="icon icon-search text-gray-400 mr-3 flex-shrink-0" />
                                             <Combobox.Input
                                                 ref={inputRef}
+                                                data-testid="command-palette-input"
                                                 className="h-12 w-full border-0 bg-transparent pl-0 pr-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:ring-0 outline-none"
                                                 placeholder="Search scripts, sounds, API, curriculum…"
                                                 value={query}
