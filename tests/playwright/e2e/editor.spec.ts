@@ -37,7 +37,7 @@ test.describe("Editor", () => {
 
     test("runs the template script", async ({ page }) => {
         await page.locator("button", { hasText: "RUN" }).click()
-        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator("#console-frame", { hasText: "Script ran successfully" })).toBeVisible()
         await expect(page.locator("#console", { hasText: "Script ran successfully" })).toBeVisible()
     })
 
@@ -49,7 +49,7 @@ test.describe("Editor", () => {
         await editor.pressSequentially(`\nprint("${message}")`)
         await page.locator("button", { hasText: "RUN" }).click()
         await expect(page.locator("#console-frame", { hasText: message })).toBeVisible()
-        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator("#console-frame", { hasText: "Script ran successfully" })).toBeVisible()
     })
 
     test("surfaces an error for a bad script", async ({ page }) => {
@@ -136,7 +136,7 @@ print(5 % 2)
         await page.keyboard.press("Delete")
         await editor.pressSequentially("\nfitMedia(OS_CLAP01, 1, 1, 2);\n")
         await page.locator("button", { hasText: "RUN" }).click()
-        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator("#console-frame", { hasText: "Script ran successfully" })).toBeVisible()
     })
 
     test("calls fetch exactly once per sound", async ({ page }) => {
@@ -217,8 +217,8 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         // Both anonymous scripts get saved on login
         await expect.poll(() => counter.count("scripts_save"), { timeout: 10000 }).toBeGreaterThanOrEqual(2)
 
-        await page.locator("#coder").locator(`button[title="${anonymousScriptName}.py"]`).click()
-        await page.locator("#coder").locator(`button[title="${anonymousScriptName2}.py"]`).click()
+        await page.locator("#coder").locator(`div[title="${anonymousScriptName}.py"]`).click()
+        await page.locator("#coder").locator(`div[title="${anonymousScriptName2}.py"]`).click()
         await page.locator(`[title="Open ${scriptName} in Code Editor"]`).click()
         await page.locator("#coder").locator(`[title="${scriptName}"]`).click()
 
@@ -229,8 +229,7 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
 
         // Modified-script indicator
         await expect(
-            page.locator("button").filter({ hasText: scriptName }).locator("..")
-        ).toHaveClass(/text-red-500/)
+            page.getByRole("tab").filter({ hasText: scriptName })).toHaveClass(/text-red-500/)
 
         await page.locator("button", { hasText: "RUN" }).click()
         await expect(page.locator("#console-frame", { hasText: message })).toBeVisible()
@@ -242,8 +241,7 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         await page.keyboard.press("End")
         await editor.pressSequentially(`\nprint("${message2}")`)
         await expect(
-            page.locator("button").filter({ hasText: scriptName }).locator("..")
-        ).toHaveClass(/text-red-500/)
+            page.getByRole("tab").filter({ hasText: scriptName })).toHaveClass(/text-red-500/)
         await page.keyboard.press("ControlOrMeta+s")
 
         await expect(page.locator("#console-frame")).not.toContainText(message2)
