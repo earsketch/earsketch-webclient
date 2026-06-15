@@ -13,7 +13,6 @@ import * as user from "../user/userState"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { ScriptDropdownMenu } from "./ScriptsMenus"
-import { BrowserTabType } from "./BrowserTab"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
