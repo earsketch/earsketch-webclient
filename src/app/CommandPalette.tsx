@@ -13,7 +13,7 @@ import * as daw from "../daw/dawState"
 import { callbacks as dawCallbacks } from "../daw/DAW"
 
 import { BrowserTabType } from "../browser/BrowserTab"
-import { API_DOC, API_FUNCTIONS } from "../api/api"
+import { API_DOC } from "../api/api"
 import * as tabs from "../ide/tabState"
 import * as tabThunks from "../ide/tabThunks"
 import * as bubble from "../bubble/bubbleState"
@@ -123,40 +123,37 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
     const appCommandIndex = useMemo((): CommandItem[] => {
         const cmds: CommandItem[] = []
 
-        // API functions — small fixed list, fine to include in static index
-        for (const funcName of Object.keys(API_FUNCTIONS)) {
+        // API functions — use API_DOC so we get descriptions
+        for (const [funcName, entries] of Object.entries(API_DOC)) {
+            const description = t(entries[0].descriptionKey)
             cmds.push({
                 id: `api-${funcName}`,
                 title: `${funcName}()`,
-                subtitle: "EarSketch API function",
+                subtitle: description,
                 category: "API",
                 action: () => {
-                    // Open the API tab in the content manager (clear any existing search text)
                     dispatch(layout.setWest({ open: true, kind: BrowserTabType.API }))
                     dispatch(apiState.setSearchText(""))
-                    // Expand the entry by mutating obj.details (same pattern the API browser uses)
-                    const docEntries = API_DOC[funcName]
-                    if (docEntries) {
-                        docEntries.forEach((obj: any) => { obj.details = true })
-                    }
-                    // After React re-renders, scroll the panel so the entry is near the top, then focus it
-                    window.setTimeout(() => {
-                        const panel = document.getElementById(`panel-${BrowserTabType.API}`)
-                        const span = document.querySelector<HTMLElement>(`[data-api-entry="${funcName}"]`)
-                        if (panel && span) {
-                            // Walk up to the entry's container div (direct child of the panel)
-                            let entry: HTMLElement = span
-                            while (entry.parentElement && entry.parentElement !== panel) {
-                                entry = entry.parentElement
-                            }
-                            panel.scrollTop = entry.offsetTop - panel.offsetTop
-                        }
-                        span?.focus()
-                    }, 100)
                     onCloseRef.current()
+                    // After the palette closes, click the entry's own open button so
+                    // forceUpdate fires from within the component, then scroll and focus.
+                    window.requestAnimationFrame(() => {
+                        const span = document.querySelector<HTMLElement>(`[data-api-entry="${funcName}"]`)
+                        const panel = document.querySelector<HTMLElement>("[data-api-scroll]")
+                        if (!span || !panel) return
+                        const entryDiv = span.closest(".p-3") as HTMLElement | null
+                        const openBtn = entryDiv?.querySelector<HTMLElement>(".rounded-full:last-child")
+                        if (openBtn) openBtn.click()
+                        window.requestAnimationFrame(() => {
+                            const panelRect = panel.getBoundingClientRect()
+                            const spanRect = span.getBoundingClientRect()
+                            panel.scrollTop += spanRect.top - panelRect.top - 8
+                            span.focus()
+                        })
+                    })
                 },
                 icon: "icon-code",
-                searchKey: `api function earsketch ${funcName}`.toLowerCase(),
+                searchKey: `api function earsketch ${funcName} ${description}`.toLowerCase(),
             })
         }
 
