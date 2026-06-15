@@ -2,7 +2,6 @@ import { useState, ChangeEvent, useMemo } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
-import { BrowserTabType } from "./BrowserTab"
 import * as api from "./apiState"
 import type { APIItem, APIParameter } from "../api/api"
 import { selectScriptLanguage } from "../app/appState"
