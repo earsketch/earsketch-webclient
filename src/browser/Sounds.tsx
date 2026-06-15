@@ -1125,7 +1125,7 @@ const DefaultSoundCollection = () => {
 
 export const SoundBrowser = () => {
     return (
-        <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
+        <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel">
             <DefaultSoundCollection />
         </div>
     )
