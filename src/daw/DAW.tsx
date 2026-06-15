@@ -470,15 +470,19 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
         className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border${sourceHighlight ? " source-highlight" : ""}`}
         data-source-line={primaryLine}
         data-source-lines={sourceLines.join(",")}
+        data-track={clip.track}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => {
             scriptMatchesDAW && setDAWHoverLine(color, sourceLines)
         }} onMouseLeave={clearDAWHoverLine}
         onFocus={() => {
-            // Jumping here from the editor (Ctrl+I) isolates this clip's track
-            // so the listener can hear and see just what they jumped to.
+            // Jumping here from the editor (Ctrl+I) isolates this clip's track (or, if this
+            // call site generated clips on several tracks, all of those tracks) so the
+            // listener can hear and see just what they jumped to.
             if (savedSoloMute === null) savedSoloMute = soloMute
-            const isolated = { [clip.track]: "solo" as const }
+            const tracksToIsolate = daw.takePendingTrackIsolation() ?? [clip.track]
+            const isolated: Record<number, daw.SoloMute> = {}
+            for (const t of tracksToIsolate) isolated[t] = "solo"
             store.dispatch(daw.setSoloMute(isolated))
             player.setMutedTracks(daw.getMuted(tracks, isolated, metronome))
         }}

@@ -24,6 +24,7 @@ import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
 import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorCursorLine, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
+import * as daw from "../daw/dawState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
@@ -510,24 +511,45 @@ export function jumpToLine(lineNumber: number) {
 function jumpToDAWClip(lineNumber: number) {
     // Prefer the parent clip (non-loopChild) so fitMedia/insertMedia jumps land on the representative button.
     // Searches both clip buttons and automation point circles (both carry data-source-line).
-    let target = (
+    const directTarget = (
         document.querySelector(`[data-source-line="${lineNumber}"]:not(.loop)`) ??
         document.querySelector(`[data-source-line="${lineNumber}"]`)
     ) as HTMLElement | null
 
-    // Fall back: cursor may be on an outer call site — search full call stack on all DAW elements.
+    let target = directTarget
+    let outerCallMatches: HTMLElement[] = []
+
+    // Fall back: cursor may be on an outer call site (e.g. a user-defined function that
+    // calls EarSketch API functions) — search full call stack on all DAW elements.
     if (!target) {
         const allElements = Array.from(document.querySelectorAll("[data-source-lines]")) as HTMLElement[]
-        const matches = allElements.filter(el => {
+        outerCallMatches = allElements.filter(el => {
             const lines = (el.getAttribute("data-source-lines") ?? "").split(",").map(Number)
             return lines.includes(lineNumber)
         })
-        target = matches.find(el => !el.classList.contains("loop")) ?? matches[0] ?? null
+        target = outerCallMatches.find(el => !el.classList.contains("loop")) ?? outerCallMatches[0] ?? null
     }
 
     if (target) {
         const originalLabel = target.getAttribute("aria-label") ?? ""
-        target.setAttribute("aria-label", `Focus shifted to DAW, ${originalLabel}`)
+        let announcedLabel = originalLabel
+
+        // If the cursor was on a user-defined function call (not a direct API call) that produced
+        // clips on multiple tracks, prepend a summary and isolate all of tracks on focus.
+        if (!directTarget && target.getAttribute("data-track") !== null) {
+            const tracks = new Set<number>()
+            for (const el of outerCallMatches) {
+                const trackAttr = el.getAttribute("data-track")
+                if (trackAttr !== null) tracks.add(Number(trackAttr))
+            }
+            if (tracks.size > 1) {
+                const sortedTracks = Array.from(tracks).sort((a, b) => a - b)
+                announcedLabel = `${i18n.t("ariaDescriptors:daw.multiTrackJump", { tracks: sortedTracks.join(", ") })} ${originalLabel}`
+                daw.setPendingTrackIsolation(sortedTracks)
+            }
+        }
+
+        target.setAttribute("aria-label", `Focus shifted to DAW, ${announcedLabel}`)
         target.focus()
         window.setTimeout(() => target!.setAttribute("aria-label", originalLabel), 1000)
     } else {
