@@ -606,7 +606,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     }, [soundNames])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden">
-        <div id="editor" className="code-container" style={{ fontSize }}>
+        <div id="editor" className="code-container" style={{ fontSize }} role="tabpanel" aria-labelledby={`${activeScript?.shareid}-tab`}>
             <div ref={blocksElement} className={"h-full w-full absolute" + (inBlocksMode ? "" : " invisible")} onClick={shakeImportButton} />
             <div
                 ref={editorElement} className={"h-full w-full" + (inBlocksMode ? " hidden" : "")}
