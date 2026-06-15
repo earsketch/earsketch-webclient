@@ -68,7 +68,7 @@ import { clearExtension } from "../extensions/extensionState"
 const FONT_SIZES = [10, 12, 14, 18, 24, 36, 40]
 
 type PanelEntry =
-    | { panel: "west"; kind: BrowserTabType; elementSelector: string }
+    | { panel: "west"; kind: BrowserTabType; elementSelector: string; onBeforeFocus?: () => void }
     | { panel: "daw"; elementSelector: string }
     | { panel: "editor" }
     | { panel: "east"; kind: "CURRICULUM"; elementSelector: string }
@@ -82,6 +82,12 @@ const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
     5: { panel: "editor" },
     6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
     7: { panel: "utilities", elementSelector: "#utilityPanelAnchor" },
+    8: {
+        panel: "west",
+        kind: BrowserTabType.Sound,
+        elementSelector: "#sound-preview-play-button",
+        onBeforeFocus: () => store.dispatch(appState.setShowSoundPreviewWidget(true)),
+    },
 }
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
@@ -355,6 +361,7 @@ const KeyboardShortcuts = () => {
         jumpToEditor: ["Ctrl", "5"],
         jumpToCurriculum: ["Ctrl", "6"],
         jumpToUtility: ["Ctrl", "7"],
+        jumpToSoundPreview: ["Ctrl", "8"],
     }
 
     return <Popover>
@@ -736,6 +743,7 @@ export const App = () => {
             if (entry.panel === "editor") {
                 editor.focus()
             } else if ("elementSelector" in entry) {
+                if (entry.panel === "west") entry.onBeforeFocus?.()
                 focusEl(entry.elementSelector)
             }
         }
@@ -747,6 +755,11 @@ export const App = () => {
                     e.preventDefault()
                     if (entry.panel === "editor" && tabs.selectOpenTabs(store.getState()).length === 0) {
                         store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("editor.noScriptsLoaded") }))
+                        return
+                    }
+                    if ("elementSelector" in entry && entry.elementSelector === "#sound-preview-play-button" &&
+                        soundsState.selectFilteredRegularNames(store.getState()).length === 0) {
+                        store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("soundBrowser.noResultsToPreview") }))
                         return
                     }
                     navigateTo(entry)
