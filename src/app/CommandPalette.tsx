@@ -10,6 +10,7 @@ import * as apiState from "../browser/apiState"
 import * as layout from "../ide/layoutState"
 import * as soundsState from "../browser/soundsState"
 import * as daw from "../daw/dawState"
+import { callbacks as dawCallbacks } from "../daw/DAW"
 
 import { BrowserTabType } from "../browser/BrowserTab"
 import { API_DOC, API_FUNCTIONS } from "../api/api"
@@ -166,6 +167,55 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             activeTabScript
                 ? (activeTabScript.readonly ? "readonly" : activeTabScript.isShared ? "shared" : "regular")
                 : "regular"
+
+        // DAW commands
+        cmds.push(
+            {
+                id: "toggle-metronome",
+                title: t("daw.tooltip.toggleMetronome"),
+                subtitle: t("daw.tooltip.toggleMetronome"),
+                category: "Commands",
+                action: () => { dawCallbacks.toggleMetronome(); onCloseRef.current() },
+                icon: "icon-meter",
+                searchKey: "toggle metronome daw commands",
+            },
+            {
+                id: "toggle-loop",
+                title: t("daw.tooltip.loopProject"),
+                subtitle: t("daw.tooltip.loopProject"),
+                category: "Commands",
+                action: () => { dawCallbacks.toggleLoop(); onCloseRef.current() },
+                icon: "icon-loop",
+                searchKey: "toggle loop project daw commands",
+            },
+            {
+                id: "toggle-mute",
+                title: t("daw.tooltip.toggleVolume"),
+                subtitle: t("daw.tooltip.toggleVolume"),
+                category: "Commands",
+                action: () => { dawCallbacks.toggleMute(); onCloseRef.current() },
+                icon: "icon-volume-high",
+                searchKey: "toggle mute volume daw commands",
+            },
+            {
+                id: "focus-volume",
+                title: "DAW Volume",
+                subtitle: "Adjust volume with slider",
+                category: "Commands",
+                action: () => { onCloseRef.current(); window.requestAnimationFrame(() => dawCallbacks.focusVolumeSlider()) },
+                icon: "icon-volume-high",
+                searchKey: "volume slider daw commands",
+            },
+            {
+                id: "daw-reset",
+                title: t("daw.tooltip.reset"),
+                subtitle: "Rewind DAW to the beginning",
+                category: "Commands",
+                action: () => { dawCallbacks.reset(); onCloseRef.current() },
+                icon: "icon-first",
+                searchKey: "reset rewind daw commands",
+            }
+        )
 
         // Play / Pause — always available (mirrors Ctrl+Space shortcut)
         cmds.push({
