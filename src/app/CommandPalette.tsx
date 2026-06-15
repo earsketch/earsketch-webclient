@@ -535,6 +535,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "Sounds",
                     action: () => {
                         dispatch(layout.setWest({ open: true, kind: BrowserTabType.Sound }))
+                        dispatch(appState.setShowSoundPreviewWidget(true))
                         dispatch(soundsState.setAuditionRequest(s.name))
                         onCloseRef.current()
                     },
@@ -557,6 +558,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     category: "My Sounds",
                     action: () => {
                         dispatch(layout.setWest({ open: true, kind: BrowserTabType.Sound }))
+                        dispatch(appState.setShowSoundPreviewWidget(true))
                         dispatch(soundsState.setAuditionRequest(s.name))
                         onCloseRef.current()
                     },
