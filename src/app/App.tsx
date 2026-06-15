@@ -40,6 +40,7 @@ import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
 import { Prompt, PromptChoice, confirm } from "../Utils"
+import { CommandPalette } from "./CommandPalette"
 
 import esLogo from "./ES_logo_extract.svg"
 import LanguageDetector from "i18next-browser-languagedetector"
@@ -73,7 +74,7 @@ type PanelEntry =
     | { panel: "east"; kind: "CURRICULUM"; elementSelector: string }
     | { panel: "utilities"; elementSelector: string }
 
-const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
+export const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
     Digit1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
     Digit2: { panel: "west", kind: BrowserTabType.Script, elementSelector: "#scriptSearchBar" },
     Digit3: { panel: "west", kind: BrowserTabType.API, elementSelector: "#apiSearchBar" },
@@ -87,6 +88,23 @@ const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
         elementSelector: "#sound-preview-play-button",
         onBeforeFocus: () => store.dispatch(appState.setShowSoundPreviewWidget(true)),
     },
+}
+
+export function navigateTo(entry: PanelEntry) {
+    if (entry.panel === "west") {
+        store.dispatch(layout.setWest({ open: true, kind: entry.kind }))
+    } else if (entry.panel === "east") {
+        store.dispatch(layout.setEast({ open: true, kind: entry.kind }))
+    }
+
+    if (entry.panel === "editor") {
+        editor.focus()
+    } else if ("elementSelector" in entry) {
+        window.requestAnimationFrame(() => {
+            const el = document.querySelector(entry.elementSelector) as HTMLElement | null
+            el?.focus()
+        })
+    }
 }
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
@@ -347,6 +365,7 @@ const KeyboardShortcuts = () => {
         undo: [modifier, "Z"],
         redo: [modifier, "Shift", "Z"],
         comment: [modifier, "/"],
+        commandPalette: [modifier, "Shift", "P"],
         playPause: ["Ctrl", "Space"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
@@ -581,6 +600,10 @@ export const App = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
+    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+
+    const openCommandPalette = () => setIsCommandPaletteOpen(true)
+    const closeCommandPalette = () => setIsCommandPaletteOpen(false)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
@@ -594,6 +617,19 @@ export const App = () => {
         dispatch(appState.setLocaleCode(lng))
         dispatch(curriculum.fetchLocale({ }))
     }
+
+    // Command Palette keyboard shortcut
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "p") {
+                event.preventDefault()
+                openCommandPalette()
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [])
 
     useEffect(() => {
         (async () => {
@@ -698,7 +734,7 @@ export const App = () => {
 
         window.addEventListener("keydown", handleKeyDown)
         return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [dispatch])
+    }, [])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
         if (loginInProgressRef.current) {
@@ -905,6 +941,8 @@ export const App = () => {
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
         </div>
         <Bubble />
+        {/* Always mounted so Headless UI's Dialog never fires focus restoration on close */}
+        <CommandPalette isOpen={isCommandPaletteOpen} onClose={closeCommandPalette} email={email} />
         <ModalContainer />
     </>
 }
