@@ -245,7 +245,7 @@ function announceLineNumber(lineNumber: number) {
         srLineEl = document.createElement("div")
         srLineEl.setAttribute("aria-live", "assertive")
         srLineEl.setAttribute("aria-atomic", "true")
-        srLineEl.style.cssText = "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)"
+        srLineEl.setAttribute("class", "sr-only")
         document.body.appendChild(srLineEl)
     }
     srLineEl.textContent = ""
