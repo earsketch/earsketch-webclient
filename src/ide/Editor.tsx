@@ -515,15 +515,6 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
     })
 }
 
-export function jumpToLine(lineNumber: number) {
-    const line = view.state.doc.line(lineNumber)
-    const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
-    view.contentDOM.setAttribute("aria-label", i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") }))
-    view.dispatch({ selection: { anchor: line.from }, scrollIntoView: true })
-    view.focus()
-    window.setTimeout(() => view.contentDOM.setAttribute("aria-label", originalLabel), 1000)
-}
-
 function jumpToDAWClip(lineNumber: number) {
     if (!selectScriptMatchesDAW(store.getState())) {
         playEarcon(SINE_BUMP, 0.3)
