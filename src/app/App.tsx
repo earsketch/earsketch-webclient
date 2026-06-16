@@ -75,14 +75,14 @@ type PanelEntry =
     | { panel: "utilities"; elementSelector: string }
 
 export const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
-    Digit1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
-    Digit2: { panel: "west", kind: BrowserTabType.Script, elementSelector: "#scriptSearchBar" },
-    Digit3: { panel: "west", kind: BrowserTabType.API, elementSelector: "#apiSearchBar" },
-    Digit4: { panel: "daw", elementSelector: "#daw-play-button button" },
-    Digit5: { panel: "editor" },
-    Digit6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
-    Digit7: { panel: "utilities", elementSelector: "#utilityPanelAnchor" },
-    Digit8: {
+    1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
+    2: { panel: "west", kind: BrowserTabType.Script, elementSelector: "#scriptSearchBar" },
+    3: { panel: "west", kind: BrowserTabType.API, elementSelector: "#apiSearchBar" },
+    4: { panel: "daw", elementSelector: "#daw-play-button button" },
+    5: { panel: "editor" },
+    6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
+    7: { panel: "utilities", elementSelector: "#utilityPanelAnchor" },
+    8: {
         panel: "west",
         kind: BrowserTabType.Sound,
         elementSelector: "#sound-preview-play-button",
@@ -715,7 +715,8 @@ export const App = () => {
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) {
-                const entry = PANEL_SHORTCUTS[e.code]
+                const digit = e.code.startsWith("Digit") ? e.code.slice(5) : null
+                const entry = digit ? PANEL_SHORTCUTS[digit] : undefined
                 if (entry) {
                     e.preventDefault()
                     if (entry.panel === "editor" && tabs.selectOpenTabs(store.getState()).length === 0) {
