@@ -16,7 +16,6 @@ import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
-import { BrowserTabType } from "./BrowserTab"
 import * as Tooltip from "@radix-ui/react-tooltip"
 
 import { SearchBar } from "./Utils"
@@ -722,6 +721,20 @@ const SoundPreview = () => {
     const canPrev = index > 0
     const canNext = index < queue.length - 1
 
+    // Respond to audition requests from the command palette
+    const auditionRequest = useSelector(sounds.selectAuditionRequest)
+    useEffect(() => {
+        if (!auditionRequest) return
+        const idx = queue.findIndex(q => q.name === auditionRequest)
+        if (idx !== -1) {
+            stopIfPlaying(currentName)
+            setIndex(idx)
+            playNow(auditionRequest)
+            dispatch(sounds.setAuditionRequest(null))
+            window.requestAnimationFrame(() => playerRef.current?.focus())
+        }
+    }, [auditionRequest, queue])
+
     const stopIfPlaying = (name: string | null) => {
         if (!name) return
         if (preview?.kind === "sound" && preview.name === name) {
@@ -1111,7 +1124,7 @@ const DefaultSoundCollection = () => {
 
 export const SoundBrowser = () => {
     return (
-        <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
+        <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel">
             <DefaultSoundCollection />
         </div>
     )

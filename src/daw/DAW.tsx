@@ -22,6 +22,11 @@ import classNames from "classnames"
 
 export const callbacks = {
     runScript: () => {},
+    toggleMetronome: () => {},
+    toggleLoop: () => {},
+    toggleMute: () => {},
+    focusVolumeSlider: () => {},
+    reset: () => {},
 }
 
 // Width of track control box
@@ -132,6 +137,13 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             setPlayPosition(pos)
         }
     }
+
+    callbacks.toggleMetronome = toggleMetronome
+    callbacks.toggleLoop = toggleLoop
+    callbacks.toggleMute = () => mute(!volumeMuted)
+    callbacks.focusVolumeSlider = () =>
+        (document.getElementById("dawVolumeSlider") as HTMLInputElement | null)?.focus()
+    callbacks.reset = reset
 
     const [titleKey, setTitleKey] = useState<string | null>(null)
 
