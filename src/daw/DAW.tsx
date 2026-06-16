@@ -599,12 +599,14 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                     <circle
                         cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
                         tabIndex={0}
+                        aria-label={t("ariaDescriptors:daw.automationPoint", { effect, parameter, measure: point.measure.toFixed(2), value: point.value < 0 ? `negative ${Math.abs(point.value)}` : point.value, line: pointLines[0] })}
                         data-source-line={pointLines[0]}
                         data-source-lines={pointLines.join(",")}
                         onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
                         onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
                         onFocus={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
                         onBlur={() => { setFocusedPoint(null); clearDAWHoverLine() }}
+                        onKeyDown={(e: React.KeyboardEvent) => { if (e.ctrlKey && e.key === "i") jumpToLine(pointLines[0]) }}
                     >
                         {/* eslint-disable-next-line react/jsx-indent */}
                         <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? formatSourceLines(pointLines) : t("daw.needsSync")}</title>

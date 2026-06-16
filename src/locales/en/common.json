@@ -464,6 +464,7 @@
     "daw.clipLength_plural": "clip, {{count}} measures long",
     "daw.clip": "clip",
     "daw.clipSourceLine": "source line {{line}}",
+    "daw.automationPoint": "{{effect}} {{parameter}} automation point, measure {{measure}}, value {{value}}, source line {{line}}",
     "daw.multiTrackJump": "This call also placed clips on tracks: {{tracks}}.",
     "editor.lineAnnouncement": "Line {{number}}: {{text}}",
     "editor.emptyLine": "empty line",
