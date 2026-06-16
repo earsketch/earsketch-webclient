@@ -430,7 +430,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
     scripts.callbacks.download = downloadScript
 
     return <main role="main" id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
-        <div className="w-full h-full overflow-hidden">
+        <div className="w-full h-full">
             <Split
                 className="split flex flex-row h-full" gutterSize={gutterSize} snapOffset={0}
                 sizes={horizontalRatio} minSize={minWidths} maxSize={maxWidths}
