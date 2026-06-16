@@ -907,8 +907,9 @@ let _setPlayPosition: ((a: number) => void) | null = null
 let savedSoloMute: Record<number, daw.SoloMute> | null = null
 
 // Scroll the DAW so that `element` is within the visible area of the track timeline.
-// Sets the container scroll directly AND keeps ghost bars (#daw-x-scroll, #daw-y-scroll) in sync,
-// so the HACK useEffect (which reads ghost bars after every render) preserves the position.
+// Updates ghost bars (#daw-x-scroll, #daw-y-scroll) as the primary mechanism — the useEffect
+// reads them after every render to keep the container in sync. Also sets the container directly
+// as a timing guard for browsers that fire scroll events asynchronously (e.g. Safari).
 export function scrollDAWToElement(element: HTMLElement) {
     const container = window.document.getElementById("daw-container") as HTMLDivElement | null
     const xScroll = window.document.getElementById("daw-x-scroll") as HTMLDivElement | null
