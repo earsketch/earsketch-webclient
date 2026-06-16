@@ -437,6 +437,7 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef<HTMLButtonElement>(null)
+    const focusedFromCtrlI = useRef(false)
     const sourceLines = clip.sourceLines
     const primaryLine = sourceLines[0]
     const sourceHighlight = scriptMatchesDAW && editorCursorLine != null && sourceLines.includes(editorCursorLine)
@@ -480,9 +481,10 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
             // call site generated clips on several tracks, all of those tracks) so the
             // listener can hear and see just what they jumped to.
             if (savedSoloMute === null) savedSoloMute = soloMute
-            const tracksToIsolate = daw.takePendingTrackIsolation() ?? [clip.track]
+            const tracksToIsolate = daw.takePendingTrackIsolation()
+            focusedFromCtrlI.current = tracksToIsolate !== null
             const isolated: Record<number, daw.SoloMute> = {}
-            for (const t of tracksToIsolate) isolated[t] = "solo"
+            for (const t of tracksToIsolate ?? [clip.track]) isolated[t] = "solo"
             store.dispatch(daw.setSoloMute(isolated))
             player.setMutedTracks(daw.getMuted(tracks, isolated, metronome))
         }}
@@ -498,7 +500,9 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
                 store.dispatch(daw.setPlaying(false))
                 _setPlayPosition?.(1)
             }
-            player.play(playStart, 0, playEnd)
+            const start = focusedFromCtrlI.current ? playStart : clip.measure
+            const end = focusedFromCtrlI.current ? playEnd : singleClipEnd
+            player.play(start, 0, end)
         }}
         onKeyDown={(e: React.KeyboardEvent) => {
             if (e.ctrlKey && e.key === "i") {
