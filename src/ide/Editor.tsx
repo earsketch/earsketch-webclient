@@ -25,6 +25,7 @@ import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
 import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorCursorLine, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
 import * as daw from "../daw/dawState"
+import { scrollDAWToElement } from "../daw/DAW"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
@@ -532,7 +533,10 @@ function jumpToDAWClip(lineNumber: number) {
 
     if (target) {
         const originalLabel = target.getAttribute("aria-label") ?? ""
-        let announcedLabel = originalLabel
+        // For Ctrl+I, announce the family-range description stored in data-family-aria
+        // (covers the full span of all clips sharing this source line), not the
+        // individual-clip description in aria-label (which Tab reads).
+        let announcedLabel = target.getAttribute("data-family-aria") ?? originalLabel
 
         // If the cursor was on a user-defined function call (not a direct API call) that produced
         // clips on multiple tracks, prepend a summary and isolate all of tracks on focus.
@@ -544,14 +548,15 @@ function jumpToDAWClip(lineNumber: number) {
             }
             if (tracks.size > 1) {
                 const sortedTracks = Array.from(tracks).sort((a, b) => a - b)
-                announcedLabel = `${i18n.t("ariaDescriptors:daw.multiTrackJump", { tracks: sortedTracks.join(", ") })} ${originalLabel}`
+                announcedLabel = `${i18n.t("ariaDescriptors:daw.multiTrackJump", { tracks: sortedTracks.join(", ") })} ${announcedLabel}`
                 daw.setPendingTrackIsolation(sortedTracks)
             }
         }
 
         daw.setPendingJumpToDAW()
         target.setAttribute("aria-label", `Focus shifted to DAW, ${announcedLabel}`)
-        target.focus()
+        target.focus({ preventScroll: true })
+        scrollDAWToElement(target)
         window.setTimeout(() => target!.setAttribute("aria-label", originalLabel), 1000)
     } else {
         playEarcon(SINE_BUMP, 0.3)

@@ -369,12 +369,14 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                     // and per-clip positions (for beat pattern aria descriptions).
                     const familyRanges: Record<number, { start: number, end: number }> = {}
                     const familyCounts: Record<number, number> = {}
+                    const familyHasLoopChildren: Record<number, boolean> = {}
                     for (const c of track.clips) {
                         const key = c.sourceLines[0]
                         if (key === undefined) continue
                         const cStart = c.measure
                         const cEnd = c.measure + c.end - c.start
                         familyCounts[key] = (familyCounts[key] ?? 0) + 1
+                        if (c.loopChild) familyHasLoopChildren[key] = true
                         if (!familyRanges[key]) {
                             familyRanges[key] = { start: cStart, end: cEnd }
                         } else {
@@ -391,6 +393,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                             familyRange={familyRanges[key]}
                             familyIndex={familyIndexCounters[key]}
                             familySize={familyCounts[key] ?? 1}
+                            familyHasLoopChildren={familyHasLoopChildren[key] ?? false}
                         />
                     })
                 })()}
@@ -436,7 +439,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: daw.Color, clip: types.Clip, familyRange?: { start: number, end: number }, familyIndex: number, familySize: number }) => {
+const Clip = ({ color, clip, familyRange, familyIndex, familySize, familyHasLoopChildren }: { color: daw.Color, clip: types.Clip, familyRange?: { start: number, end: number }, familyIndex: number, familySize: number, familyHasLoopChildren: boolean }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
@@ -459,17 +462,27 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
     // Classify clip type for aria-label.
     const singleClipEnd = clip.measure + clip.end - clip.start
     const actuallyLoops = clip.loop && playEnd > singleClipEnd + 0.01
-    const isBeatPattern = !clip.loop
+    // makeBeat: loop=false. makeBeatSlice: loop=true but no loopChildren (unlike fitMedia expansion).
+    const isBeatPattern = !clip.loop || (!familyHasLoopChildren && familySize > 1)
     const clipLengthMeasures = clip.end - clip.start
+    // Family-range clip type (used for Ctrl+I announcement).
+    // isBeatPattern checked first: makeBeatSlice has loop=true but is still a beat pattern.
     let clipType: string
-    if (actuallyLoops) {
-        clipType = t("ariaDescriptors:daw.clipLooping", { end: playEnd.toFixed(2) })
-    } else if (isBeatPattern) {
+    if (isBeatPattern) {
         clipType = t("ariaDescriptors:daw.clipBeatPattern", { index: familyIndex, count: familySize })
+    } else if (actuallyLoops) {
+        clipType = t("ariaDescriptors:daw.clipLooping", { end: playEnd.toFixed(2) })
     } else {
         clipType = t("ariaDescriptors:daw.clipLength", { count: clipLengthMeasures })
     }
+    // For Tab navigation, start/end already convey the range, so only call out beat patterns.
+    const clipTypeForTab = isBeatPattern
+        ? t("ariaDescriptors:daw.clipBeatPattern", { index: familyIndex, count: familySize })
+        : t("ariaDescriptors:daw.clip")
     const sourceLineDesc = t("ariaDescriptors:daw.clipSourceLine", { line: primaryLine })
+    // Tab reads aria-label (individual clip range); Ctrl+I reads data-family-aria (full family range).
+    const clipAriaLabel = t("ariaDescriptors:daw.clipDescriptionTab", { track: clip.track, start: clip.measure.toFixed(2), end: singleClipEnd.toFixed(2), type: clipTypeForTab, filekey: clip.filekey })
+    const familyAriaLabel = t("ariaDescriptors:daw.clipDescription", { track: clip.track, start: playStart.toFixed(2), end: playEnd.toFixed(2), type: clipType, filekey: clip.filekey, callStack: sourceLineDesc })
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -484,6 +497,7 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
         data-source-line={primaryLine}
         data-source-lines={sourceLines.join(",")}
         data-track={clip.track}
+        data-family-aria={familyAriaLabel}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => {
             scriptMatchesDAW && setDAWHoverLine(color, sourceLines)
@@ -501,7 +515,7 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
             player.setMutedTracks(daw.getMuted(tracks, isolated, metronome))
         }}
         title={scriptMatchesDAW ? formatSourceLines(sourceLines) : t("daw.needsSync")}
-        aria-label={t("ariaDescriptors:daw.clipDescription", { track: clip.track, start: playStart.toFixed(2), end: playEnd.toFixed(2), type: clipType, filekey: clip.filekey, callStack: sourceLineDesc })}
+        aria-label={clipAriaLabel}
         onClick={() => {
             player.setPreview(clip.track)
             player.callbacks.onStartedCallback = () => {
@@ -891,6 +905,57 @@ let _setPlayPosition: ((a: number) => void) | null = null
 // Solo/mute state saved when Ctrl+I focus-isolates a clip's track, so it can be restored
 // when jumping back to the editor. null means no isolation is currently active.
 let savedSoloMute: Record<number, daw.SoloMute> | null = null
+
+// Scroll the DAW so that `element` is within the visible area of the track timeline.
+// Sets the container scroll directly AND keeps ghost bars (#daw-x-scroll, #daw-y-scroll) in sync,
+// so the HACK useEffect (which reads ghost bars after every render) preserves the position.
+export function scrollDAWToElement(element: HTMLElement) {
+    const container = window.document.getElementById("daw-container") as HTMLDivElement | null
+    const xScroll = window.document.getElementById("daw-x-scroll") as HTMLDivElement | null
+    const yScroll = window.document.getElementById("daw-y-scroll") as HTMLDivElement | null
+    if (!container) return
+
+    // Horizontal: element.offsetLeft is relative to .daw-track (position: relative), which
+    // itself starts at X_OFFSET inside the scrollable content. So the clip's position within
+    // the visible timeline region is just element.offsetLeft (no X_OFFSET subtraction needed).
+    if (xScroll) {
+        const clipLeft = element.offsetLeft
+        const clipRight = clipLeft + element.offsetWidth
+        const viewLeft = container.scrollLeft
+        const viewRight = viewLeft + container.clientWidth - X_OFFSET
+        let newScrollLeft: number | null = null
+        if (clipLeft < viewLeft) {
+            newScrollLeft = Math.max(0, clipLeft)
+        } else if (clipRight > viewRight) {
+            newScrollLeft = clipRight - (container.clientWidth - X_OFFSET)
+        }
+        if (newScrollLeft !== null) {
+            container.scrollLeft = newScrollLeft
+            const frac = newScrollLeft / (container.scrollWidth - container.clientWidth)
+            xScroll.scrollLeft = frac * (xScroll.scrollWidth - xScroll.clientWidth)
+        }
+    }
+
+    // Vertical: use getBoundingClientRect to get viewport-relative positions so we don't need
+    // to know the clip's exact offsetTop chain. Account for the sticky Timeline+Measureline header.
+    if (yScroll) {
+        const elRect = element.getBoundingClientRect()
+        const cRect = container.getBoundingClientRect()
+        const stickyHeader = container.querySelector(".sticky") as HTMLElement | null
+        const stickyHeight = stickyHeader?.offsetHeight ?? 0
+        let newScrollTop: number | null = null
+        if (elRect.top < cRect.top + stickyHeight) {
+            newScrollTop = Math.max(0, container.scrollTop + elRect.top - cRect.top - stickyHeight)
+        } else if (elRect.bottom > cRect.bottom) {
+            newScrollTop = container.scrollTop + elRect.bottom - cRect.bottom
+        }
+        if (newScrollTop !== null) {
+            container.scrollTop = newScrollTop
+            const frac = newScrollTop / (container.scrollHeight - container.clientHeight)
+            yScroll.scrollTop = frac * (yScroll.scrollHeight - yScroll.clientHeight)
+        }
+    }
+}
 
 export function setDAWData(result: types.DAWData) {
     const { dispatch, getState } = store
@@ -1328,7 +1393,7 @@ export const DAW = () => {
                     <button onMouseDown={zoomOutY} className="zoom-out leading-none" title={t("ariaDescriptors:daw.verticalZoomOut")} aria-label={t("ariaDescriptors:daw.verticalZoomOut")}><i className="icon-minus text-[10px]"></i></button>
                 </div>
 
-                <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
+                <div ref={yScrollEl} id="daw-y-scroll" className="absolute overflow-y-scroll z-20"
                     title={t("ariaDescriptors:daw.verticalScroll")}
                     style={{ width: "15px", top: "32px", right: "2px", bottom: "40px" }}
                     onScroll={e => {
@@ -1340,7 +1405,7 @@ export const DAW = () => {
                     <div style={{ width: "1px", height: `max(${totalTrackHeight}px, 100.5%)` }}></div>
                 </div>
 
-                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20"
+                <div ref={xScrollEl} id="daw-x-scroll" className="absolute overflow-x-scroll z-20"
                     title={t("ariaDescriptors:daw.horizontalScroll")}
                     style={{ height: "15px", left: X_OFFSET + "px", right: "45px", bottom: "2px" }}
                     onScroll={e => {
