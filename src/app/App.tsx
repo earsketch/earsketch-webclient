@@ -75,14 +75,14 @@ type PanelEntry =
     | { panel: "utilities"; elementSelector: string }
 
 export const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
-    1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
-    2: { panel: "west", kind: BrowserTabType.Script, elementSelector: "#scriptSearchBar" },
-    3: { panel: "west", kind: BrowserTabType.API, elementSelector: "#apiSearchBar" },
-    4: { panel: "daw", elementSelector: "#daw-play-button button" },
-    5: { panel: "editor" },
-    6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
-    7: { panel: "utilities", elementSelector: "#utilityPanelAnchor" },
-    8: {
+    Digit1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
+    Digit2: { panel: "west", kind: BrowserTabType.Script, elementSelector: "#scriptSearchBar" },
+    Digit3: { panel: "west", kind: BrowserTabType.API, elementSelector: "#apiSearchBar" },
+    Digit4: { panel: "daw", elementSelector: "#daw-play-button button" },
+    Digit5: { panel: "editor" },
+    Digit6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
+    Digit7: { panel: "utilities", elementSelector: "#utilityPanelAnchor" },
+    Digit8: {
         panel: "west",
         kind: BrowserTabType.Sound,
         elementSelector: "#sound-preview-play-button",
@@ -100,6 +100,7 @@ export function navigateTo(entry: PanelEntry) {
     if (entry.panel === "editor") {
         editor.focus()
     } else if ("elementSelector" in entry) {
+        if (entry.panel === "west") entry.onBeforeFocus?.()
         window.requestAnimationFrame(() => {
             const el = document.querySelector(entry.elementSelector) as HTMLElement | null
             el?.focus()
@@ -372,14 +373,14 @@ const KeyboardShortcuts = () => {
         </>,
         zoomVertical: [modifier, "Shift", "Wheel"],
         escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
-        jumpToSounds: ["Ctrl", "1"],
-        jumpToScripts: ["Ctrl", "2"],
-        jumpToApi: ["Ctrl", "3"],
-        jumpToDaw: ["Ctrl", "4"],
-        jumpToEditor: ["Ctrl", "5"],
-        jumpToCurriculum: ["Ctrl", "6"],
-        jumpToUtility: ["Ctrl", "7"],
-        jumpToSoundPreview: ["Ctrl", "8"],
+        jumpToSounds: ["Ctrl", "Shift", "1"],
+        jumpToScripts: ["Ctrl", "Shift", "2"],
+        jumpToApi: ["Ctrl", "Shift", "3"],
+        jumpToDaw: ["Ctrl", "Shift", "4"],
+        jumpToEditor: ["Ctrl", "Shift", "5"],
+        jumpToCurriculum: ["Ctrl", "Shift", "6"],
+        jumpToUtility: ["Ctrl", "Shift", "7"],
+        jumpToSoundPreview: ["Ctrl", "Shift", "8"],
     }
 
     return <Popover>
@@ -696,26 +697,9 @@ export const App = () => {
     }, [currentLocale])
 
     useEffect(() => {
-        const focusEl = (selector: string) =>
-            window.setTimeout(() => (document.querySelector(selector) as HTMLElement | null)?.focus(), 50)
-
-        const navigateTo = (entry: PanelEntry) => {
-            if (entry.panel === "west") {
-                dispatch(layout.setWest({ open: true, kind: entry.kind }))
-            } else if (entry.panel === "east") {
-                dispatch(layout.setEast({ open: true, kind: entry.kind }))
-            }
-            if (entry.panel === "editor") {
-                editor.focus()
-            } else if ("elementSelector" in entry) {
-                if (entry.panel === "west") entry.onBeforeFocus?.()
-                focusEl(entry.elementSelector)
-            }
-        }
-
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
-                const entry = PANEL_SHORTCUTS[e.key]
+            if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) {
+                const entry = PANEL_SHORTCUTS[e.code]
                 if (entry) {
                     e.preventDefault()
                     if (entry.panel === "editor" && tabs.selectOpenTabs(store.getState()).length === 0) {
