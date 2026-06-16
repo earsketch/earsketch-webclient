@@ -23,7 +23,7 @@ import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorCursorLine, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorCursorLine, setScriptMatchesDAW, selectScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
 import * as daw from "../daw/dawState"
 import { scrollDAWToElement } from "../daw/DAW"
 import * as tabs from "./tabState"
@@ -33,6 +33,7 @@ import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
 import * as scripts from "../browser/scriptsState"
+import { status as consoleStatus } from "./console"
 
 Object.assign(window, { Sk, ace }) // for droplet
 
@@ -510,6 +511,12 @@ export function jumpToLine(lineNumber: number) {
 }
 
 function jumpToDAWClip(lineNumber: number) {
+    if (!selectScriptMatchesDAW(store.getState())) {
+        playEarcon(SINE_BUMP, 0.3)
+        consoleStatus(i18n.t("daw.needsSync"))
+        return
+    }
+
     // Prefer the parent clip (non-loopChild) so fitMedia/insertMedia jumps land on the representative button.
     // Searches both clip buttons and automation point circles (both carry data-source-line).
     const directTarget = (
