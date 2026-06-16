@@ -253,6 +253,20 @@ export function takePendingTrackIsolation(): number[] | null {
     return tracks
 }
 
+// Set by jumpToDAWClip (Editor.tsx) before any Ctrl+I focus, so the Clip's onFocus handler
+// knows to play the full family range rather than just the individual clip.
+let pendingJumpToDAW = false
+
+export function setPendingJumpToDAW() {
+    pendingJumpToDAW = true
+}
+
+export function takePendingJumpToDAW(): boolean {
+    const val = pendingJumpToDAW
+    pendingJumpToDAW = false
+    return val
+}
+
 export const getMuted = (tracks: Track[], soloMute: SoloMuteConfig, metronome: boolean) => {
     const keys = Object.keys(tracks).map(x => +x)
     const soloed = keys.filter(key => soloMute[key] === "solo")

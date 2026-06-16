@@ -493,8 +493,8 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize }: { color: da
             // call site generated clips on several tracks, all of those tracks) so the
             // listener can hear and see just what they jumped to.
             if (savedSoloMute === null) savedSoloMute = soloMute
+            focusedFromCtrlI.current = daw.takePendingJumpToDAW()
             const tracksToIsolate = daw.takePendingTrackIsolation()
-            focusedFromCtrlI.current = tracksToIsolate !== null
             const isolated: Record<number, daw.SoloMute> = {}
             for (const t of tracksToIsolate ?? [clip.track]) isolated[t] = "solo"
             store.dispatch(daw.setSoloMute(isolated))

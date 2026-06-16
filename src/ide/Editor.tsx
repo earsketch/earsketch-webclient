@@ -549,6 +549,7 @@ function jumpToDAWClip(lineNumber: number) {
             }
         }
 
+        daw.setPendingJumpToDAW()
         target.setAttribute("aria-label", `Focus shifted to DAW, ${announcedLabel}`)
         target.focus()
         window.setTimeout(() => target!.setAttribute("aria-label", originalLabel), 1000)
