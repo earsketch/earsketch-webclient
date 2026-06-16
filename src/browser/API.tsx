@@ -2,7 +2,6 @@ import { useState, ChangeEvent, useMemo } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
-import { BrowserTabType } from "./BrowserTab"
 import * as api from "./apiState"
 import type { APIItem, APIParameter } from "../api/api"
 import { selectScriptLanguage } from "../app/appState"
@@ -71,6 +70,8 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                 <span
                     className="font-bold cursor-pointer truncate" title={returnText}
                     onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
+                    data-api-entry={name}
+                    tabIndex={-1}
                 >
                     {name}
                 </span>
@@ -194,7 +195,7 @@ export const APIBrowser = () => {
                 <APISearchBar />
             </div>
 
-            <div className="flex-auto overflow-y-scroll overflow-x-none" role="tabpanel" id={"panel-" + BrowserTabType.API}>
+            <div className="flex-auto overflow-y-scroll overflow-x-none" role="tabpanel" data-api-scroll>
                 <EntryList />
             </div>
         </>

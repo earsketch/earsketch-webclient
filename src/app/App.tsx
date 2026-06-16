@@ -40,6 +40,7 @@ import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
 import { Prompt, PromptChoice, confirm } from "../Utils"
+import { CommandPalette } from "./CommandPalette"
 
 import esLogo from "./ES_logo_extract.svg"
 import LanguageDetector from "i18next-browser-languagedetector"
@@ -67,20 +68,44 @@ import { clearExtension } from "../extensions/extensionState"
 const FONT_SIZES = [10, 12, 14, 18, 24, 36, 40]
 
 type PanelEntry =
-    | { panel: "west"; kind: BrowserTabType; elementSelector: string }
+    | { panel: "west"; kind: BrowserTabType; elementSelector: string; onBeforeFocus?: () => void }
     | { panel: "daw"; elementSelector: string }
     | { panel: "editor" }
     | { panel: "east"; kind: "CURRICULUM"; elementSelector: string }
     | { panel: "utilities"; elementSelector: string }
 
-const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
-    1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
-    2: { panel: "west", kind: BrowserTabType.Script, elementSelector: "#scriptSearchBar" },
-    3: { panel: "west", kind: BrowserTabType.API, elementSelector: "#apiSearchBar" },
-    4: { panel: "daw", elementSelector: "#daw-play-button button" },
-    5: { panel: "editor" },
-    6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
-    7: { panel: "utilities", elementSelector: "#utilityPanelAnchor" },
+export const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
+    Digit1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
+    Digit2: { panel: "west", kind: BrowserTabType.Script, elementSelector: "#scriptSearchBar" },
+    Digit3: { panel: "west", kind: BrowserTabType.API, elementSelector: "#apiSearchBar" },
+    Digit4: { panel: "daw", elementSelector: "#daw-play-button button" },
+    Digit5: { panel: "editor" },
+    Digit6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
+    Digit7: { panel: "utilities", elementSelector: "#utilityPanelAnchor" },
+    Digit8: {
+        panel: "west",
+        kind: BrowserTabType.Sound,
+        elementSelector: "#sound-preview-play-button",
+        onBeforeFocus: () => store.dispatch(appState.setShowSoundPreviewWidget(true)),
+    },
+}
+
+export function navigateTo(entry: PanelEntry) {
+    if (entry.panel === "west") {
+        store.dispatch(layout.setWest({ open: true, kind: entry.kind }))
+    } else if (entry.panel === "east") {
+        store.dispatch(layout.setEast({ open: true, kind: entry.kind }))
+    }
+
+    if (entry.panel === "editor") {
+        editor.focus()
+    } else if ("elementSelector" in entry) {
+        if (entry.panel === "west") entry.onBeforeFocus?.()
+        window.requestAnimationFrame(() => {
+            const el = document.querySelector(entry.elementSelector) as HTMLElement | null
+            el?.focus()
+        })
+    }
 }
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
@@ -341,19 +366,21 @@ const KeyboardShortcuts = () => {
         undo: [modifier, "Z"],
         redo: [modifier, "Shift", "Z"],
         comment: [modifier, "/"],
+        commandPalette: [modifier, "Shift", "P"],
         playPause: ["Ctrl", "Space"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
         zoomVertical: [modifier, "Shift", "Wheel"],
         escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
-        jumpToSounds: ["Ctrl", "1"],
-        jumpToScripts: ["Ctrl", "2"],
-        jumpToApi: ["Ctrl", "3"],
-        jumpToDaw: ["Ctrl", "4"],
-        jumpToEditor: ["Ctrl", "5"],
-        jumpToCurriculum: ["Ctrl", "6"],
-        jumpToUtility: ["Ctrl", "7"],
+        jumpToSounds: ["Ctrl", "Shift", "1"],
+        jumpToScripts: ["Ctrl", "Shift", "2"],
+        jumpToApi: ["Ctrl", "Shift", "3"],
+        jumpToDaw: ["Ctrl", "Shift", "4"],
+        jumpToEditor: ["Ctrl", "Shift", "5"],
+        jumpToCurriculum: ["Ctrl", "Shift", "6"],
+        jumpToUtility: ["Ctrl", "Shift", "7"],
+        jumpToSoundPreview: ["Ctrl", "Shift", "8"],
     }
 
     return <Popover>
@@ -574,6 +601,10 @@ export const App = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
+    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+
+    const openCommandPalette = () => setIsCommandPaletteOpen(true)
+    const closeCommandPalette = () => setIsCommandPaletteOpen(false)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
@@ -587,6 +618,19 @@ export const App = () => {
         dispatch(appState.setLocaleCode(lng))
         dispatch(curriculum.fetchLocale({ }))
     }
+
+    // Command Palette keyboard shortcut
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "p") {
+                event.preventDefault()
+                openCommandPalette()
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [])
 
     useEffect(() => {
         (async () => {
@@ -653,29 +697,18 @@ export const App = () => {
     }, [currentLocale])
 
     useEffect(() => {
-        const focusEl = (selector: string) =>
-            window.setTimeout(() => (document.querySelector(selector) as HTMLElement | null)?.focus(), 50)
-
-        const navigateTo = (entry: PanelEntry) => {
-            if (entry.panel === "west") {
-                dispatch(layout.setWest({ open: true, kind: entry.kind }))
-            } else if (entry.panel === "east") {
-                dispatch(layout.setEast({ open: true, kind: entry.kind }))
-            }
-            if (entry.panel === "editor") {
-                editor.focus()
-            } else if ("elementSelector" in entry) {
-                focusEl(entry.elementSelector)
-            }
-        }
-
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
-                const entry = PANEL_SHORTCUTS[e.key]
+            if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) {
+                const entry = PANEL_SHORTCUTS[e.code]
                 if (entry) {
                     e.preventDefault()
                     if (entry.panel === "editor" && tabs.selectOpenTabs(store.getState()).length === 0) {
                         store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("editor.noScriptsLoaded") }))
+                        return
+                    }
+                    if ("elementSelector" in entry && entry.elementSelector === "#sound-preview-play-button" &&
+                        soundsState.selectFilteredRegularNames(store.getState()).length === 0) {
+                        store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("soundBrowser.noResultsToPreview") }))
                         return
                     }
                     navigateTo(entry)
@@ -685,7 +718,7 @@ export const App = () => {
 
         window.addEventListener("keydown", handleKeyDown)
         return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [dispatch])
+    }, [])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
         if (loginInProgressRef.current) {
@@ -892,6 +925,8 @@ export const App = () => {
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
         </div>
         <Bubble />
+        {/* Always mounted so Headless UI's Dialog never fires focus restoration on close */}
+        <CommandPalette isOpen={isCommandPaletteOpen} onClose={closeCommandPalette} email={email} />
         <ModalContainer />
     </>
 }
