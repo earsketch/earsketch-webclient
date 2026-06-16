@@ -100,6 +100,7 @@ export function navigateTo(entry: PanelEntry) {
     if (entry.panel === "editor") {
         editor.focus()
     } else if ("elementSelector" in entry) {
+        if (entry.panel === "west") entry.onBeforeFocus?.()
         window.requestAnimationFrame(() => {
             const el = document.querySelector(entry.elementSelector) as HTMLElement | null
             el?.focus()
@@ -696,23 +697,6 @@ export const App = () => {
     }, [currentLocale])
 
     useEffect(() => {
-        const focusEl = (selector: string) =>
-            window.setTimeout(() => (document.querySelector(selector) as HTMLElement | null)?.focus(), 50)
-
-        const navigateTo = (entry: PanelEntry) => {
-            if (entry.panel === "west") {
-                dispatch(layout.setWest({ open: true, kind: entry.kind }))
-            } else if (entry.panel === "east") {
-                dispatch(layout.setEast({ open: true, kind: entry.kind }))
-            }
-            if (entry.panel === "editor") {
-                editor.focus()
-            } else if ("elementSelector" in entry) {
-                if (entry.panel === "west") entry.onBeforeFocus?.()
-                focusEl(entry.elementSelector)
-            }
-        }
-
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) {
                 const entry = PANEL_SHORTCUTS[e.code]
