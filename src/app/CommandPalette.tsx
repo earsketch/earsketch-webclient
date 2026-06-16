@@ -469,13 +469,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 
         // ── Panel navigation commands ────────────────────────────────────────
         const panelLabels: Record<string, { title: string, icon: string, searchKey: string }> = {
-            1: { title: t("soundBrowser.title"), icon: "icon-music", searchKey: t("commandPalette.searchKey.navigateSounds") },
-            2: { title: t("scriptBrowser.myScripts"), icon: "icon-file-text2", searchKey: t("commandPalette.searchKey.navigateScripts") },
-            3: { title: "API", icon: "icon-code", searchKey: t("commandPalette.searchKey.navigateApi") },
-            4: { title: t("daw.title"), icon: "icon-music", searchKey: t("commandPalette.searchKey.navigateDaw") },
-            5: { title: t("editor.title"), icon: "icon-pencil2", searchKey: t("commandPalette.searchKey.navigateEditor") },
-            6: { title: t("curriculum.title"), icon: "icon-book", searchKey: t("commandPalette.searchKey.navigateCurriculum") },
-            7: { title: t("ariaDescriptors:skipLink.daw"), icon: "icon-equalizer", searchKey: t("commandPalette.searchKey.navigateUtilities") },
+            Digit1: { title: t("soundBrowser.title"), icon: "icon-music", searchKey: t("commandPalette.searchKey.navigateSounds") },
+            Digit2: { title: t("scriptBrowser.myScripts"), icon: "icon-file-text2", searchKey: t("commandPalette.searchKey.navigateScripts") },
+            Digit3: { title: "API", icon: "icon-code", searchKey: t("commandPalette.searchKey.navigateApi") },
+            Digit4: { title: t("daw.title"), icon: "icon-music", searchKey: t("commandPalette.searchKey.navigateDaw") },
+            Digit5: { title: t("editor.title"), icon: "icon-pencil2", searchKey: t("commandPalette.searchKey.navigateEditor") },
+            Digit6: { title: t("curriculum.title"), icon: "icon-book", searchKey: t("commandPalette.searchKey.navigateCurriculum") },
+            Digit7: { title: t("ariaDescriptors:skipLink.daw"), icon: "icon-equalizer", searchKey: t("commandPalette.searchKey.navigateUtilities") },
+            Digit8: { title: t("sounds.preview.title"), icon: "icon-headphones", searchKey: t("commandPalette.searchKey.navigateSoundPreview") },
         }
         Object.entries(PANEL_SHORTCUTS).forEach(([key, entry]) => {
             const label = panelLabels[key]
@@ -483,7 +484,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             cmds.push({
                 id: `navigate-panel-${key}`,
                 title: `${t("thing.open")}: ${label.title}`,
-                subtitle: `Ctrl+Shift+${key}`,
+                subtitle: `Ctrl+Shift+${key.replace("Digit", "")}`,
                 category: "Navigate",
                 action: () => { navigateTo(entry); onCloseRef.current() },
                 icon: label.icon,
