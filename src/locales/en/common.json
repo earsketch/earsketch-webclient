@@ -358,6 +358,7 @@
     "shortcuts.jumpToCurriculum": "Jump to Curriculum",
     "shortcuts.jumpToUtility": "Jump to Keyboard Shortcuts",
     "shortcuts.jumpToSoundPreview": "Jump to Audition Panel",
+    "shortcuts.jumpToConsole": "Jump to Console",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
@@ -1409,6 +1410,9 @@
   "console": {
     "warning": "Warning",
     "error": "Error",
+    "output": "Console output",
+    "clickHereForMoreInfo": "Click here for more information.",
+    "moreInfoLabel": "More information about: {{error}}",
     "errors": {
       "AssertionError": "An assert statement failed",
       "AttributeError": "There is a mismatch between the object and the attribute",
