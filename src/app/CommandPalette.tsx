@@ -483,7 +483,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             cmds.push({
                 id: `navigate-panel-${key}`,
                 title: `${t("thing.open")}: ${label.title}`,
-                subtitle: `Ctrl+${key}`,
+                subtitle: `Ctrl+Shift+${key}`,
                 category: "Navigate",
                 action: () => { navigateTo(entry); onCloseRef.current() },
                 icon: label.icon,
