@@ -497,9 +497,9 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                         </div>
                     </div>
 
-                    <div ref={consoleContainer} id="console-frame" aria-label={t("console:output")} className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
+                    <div ref={consoleContainer} id="console-frame" role="region" aria-label={t("console:output")} className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <ul id="console" aria-live="assertive" aria-atomic="false">
-                            {logs.length === 0 && <span>&nbsp;</span> /* hack for screen readers */}
+                            {logs.length === 0 && <li>&nbsp;</li> /* hack for screen readers */}
                             {logs.map((msg: ide.Log, index: number) => {
                                 const consoleLineClass = classNames({
                                     "console-line": true,
@@ -511,6 +511,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                     className={consoleLineClass}
                                     style={{ fontSize }}
                                     tabIndex={focusedConsoleIndex === index ? 0 : -1}
+                                    aria-current={focusedConsoleIndex === index ? "true" : undefined}
                                     onFocus={() => setFocusedConsoleIndex(index)}
                                     onKeyDown={(e) => handleConsoleKeyDown(e, index)}
                                 >
