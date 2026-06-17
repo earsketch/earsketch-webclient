@@ -50,6 +50,8 @@ import { downloadScript, shareScript } from "./scriptActions"
 import { BrowserTabType } from "../browser/BrowserTab"
 import * as editor from "../ide/Editor"
 import * as ide from "../ide/ideState"
+import { status as consoleStatus } from "../ide/console"
+import { playEarcon, SINE_BUMP } from "../audio/earcon"
 import { pushFocus, updateNewerFocus, stepBackward, stepForward, selectNewerFocus, selectAtNavOffset, FocusRecord } from "./focusHistoryState"
 import { ExtensionLoader } from "../extensions/ExtensionLoader"
 import { clearExtension } from "../extensions/extensionState"
@@ -834,13 +836,29 @@ export const App = () => {
     useEffect(() => {
         const handleFocusNav = (e: KeyboardEvent) => {
             if (!e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return
+            if (e.key !== "[" && e.key !== "]") return
+            e.preventDefault()
+            const { count, navOffset } = store.getState().focusHistory
+            if (count === 0) {
+                consoleStatus(i18n.t("focusHistory.empty"))
+                playEarcon(SINE_BUMP, 0.3)
+                return
+            }
             if (e.key === "[") {
-                e.preventDefault()
+                if (navOffset >= count - 1) {
+                    consoleStatus(i18n.t("focusHistory.endOfBuffer"))
+                    playEarcon(SINE_BUMP, 0.3)
+                    return
+                }
                 store.dispatch(stepBackward())
                 const record = selectAtNavOffset(store.getState())
                 if (record) navigateToRecord(record)
-            } else if (e.key === "]") {
-                e.preventDefault()
+            } else {
+                if (navOffset <= 0) {
+                    consoleStatus(i18n.t("focusHistory.endOfBuffer"))
+                    playEarcon(SINE_BUMP, 0.3)
+                    return
+                }
                 store.dispatch(stepForward())
                 const record = selectAtNavOffset(store.getState())
                 if (record) navigateToRecord(record)

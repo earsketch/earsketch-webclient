@@ -132,6 +132,8 @@
     "daw.tooltip.toggleEffects": "Toggle All Effects",
     "daw.bypass": "Bypass",
     "daw.needsSync": "Run the script to sync the DAW",
+    "focusHistory.empty": "No elements are in focus history.",
+    "focusHistory.endOfBuffer": "End of back to recent buffer.",
     "daw.mix": "Mix",
     "daw.mixTrack": "Mix Track",
     "newScript": "New script",

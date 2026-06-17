@@ -13,8 +13,8 @@ interface FocusHistoryState {
     // Most recent entry is at (writeIndex - 1 + RING_SIZE) % RING_SIZE.
     // Oldest entry is at writeIndex (will be overwritten next).
     writeIndex: number
-    count: number      // valid entries, 0..RING_SIZE
-    navOffset: number  // 0 = newest, count-1 = oldest; resets to 0 on each new push
+    count: number // valid entries, 0..RING_SIZE
+    navOffset: number // 0 = newest, count-1 = oldest; resets to 0 on each new push
 }
 
 const initialState: FocusHistoryState = {
