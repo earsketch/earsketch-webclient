@@ -50,6 +50,9 @@ import { downloadScript, shareScript } from "./scriptActions"
 import { BrowserTabType } from "../browser/BrowserTab"
 import * as editor from "../ide/Editor"
 import * as ide from "../ide/ideState"
+import { status as consoleStatus } from "../ide/console"
+import { playEarcon, SINE_BUMP } from "../audio/earcon"
+import { pushFocus, updateNewerFocus, stepBackward, stepForward, selectNewerFocus, selectAtNavOffset, FocusRecord } from "./focusHistoryState"
 import { ExtensionLoader } from "../extensions/ExtensionLoader"
 import { clearExtension } from "../extensions/extensionState"
 
@@ -597,6 +600,80 @@ const USER_STATE_KEY = "userstate"
 const userstate = window.localStorage.getItem(USER_STATE_KEY)
 const savedLoginInfo = userstate === null ? undefined : JSON.parse(userstate)
 
+// Prevents focus history from recording the programmatic focus caused by Ctrl+[/].
+let isNavigatingFocusHistory = false
+
+// WeakMap assigns a stable string key to every element that receives focus.
+// The key is stored in Redux; the actual element reference lives here so it can be GC'd.
+const elementKeys = new WeakMap<Element, string>()
+const keyedElements = new Map<string, WeakRef<Element>>()
+let focusKeyCounter = 0
+
+function getOrCreateKey(el: Element): string {
+    if (!elementKeys.has(el)) {
+        const key = `fh-${focusKeyCounter++}`
+        elementKeys.set(el, key)
+        keyedElements.set(key, new WeakRef(el))
+    }
+    return elementKeys.get(el)!
+}
+
+// Walk up the DOM to find the nearest meaningful panel boundary.
+// Tries progressively broader containers so that e.g. the filter section
+// and the sound list resolve to different panelIds even though they share
+// a common browser ancestor.
+// data-focus-panel is checked first so a component can declare a stable panel
+// boundary that takes priority over any [id] on descendant elements.
+function getPanelId(element: Element): string {
+    const panelBoundary = element.closest("[data-focus-panel]")
+    if (panelBoundary) return panelBoundary.getAttribute("data-focus-panel")!
+    const candidates = element.closest([
+        ".cm-editor",
+        "[role='tabpanel']",
+        "[role='region']",
+        "section",
+        "nav",
+        "header",
+        "aside",
+        "main",
+        "[role='navigation']",
+        "[role='list']",
+        "[role='grid']",
+        "[id]",
+    ].join(","))
+    if (!candidates) return "root"
+    return (
+        candidates.id ||
+        candidates.getAttribute("aria-label") ||
+        candidates.getAttribute("aria-labelledby") ||
+        candidates.getAttribute("role") ||
+        candidates.tagName
+    )
+}
+
+function getFocusRecord(element: Element): FocusRecord {
+    const el = element as HTMLElement
+    if (element.closest(".cm-editor")) {
+        const line = editor.getEditorLine()
+        return { type: "editor", line, label: `Line ${line}`, panelId: "editor" }
+    }
+    const panelId = getPanelId(element)
+    const key = getOrCreateKey(el)
+    const label = (el.getAttribute("aria-label") || el.title || el.textContent?.trim() || el.tagName).slice(0, 60)
+    return { type: "element", key, label, panelId }
+}
+
+function navigateToRecord(record: FocusRecord) {
+    isNavigatingFocusHistory = true
+    if (record.type === "editor") {
+        editor.jumpToLine(record.line)
+    } else {
+        const el = keyedElements.get(record.key)?.deref() as HTMLElement | undefined
+        el?.focus()
+    }
+    window.setTimeout(() => { isNavigatingFocusHistory = false }, 100)
+}
+
 export const App = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
@@ -732,6 +809,76 @@ export const App = () => {
 
         window.addEventListener("keydown", handleKeyDown)
         return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [])
+
+    // Track focus history: record every meaningful focus change into the ring buffer.
+    useEffect(() => {
+        const handleFocusIn = (e: FocusEvent) => {
+            if (isNavigatingFocusHistory) return
+            const el = e.target as Element | null
+            if (!el || el === document.body) return
+            const record = getFocusRecord(el)
+            let newer = selectNewerFocus(store.getState())
+            // Cursor movement within the editor doesn't re-trigger focusin, so a stale
+            // "editor" entry's line can lag behind the actual cursor position. Refresh
+            // it before it gets demoted to "older" by a focus change to another panel.
+            if (newer?.type === "editor" && newer.panelId !== record.panelId) {
+                const line = editor.getEditorLine()
+                newer = { ...newer, line, label: `Line ${line}` }
+                store.dispatch(updateNewerFocus(newer))
+            }
+            // Skip exact duplicate.
+            if (newer && newer.type === record.type && (
+                (newer.type === "editor" && record.type === "editor" && newer.line === record.line) ||
+                (newer.type === "element" && record.type === "element" && newer.key === record.key)
+            )) return
+            if (newer && newer.panelId === record.panelId) {
+                // Same panel: update the newer slot in place so the ring doesn't fill
+                // up with every item scrolled through inside one panel.
+                store.dispatch(updateNewerFocus(record))
+            } else {
+                // Different panel: push and advance the ring.
+                store.dispatch(pushFocus(record))
+            }
+        }
+        window.addEventListener("focusin", handleFocusIn, true)
+        return () => window.removeEventListener("focusin", handleFocusIn, true)
+    }, [])
+
+    // Ctrl+[ = step backward through focus history; Ctrl+] = step forward.
+    useEffect(() => {
+        const handleFocusNav = (e: KeyboardEvent) => {
+            if (!e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return
+            if (e.key !== "[" && e.key !== "]") return
+            e.preventDefault()
+            const { count, navOffset } = store.getState().focusHistory
+            if (count === 0) {
+                consoleStatus(i18n.t("focusHistory.empty"))
+                playEarcon(SINE_BUMP, 0.3)
+                return
+            }
+            if (e.key === "[") {
+                if (navOffset >= count - 1) {
+                    consoleStatus(i18n.t("focusHistory.startOfBuffer"))
+                    playEarcon(SINE_BUMP, 0.3)
+                    return
+                }
+                store.dispatch(stepBackward())
+                const record = selectAtNavOffset(store.getState())
+                if (record) navigateToRecord(record)
+            } else {
+                if (navOffset <= 0) {
+                    consoleStatus(i18n.t("focusHistory.endOfBuffer"))
+                    playEarcon(SINE_BUMP, 0.3)
+                    return
+                }
+                store.dispatch(stepForward())
+                const record = selectAtNavOffset(store.getState())
+                if (record) navigateToRecord(record)
+            }
+        }
+        window.addEventListener("keydown", handleFocusNav)
+        return () => window.removeEventListener("keydown", handleFocusNav)
     }, [])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
