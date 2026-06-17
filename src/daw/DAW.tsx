@@ -36,6 +36,15 @@ function formatSourceLines(sourceLines: number[]): string {
     return `Line: ${sourceLines[0] ?? 0}`
 }
 
+// Ctrl+I is a native browser shortcut in some browsers (e.g. Firefox's Page Info dialog),
+// so jump-to-editor handlers must prevent it before running their own action.
+function onCtrlI(e: React.KeyboardEvent, action: () => void) {
+    if (e.ctrlKey && e.key === "i") {
+        e.preventDefault()
+        action()
+    }
+}
+
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void }) => {
     const dispatch = useDispatch()
     const hideDAW = useSelector(appState.selectHideDAW)
@@ -505,6 +514,11 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize, familyHasLoop
         onMouseEnter={() => {
             scriptMatchesDAW && setDAWHoverLine(color, sourceLines)
         }} onMouseLeave={clearDAWHoverLine}
+        onMouseDown={(e: React.MouseEvent) => {
+            // A plain click should do nothing at all; only Option/Alt+click focuses the clip
+            // (for solo-isolation and Ctrl+Space preview scoping), same as Tab and Ctrl+I.
+            if (!e.altKey) e.preventDefault()
+        }}
         onFocus={() => {
             // Jumping here from the editor (Ctrl+I) isolates this clip's track (or, if this
             // call site generated clips on several tracks, all of those tracks) so the
@@ -541,13 +555,11 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize, familyHasLoop
         }}
         title={scriptMatchesDAW ? formatSourceLines(sourceLines) : t("daw.needsSync")}
         aria-label={clipAriaLabel}
-        onKeyDown={(e: React.KeyboardEvent) => {
-            if (e.ctrlKey && e.key === "i") {
-                // The subsequent onBlur (triggered by jumpToLine shifting focus to the editor)
-                // restores normal playback and visuals.
-                jumpToLine(primaryLine)
-            }
-        }}
+        onKeyDown={(e: React.KeyboardEvent) => onCtrlI(e, () => {
+            // The subsequent onBlur (triggered by jumpToLine shifting focus to the editor)
+            // restores normal playback and visuals.
+            jumpToLine(primaryLine)
+        })}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
@@ -614,7 +626,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                         onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
                         onFocus={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
                         onBlur={() => { setFocusedPoint(null); clearDAWHoverLine() }}
-                        onKeyDown={(e: React.KeyboardEvent) => { if (e.ctrlKey && e.key === "i") jumpToLine(pointLines[0]) }}
+                        onKeyDown={(e: React.KeyboardEvent) => onCtrlI(e, () => jumpToLine(pointLines[0]))}
                     >
                         {/* eslint-disable-next-line react/jsx-indent */}
                         <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? formatSourceLines(pointLines) : t("daw.needsSync")}</title>
