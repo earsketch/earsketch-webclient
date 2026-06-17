@@ -22,6 +22,18 @@ import { SearchBar } from "./Utils"
 import { Waveform } from "../app/Recorder"
 import * as audioLibrary from "../app/audiolibrary"
 
+const TABBABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+// Focus the next (or previous, if reverse=true) tabbable element in the document
+// relative to `from`. Elements with tabIndex={-1} are excluded by the selector,
+// so callers don't need a ref to the target — it's found by DOM order automatically.
+function focusNextTabbableFrom(from: HTMLElement, reverse = false) {
+    const all = Array.from(document.querySelectorAll<HTMLElement>(TABBABLE_SELECTOR))
+    const index = all.indexOf(from)
+    if (index === -1) return
+    all[reverse ? index - 1 : index + 1]?.focus()
+}
+
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
     rename: (_: SoundEntity) => {},
@@ -132,6 +144,22 @@ const ButtonFilterList = ({ category, ariaListBox, items, justification, showMaj
                 if (e.key === "Escape") {
                     e.preventDefault()
                     tabButtonRef?.current?.focus()
+                } else if (e.key === "Tab") {
+                    if (e.shiftKey) {
+                        // Shift+Tab walks backward from the current tab button, landing on
+                        // the previous tabbable element (e.g. Genres button from Instruments panel).
+                        if (tabButtonRef?.current) {
+                            e.preventDefault()
+                            focusNextTabbableFrom(tabButtonRef.current, true)
+                        }
+                    } else if (tabButtonRef?.current) {
+                        // Tab walks forward from the current tab button to find the next
+                        // tabbable element. Panel options have tabIndex={-1} so they are
+                        // invisible to the query: for Artists/Genres/Instruments this lands
+                        // on the next tab button; for Keys it exits past the Filters component.
+                        e.preventDefault()
+                        focusNextTabbableFrom(tabButtonRef.current)
+                    }
                 } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
                     e.preventDefault()
                     const options = Array.from(
