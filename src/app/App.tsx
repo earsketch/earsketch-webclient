@@ -375,6 +375,7 @@ const KeyboardShortcuts = () => {
         comment: [modifier, "/"],
         commandPalette: [modifier, "Shift", "P"],
         playPause: ["Ctrl", "Space"],
+        jumpToCodeDaw: ["Ctrl", "I"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
