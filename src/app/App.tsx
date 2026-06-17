@@ -846,7 +846,7 @@ export const App = () => {
             }
             if (e.key === "[") {
                 if (navOffset >= count - 1) {
-                    consoleStatus(i18n.t("focusHistory.endOfBuffer"))
+                    consoleStatus(i18n.t("focusHistory.startOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
                     return
                 }
