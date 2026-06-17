@@ -111,6 +111,15 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
                 <ListboxButton
                     className={`flex justify-between w-full scale:text-base border-b-2 ${margin} border-black dark:border-white`}
                     aria-label={aria}
+                    onKeyDown={(e) => {
+                        // Headless UI v2 ListboxButton does not open the dropdown on Enter
+                        // (it calls attemptSubmit instead). We intercept Enter, cancel the
+                        // default Enter→click so it doesn't fire twice, then click explicitly.
+                        if (e.key === "Enter") {
+                            e.preventDefault()
+                            e.currentTarget.click()
+                        }
+                    }}
                 >
                     <span className="truncate">
                         {title} {numSelected ? `(${numSelected})` : ""}

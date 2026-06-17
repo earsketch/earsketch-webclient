@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, ChangeEvent, useState, useMemo, useCallback } from "react"
+import React, { useRef, useEffect, useContext, ChangeEvent, useState, useMemo, useCallback } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
@@ -21,6 +21,18 @@ import * as Tooltip from "@radix-ui/react-tooltip"
 import { SearchBar } from "./Utils"
 import { Waveform } from "../app/Recorder"
 import * as audioLibrary from "../app/audiolibrary"
+
+const TABBABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+// Focus the next (or previous, if reverse=true) tabbable element in the document
+// relative to `from`. Elements with tabIndex={-1} are excluded by the selector,
+// so callers don't need a ref to the target — it's found by DOM order automatically.
+function focusNextTabbableFrom(from: HTMLElement, reverse = false) {
+    const all = Array.from(document.querySelectorAll<HTMLElement>(TABBABLE_SELECTOR))
+    const index = all.indexOf(from)
+    if (index === -1) return
+    all[reverse ? index - 1 : index + 1]?.focus()
+}
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -64,7 +76,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
         <div
             role="option"
             aria-selected={selected}
-            tabIndex={0}
+            tabIndex={-1}
             className={classnames}
             onClick={handleToggle}
             onKeyDown={(e) => {
@@ -132,6 +144,22 @@ const ButtonFilterList = ({ category, ariaListBox, items, justification, showMaj
                 if (e.key === "Escape") {
                     e.preventDefault()
                     tabButtonRef?.current?.focus()
+                } else if (e.key === "Tab") {
+                    if (e.shiftKey) {
+                        // Shift+Tab walks backward from the current tab button, landing on
+                        // the previous tabbable element (e.g. Genres button from Instruments panel).
+                        if (tabButtonRef?.current) {
+                            e.preventDefault()
+                            focusNextTabbableFrom(tabButtonRef.current, true)
+                        }
+                    } else if (tabButtonRef?.current) {
+                        // Tab walks forward from the current tab button to find the next
+                        // tabbable element. Panel options have tabIndex={-1} so they are
+                        // invisible to the query: for Artists/Genres/Instruments this lands
+                        // on the next tab button; for Keys it exits past the Filters component.
+                        e.preventDefault()
+                        focusNextTabbableFrom(tabButtonRef.current)
+                    }
                 } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
                     e.preventDefault()
                     const options = Array.from(
@@ -229,12 +257,14 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
             <button
                 role="radio"
                 aria-checked={showMajMinPageOne}
+                tabIndex={-1}
                 className={majorButtonClass}
                 onClick={chooseMaj}
             >Major</button>
             <button
                 role="radio"
                 aria-checked={!showMajMinPageOne}
+                tabIndex={-1}
                 className={minorButtonClass}
                 onClick={chooseMin}
             >Minor</button>
@@ -242,7 +272,7 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
     </div>
 }
 
-const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab, userExpandedTab, onOpen, tabButtonRef }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters, userExpandedTab: keyof sounds.Filters | null, onOpen: () => void, tabButtonRef: React.RefObject<HTMLButtonElement> }) => {
+const SoundFilterTab = ({ soundFilterKey, numItemsSelected, currentFilterTab, userExpandedTab, onOpen, tabButtonRef }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, currentFilterTab: keyof sounds.Filters, userExpandedTab: keyof sounds.Filters | null, onOpen: () => void, tabButtonRef: React.RefObject<HTMLButtonElement> }) => {
     const { t } = useTranslation()
     const isCurrentTab = currentFilterTab === soundFilterKey
     const isExpanded = userExpandedTab === soundFilterKey
@@ -259,18 +289,11 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
                     ? <div className={spanClass} aria-hidden="true">{numItemsSelected}</div>
                     : null}
                 <button
-                    ref={isCurrentTab ? tabButtonRef : undefined}
+                    ref={tabButtonRef}
                     aria-expanded={isExpanded}
                     aria-controls={`sound-filter-panel-${soundFilterKey}`}
                     className={tabClass}
-                    onClick={() => {
-                        setCurrentFilterTab(soundFilterKey)
-                        onOpen()
-                    }}
-                    onKeyDown={(e) => {
-                        // Prevent Space from scrolling the virtual list. The click still fires on keyup.
-                        if (e.key === " ") e.preventDefault()
-                    }}
+                    onClick={onOpen}
                 >
                     {t(`soundBrowser.filterDropdown.${soundFilterKey}`)}
                     {numItemsSelected > 0
@@ -295,9 +318,15 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
     // Set to true when a tab is opened via keyboard and we still need to move
     // focus into the panel. ButtonFilterList clears this after calling focus.
     const pendingKeyboardFocusRef = useRef(false)
-    // Points to the currently-visible SoundFilterTab button so that
-    // Escape in the ButtonFilterList can return focus to it.
-    const activeTabButtonRef = useRef<HTMLButtonElement>(null)
+    // One stable ref per tab button (rather than a single ref shared/swapped
+    // across tabs) so Escape in ButtonFilterList always returns focus to the
+    // correct tab, with no attach/detach race during tab switches.
+    const tabButtonRefs: Record<keyof sounds.FilterTabs, React.RefObject<HTMLButtonElement>> = {
+        artists: useRef<HTMLButtonElement>(null),
+        genres: useRef<HTMLButtonElement>(null),
+        instruments: useRef<HTMLButtonElement>(null),
+        keys: useRef<HTMLButtonElement>(null),
+    }
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
@@ -325,11 +354,10 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                         key={name}
                         soundFilterKey={name as keyof sounds.Filters}
                         numItemsSelected={num}
-                        setCurrentFilterTab={setCurrentFilterTab}
                         currentFilterTab={currentFilterTab}
                         userExpandedTab={userExpandedTab}
                         onOpen={() => handleOpen(name as keyof sounds.Filters)}
-                        tabButtonRef={activeTabButtonRef} />
+                        tabButtonRef={tabButtonRefs[name as keyof sounds.FilterTabs]} />
                 })}
             </div>
 
@@ -342,7 +370,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 justification="flex"
                 focusFirstOptionRef={focusFirstOptionRef}
                 pendingKeyboardFocusRef={pendingKeyboardFocusRef}
-                tabButtonRef={activeTabButtonRef}
+                tabButtonRef={tabButtonRefs.artists}
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -353,7 +381,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 justification="flex"
                 focusFirstOptionRef={focusFirstOptionRef}
                 pendingKeyboardFocusRef={pendingKeyboardFocusRef}
-                tabButtonRef={activeTabButtonRef}
+                tabButtonRef={tabButtonRefs.genres}
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
@@ -364,7 +392,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 justification="flex"
                 focusFirstOptionRef={focusFirstOptionRef}
                 pendingKeyboardFocusRef={pendingKeyboardFocusRef}
-                tabButtonRef={activeTabButtonRef}
+                tabButtonRef={tabButtonRefs.instruments}
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
@@ -377,7 +405,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 setShowMajMinPageOne={setShowMajMinPageOne}
                 focusFirstOptionRef={focusFirstOptionRef}
                 pendingKeyboardFocusRef={pendingKeyboardFocusRef}
-                tabButtonRef={activeTabButtonRef}
+                tabButtonRef={tabButtonRefs.keys}
             />}
         </div>
     )
@@ -975,20 +1003,20 @@ const SoundFiltersContext = React.createContext<SoundFiltersContextValue | null>
 // filterHeight so that react-window's absolute-positioned items are pushed down
 // to start below the filters. SoundFilters is never touched by react-window so
 // focus inside it is completely stable.
-const SoundListHeader = ({ currentFilterTab, setCurrentFilterTab, t }: {
-    currentFilterTab: keyof sounds.Filters,
-    setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>,
-    t: (key: string) => string
-}) => (
-    <>
-        <h3 className="sr-only">{t("soundBrowser.filterHeader")}</h3>
-        <SoundFilters
-            currentFilterTab={currentFilterTab}
-            setCurrentFilterTab={setCurrentFilterTab}
-        />
-        <h3 className="sr-only">{t("soundBrowser.soundHeader")}</h3>
-    </>
-)
+const SoundListHeader = () => {
+    const { t } = useTranslation()
+    const { currentFilterTab, setCurrentFilterTab } = useContext(SoundFiltersContext)!
+    return (
+        <>
+            <h3 className="sr-only">{t("soundBrowser.filterHeader")}</h3>
+            <SoundFilters
+                currentFilterTab={currentFilterTab}
+                setCurrentFilterTab={setCurrentFilterTab}
+            />
+            <h3 className="sr-only">{t("soundBrowser.soundHeader")}</h3>
+        </>
+    )
+}
 
 const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
     title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
@@ -1013,18 +1041,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const scrolltoTopClassnames = "absolute bottom-4 right-4 z-10 opacity-0 transform translate-y-full transition-all duration-300 pointer-events-none"
 
     const virtuosoRef = useRef<VirtuosoHandle>(null)
-
-    const Header = useMemo(() => {
-        const SoundBrowserHeader = () => (
-            <SoundListHeader
-                currentFilterTab={currentFilterTab}
-                setCurrentFilterTab={setCurrentFilterTab}
-                t={t}
-            />
-        )
-        SoundBrowserHeader.displayName = "SoundBrowserHeader"
-        return SoundBrowserHeader
-    }, [currentFilterTab, setCurrentFilterTab])
 
     const overscanSize = Math.round(2500 * scalar)
     const increaseViewportSize = Math.round(3500 * scalar)
@@ -1077,7 +1093,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                             }
                         }}
                         components={{
-                            Header,
+                            Header: SoundListHeader,
                         }}
                         itemContent={itemContent}
                     />
