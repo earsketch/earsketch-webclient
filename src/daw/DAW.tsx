@@ -235,22 +235,19 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                 </button>
             </span>
 
-            <span id="daw-play-button">
-                {/* Play */}
-                {/* Prevent embedded mode race condition by waiting for embeddedScriptName to populate before showing */}
-                {!playing && (!embedMode || (embedMode && embeddedScriptName)) && <span className="daw-transport-button">
-                    <button aria-label={t("daw.tooltip.play")} type="submit" className={"hover:opacity-70 text-green-600" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
-                        <span className="icon icon-play4"></span>
-                    </button>
-                </span>}
-
-                {/* Pause */}
-                {playing && <span className="daw-transport-button">
-                    <button aria-label={t("daw.tooltip.pause")} type="submit" className="dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); addUIClick("project - pause") }}>
-                        <span className="icon icon-pause2"></span>
-                    </button>
-                </span>}
-            </span>
+            {/* Play/Pause — single button so focus is retained when toggling via keyboard */}
+            {/* Prevent embedded mode race condition by waiting for embeddedScriptName to populate before showing */}
+            {(!embedMode || (embedMode && embeddedScriptName)) && <span id="daw-play-button" className="daw-transport-button">
+                <button
+                    aria-label={playing ? t("daw.tooltip.pause") : t("daw.tooltip.play")}
+                    type="button"
+                    className={playing ? "dark:text-white hover:opacity-70" : ("hover:opacity-70 text-green-600" + (needCompile ? " flashButton" : ""))}
+                    title={playing ? t("daw.tooltip.pause") : t("daw.tooltip.play")}
+                    onClick={() => { if (playing) { pause(); addUIClick("project - pause") } else { play(); addUIClick("project - play") } }}
+                >
+                    <span className={playing ? "icon icon-pause2" : "icon icon-play4"}></span>
+                </button>
+            </span>}
 
             {/* Loop */}
             <span className="daw-transport-button">
