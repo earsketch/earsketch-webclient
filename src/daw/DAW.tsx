@@ -63,7 +63,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         setPlayPosition(1)
     }
 
-    const play = () => {
+    const play = (range?: { start: number, end: number }) => {
         if (bubble.active && bubble.currentPage === 4 && !bubble.readyToProceed) {
             dispatch(setReady(true))
         }
@@ -77,13 +77,13 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
         dispatch(daw.setPlaying(false))
 
-        if (playPosition >= playLength) {
+        if (!range && playPosition >= playLength) {
             setPlayPosition(loop.selection ? loop.start : 1)
         }
 
         player.callbacks.onStartedCallback = playbackStartedCallback
         player.callbacks.onFinishedCallback = playbackEndedCallback
-        player.play(playPosition)
+        player.play(range?.start ?? playPosition, 0, range?.end ?? 0)
 
         // player does not preserve volume state between plays
         player.setVolume(volumeMuted ? -60 : volume)
@@ -147,18 +147,19 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
     const [titleKey, setTitleKey] = useState<string | null>(null)
 
-    const usePlayPauseShortcut = (playing: boolean, play: () => void, pause: () => void, hasDAWData: boolean) => {
+    const usePlayPauseShortcut = (playing: boolean, play: (range?: { start: number, end: number }) => void, pause: () => void, hasDAWData: boolean) => {
         useEffect(() => {
             const handleKeyPress = (event: KeyboardEvent) => {
             // Ctrl (ctrlKey) and spacebar key press
                 if ((event.ctrlKey) && event.key === " " && hasDAWData) {
                     event.preventDefault()
 
-                    // Toggle between play and pause based on current state
+                    // Toggle between play and pause based on current state.
+                    // If a clip is currently focused, play just its (already-soloed) range.
                     if (playing) {
                         pause()
                     } else {
-                        play()
+                        play(focusedClipRange ?? undefined)
                     }
                 }
             }
@@ -513,30 +514,31 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize, familyHasLoop
             for (const t of tracksToIsolate ?? [clip.track]) isolated[t] = "solo"
             store.dispatch(daw.setSoloMute(isolated))
             player.setMutedTracks(daw.getMuted(tracks, isolated, metronome))
+            // Remember this clip's range so Ctrl+Space plays just this clip (or, if this focus
+            // came from a Ctrl+I jump, the full family range) instead of the whole arrangement.
+            focusedClipRange = {
+                start: focusedFromCtrlI.current ? playStart : clip.measure,
+                end: focusedFromCtrlI.current ? playEnd : singleClipEnd,
+            }
+        }}
+        onBlur={() => {
+            // Leaving the clip (Tab to another element, click elsewhere, Ctrl+I back to the
+            // editor) stops playback and restores normal solo/mute so nothing keeps playing
+            // or stays isolated unattended.
+            focusedClipRange = null
+            player.pause()
+            store.dispatch(daw.setPlaying(false))
+            const restored = savedSoloMute ?? soloMute
+            store.dispatch(daw.setSoloMute(restored))
+            player.setMutedTracks(daw.getMuted(tracks, restored, metronome))
+            savedSoloMute = null
         }}
         title={scriptMatchesDAW ? formatSourceLines(sourceLines) : t("daw.needsSync")}
         aria-label={clipAriaLabel}
-        onClick={() => {
-            player.setPreview(clip.track)
-            player.callbacks.onStartedCallback = () => {
-                store.dispatch(daw.setPlaying(true))
-                store.dispatch(daw.setPendingPosition(null))
-            }
-            player.callbacks.onFinishedCallback = () => {
-                store.dispatch(daw.setPlaying(false))
-                _setPlayPosition?.(1)
-            }
-            const start = focusedFromCtrlI.current ? playStart : clip.measure
-            const end = focusedFromCtrlI.current ? playEnd : singleClipEnd
-            player.play(start, 0, end)
-        }}
         onKeyDown={(e: React.KeyboardEvent) => {
             if (e.ctrlKey && e.key === "i") {
-                // Jumping back to the editor restores normal playback and visuals.
-                const restored = savedSoloMute ?? soloMute
-                store.dispatch(daw.setSoloMute(restored))
-                player.setMutedTracks(daw.getMuted(tracks, restored, metronome))
-                savedSoloMute = null
+                // The subsequent onBlur (triggered by jumpToLine shifting focus to the editor)
+                // restores normal playback and visuals.
                 jumpToLine(primaryLine)
             }
         }}
@@ -907,6 +909,10 @@ let _setPlayPosition: ((a: number) => void) | null = null
 // Solo/mute state saved when Ctrl+I focus-isolates a clip's track, so it can be restored
 // when jumping back to the editor. null means no isolation is currently active.
 let savedSoloMute: Record<number, daw.SoloMute> | null = null
+
+// Start/end measures of the currently focused clip (Tab or Ctrl+I), so Ctrl+Space can play
+// just that clip's range instead of the whole arrangement. null means no clip is focused.
+let focusedClipRange: { start: number, end: number } | null = null
 
 // Scroll the DAW so that `element` is within the visible area of the track timeline.
 // Updates ghost bars (#daw-x-scroll, #daw-y-scroll) as the primary mechanism — the useEffect
