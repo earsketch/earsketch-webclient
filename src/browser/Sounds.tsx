@@ -638,26 +638,28 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndF
                 {loggedIn && <ShowOnlyFavorites />}
                 <AddSound />
             </div>
-            <h4 className="sr-only">{t("sounds.preview.title").toLocaleUpperCase()}</h4>
-            <button
-                type="button"
-                onClick={() => dispatch(appState.setShowSoundPreviewWidget(!showPreview))}
-                aria-expanded={showPreview}
-                aria-controls="sound-preview-panel"
-                title={showPreview ? t("ariaDescriptors:sounds.preview.close") : t("ariaDescriptors:sounds.preview.open")}
-                aria-label={showPreview ? t("ariaDescriptors:sounds.preview.close") : t("ariaDescriptors:sounds.preview.open")}
-                className="flex bg-blue text-white w-full justify-center items-center gap-1 text-sm p-1"
-            >
-                <span>{t("sounds.preview.title").toLocaleUpperCase()}</span>
-                <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
-            </button>
-            <div
-                id="sound-preview-panel"
-                aria-hidden={!showPreview}
-                style={{ display: showPreview ? undefined : "none" }}
-                className="bg-blue"
-            >
-                <SoundPreview />
+            <div data-focus-panel="sound-preview">
+                <h4 className="sr-only">{t("sounds.preview.title").toLocaleUpperCase()}</h4>
+                <button
+                    type="button"
+                    onClick={() => dispatch(appState.setShowSoundPreviewWidget(!showPreview))}
+                    aria-expanded={showPreview}
+                    aria-controls="sound-preview-panel"
+                    title={showPreview ? t("ariaDescriptors:sounds.preview.close") : t("ariaDescriptors:sounds.preview.open")}
+                    aria-label={showPreview ? t("ariaDescriptors:sounds.preview.close") : t("ariaDescriptors:sounds.preview.open")}
+                    className="flex bg-blue text-white w-full justify-center items-center gap-1 text-sm p-1"
+                >
+                    <span>{t("sounds.preview.title").toLocaleUpperCase()}</span>
+                    <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
+                </button>
+                <div
+                    id="sound-preview-panel"
+                    aria-hidden={!showPreview}
+                    style={{ display: showPreview ? undefined : "none" }}
+                    className="bg-blue"
+                >
+                    <SoundPreview />
+                </div>
             </div>
         </div>
     )
