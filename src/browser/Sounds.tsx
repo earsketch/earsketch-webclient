@@ -266,10 +266,6 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, currentFilterTab, us
                     aria-controls={`sound-filter-panel-${soundFilterKey}`}
                     className={tabClass}
                     onClick={onOpen}
-                    onKeyDown={(e) => {
-                        // Prevent Space from scrolling the virtual list. The click still fires on keyup.
-                        if (e.key === " ") e.preventDefault()
-                    }}
                 >
                     {t(`soundBrowser.filterDropdown.${soundFilterKey}`)}
                     {numItemsSelected > 0
