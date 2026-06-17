@@ -64,7 +64,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
         <div
             role="option"
             aria-selected={selected}
-            tabIndex={0}
+            tabIndex={-1}
             className={classnames}
             onClick={handleToggle}
             onKeyDown={(e) => {
@@ -229,12 +229,14 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
             <button
                 role="radio"
                 aria-checked={showMajMinPageOne}
+                tabIndex={-1}
                 className={majorButtonClass}
                 onClick={chooseMaj}
             >Major</button>
             <button
                 role="radio"
                 aria-checked={!showMajMinPageOne}
+                tabIndex={-1}
                 className={minorButtonClass}
                 onClick={chooseMin}
             >Minor</button>
