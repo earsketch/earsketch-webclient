@@ -512,7 +512,16 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                     style={{ fontSize }}
                                     tabIndex={focusedConsoleIndex === index ? 0 : -1}
                                     aria-current={focusedConsoleIndex === index ? "true" : undefined}
-                                    onFocus={() => setFocusedConsoleIndex(index)}
+                                    onFocus={(e) => {
+                                        setFocusedConsoleIndex(index)
+                                        // Announce "Focus shifted to Console" before the message text, so
+                                        // it's clear from anywhere (Tab, arrow keys, or a panel jump) that
+                                        // focus landed in the console rather than just reading the message.
+                                        const target = e.currentTarget
+                                        const originalLabel = target.getAttribute("aria-label") ?? ""
+                                        target.setAttribute("aria-label", `${t("ariaDescriptors:console.focusAnnouncement")} ${target.textContent ?? ""}`)
+                                        window.setTimeout(() => target.setAttribute("aria-label", originalLabel), 1000)
+                                    }}
                                     onKeyDown={(e) => handleConsoleKeyDown(e, index)}
                                 >
                                     {["warn", "error"].includes(msg.level) && (msg.level === "error"

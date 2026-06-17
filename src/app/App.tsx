@@ -105,14 +105,10 @@ export function navigateTo(entry: PanelEntry) {
     if (entry.panel === "editor") {
         editor.focus()
     } else if (entry.panel === "console") {
+        // The console <li>'s own onFocus handler announces "Focus shifted to Console".
         window.requestAnimationFrame(() => {
             const items = document.querySelectorAll<HTMLElement>("#console li")
-            if (items.length === 0) return
-            const target = items[items.length - 1]
-            const originalLabel = target.getAttribute("aria-label") ?? ""
-            target.setAttribute("aria-label", `${i18n.t("ariaDescriptors:console.focusAnnouncement")} ${target.textContent ?? ""}`)
-            target.focus()
-            window.setTimeout(() => target.setAttribute("aria-label", originalLabel), 1000)
+            items[items.length - 1]?.focus()
         })
     } else if ("elementSelector" in entry) {
         if (entry.panel === "west") entry.onBeforeFocus?.()
