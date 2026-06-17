@@ -25,6 +25,8 @@ export interface Filters {
     keys: string[]
 }
 
+export type FilterTabs = Omit<Filters, "favorites">
+
 export interface SoundsState {
     standardSounds: Sounds
     userSounds: Sounds

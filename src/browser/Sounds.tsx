@@ -295,7 +295,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
     // One stable ref per tab button (rather than a single ref shared/swapped
     // across tabs) so Escape in ButtonFilterList always returns focus to the
     // correct tab, with no attach/detach race during tab switches.
-    const tabButtonRefs: Record<keyof sounds.Filters, React.RefObject<HTMLButtonElement>> = {
+    const tabButtonRefs: Record<keyof sounds.FilterTabs, React.RefObject<HTMLButtonElement>> = {
         artists: useRef<HTMLButtonElement>(null),
         genres: useRef<HTMLButtonElement>(null),
         instruments: useRef<HTMLButtonElement>(null),
@@ -331,7 +331,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                         currentFilterTab={currentFilterTab}
                         userExpandedTab={userExpandedTab}
                         onOpen={() => handleOpen(name as keyof sounds.Filters)}
-                        tabButtonRef={tabButtonRefs[name as keyof sounds.Filters]} />
+                        tabButtonRef={tabButtonRefs[name as keyof sounds.FilterTabs]} />
                 })}
             </div>
 
