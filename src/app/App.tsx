@@ -50,7 +50,7 @@ import { downloadScript, shareScript } from "./scriptActions"
 import { BrowserTabType } from "../browser/BrowserTab"
 import * as editor from "../ide/Editor"
 import * as ide from "../ide/ideState"
-import { pushFocus, updateNewerFocus, selectNewerFocus, selectOlderFocus, FocusRecord } from "./focusHistoryState"
+import { pushFocus, updateNewerFocus, stepBackward, stepForward, selectNewerFocus, selectAtNavOffset, FocusRecord } from "./focusHistoryState"
 import { ExtensionLoader } from "../extensions/ExtensionLoader"
 import { clearExtension } from "../extensions/extensionState"
 
@@ -606,7 +606,11 @@ function getOrCreateKey(el: Element): string {
 // Tries progressively broader containers so that e.g. the filter section
 // and the sound list resolve to different panelIds even though they share
 // a common browser ancestor.
+// data-focus-panel is checked first so a component can declare a stable panel
+// boundary that takes priority over any [id] on descendant elements.
 function getPanelId(element: Element): string {
+    const panelBoundary = element.closest("[data-focus-panel]")
+    if (panelBoundary) return panelBoundary.getAttribute("data-focus-panel")!
     const candidates = element.closest([
         ".cm-editor",
         "[role='tabpanel']",
@@ -825,17 +829,19 @@ export const App = () => {
         return () => window.removeEventListener("focusin", handleFocusIn, true)
     }, [])
 
-    // Ctrl+[ = jump to older focus; Ctrl+] = jump to newer focus.
+    // Ctrl+[ = step backward through focus history; Ctrl+] = step forward.
     useEffect(() => {
         const handleFocusNav = (e: KeyboardEvent) => {
             if (!e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return
             if (e.key === "[") {
                 e.preventDefault()
-                const record = selectOlderFocus(store.getState())
+                store.dispatch(stepBackward())
+                const record = selectAtNavOffset(store.getState())
                 if (record) navigateToRecord(record)
             } else if (e.key === "]") {
                 e.preventDefault()
-                const record = selectNewerFocus(store.getState())
+                store.dispatch(stepForward())
+                const record = selectAtNavOffset(store.getState())
                 if (record) navigateToRecord(record)
             }
         }
