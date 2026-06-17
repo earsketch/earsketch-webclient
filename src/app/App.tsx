@@ -104,7 +104,12 @@ export function navigateTo(entry: PanelEntry) {
     } else if (entry.panel === "console") {
         window.requestAnimationFrame(() => {
             const items = document.querySelectorAll<HTMLElement>("#console li")
-            if (items.length > 0) items[items.length - 1].focus()
+            if (items.length === 0) return
+            const target = items[items.length - 1]
+            const originalLabel = target.getAttribute("aria-label") ?? ""
+            target.setAttribute("aria-label", `${i18n.t("ariaDescriptors:console.focusAnnouncement")} ${target.textContent ?? ""}`)
+            target.focus()
+            window.setTimeout(() => target.setAttribute("aria-label", originalLabel), 1000)
         })
     } else if ("elementSelector" in entry) {
         if (entry.panel === "west") entry.onBeforeFocus?.()
