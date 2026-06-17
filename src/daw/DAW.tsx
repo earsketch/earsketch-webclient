@@ -77,7 +77,9 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
         dispatch(daw.setPlaying(false))
 
-        if (!range && playPosition >= playLength) {
+        if (range) {
+            player.startPreview()
+        } else if (playPosition >= playLength) {
             setPlayPosition(loop.selection ? loop.start : 1)
         }
 
@@ -523,11 +525,15 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize, familyHasLoop
         }}
         onBlur={() => {
             // Leaving the clip (Tab to another element, click elsewhere, Ctrl+I back to the
-            // editor) stops playback and restores normal solo/mute so nothing keeps playing
-            // or stays isolated unattended.
+            // editor) restores normal solo/mute so nothing stays isolated unattended. Only stop
+            // playback if this clip's own preview is what's playing — leave unrelated
+            // whole-arrangement playback alone.
             focusedClipRange = null
-            player.pause()
-            store.dispatch(daw.setPlaying(false))
+            if (player.isPreviewing()) {
+                player.pause()
+                store.dispatch(daw.setPlaying(false))
+                player.clearPreview()
+            }
             const restored = savedSoloMute ?? soloMute
             store.dispatch(daw.setSoloMute(restored))
             player.setMutedTracks(daw.getMuted(tracks, restored, metronome))

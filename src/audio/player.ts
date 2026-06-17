@@ -24,6 +24,11 @@ let loop = {
     end: 0,
 }
 
+// Tracks whether the active playback is a clip-scoped preview (started by Ctrl+Space while a
+// DAW clip is focused), as opposed to whole-arrangement playback. Lets the DAW know whether
+// losing focus on that clip should stop playback, or leave unrelated playback alone.
+let previewing = false
+
 let dawData: DAWData | null = null
 
 let upcomingProjectGraph: ProjectGraph | null = null
@@ -203,6 +208,18 @@ export function getPosition() {
 }
 
 export const getProjectTracks = () => [...projectGraph?.tracks.entries() ?? [], ...upcomingProjectGraph?.tracks.entries() ?? []]
+
+export function startPreview() {
+    previewing = true
+}
+
+export function isPreviewing() {
+    return previewing
+}
+
+export function clearPreview() {
+    previewing = false
+}
 
 export function setMutedTracks(muted: number[]) {
     mutedTracks = muted
