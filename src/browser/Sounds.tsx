@@ -839,7 +839,8 @@ const SoundPreview = () => {
         }
     }
 
-    const focusPlayer = () => {
+    const focusPlayer = (e: React.MouseEvent<HTMLDivElement>) => {
+        if ((e.target as HTMLElement).closest("button, input, select, textarea, a")) return
         playerRef.current?.focus()
     }
 
