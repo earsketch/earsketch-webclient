@@ -720,7 +720,6 @@ const SoundPreview = () => {
             setQueue([])
             const out: Array<{ folder: string; name: string }> = []
             if (recommendationMode) {
-                console.log(filters.artists)
                 const recommendations = await recommend([], 1, 1, filters.genres, filters.instruments, [], 100, filters.keys, filters.artists)
                 for (const name of recommendations) out.push({ folder: "", name })
             } else {
@@ -792,7 +791,24 @@ const SoundPreview = () => {
         playNow(next.name)
     }
 
-    const goPrev = () => canPrev && goTo(index - 1)
+    const restartCurrent = () => {
+        if (!currentName) return
+        const isPlaying = preview?.kind === "sound" && preview.name === currentName
+        if (isPlaying) {
+            // stop, then start again next frame so the audio nodes tear down first
+            dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" })) // OFF
+            window.requestAnimationFrame(() => {
+                dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" })) // ON
+            })
+        } else {
+            dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" })) // ON
+        }
+    }
+
+    const goPrev = () => {
+        if (canPrev) goTo(index - 1)
+        else restartCurrent()
+    }
     const goNext = () => canNext && goTo(index + 1)
 
     // stop reliably on unmount (no stale preview)
@@ -903,9 +919,13 @@ const SoundPreview = () => {
                     <button
                         type="button"
                         onClick={goPrev}
-                        disabled={!canPrev}
-                        aria-label={t("ariaDescriptors:sounds.preview.previousSound")}
-                        title={t("ariaDescriptors:sounds.preview.previousTitle")}
+                        disabled={!currentName}
+                        aria-label={canPrev
+                            ? t("ariaDescriptors:sounds.preview.previousSound")
+                            : t("ariaDescriptors:sounds.preview.restartSound")}
+                        title={canPrev
+                            ? t("ariaDescriptors:sounds.preview.previousTitle")
+                            : t("ariaDescriptors:sounds.preview.restartTitle")}
                         className="sound-btn-ghost"
                     >
                         <i className="icon icon-first"></i>
