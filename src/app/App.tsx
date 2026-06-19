@@ -27,6 +27,7 @@ import { NotificationBar, NotificationMenu } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameSound } from "./Rename"
 import reporter from "./reporter"
+import * as uiLogger from "./uiLogger"
 import * as scriptsState from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as sounds from "../browser/Sounds"
@@ -184,6 +185,7 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
 async function postLogin(username: string) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
+    uiLogger.init()
 
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
@@ -962,6 +964,7 @@ export const App = () => {
         }
         userNotification.clearHistory()
         reporter.logout()
+        uiLogger.destroy()
 
         if (keepUnsavedTabs) {
             // Close unmodified tabs/scripts.
