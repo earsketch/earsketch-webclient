@@ -19,6 +19,8 @@ import type { SoundEntity } from "common"
 import * as Tooltip from "@radix-ui/react-tooltip"
 
 import { SearchBar } from "./Utils"
+import * as uiLogger from "../app/uiLogger"
+import reporter from "../app/reporter"
 import { Waveform } from "../app/Recorder"
 import * as audioLibrary from "../app/audiolibrary"
 
@@ -666,7 +668,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndF
                 {loggedIn && <ShowOnlyFavorites />}
                 <AddSound />
             </div>
-            <div data-focus-panel="sound-preview">
+            <div data-focus-panel="audition-panel">
                 <h4 className="sr-only">{t("sounds.preview.title").toLocaleUpperCase()}</h4>
                 <button
                     type="button"
@@ -837,6 +839,8 @@ const SoundPreview = () => {
             case "ArrowLeft":
                 e.preventDefault()
                 goPrev()
+                uiLogger.shortcut(e.key, "audition-panel")
+                reporter.keyboardShortcut(e.key)
                 break
 
             case "l":
@@ -844,6 +848,8 @@ const SoundPreview = () => {
             case "ArrowRight":
                 e.preventDefault()
                 goNext()
+                uiLogger.shortcut(e.key, "audition-panel")
+                reporter.keyboardShortcut(e.key)
                 break
 
             case "k":
@@ -851,6 +857,8 @@ const SoundPreview = () => {
                 e.preventDefault()
                 if (!currentName) return
                 dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
+                uiLogger.shortcut(e.key, "audition-panel")
+                reporter.keyboardShortcut(e.key)
                 break
         }
     }
