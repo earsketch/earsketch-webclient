@@ -705,6 +705,7 @@ export const App = () => {
             if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "p") {
                 event.preventDefault()
                 openCommandPalette()
+                uiLogger.shortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+Shift+P`)
             }
         }
 
