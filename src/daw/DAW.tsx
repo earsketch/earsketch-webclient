@@ -1226,8 +1226,12 @@ export const DAW = () => {
     const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === "+" || event.key === "=") {
             zoomX(1)
+            uiLogger.shortcut(event.key, "daw")
+            reporter.keyboardShortcut(`daw: ${event.key}`)
         } else if (event.key === "-") {
             zoomX(-1)
+            uiLogger.shortcut("-", "daw")
+            reporter.keyboardShortcut("daw: -")
         }
     }
 
