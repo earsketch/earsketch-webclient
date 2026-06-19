@@ -523,6 +523,8 @@ function jumpToDAWClip(lineNumber: number) {
     if (!selectScriptMatchesDAW(store.getState())) {
         playEarcon(SINE_BUMP, 0.3)
         consoleStatus(i18n.t("daw.needsSync"))
+        uiLogger.event("cannot_inspect", "editor", { error: "needsSync" })
+        reporter.keyboardShortcut("editor cannot_inspect: needsSync")
         return
     }
 
@@ -576,6 +578,8 @@ function jumpToDAWClip(lineNumber: number) {
         window.setTimeout(() => target!.setAttribute("aria-label", originalLabel), 1000)
     } else {
         playEarcon(SINE_BUMP, 0.3)
+        uiLogger.event("cannot_inspect", "editor", { error: "noTarget" })
+        reporter.keyboardShortcut("editor cannot_inspect: noTarget")
     }
 }
 
