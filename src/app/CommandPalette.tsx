@@ -32,6 +32,7 @@ import { PANEL_SHORTCUTS, navigateTo, closeAllTabs } from "./App"
 import * as editor from "../ide/Editor"
 import * as ESUtils from "../esutils"
 import * as uiLogger from "./uiLogger"
+import reporter from "./reporter"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -731,6 +732,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                                 <Combobox onChange={(item: CommandItem | null) => {
                                     if (!item) return
                                     uiLogger.event("command_palette_select", item.id, { title: item.title, category: item.category })
+                                    reporter.commandSelected(item.id, item.category)
                                     item.action()
                                 }}>
                                     <div className="relative">
