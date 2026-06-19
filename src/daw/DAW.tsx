@@ -174,6 +174,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                     } else {
                         play(focusedClipRange ?? undefined)
                     }
+                    uiLogger.shortcut("Ctrl+Space", "daw")
+                    reporter.keyboardShortcut("Ctrl+Space")
                 }
             }
             // Attach keydown event listener
