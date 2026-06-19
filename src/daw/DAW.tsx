@@ -562,6 +562,8 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize, familyHasLoop
             // The subsequent onBlur (triggered by jumpToLine shifting focus to the editor)
             // restores normal playback and visuals.
             jumpToLine(primaryLine)
+            uiLogger.shortcut("Ctrl+I", "daw-clip")
+            reporter.keyboardShortcut("Ctrl+I")
         })}
     >
         <div className="clipWrapper">

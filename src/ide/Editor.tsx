@@ -34,6 +34,8 @@ import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
 import * as scripts from "../browser/scriptsState"
 import { status as consoleStatus } from "./console"
+import * as uiLogger from "../app/uiLogger"
+import reporter from "../app/reporter"
 
 Object.assign(window, { Sk, ace }) // for droplet
 
@@ -242,6 +244,8 @@ const keyBindings: { key: string, run: () => boolean }[] = [
         run: () => {
             const currentLine = view.state.doc.lineAt(view.state.selection.main.head)
             jumpToDAWClip(currentLine.number)
+            uiLogger.shortcut("Ctrl+I", "editor")
+            reporter.keyboardShortcut("Ctrl+I")
             return true
         },
     },
