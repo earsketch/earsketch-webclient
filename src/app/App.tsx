@@ -850,26 +850,35 @@ export const App = () => {
             if (count === 0) {
                 consoleStatus(i18n.t("focusHistory.empty"))
                 playEarcon(SINE_BUMP, 0.3)
+                uiLogger.event("keyboard_shortcut", `Ctrl+${e.key}`, { error: "empty" })
                 return
             }
             if (e.key === "[") {
                 if (navOffset >= count - 1) {
                     consoleStatus(i18n.t("focusHistory.startOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
+                    uiLogger.event("keyboard_shortcut", "Ctrl+[", { error: "startOfBuffer" })
                     return
                 }
                 store.dispatch(stepBackward())
                 const record = selectAtNavOffset(store.getState())
-                if (record) navigateToRecord(record)
+                if (record) {
+                    navigateToRecord(record)
+                    uiLogger.shortcut("Ctrl+[", record.panelId)
+                }
             } else {
                 if (navOffset <= 0) {
                     consoleStatus(i18n.t("focusHistory.endOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
+                    uiLogger.event("keyboard_shortcut", "Ctrl+]", { error: "endOfBuffer" })
                     return
                 }
                 store.dispatch(stepForward())
                 const record = selectAtNavOffset(store.getState())
-                if (record) navigateToRecord(record)
+                if (record) {
+                    navigateToRecord(record)
+                    uiLogger.shortcut("Ctrl+]", record.panelId)
+                }
             }
         }
         window.addEventListener("keydown", handleFocusNav)
