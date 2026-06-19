@@ -804,10 +804,15 @@ export const App = () => {
     // Track focus history: record every meaningful focus change into the ring buffer.
     useEffect(() => {
         const handleFocusIn = (e: FocusEvent) => {
-            if (isNavigatingFocusHistory) return
             const el = e.target as Element | null
             if (!el || el === document.body) return
             const record = getFocusRecord(el)
+            uiLogger.event("focus", record.label, {
+                type: record.type,
+                panelId: record.panelId,
+                ...(record.type === "editor" ? { line: record.line } : { key: record.key }),
+            })
+            if (isNavigatingFocusHistory) return
             let newer = selectNewerFocus(store.getState())
             // Cursor movement within the editor doesn't re-trigger focusin, so a stale
             // "editor" entry's line can lag behind the actual cursor position. Refresh
