@@ -21,9 +21,9 @@ interface LogEvent {
 
 let enabled = false
 let queue: LogEvent[] = []
-let timer: ReturnType<typeof setInterval> | null = null
+let timer: number | null = null
 let flagExpiry = 0
-const sessionId = crypto.randomUUID()
+const sessionId = window.crypto.randomUUID()
 
 function token() {
     return user.selectToken(store.getState())
@@ -82,12 +82,12 @@ async function flush(): Promise<boolean> {
 export async function init(): Promise<void> {
     await fetchFlag()
     if (enabled && !timer) {
-        timer = setInterval(flush, FLUSH_INTERVAL)
+        timer = window.setInterval(flush, FLUSH_INTERVAL)
     }
 }
 
 export async function destroy(): Promise<void> {
-    if (timer) { clearInterval(timer); timer = null }
+    if (timer) { window.clearInterval(timer); timer = null }
     await flush()
     enabled = false
     queue = []
@@ -113,7 +113,7 @@ export function event(action: string, target = "", metadata: Record<string, unkn
         timestamp: new Date().toISOString(),
         action: action.slice(0, 128),
         target: target.slice(0, 256),
-        page: location.pathname,
+        page: window.location.pathname,
         metadata,
     })
 }
