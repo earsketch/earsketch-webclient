@@ -706,6 +706,7 @@ export const App = () => {
                 event.preventDefault()
                 openCommandPalette()
                 uiLogger.shortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+Shift+P`)
+                reporter.keyboardShortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+Shift+P`)
             }
         }
 
@@ -794,6 +795,7 @@ export const App = () => {
                     }
                     navigateTo(entry)
                     uiLogger.shortcut(`Ctrl+Shift+${e.code}`, entry.panel)
+                    reporter.keyboardShortcut(`Ctrl+Shift+${e.code}`)
                 }
             }
         }
@@ -852,6 +854,7 @@ export const App = () => {
                 consoleStatus(i18n.t("focusHistory.empty"))
                 playEarcon(SINE_BUMP, 0.3)
                 uiLogger.event("keyboard_shortcut", `Ctrl+${e.key}`, { error: "empty" })
+                reporter.keyboardShortcut(`Ctrl+${e.key}`)
                 return
             }
             if (e.key === "[") {
@@ -859,6 +862,7 @@ export const App = () => {
                     consoleStatus(i18n.t("focusHistory.startOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
                     uiLogger.event("keyboard_shortcut", "Ctrl+[", { error: "startOfBuffer" })
+                    reporter.keyboardShortcut("Ctrl+[")
                     return
                 }
                 store.dispatch(stepBackward())
@@ -866,12 +870,14 @@ export const App = () => {
                 if (record) {
                     navigateToRecord(record)
                     uiLogger.shortcut("Ctrl+[", record.panelId)
+                    reporter.keyboardShortcut("Ctrl+[")
                 }
             } else {
                 if (navOffset <= 0) {
                     consoleStatus(i18n.t("focusHistory.endOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
                     uiLogger.event("keyboard_shortcut", "Ctrl+]", { error: "endOfBuffer" })
+                    reporter.keyboardShortcut("Ctrl+]")
                     return
                 }
                 store.dispatch(stepForward())
@@ -879,6 +885,7 @@ export const App = () => {
                 if (record) {
                     navigateToRecord(record)
                     uiLogger.shortcut("Ctrl+]", record.panelId)
+                    reporter.keyboardShortcut("Ctrl+]")
                 }
             }
         }
