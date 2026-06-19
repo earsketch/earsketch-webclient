@@ -631,7 +631,11 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                         onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
                         onFocus={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
                         onBlur={() => { setFocusedPoint(null); clearDAWHoverLine() }}
-                        onKeyDown={(e: React.KeyboardEvent) => onCtrlI(e, () => jumpToLine(pointLines[0]))}
+                        onKeyDown={(e: React.KeyboardEvent) => onCtrlI(e, () => {
+                            jumpToLine(pointLines[0])
+                            uiLogger.shortcut("Ctrl+I", "daw-automation")
+                            reporter.keyboardShortcut("Ctrl+I")
+                        })}
                     >
                         {/* eslint-disable-next-line react/jsx-indent */}
                         <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? formatSourceLines(pointLines) : t("daw.needsSync")}</title>
