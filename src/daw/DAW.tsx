@@ -19,6 +19,8 @@ import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines, jumpToLine } from "../ide/Editor"
 import { selectEditorCursorLine, selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
+import * as uiLogger from "../app/uiLogger"
+import reporter from "../app/reporter"
 
 export const callbacks = {
     runScript: () => {},
@@ -742,14 +744,20 @@ const Measureline = ({ setCursorPosition }: { setCursorPosition: (pos: number) =
         if (e.key === "ArrowRight") {
             e.preventDefault()
             moveTo(Math.min(focusedMeasure + 1, playLength))
+            uiLogger.shortcut("ArrowRight", "daw-measureline")
+            reporter.keyboardShortcut("daw-measureline: ArrowRight")
         } else if (e.key === "ArrowLeft") {
             e.preventDefault()
             moveTo(Math.max(focusedMeasure - 1, 1))
+            uiLogger.shortcut("ArrowLeft", "daw-measureline")
+            reporter.keyboardShortcut("daw-measureline: ArrowLeft")
         } else if (e.key === "Enter" || e.key === " ") {
             e.preventDefault()
             player.setPosition(focusedMeasure)
             _setPlayPosition?.(focusedMeasure)
             dispatch(daw.setPendingPosition(playing ? focusedMeasure : null))
+            uiLogger.shortcut(e.key, "daw-measureline")
+            reporter.keyboardShortcut(`daw-measureline: ${e.key}`)
         }
     }
 
