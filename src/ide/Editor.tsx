@@ -313,7 +313,11 @@ export const changeListeners: ((deletion?: boolean) => void)[] = []
 export function bindKey(key: string, fn: () => void) {
     keyBindings.push({
         key,
-        run: () => { fn(); return true },
+        run: () => {
+            fn()
+            uiLogger.shortcut(key.replace("-", "+"), "editor")
+            return true
+        },
     })
 }
 
