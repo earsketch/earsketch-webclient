@@ -97,6 +97,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         player.callbacks.onStartedCallback = playbackStartedCallback
         player.callbacks.onFinishedCallback = playbackEndedCallback
         player.play(range?.start ?? playPosition, 0, range?.end ?? 0)
+        uiLogger.event("play", "daw", { preview: !!range })
 
         // player does not preserve volume state between plays
         player.setVolume(volumeMuted ? -60 : volume)
@@ -105,6 +106,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const pause = () => {
         player.pause()
         dispatch(daw.setPlaying(false))
+        uiLogger.event("pause", "daw")
     }
 
     const toggleMetronome = () => {
