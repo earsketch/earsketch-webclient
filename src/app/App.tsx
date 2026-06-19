@@ -792,6 +792,7 @@ export const App = () => {
                         return
                     }
                     navigateTo(entry)
+                    uiLogger.shortcut(`Ctrl+Shift+${e.code}`, entry.panel)
                 }
             }
         }
