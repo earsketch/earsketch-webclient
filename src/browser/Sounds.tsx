@@ -840,7 +840,7 @@ const SoundPreview = () => {
                 e.preventDefault()
                 goPrev()
                 uiLogger.shortcut(e.key, "audition-panel")
-                reporter.keyboardShortcut(e.key)
+                reporter.keyboardShortcut(`audition-panel: ${e.key}`)
                 break
 
             case "l":
@@ -849,7 +849,7 @@ const SoundPreview = () => {
                 e.preventDefault()
                 goNext()
                 uiLogger.shortcut(e.key, "audition-panel")
-                reporter.keyboardShortcut(e.key)
+                reporter.keyboardShortcut(`audition-panel: ${e.key}`)
                 break
 
             case "k":
@@ -858,7 +858,7 @@ const SoundPreview = () => {
                 if (!currentName) return
                 dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
                 uiLogger.shortcut(e.key, "audition-panel")
-                reporter.keyboardShortcut(e.key)
+                reporter.keyboardShortcut(`audition-panel: ${e.key}`)
                 break
         }
     }
