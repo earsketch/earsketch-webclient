@@ -29,6 +29,7 @@ import * as layout from "./layoutState"
 import { openModal } from "../app/modal"
 import { reloadRecommendations } from "../app/reloadRecommender"
 import reporter from "../app/reporter"
+import * as uiLogger from "../app/uiLogger"
 import * as runner from "../app/runner"
 import { ScriptCreator } from "../app/ScriptCreator"
 import store from "../reducers"
@@ -131,6 +132,8 @@ window.addEventListener("keydown", event => {
     if ((event.ctrlKey || event.metaKey) && event.key === "s") {
         event.preventDefault()
         saveScript()
+        uiLogger.shortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+S`, "editor")
+        reporter.keyboardShortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+S`)
     }
 })
 

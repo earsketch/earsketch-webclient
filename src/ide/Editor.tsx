@@ -34,6 +34,8 @@ import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
 import * as scripts from "../browser/scriptsState"
 import { status as consoleStatus } from "./console"
+import * as uiLogger from "../app/uiLogger"
+import reporter from "../app/reporter"
 
 Object.assign(window, { Sk, ace }) // for droplet
 
@@ -242,6 +244,8 @@ const keyBindings: { key: string, run: () => boolean }[] = [
         run: () => {
             const currentLine = view.state.doc.lineAt(view.state.selection.main.head)
             jumpToDAWClip(currentLine.number)
+            uiLogger.shortcut("Ctrl+I", "editor")
+            reporter.keyboardShortcut("Ctrl+I")
             return true
         },
     },
@@ -309,7 +313,11 @@ export const changeListeners: ((deletion?: boolean) => void)[] = []
 export function bindKey(key: string, fn: () => void) {
     keyBindings.push({
         key,
-        run: () => { fn(); return true },
+        run: () => {
+            fn()
+            uiLogger.shortcut(key.replace("-", "+"), "editor")
+            return true
+        },
     })
 }
 
@@ -519,6 +527,8 @@ function jumpToDAWClip(lineNumber: number) {
     if (!selectScriptMatchesDAW(store.getState())) {
         playEarcon(SINE_BUMP, 0.3)
         consoleStatus(i18n.t("daw.needsSync"))
+        uiLogger.event("cannot_inspect", "editor", { error: "needsSync" })
+        reporter.keyboardShortcut("editor cannot_inspect: needsSync")
         return
     }
 
@@ -572,6 +582,8 @@ function jumpToDAWClip(lineNumber: number) {
         window.setTimeout(() => target!.setAttribute("aria-label", originalLabel), 1000)
     } else {
         playEarcon(SINE_BUMP, 0.3)
+        uiLogger.event("cannot_inspect", "editor", { error: "noTarget" })
+        reporter.keyboardShortcut("editor cannot_inspect: noTarget")
     }
 }
 

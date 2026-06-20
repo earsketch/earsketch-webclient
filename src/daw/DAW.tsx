@@ -19,6 +19,8 @@ import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines, jumpToLine } from "../ide/Editor"
 import { selectEditorCursorLine, selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
+import * as uiLogger from "../app/uiLogger"
+import reporter from "../app/reporter"
 
 export const callbacks = {
     runScript: () => {},
@@ -95,6 +97,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         player.callbacks.onStartedCallback = playbackStartedCallback
         player.callbacks.onFinishedCallback = playbackEndedCallback
         player.play(range?.start ?? playPosition, 0, range?.end ?? 0)
+        uiLogger.event("play", "daw", { preview: !!range })
 
         // player does not preserve volume state between plays
         player.setVolume(volumeMuted ? -60 : volume)
@@ -103,6 +106,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const pause = () => {
         player.pause()
         dispatch(daw.setPlaying(false))
+        uiLogger.event("pause", "daw")
     }
 
     const toggleMetronome = () => {
@@ -172,6 +176,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                     } else {
                         play(focusedClipRange ?? undefined)
                     }
+                    uiLogger.shortcut("Ctrl+Space", "daw")
+                    reporter.keyboardShortcut("Ctrl+Space")
                 }
             }
             // Attach keydown event listener
@@ -556,6 +562,8 @@ const Clip = ({ color, clip, familyRange, familyIndex, familySize, familyHasLoop
             // The subsequent onBlur (triggered by jumpToLine shifting focus to the editor)
             // restores normal playback and visuals.
             jumpToLine(primaryLine)
+            uiLogger.shortcut("Ctrl+I", "daw-clip")
+            reporter.keyboardShortcut("Ctrl+I")
         })}
     >
         <div className="clipWrapper">
@@ -623,7 +631,11 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                         onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
                         onFocus={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
                         onBlur={() => { setFocusedPoint(null); clearDAWHoverLine() }}
-                        onKeyDown={(e: React.KeyboardEvent) => onCtrlI(e, () => jumpToLine(pointLines[0]))}
+                        onKeyDown={(e: React.KeyboardEvent) => onCtrlI(e, () => {
+                            jumpToLine(pointLines[0])
+                            uiLogger.shortcut("Ctrl+I", "daw-automation")
+                            reporter.keyboardShortcut("Ctrl+I")
+                        })}
                     >
                         {/* eslint-disable-next-line react/jsx-indent */}
                         <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? formatSourceLines(pointLines) : t("daw.needsSync")}</title>
@@ -742,14 +754,20 @@ const Measureline = ({ setCursorPosition }: { setCursorPosition: (pos: number) =
         if (e.key === "ArrowRight") {
             e.preventDefault()
             moveTo(Math.min(focusedMeasure + 1, playLength))
+            uiLogger.shortcut("ArrowRight", "daw-measureline")
+            reporter.keyboardShortcut("daw-measureline: ArrowRight")
         } else if (e.key === "ArrowLeft") {
             e.preventDefault()
             moveTo(Math.max(focusedMeasure - 1, 1))
+            uiLogger.shortcut("ArrowLeft", "daw-measureline")
+            reporter.keyboardShortcut("daw-measureline: ArrowLeft")
         } else if (e.key === "Enter" || e.key === " ") {
             e.preventDefault()
             player.setPosition(focusedMeasure)
             _setPlayPosition?.(focusedMeasure)
             dispatch(daw.setPendingPosition(playing ? focusedMeasure : null))
+            uiLogger.shortcut(e.key, "daw-measureline")
+            reporter.keyboardShortcut(`daw-measureline: ${e.key}`)
         }
     }
 
@@ -1212,8 +1230,12 @@ export const DAW = () => {
     const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === "+" || event.key === "=") {
             zoomX(1)
+            uiLogger.shortcut(event.key, "daw")
+            reporter.keyboardShortcut(`daw: ${event.key}`)
         } else if (event.key === "-") {
             zoomX(-1)
+            uiLogger.shortcut("-", "daw")
+            reporter.keyboardShortcut("daw: -")
         }
     }
 

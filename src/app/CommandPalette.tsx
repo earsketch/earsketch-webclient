@@ -31,6 +31,8 @@ import { saveScript, openShare, createScript } from "../ide/IDE"
 import { PANEL_SHORTCUTS, navigateTo, closeAllTabs } from "./App"
 import * as editor from "../ide/Editor"
 import * as ESUtils from "../esutils"
+import * as uiLogger from "./uiLogger"
+import reporter from "./reporter"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -727,7 +729,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                             leave="ease-in duration-150" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95"
                         >
                             <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all">
-                                <Combobox onChange={(item: CommandItem | null) => item?.action()}>
+                                <Combobox onChange={(item: CommandItem | null) => {
+                                    if (!item) return
+                                    uiLogger.event("command_palette_select", item.id, { title: item.title, category: item.category })
+                                    reporter.commandSelected(item.id, item.category)
+                                    item.action()
+                                }}>
                                     <div className="relative">
                                         {/* Search input */}
                                         <div className="flex items-center border-b dark:border-gray-600 px-4">
