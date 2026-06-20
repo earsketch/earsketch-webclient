@@ -527,7 +527,11 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                 <div className="pl-2 pr-4">
                     <button
                         className="scale:text-xs pr-1.5"
-                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewState !== "play" ? " stop" : " play")) }}
+                        onClick={() => {
+                            dispatch(soundsThunks.togglePreview({ name, kind: "sound" }))
+                            addUIClick("sound preview - " + name + (previewState !== "play" ? " stop" : " play"))
+                            if (previewState === "play") uiLogger.event("preview", "sound-browser", { sound: name })
+                        }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
@@ -782,6 +786,7 @@ const SoundPreview = () => {
 
         if (!(preview?.kind === "sound" && preview.name === name)) {
             dispatch(soundsThunks.togglePreview({ name, kind: "sound" })) // ON new
+            uiLogger.event("preview", "audition-panel", { sound: name })
         }
     }
 
@@ -805,6 +810,7 @@ const SoundPreview = () => {
         } else {
             dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" })) // ON
         }
+        uiLogger.event("preview", "audition-panel", { sound: currentName, restart: true })
     }
 
     const goPrev = () => {
@@ -949,6 +955,9 @@ const SoundPreview = () => {
                         type="button"
                         onClick={() => {
                             if (!currentName) return
+                            if (!(preview?.kind === "sound" && preview.name === currentName)) {
+                                uiLogger.event("preview", "audition-panel", { sound: currentName })
+                            }
                             dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
                         }}
                         disabled={!currentName}
