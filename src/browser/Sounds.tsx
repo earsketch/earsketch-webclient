@@ -870,6 +870,7 @@ const SoundPreview = () => {
 
     const copyToClipboard = (value: string) => {
         window.navigator.clipboard.writeText(value)
+        uiLogger.event("copy", "audition-panel", { content: value })
     }
     const [buffer, setBuffer] = useState<AudioBuffer | null>(null)
     const [bufferReady, setBufferReady] = useState(false)
@@ -1005,6 +1006,7 @@ const SoundPreview = () => {
                                 if (!currentName) return
                                 editor.pasteCode(currentName)
                                 addUIClick("sound copy - " + currentName)
+                                uiLogger.event("paste", "audition-panel", { content: currentName })
                             }}
                             title={t("soundBrowser.clip.tooltip.paste")}
                             aria-label={t("ariaDescriptors:sounds.paste", { name: currentName })}
