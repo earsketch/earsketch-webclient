@@ -45,7 +45,7 @@ const ScriptSearchBar = () => {
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(scripts.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(scripts.setSearchText(""))
     const liveMessage = t("scriptsFound", { count })
-    const props = { id: "scriptSearchBar", aria: t("ariaDescriptors:scripts.searchBar"), liveMessage, firstResultSelector: "#panel-1 button", searchText, dispatchSearch, dispatchReset }
+    const props = { id: "scriptSearchBar", aria: t("ariaDescriptors:scripts.searchBar"), liveMessage, firstResultSelector: "#panel-1 [data-test=\"scriptEntry\"]", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -299,17 +299,24 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
 
     const shared = script.creator || script.isShared
     const ariaLabel = type === "deleted" ? "" : t("scriptBrowser.openInEditor", { name: script.name })
+    const openScript = () => {
+        if (type === "regular" || type === "shared") {
+            dispatch(setActiveTabAndEditor(script.shareid))
+        }
+        if (highlight) {
+            dispatch(caiThunks.highlight({ zone: null }))
+        }
+    }
     return (
         <div
             className={`flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
-            onClick={() => {
-                if (type === "regular") {
-                    dispatch(setActiveTabAndEditor(script.shareid))
-                } else if (type === "shared") {
-                    dispatch(setActiveTabAndEditor(script.shareid))
-                }
-                if (highlight) {
-                    dispatch(caiThunks.highlight({ zone: null }))
+            data-test="scriptEntry"
+            tabIndex={type === "deleted" ? -1 : 0}
+            onClick={openScript}
+            onKeyDown={(e) => {
+                if (type !== "deleted" && (e.key === "Enter" || e.key === " ")) {
+                    e.preventDefault()
+                    openScript()
                 }
             }}
             title={ariaLabel}
