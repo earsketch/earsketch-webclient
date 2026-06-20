@@ -50,12 +50,13 @@ async function fetchFlag(): Promise<void> {
 }
 
 async function flush(): Promise<boolean> {
-    if (!queue.length) return true
-
     if (Date.now() > flagExpiry) {
         await fetchFlag()
-        if (!enabled) { queue = []; return true }
     }
+
+    if (!enabled) { queue = []; return true }
+
+    if (!queue.length) return true
 
     const tok = token()
     if (!tok) { enabled = false; queue = []; return false }
@@ -81,7 +82,7 @@ async function flush(): Promise<boolean> {
 
 export async function init(): Promise<void> {
     await fetchFlag()
-    if (enabled && !timer) {
+    if (!timer) {
         timer = window.setInterval(flush, FLUSH_INTERVAL)
     }
 }
