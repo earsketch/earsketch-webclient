@@ -743,9 +743,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                                                 )
                                                 : Object.entries(groupedCommands).map(([category, items]) => (
                                                     <div key={category} className="mb-2">
-                                                        <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                                                        <h3 className="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                                                             {categoryLabel(category)}
-                                                        </div>
+                                                        </h3>
                                                         {items.map(item => (
                                                             <Combobox.Option
                                                                 key={item.id}
