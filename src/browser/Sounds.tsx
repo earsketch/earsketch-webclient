@@ -917,7 +917,11 @@ const SoundPreview = () => {
                 <div className="flex items-center justify-evenly mt-2">
                     <button
                         type="button"
-                        onClick={() => setRecommendationMode(1 - recommendationMode)}
+                        onClick={() => {
+                            const next = 1 - recommendationMode
+                            setRecommendationMode(next)
+                            uiLogger.event("button_click", "audition-panel-recommendation-mode", { setStateTo: next })
+                        }}
                         aria-label={recommendationMode ? t("ariaDescriptors:sounds.preview.switchToOrderedMode") : t("ariaDescriptors:sounds.preview.switchToRecommendationMode")}
                         title={recommendationMode ? t("ariaDescriptors:sounds.preview.switchToOrderedMode") : t("ariaDescriptors:sounds.preview.switchToRecommendationMode")}
                         className="sound-btn-ghost"
