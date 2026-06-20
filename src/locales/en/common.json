@@ -354,6 +354,7 @@
     "shortcuts.escapeEditor": "Escape editor focus",
     "shortcuts.playPause": "Play / Pause",
     "shortcuts.jumpToCodeDaw": "Jump to code / DAW clip",
+    "shortcuts.jumpToRecentFocus": "Jump to recent focus",
     "shortcuts.jumpToSounds": "Jump to Sounds",
     "shortcuts.jumpToScripts": "Jump to Scripts",
     "shortcuts.jumpToApi": "Jump to API",
