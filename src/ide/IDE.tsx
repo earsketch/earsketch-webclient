@@ -394,6 +394,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
 
     const logs = useSelector(ide.selectLogs)
     const consoleContainer = useRef<HTMLDivElement>(null)
+    const [focusedConsoleIndex, setFocusedConsoleIndex] = useState(-1)
 
     const [loading, _setLoading] = useState(false)
 
@@ -407,7 +408,20 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
         if (consoleContainer.current) {
             consoleContainer.current.scrollTop = consoleContainer.current.scrollHeight
         }
+        setFocusedConsoleIndex(logs.length - 1)
     }, [logs])
+
+    const handleConsoleKeyDown = (e: React.KeyboardEvent<HTMLLIElement>, index: number) => {
+        let newIndex: number | null = null
+        if (e.key === "ArrowUp") newIndex = Math.max(0, index - 1)
+        else if (e.key === "ArrowDown") newIndex = Math.min(logs.length - 1, index + 1)
+        else if (e.key === "Home") newIndex = 0
+        else if (e.key === "End") newIndex = logs.length - 1
+        else return
+        e.preventDefault()
+        const items = consoleContainer.current?.querySelectorAll<HTMLElement>("li")
+        items?.[newIndex]?.focus()
+    }
 
     useEffect(() => {
         dispatch(layout.setWestSizeForFontSize(fontSize))
@@ -486,33 +500,51 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                         </div>
                     </div>
 
-                    <div ref={consoleContainer} id="console-frame" aria-live="assertive" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
-                        <div id="console">
-                            {logs.length === 0 && <span>&nbsp;</span> /* hack for screen readers */}
+                    <div ref={consoleContainer} id="console-frame" role="region" aria-label={t("console:output")} className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
+                        <ul id="console" aria-live="assertive" aria-atomic="false">
+                            {logs.length === 0 && <li>&nbsp;</li> /* hack for screen readers */}
                             {logs.map((msg: ide.Log, index: number) => {
                                 const consoleLineClass = classNames({
                                     "console-line": true,
                                     "console-warn": msg.level === "warn",
                                     "console-error": msg.level === "error",
                                 })
-                                return <div key={index} className={consoleLineClass} style={{ fontSize }}>
+                                return <li
+                                    key={index}
+                                    className={consoleLineClass}
+                                    style={{ fontSize }}
+                                    tabIndex={focusedConsoleIndex === index ? 0 : -1}
+                                    aria-current={focusedConsoleIndex === index ? "true" : undefined}
+                                    onFocus={(e) => {
+                                        setFocusedConsoleIndex(index)
+                                        // Announce "Focus shifted to Console" before the message text, so
+                                        // it's clear from anywhere (Tab, arrow keys, or a panel jump) that
+                                        // focus landed in the console rather than just reading the message.
+                                        const target = e.currentTarget
+                                        const originalLabel = target.getAttribute("aria-label") ?? ""
+                                        target.setAttribute("aria-label", `${t("ariaDescriptors:console.focusAnnouncement")} ${target.textContent ?? ""}`)
+                                        window.setTimeout(() => target.setAttribute("aria-label", originalLabel), 1000)
+                                    }}
+                                    onKeyDown={(e) => handleConsoleKeyDown(e, index)}
+                                >
                                     {["warn", "error"].includes(msg.level) && (msg.level === "error"
-                                        ? <span title={t("console:error")} className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
-                                        : <span title={t("console:warning")} className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
+                                        ? <span aria-hidden="true" className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
+                                        : <span aria-hidden="true" className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
                                     <span>
+                                        {["warn", "error"].includes(msg.level) && <span className="sr-only">{msg.level === "error" ? t("console:error") : t("console:warning")}: </span>}
                                         {msg.text}{" "}
                                         {msg.level === "error" && <>
                                             —{" "}
-                                            <a className="cursor-pointer" onClick={() => {
+                                            <a className="cursor-pointer" aria-label={t("console:moreInfoLabel", { error: msg.text })} onClick={() => {
                                                 dispatch(curriculum.openErrorPage(msg.text))
                                             }}>
-                                                Click here for more information.
+                                                {t("console:clickHereForMoreInfo")}
                                             </a>
                                         </>}
                                     </span>
-                                </div>
+                                </li>
                             })}
-                        </div>
+                        </ul>
                     </div>
                 </Split>
 
