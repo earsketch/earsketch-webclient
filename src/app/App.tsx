@@ -27,6 +27,7 @@ import { NotificationBar, NotificationMenu } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameSound } from "./Rename"
 import reporter from "./reporter"
+import * as uiLogger from "./uiLogger"
 import * as scriptsState from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as sounds from "../browser/Sounds"
@@ -192,6 +193,7 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
 async function postLogin(username: string) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
+    uiLogger.init()
 
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
@@ -380,6 +382,8 @@ const KeyboardShortcuts = () => {
         commandPalette: [modifier, "Shift", "P"],
         playPause: ["Ctrl", "Space"],
         jumpToCodeDaw: ["Ctrl", "I"],
+        jumpBackInFocus: ["Ctrl", "["],
+        jumpForwardInFocus: ["Ctrl", "]"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
@@ -712,6 +716,8 @@ export const App = () => {
             if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "p") {
                 event.preventDefault()
                 openCommandPalette()
+                uiLogger.shortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+Shift+P`)
+                reporter.keyboardShortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+Shift+P`)
             }
         }
 
@@ -799,6 +805,8 @@ export const App = () => {
                         return
                     }
                     navigateTo(entry)
+                    uiLogger.shortcut(`Ctrl+Shift+${e.code}`, entry.panel)
+                    reporter.keyboardShortcut(`Ctrl+Shift+${e.code}`)
                 }
             }
         }
@@ -810,10 +818,15 @@ export const App = () => {
     // Track focus history: record every meaningful focus change into the ring buffer.
     useEffect(() => {
         const handleFocusIn = (e: FocusEvent) => {
-            if (isNavigatingFocusHistory) return
             const el = e.target as Element | null
             if (!el || el === document.body) return
             const record = getFocusRecord(el)
+            uiLogger.event("focus", record.label, {
+                type: record.type,
+                panelId: record.panelId,
+                ...(record.type === "editor" ? { line: record.line } : { key: record.key }),
+            })
+            if (isNavigatingFocusHistory) return
             let newer = selectNewerFocus(store.getState())
             // Cursor movement within the editor doesn't re-trigger focusin, so a stale
             // "editor" entry's line can lag behind the actual cursor position. Refresh
@@ -851,26 +864,40 @@ export const App = () => {
             if (count === 0) {
                 consoleStatus(i18n.t("focusHistory.empty"))
                 playEarcon(SINE_BUMP, 0.3)
+                uiLogger.event("keyboard_shortcut", `Ctrl+${e.key}`, { error: "empty" })
+                reporter.keyboardShortcut(`Ctrl+${e.key}`)
                 return
             }
             if (e.key === "[") {
                 if (navOffset >= count - 1) {
                     consoleStatus(i18n.t("focusHistory.startOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
+                    uiLogger.event("keyboard_shortcut", "Ctrl+[", { error: "startOfBuffer" })
+                    reporter.keyboardShortcut("Ctrl+[")
                     return
                 }
                 store.dispatch(stepBackward())
                 const record = selectAtNavOffset(store.getState())
-                if (record) navigateToRecord(record)
+                if (record) {
+                    navigateToRecord(record)
+                    uiLogger.shortcut("Ctrl+[", record.panelId)
+                    reporter.keyboardShortcut("Ctrl+[")
+                }
             } else {
                 if (navOffset <= 0) {
                     consoleStatus(i18n.t("focusHistory.endOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
+                    uiLogger.event("keyboard_shortcut", "Ctrl+]", { error: "endOfBuffer" })
+                    reporter.keyboardShortcut("Ctrl+]")
                     return
                 }
                 store.dispatch(stepForward())
                 const record = selectAtNavOffset(store.getState())
-                if (record) navigateToRecord(record)
+                if (record) {
+                    navigateToRecord(record)
+                    uiLogger.shortcut("Ctrl+]", record.panelId)
+                    reporter.keyboardShortcut("Ctrl+]")
+                }
             }
         }
         window.addEventListener("keydown", handleFocusNav)
@@ -971,6 +998,7 @@ export const App = () => {
         }
         userNotification.clearHistory()
         reporter.logout()
+        uiLogger.destroy()
 
         if (keepUnsavedTabs) {
             // Close unmodified tabs/scripts.
