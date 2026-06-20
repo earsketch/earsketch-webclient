@@ -372,9 +372,8 @@ const KeyboardShortcuts = () => {
         commandPalette: [modifier, "Shift", "P"],
         playPause: ["Ctrl", "Space"],
         jumpToCodeDaw: ["Ctrl", "I"],
-        jumpToRecentFocus: <>
-            <kbd>Ctrl</kbd>+<kbd>[</kbd> or <kbd>Ctrl</kbd>+<kbd>]</kbd>
-        </>,
+        jumpBackInFocus: ["Ctrl", "["],
+        jumpForwardInFocus: ["Ctrl", "]"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
