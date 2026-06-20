@@ -374,6 +374,8 @@ const KeyboardShortcuts = () => {
         commandPalette: [modifier, "Shift", "P"],
         playPause: ["Ctrl", "Space"],
         jumpToCodeDaw: ["Ctrl", "I"],
+        jumpBackInFocus: ["Ctrl", "["],
+        jumpForwardInFocus: ["Ctrl", "]"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
@@ -387,6 +389,7 @@ const KeyboardShortcuts = () => {
         jumpToCurriculum: ["Ctrl", "Shift", "6"],
         jumpToUtility: ["Ctrl", "Shift", "7"],
         jumpToSoundPreview: ["Ctrl", "Shift", "8"],
+
     }
 
     return <Popover>
