@@ -92,10 +92,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
     const allScripts = useSelector(scriptsState.selectAllScripts)
     const regularScripts = useSelector(scriptsState.selectRegularScripts)
     const sharedScripts = useSelector(scriptsState.selectSharedScripts)
-    const standardSoundNames = useSelector((state: any) => state.sounds.standardSounds.names as string[])
-    const standardSoundEntities = useSelector((state: any) => state.sounds.standardSounds.entities as Record<string, any>)
-    const userSoundNames = useSelector((state: any) => state.sounds.userSounds.names as string[])
-    const userSoundEntities = useSelector((state: any) => state.sounds.userSounds.entities as Record<string, any>)
+    const filteredSoundNames = useSelector(soundsState.selectFilteredRegularNames)
+    const filteredSoundEntities = useSelector(soundsState.selectFilteredRegularEntities)
+    const userSoundNamesArr = useSelector((state: any) => state.sounds.userSounds.names as string[])
+    const userSoundSet = useMemo(() => new Set(userSoundNamesArr), [userSoundNamesArr])
     const loggedIn = useSelector(user.selectLoggedIn)
     const username = useSelector(user.selectUserName) ?? ""
     const isPlaying = useSelector(daw.selectPlaying)
@@ -602,19 +602,25 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             }
         }
 
-        // 3. Sounds: filter lazily here — never stored in index — capped at MAX_SOUNDS
+        // Sounds: search within what the sound browser has already filtered (artist/genre/etc.),
+        // capped at MAX_SOUNDS. User sounds get their own category heading.
         let soundCount = 0
-        for (const name of standardSoundNames) {
+        for (const name of filteredSoundNames) {
             if (soundCount >= MAX_SOUNDS) break
-            const s = standardSoundEntities[name]
+            const s = filteredSoundEntities[name]
             if (!s) continue
-            const key = `${s.name} ${s.artist ?? ""} ${s.genre ?? ""} ${s.instrument ?? ""} ${s.folder ?? ""}`.toLowerCase()
+            const isUserSound = userSoundSet.has(name)
+            const key = isUserSound
+                ? s.name.toLowerCase()
+                : `${s.name} ${s.artist ?? ""} ${s.genre ?? ""} ${s.instrument ?? ""} ${s.folder ?? ""}`.toLowerCase()
             if (key.includes(q)) {
                 results.push({
-                    id: `sound-${name}`,
+                    id: isUserSound ? `user-sound-${name}` : `sound-${name}`,
                     title: s.name,
-                    subtitle: `${s.artist} – ${s.genre} (${s.instrument})`,
-                    category: "Sounds",
+                    subtitle: isUserSound
+                        ? t("commandPalette.command.yourUploadedSound")
+                        : `${s.artist} – ${s.genre} (${s.instrument})`,
+                    category: isUserSound ? "My Sounds" : "Sounds",
                     action: () => {
                         dispatch(layout.setWest({ open: true, kind: BrowserTabType.Sound }))
                         dispatch(appState.setShowSoundPreviewWidget(true))
@@ -625,28 +631,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     searchKey: key,
                 })
                 soundCount++
-            }
-        }
-
-        // User sounds
-        for (const name of userSoundNames) {
-            const s = userSoundEntities[name]
-            if (!s) continue
-            if (s.name.toLowerCase().includes(q)) {
-                results.push({
-                    id: `user-sound-${name}`,
-                    title: s.name,
-                    subtitle: t("commandPalette.command.yourUploadedSound"),
-                    category: "My Sounds",
-                    action: () => {
-                        dispatch(layout.setWest({ open: true, kind: BrowserTabType.Sound }))
-                        dispatch(appState.setShowSoundPreviewWidget(true))
-                        dispatch(soundsState.setAuditionRequest(s.name))
-                        onCloseRef.current()
-                    },
-                    icon: "icon-music",
-                    searchKey: s.name.toLowerCase(),
-                })
             }
         }
 
@@ -679,8 +663,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
         appCommandIndex,
         openTabCommands, openTabIDs,
         regularScripts, sharedScripts,
-        standardSoundNames, standardSoundEntities,
-        userSoundNames, userSoundEntities,
+        filteredSoundNames, filteredSoundEntities, userSoundSet,
         curriculumResults,
         dispatch, t,
     ])
