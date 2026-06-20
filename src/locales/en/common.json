@@ -429,7 +429,7 @@
     "commandPalette.searchKey.closeAllTabs": "close all tabs scripts commands"
   },
   "ariaDescriptors": {
-    "daw.transportControls": "Transport controls",
+    "daw.transportControls": "DAW Transport controls",
     "daw.track": "Track {{label}}",
     "api.searchBar": "API",
     "scripts.searchBar": "Scripts",
@@ -473,8 +473,6 @@
     "editor.lineAnnouncement": "Line {{number}}: {{text}}",
     "editor.emptyLine": "empty line",
     "editor.indentLevel": "indent {{count}}",
-    "daw.transportControls": "DAW Transport Controls",
-    "daw.track": "Track {{label}}",
 
     "daw.timeline": "DAW Timeline",
     "daw.measurelineLabel": "Navigate measures. Use arrow keys to browse, Enter or Space to set playback start.",
@@ -511,9 +509,11 @@
     "sounds.preview.switchToRecommendationMode": "Switch to Recommendation Mode",
     "sounds.preview.switchToOrderedMode": "Switch to Ordered Mode",
     "sounds.preview.previousSound": "Previous sound",
-    "sounds.preview.previousTitle": "Previous (Left Arrow)",
+    "sounds.preview.restartSound": "Restart sound",
+    "sounds.preview.previousTitle": "Previous (J or Left Arrow)",
+    "sounds.preview.restartTitle": "Restart (J or Left Arrow)",
     "sounds.preview.nextSound": "Next sound",
-    "sounds.preview.nextTitle": "Next (Right Arrow)",
+    "sounds.preview.nextTitle": "Next (L or Right Arrow)",
     "sounds.preview.stop": "Stop Preview",
     "sounds.preview.play": "Preview Sound",
     "skipLink.contentManager": "Skip to Content Manager",
