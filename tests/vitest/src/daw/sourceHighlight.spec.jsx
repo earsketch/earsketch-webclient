@@ -1,4 +1,4 @@
-import { beforeEach, expect, it, vi } from "vitest"
+import { afterAll, beforeAll, beforeEach, expect, it, vi } from "vitest"
 import { Provider } from "react-redux"
 import { render, waitFor } from "@testing-library/react"
 import d3 from "d3"
@@ -12,6 +12,14 @@ import { setEditorCursorLine, setScriptMatchesDAW } from "../../../../src/ide/id
 
 window.d3 = d3
 window.ResizeObserver = ResizeObserver
+
+// jsdom simulates requestAnimationFrame via a real setTimeout. If a rAF is
+// pending when the jsdom document is destroyed at suite teardown, it fires
+// against a null document and throws. Faking only rAF/cancelAnimationFrame
+// prevents that real setTimeout from ever being scheduled, while leaving
+// waitFor's setTimeout/setInterval untouched.
+beforeAll(() => { vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame"] }) })
+afterAll(() => { vi.useRealTimers() })
 
 vi.mock("react-i18next")
 vi.mock("../../../../src/app/audiolibrary")
