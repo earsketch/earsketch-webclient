@@ -29,6 +29,7 @@ import { openScriptHistory, openCodeIndicator, renameScript, shareScript, downlo
 import { importScript } from "../browser/scriptsThunks"
 import { saveScript, openShare, createScript } from "../ide/IDE"
 import { PANEL_SHORTCUTS, navigateTo, closeAllTabs } from "./App"
+import { useEditorSettings } from "../ide/EditorHeader"
 import * as editor from "../ide/Editor"
 import * as ESUtils from "../esutils"
 import * as uiLogger from "./uiLogger"
@@ -102,6 +103,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 
     const activeTabScript = useSelector(tabs.selectActiveTabScript)
     const colorTheme = useSelector(appState.selectColorTheme)
+    const editorSettings = useEditorSettings()
     // Curriculum: use the existing lunr-backed selector by keeping searchText in sync
     const curriculumResults = useSelector(curriculum.selectSearchResults)
 
@@ -517,8 +519,23 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             )
         }
 
+        // ── Editor settings ─────────────────────────────────────────────────
+        for (const { id, nameKey, state, setState } of editorSettings) {
+            const actionKey = state ? "tooltip-disable" : "tooltip-enable"
+            const title = t(`${nameKey}.${actionKey}`)
+            cmds.push({
+                id: `editor-setting-${id}`,
+                title,
+                subtitle: t("editor.title"),
+                category: "Commands",
+                action: () => { setState(!state); onCloseRef.current() },
+                icon: "icon-cog",
+                searchKey: `${t(nameKey)} ${t(`${nameKey}.tooltip-enable`)} ${t(`${nameKey}.tooltip-disable`)} ${t("editor.title")} ${t("ariaDescriptors:editor.settings")}`.toLowerCase(),
+            })
+        }
+
         return cmds
-    }, [loggedIn, username, email, isPlaying, activeTabScript, colorTheme, openTabIDs, dispatch, t])
+    }, [loggedIn, username, email, isPlaying, activeTabScript, colorTheme, openTabIDs, editorSettings, dispatch, t])
 
     // ── Open tabs index ────────────────────────────────────────────────────
     // Built separately so it can be shown at the top with no query typed.
