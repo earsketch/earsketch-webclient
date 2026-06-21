@@ -384,6 +384,8 @@ const KeyboardShortcuts = () => {
         undo: { keys: [modifier, "Z"], group: "editor" },
         redo: { keys: [modifier, "Shift", "Z"], group: "editor" },
         comment: { keys: [modifier, "/"], group: "editor" },
+        findReplace: { keys: [modifier, "G"], group: "editor" },
+        goToLine: { keys: [modifier, "Alt", "G"], group: "editor" },
         escapeEditor: { keys: <><kbd>{localize("Esc")}</kbd> then <kbd>{localize("Tab")}</kbd></>, group: "editor" },
         playPause: { keys: ["Ctrl", "Space"], group: "daw" },
         jumpToCodeDaw: { keys: ["Ctrl", "I"], group: "daw" },
