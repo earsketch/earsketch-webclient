@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
@@ -101,72 +101,72 @@ interface RegisterViewProps {
 
 const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, confirmPassword, setConfirmPassword, emailLocal, setEmailLocal, error, handleRegister, setMode, close }: RegisterViewProps) => {
     const { t } = useTranslation()
-    return <div className="animate-slide-in-from-right">
-        <DialogTitle className="p-3.5 text-2xl text-gray-900 dark:text-white">{t("accountCreator.prompt")}</DialogTitle>
+    const containerRef = useRef<HTMLDivElement>(null)
+    useEffect(() => { containerRef.current?.focus() }, [])
+    return <div ref={containerRef} tabIndex={-1} className="p-3.5 outline-none animate-slide-in-from-right">
+        <DialogTitle className="text-2xl text-white">{t("accountCreator.prompt")}</DialogTitle>
 
         <form onSubmit={handleRegister}>
-            <ModalBody>
-                <div className="mb-4">
-                    <button
-                        type="button"
-                        className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                        onClick={() => setMode("login")}
-                    >
-                        ← {t("accountMenu.backToLogin")}
-                    </button>
-                </div>
-                <Alert message={error} />
-                <div>
-                    <label>
-                        {t("formfieldPlaceholder.username")}
-                        <input
-                            type="text"
-                            className="form-input w-full mb-2 dark:bg-transparent"
-                            name="username"
-                            value={username}
-                            onChange={e => setUsernameLocal(e.target.value)}
-                            required
-                            maxLength={25}
-                            pattern="[a-zA-Z_][0-9a-zA-Z_]*"
-                            title={t("messages:createaccount.usernameconstraint")}
-                        />
-                    </label>
-                </div>
-                <div className="flex">
-                    <label className="w-full mr-2">
-                        {t("formfieldPlaceholder.password")}
-                        <input
-                            type="password"
-                            className="form-input mb-2 w-full dark:bg-transparent"
-                            name="password"
-                            value={password}
-                            onChange={e => setPasswordLocal(e.target.value)}
-                            required
-                            minLength={5}
-                        />
-                    </label>
-                    <label className="w-full ml-2">
-                        {t("formfieldPlaceholder.confirmPassword")}
-                        <input
-                            type="password"
-                            className="form-input mb-2 w-full dark:bg-transparent"
-                            name="passwordconfirm"
-                            onChange={e => {
-                                e.target.setCustomValidity(e.target.value === password ? "" : t("messages:createaccount.pwdfail"))
-                                setConfirmPassword(e.target.value)
-                            }}
-                            value={confirmPassword}
-                            required
-                        />
-                    </label>
-                </div>
-                <div>
-                    <label>{t("formFieldPlaceholder.emailOptional")}
-                        <p className="text-sm">{t("formFieldPlaceholder.emailOptional.usedFor")}</p>
-                        <input type="email" className="form-input w-full dark:bg-transparent" name="email" value={emailLocal} onChange={e => setEmailLocal(e.target.value)} />
-                    </label>
-                </div>
-            </ModalBody>
+            <div className="mb-4">
+                <button
+                    type="button"
+                    className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                    onClick={() => setMode("login")}
+                >
+                    ← {t("accountMenu.backToLogin")}
+                </button>
+            </div>
+            <Alert message={error} />
+            <div>
+                <label>
+                    {t("formfieldPlaceholder.username")}
+                    <input
+                        type="text"
+                        className="form-input w-full mb-2 dark:bg-transparent"
+                        name="username"
+                        value={username}
+                        onChange={e => setUsernameLocal(e.target.value)}
+                        required
+                        maxLength={25}
+                        pattern="[a-zA-Z_][0-9a-zA-Z_]*"
+                        title={t("messages:createaccount.usernameconstraint")}
+                    />
+                </label>
+            </div>
+            <div className="flex">
+                <label className="w-full mr-2">
+                    {t("formfieldPlaceholder.password")}
+                    <input
+                        type="password"
+                        className="form-input mb-2 w-full dark:bg-transparent"
+                        name="password"
+                        value={password}
+                        onChange={e => setPasswordLocal(e.target.value)}
+                        required
+                        minLength={5}
+                    />
+                </label>
+                <label className="w-full ml-2">
+                    {t("formfieldPlaceholder.confirmPassword")}
+                    <input
+                        type="password"
+                        className="form-input mb-2 w-full dark:bg-transparent"
+                        name="passwordconfirm"
+                        onChange={e => {
+                            e.target.setCustomValidity(e.target.value === password ? "" : t("messages:createaccount.pwdfail"))
+                            setConfirmPassword(e.target.value)
+                        }}
+                        value={confirmPassword}
+                        required
+                    />
+                </label>
+            </div>
+            <div>
+                <label>{t("formFieldPlaceholder.emailOptional")}
+                    <p className="text-sm">{t("formFieldPlaceholder.emailOptional.usedFor")}</p>
+                    <input type="email" className="form-input w-full dark:bg-transparent" name="email" value={emailLocal} onChange={e => setEmailLocal(e.target.value)} />
+                </label>
+            </div>
             <ModalFooter submit="accountCreator.submit" close={close} />
         </form>
     </div>
@@ -182,7 +182,9 @@ interface RecoverViewProps {
 
 const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, setMode, close }: RecoverViewProps) => {
     const { t } = useTranslation()
-    return <>
+    const containerRef = useRef<HTMLDivElement>(null)
+    useEffect(() => { containerRef.current?.focus() }, [])
+    return <div ref={containerRef} tabIndex={-1} className="outline-none">
         <div className="mb-4">
             <button
                 type="button"
@@ -192,7 +194,7 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
                 ← {t("accountMenu.backToLogin")}
             </button>
         </div>
-        <DialogTitle className="p-3.5 text-2xl text-gray-900 dark:text-white">{t("forgotPassword.title")}</DialogTitle>
+        <DialogTitle className="p-3.5 text-2xl text-white">{t("forgotPassword.title")}</DialogTitle>
         <form onSubmit={handleRecoverPassword}>
             <ModalBody>
                 <label className="w-full text-sm">
@@ -211,7 +213,7 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
             </ModalBody>
             <ModalFooter submit="forgotPassword.submit" close={close} />
         </form>
-    </>
+    </div>
 }
 
 export const AccountMenu = ({
