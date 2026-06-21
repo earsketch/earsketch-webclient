@@ -407,43 +407,46 @@ const KeyboardShortcuts = () => {
         <Popover.Button id="utilityPanelAnchor" className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel
-            role="region"
-            aria-label={t("ariaDescriptors:header.shortcuts")}
-            className="absolute z-10 mt-1 bg-gray-100 shadow-lg -translate-x-1/2 w-max max-h-[70vh] overflow-y-auto p-2"
-        >
-            <table>
-                <thead className="sr-only">
-                    <tr>
-                        <th scope="col">{t("shortcuts.action")}</th>
-                        <th scope="col">{t("shortcuts.keys")}</th>
-                    </tr>
-                </thead>
-                {Object.entries(shortcuts).reduce<{ group: string; entries: [string, typeof shortcuts[string]][] }[]>(
-                    (acc, entry) => {
-                        const last = acc[acc.length - 1]
-                        if (last?.group === entry[1].group) last.entries.push(entry)
-                        else acc.push({ group: entry[1].group, entries: [entry] })
-                        return acc
-                    }, []
-                ).map(({ group, entries }) => (
-                    <tbody key={group}>
+        <Popover.Panel className="absolute z-10 mt-1 -translate-x-1/2 w-max">
+            <div
+                role="region"
+                aria-label={t("ariaDescriptors:header.shortcuts")}
+                tabIndex={0}
+                className="bg-gray-100 shadow-lg max-h-[70vh] overflow-y-auto p-2"
+            >
+                <table>
+                    <thead className="sr-only">
                         <tr>
-                            <th role="presentation" scope="rowgroup" colSpan={2} className="px-2 pt-3 pb-0.5 text-left">
-                                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                                    {t(`shortcuts.group.${group}`)}
-                                </h3>
-                            </th>
+                            <th scope="col">{t("shortcuts.action")}</th>
+                            <th scope="col">{t("shortcuts.keys")}</th>
                         </tr>
-                        {entries.map(([action, { keys }], index, arr) => (
-                            <tr key={action} className={index < arr.length - 1 ? "border-b border-gray-200" : ""}>
-                                <th scope="row" className="text-sm p-2 text-left font-normal pl-4">{t(`shortcuts.${action}`)}</th>
-                                <td className="p-2">{renderKeys(keys)}</td>
+                    </thead>
+                    {Object.entries(shortcuts).reduce<{ group: string; entries: [string, typeof shortcuts[string]][] }[]>(
+                        (acc, entry) => {
+                            const last = acc[acc.length - 1]
+                            if (last?.group === entry[1].group) last.entries.push(entry)
+                            else acc.push({ group: entry[1].group, entries: [entry] })
+                            return acc
+                        }, []
+                    ).map(({ group, entries }) => (
+                        <tbody key={group}>
+                            <tr>
+                                <th role="presentation" scope="rowgroup" colSpan={2} className="px-2 pt-3 pb-0.5 text-left">
+                                    <h2 className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                                        {t(`shortcuts.group.${group}`)}
+                                    </h2>
+                                </th>
                             </tr>
-                        ))}
-                    </tbody>
-                ))}
-            </table>
+                            {entries.map(([action, { keys }], index, arr) => (
+                                <tr key={action} className={index < arr.length - 1 ? "border-b border-gray-200" : ""}>
+                                    <th scope="row" className="text-sm p-2 text-left font-normal pl-4">{t(`shortcuts.${action}`)}</th>
+                                    <td className="p-2">{renderKeys(keys)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    ))}
+                </table>
+            </div>
         </Popover.Panel>
     </Popover>
 }
