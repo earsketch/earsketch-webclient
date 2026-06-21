@@ -50,9 +50,19 @@ module.exports = {
                     "30%, 50%, 70%": { transform: "translateX(-4px)" },
                     "40%, 60%": { transform: "translateX(4px)" },
                 },
+                "slide-in-from-right": {
+                    from: { transform: "translateX(100%)" },
+                    to: { transform: "translateX(0)" },
+                },
+                "slide-in-from-left": {
+                    from: { transform: "translateX(-100%)" },
+                    to: { transform: "translateX(0)" },
+                },
             },
             animation: {
                 shake: "shake 0.82s cubic-bezier(.36,.07,.19,.97) both",
+                "slide-in-from-right": "slide-in-from-right 0.2s ease-out",
+                "slide-in-from-left": "slide-in-from-left 0.2s ease-out",
             },
         },
     },

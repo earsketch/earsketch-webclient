@@ -162,6 +162,7 @@
     "createResetAccount": "Create / Reset Account",
     "accountMenu.title": "Account",
     "accountMenu.login": "Login",
+    "accountMenu.loginCallToAction": "Login to your account",
     "accountMenu.backToLogin": "Back to Login",
     "accountCreator.prompt": "Create an account",
     "accountCreator.success": "Account created!",
