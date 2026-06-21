@@ -373,50 +373,75 @@ const KeyboardShortcuts = () => {
 
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
 
-    const shortcuts = {
-        run: [modifier, "Enter"],
-        save: [modifier, "S"],
-        undo: [modifier, "Z"],
-        redo: [modifier, "Shift", "Z"],
-        comment: [modifier, "/"],
-        commandPalette: [modifier, "Shift", "P"],
-        playPause: ["Ctrl", "Space"],
-        jumpToCodeDaw: ["Ctrl", "I"],
-        jumpBackInFocus: ["Ctrl", "["],
-        jumpForwardInFocus: ["Ctrl", "]"],
-        zoomHorizontal: <>
-            <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
-        </>,
-        zoomVertical: [modifier, "Shift", "Wheel"],
-        escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
-        jumpToSounds: ["Ctrl", "Shift", "1"],
-        jumpToScripts: ["Ctrl", "Shift", "2"],
-        jumpToApi: ["Ctrl", "Shift", "3"],
-        jumpToDaw: ["Ctrl", "Shift", "4"],
-        jumpToEditor: ["Ctrl", "Shift", "5"],
-        jumpToCurriculum: ["Ctrl", "Shift", "6"],
-        jumpToUtility: ["Ctrl", "Shift", "7"],
-        jumpToSoundPreview: ["Ctrl", "Shift", "8"],
-        jumpToConsole: ["Ctrl", "Shift", "9"],
+    const renderKeys = (keys: string[] | React.ReactNode) =>
+        Array.isArray(keys)
+            ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
+            : keys
+
+    const shortcuts: Record<string, { keys: string[] | React.ReactNode; group: string }> = {
+        run: { keys: [modifier, "Enter"], group: "editor" },
+        save: { keys: [modifier, "S"], group: "editor" },
+        undo: { keys: [modifier, "Z"], group: "editor" },
+        redo: { keys: [modifier, "Shift", "Z"], group: "editor" },
+        comment: { keys: [modifier, "/"], group: "editor" },
+        escapeEditor: { keys: <><kbd>{localize("Esc")}</kbd> then <kbd>{localize("Tab")}</kbd></>, group: "editor" },
+        playPause: { keys: ["Ctrl", "Space"], group: "daw" },
+        jumpToCodeDaw: { keys: ["Ctrl", "I"], group: "daw" },
+        zoomHorizontal: { keys: <><kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd></>, group: "daw" },
+        zoomVertical: { keys: [modifier, "Shift", "Wheel"], group: "daw" },
+        commandPalette: { keys: [modifier, "Shift", "P"], group: "navigation" },
+        jumpBackInFocus: { keys: ["Ctrl", "["], group: "navigation" },
+        jumpForwardInFocus: { keys: ["Ctrl", "]"], group: "navigation" },
+        jumpToSounds: { keys: ["Ctrl", "Shift", "1"], group: "navigation" },
+        jumpToScripts: { keys: ["Ctrl", "Shift", "2"], group: "navigation" },
+        jumpToApi: { keys: ["Ctrl", "Shift", "3"], group: "navigation" },
+        jumpToDaw: { keys: ["Ctrl", "Shift", "4"], group: "navigation" },
+        jumpToEditor: { keys: ["Ctrl", "Shift", "5"], group: "navigation" },
+        jumpToCurriculum: { keys: ["Ctrl", "Shift", "6"], group: "navigation" },
+        jumpToUtility: { keys: ["Ctrl", "Shift", "7"], group: "navigation" },
+        jumpToSoundPreview: { keys: ["Ctrl", "Shift", "8"], group: "navigation" },
+        jumpToConsole: { keys: ["Ctrl", "Shift", "9"], group: "navigation" },
     }
 
     return <Popover>
         <Popover.Button id="utilityPanelAnchor" className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-1/2 w-max">
-            <table>
-                <tbody>
-                    {Object.entries(shortcuts).map(([action, keys], index, arr) =>
-                        <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
-                            <td className="text-sm p-2">{t(`shortcuts.${action}`)}</td>
-                            <td>{Array.isArray(keys)
-                                ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
-                                : keys}
-                            </td>
-                        </tr>)}
-                </tbody>
-            </table>
+        <Popover.Panel className="absolute z-10 mt-1 -translate-x-1/2 w-max">
+            <div tabIndex={0} className="bg-gray-100 shadow-lg max-h-[70vh] overflow-y-auto p-2">
+                <table>
+                    <thead className="sr-only">
+                        <tr>
+                            <th scope="col">{t("shortcuts.action")}</th>
+                            <th scope="col">{t("shortcuts.keys")}</th>
+                        </tr>
+                    </thead>
+                    {Object.entries(shortcuts).reduce<{ group: string; entries: [string, typeof shortcuts[string]][] }[]>(
+                        (acc, entry) => {
+                            const last = acc[acc.length - 1]
+                            if (last?.group === entry[1].group) last.entries.push(entry)
+                            else acc.push({ group: entry[1].group, entries: [entry] })
+                            return acc
+                        }, []
+                    ).map(({ group, entries }) => (
+                        <tbody key={group}>
+                            <tr>
+                                <th role="presentation" scope="rowgroup" colSpan={2} className="px-2 pt-3 pb-0.5 text-left">
+                                    <h2 className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                                        {t(`shortcuts.group.${group}`)}
+                                    </h2>
+                                </th>
+                            </tr>
+                            {entries.map(([action, { keys }], index, arr) => (
+                                <tr key={action} className={index < arr.length - 1 ? "border-b border-gray-200" : ""}>
+                                    <th scope="row" className="text-sm p-2 text-left font-normal pl-4">{t(`shortcuts.${action}`)}</th>
+                                    <td className="p-2">{renderKeys(keys)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    ))}
+                </table>
+            </div>
         </Popover.Panel>
     </Popover>
 }

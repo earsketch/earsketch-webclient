@@ -766,7 +766,10 @@ const SoundPreview = () => {
             setIndex(idx)
             playNow(auditionRequest)
             dispatch(sounds.setAuditionRequest(null))
-            window.requestAnimationFrame(() => playerRef.current?.focus())
+            window.requestAnimationFrame(() => {
+                const playBtn = document.getElementById("sound-preview-play-button")
+                ;(playBtn ?? playerRef.current)?.focus()
+            })
         }
     }, [auditionRequest, queue])
 
