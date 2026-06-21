@@ -17,13 +17,15 @@ import { gutter, GutterMarker, keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setPreview, previewPlugin, setAppLocale, setShowBeatStringAnnotation } from "./EditorWidgets"
-
+import { playEarcon, SINE_BUMP } from "../audio/earcon"
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorCursorLine, setScriptMatchesDAW, selectScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
+import * as daw from "../daw/dawState"
+import { scrollDAWToElement } from "../daw/DAW"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
@@ -31,11 +33,14 @@ import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
 import * as scripts from "../browser/scriptsState"
+import { status as consoleStatus } from "./console"
+import * as uiLogger from "../app/uiLogger"
+import reporter from "../app/reporter"
 
 Object.assign(window, { Sk, ace }) // for droplet
 
-const dawHoverLinesEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
-    map: (val, mapping) => (val ? { color: val.color, pos: mapping.mapPos(val.pos) } : undefined),
+const dawHoverLinesEffect = StateEffect.define<{ color: string, pos: number, primary: boolean }[]>({
+    map: (val, mapping) => val.map(line => ({ color: line.color, pos: mapping.mapPos(line.pos), primary: line.primary })),
 })
 
 const dawPlayingLinesEffect = StateEffect.define<{ color: string, pos: number }[]>({
@@ -45,19 +50,36 @@ const dawPlayingLinesEffect = StateEffect.define<{ color: string, pos: number }[
 type DAWMarkerType = "hover" | "play"
 const MARKER_ICONS = { hover: "icon-arrow-right-thick", play: "icon-play4" }
 
+interface DAWMarkerOptions {
+    type: DAWMarkerType
+    color: string
+    visible?: boolean
+    primary?: boolean
+}
+
 class DAWMarker extends GutterMarker {
-    constructor(readonly type: DAWMarkerType, readonly color: string, readonly visible = true) {
+    readonly type: DAWMarkerType
+    readonly color: string
+    readonly visible: boolean
+    readonly primary: boolean
+
+    constructor({ type, color, visible = true, primary = true }: DAWMarkerOptions) {
         super()
+        this.type = type
+        this.color = color
+        this.visible = visible
+        this.primary = primary
     }
 
     override eq(other: DAWMarker) {
-        return this.type === other.type && this.color === other.color && this.visible === other.visible
+        return this.type === other.type && this.color === other.color && this.visible === other.visible && this.primary === other.primary
     }
 
     override toDOM() {
         const node = document.createElement("i")
         if (!this.visible) return node
         node.classList.add(MARKER_ICONS[this.type], `daw-marker-${this.type}`)
+        if (!this.primary) node.classList.add(`daw-marker-${this.type}-secondary`)
         node.style.color = this.color
         return node
     }
@@ -75,7 +97,7 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
         // - If an item is both currently playing *and* the user is hovering over it,
         //   the "hover" marker takes precedence, and the playing marker is hidden.
         set = set.map(transaction.changes)
-        let dawHoverUpdate = null // `null` indicates no update, `undefined` indicates "update: no hover".
+        let dawHoverUpdate: { color: string, pos: number, primary: boolean }[] | null = null
         let dawPlayingUpdate = null
         // Determine most recent update for hover & playing lines
         for (const e of transaction.effects) {
@@ -85,10 +107,14 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
                 dawPlayingUpdate = e.value
             }
         }
-        if (dawHoverUpdate) {
-            set = set.update({ add: [new DAWMarker("hover", dawHoverUpdate.color).range(dawHoverUpdate.pos)] })
-        } else if (dawHoverUpdate === undefined) {
+        if (dawHoverUpdate !== null) {
             set = set.update({ filter: (_from, _to, m) => m.type !== "hover" })
+            if (dawHoverUpdate.length > 0) {
+                const ranges = [...dawHoverUpdate]
+                    .sort((a, b) => a.pos - b.pos)
+                    .map(h => new DAWMarker({ type: "hover", color: h.color, primary: h.primary }).range(h.pos))
+                set = set.update({ add: ranges })
+            }
         }
         if (dawPlayingUpdate === null && dawHoverUpdate !== null) {
             // Kinda gross: need to recreate play markers in case hover marker has moved.
@@ -101,16 +127,16 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
             }
         }
         if (dawPlayingUpdate !== null) {
-            // Don't show a playback marker on the line where we're already showing a hover marker.
-            let hoverPos: number | null = null
+            // Don't show a playback marker on a line where we're already showing a hover marker.
+            const hoverPositions = new Set<number>()
             for (let iter = set.iter(); iter.value !== null; iter.next()) {
                 if (iter.value.type === "hover") {
-                    hoverPos = iter.from
+                    hoverPositions.add(iter.from)
                 }
             }
             const add = dawPlayingUpdate
                 .sort((a, b) => a.pos - b.pos)
-                .map(line => new DAWMarker("play", line.color, line.pos !== hoverPos).range(line.pos))
+                .map(line => new DAWMarker({ type: "play", color: line.color, visible: !hoverPositions.has(line.pos) }).range(line.pos))
             set = set.update({ filter: (_from, _to, m) => m.type !== "play" }).update({ add })
         }
         return set
@@ -122,7 +148,7 @@ const dawMarkerGutter = [
     gutter({
         class: "daw-markers",
         markers: v => v.state.field(dawMarkerState),
-        initialSpacer: () => new DAWMarker("hover", ""),
+        initialSpacer: () => new DAWMarker({ type: "hover", color: "" }),
     }),
     EditorView.baseTheme({
         ".daw-markers .cm-gutterElement": {
@@ -135,6 +161,9 @@ const dawMarkerGutter = [
             },
             "& .daw-marker-hover": {
                 left: "5px",
+            },
+            "& .daw-marker-hover-secondary": {
+                opacity: "0.45",
             },
             "& .daw-marker-play": {
                 transform: "translateX(8.5px) scale(0.8, 1.2)",
@@ -209,9 +238,70 @@ const pythonAutocomplete: CompletionSource = (context) => autocompleteEnabled ? 
 // Internal state
 let view: EditorView = null as unknown as EditorView
 let sessions: { [key: string]: EditorSession } = {}
-const keyBindings: { key: string, run: () => boolean }[] = []
+const keyBindings: { key: string, run: () => boolean }[] = [
+    {
+        key: "Ctrl-i",
+        run: () => {
+            const currentLine = view.state.doc.lineAt(view.state.selection.main.head)
+            jumpToDAWClip(currentLine.number)
+            uiLogger.shortcut("Ctrl+I", "editor")
+            reporter.keyboardShortcut("Ctrl+I")
+            return true
+        },
+    },
+]
 let resolveReady: () => void
 let droplet: any
+
+let srLineEl: HTMLElement | null = null
+let lastAnnouncedLine = -1
+
+function getIndentLevel(lineText: string): number {
+    const trimmed = lineText.trimStart()
+    if (!trimmed) return 0
+    const leading = lineText.length - trimmed.length
+    if (leading === 0) return 0
+    // Find the smallest non-zero indent in the document to use as the unit.
+    const doc = view.state.doc
+    let unit = 0
+    for (let i = 1; i <= doc.lines; i++) {
+        const t = doc.line(i).text
+        if (!t.trim()) continue
+        const n = t.length - t.trimStart().length
+        if (n > 0 && (unit === 0 || n < unit)) unit = n
+    }
+    return unit > 0 ? Math.round(leading / unit) : 0
+}
+
+function announceLineNumber(lineNumber: number) {
+    if (!srLineEl) {
+        srLineEl = document.createElement("div")
+        srLineEl.setAttribute("aria-live", "assertive")
+        srLineEl.setAttribute("aria-atomic", "true")
+        srLineEl.setAttribute("class", "sr-only")
+        document.body.appendChild(srLineEl)
+    }
+    srLineEl.textContent = ""
+    window.setTimeout(() => {
+        const line = view.state.doc.line(lineNumber)
+        if (srLineEl) {
+            const indentLevel = getIndentLevel(line.text)
+            const content = line.text.trim() || i18n.t("ariaDescriptors:editor.emptyLine")
+            const text = indentLevel > 0
+                ? i18n.t("ariaDescriptors:editor.indentLevel", { count: indentLevel }) + ", " + content
+                : content
+            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text })
+        }
+    }, 10)
+}
+
+const lineAnnouncementExtension = EditorView.updateListener.of(update => {
+    if (!update.selectionSet) return
+    const line = update.state.doc.lineAt(update.state.selection.main.head)
+    if (line.number === lastAnnouncedLine) return
+    lastAnnouncedLine = line.number
+    announceLineNumber(line.number)
+})
 
 // External API
 export type EditorSession = EditorState
@@ -223,7 +313,11 @@ export const changeListeners: ((deletion?: boolean) => void)[] = []
 export function bindKey(key: string, fn: () => void) {
     keyBindings.push({
         key,
-        run: () => { fn(); return true },
+        run: () => {
+            fn()
+            uiLogger.shortcut(key.replace("-", "+"), "editor")
+            return true
+        },
     })
 }
 
@@ -252,7 +346,11 @@ export function createSession(id: string, language: Language, contents: string) 
             EditorView.updateListener.of(update => {
                 sessions[id] = update.state
                 if (update.docChanged) onEdit(update)
+                if (update.selectionSet || update.docChanged) {
+                    syncCursorLine(update.state)
+                }
             }),
+            lineAnnouncementExtension,
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
             EditorView.contentAttributes.of({ "aria-label": i18n.t("editor.title") }),
@@ -279,6 +377,8 @@ export function setActiveSession(session: EditorSession) {
         view.setState(session)
         view.dispatch({ effects: themeConfig.reconfigure(getTheme()) })
         changeListeners.forEach(f => f())
+        lastDispatchedCursorLine = null
+        syncCursorLine(view.state)
     }
 }
 
@@ -296,8 +396,34 @@ export function setReadOnly(value: boolean) {
     droplet.setReadOnly(value)
 }
 
-export function focus() {
+export function getEditorLine(): number {
+    const { from } = view.state.selection.main
+    return view.state.doc.lineAt(from).number
+}
+
+export function jumpToLine(lineNumber: number) {
+    const line = view.state.doc.line(lineNumber)
+    const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
+    view.contentDOM.setAttribute("aria-label", i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") }))
+    view.dispatch({ selection: { anchor: line.from }, scrollIntoView: true })
     view.focus()
+    window.setTimeout(() => view.contentDOM.setAttribute("aria-label", originalLabel), 1000)
+}
+
+export function focus() {
+    const { from } = view.state.selection.main
+    const line = view.state.doc.lineAt(from)
+    const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
+    const announcement = line.text
+        ? i18n.t("editor.lineAnnouncement", { number: line.number, text: line.text })
+        : i18n.t("editor.emptyLineAnnouncement", { number: line.number })
+
+    view.contentDOM.setAttribute("aria-label", announcement)
+    view.dispatch({ selection: { anchor: from }, scrollIntoView: true })
+    view.focus()
+
+    // eslint-disable-next-line no-restricted-globals
+    setTimeout(() => view.contentDOM.setAttribute("aria-label", originalLabel), 1000)
 }
 
 export function getSelection() {
@@ -375,13 +501,17 @@ export function clearErrors() {
     view.dispatch(setDiagnostics(view.state, []))
 }
 
-export function setDAWHoverLine(color: string, lineNumber: number) {
-    const line = view.state.doc.line(lineNumber)
-    view.dispatch({ effects: dawHoverLinesEffect.of({ color, pos: line.from }) })
+export function setDAWHoverLine(color: string, lineNumbers: number[]) {
+    // First entry is the innermost (primary) frame; the rest are outer call-site frames.
+    const payload = lineNumbers.map((lineNumber, i) => {
+        const line = view.state.doc.line(lineNumber)
+        return { color, pos: line.from, primary: i === 0 }
+    })
+    view.dispatch({ effects: dawHoverLinesEffect.of(payload) })
 }
 
 export function clearDAWHoverLine() {
-    view.dispatch({ effects: dawHoverLinesEffect.of(undefined) })
+    view.dispatch({ effects: dawHoverLinesEffect.of([]) })
 }
 
 export function setDAWPlayingLines(playing: { color: string, lineNumber: number }[]) {
@@ -391,6 +521,79 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
             return { color: p.color, pos: line.from }
         })),
     })
+}
+
+function jumpToDAWClip(lineNumber: number) {
+    if (!selectScriptMatchesDAW(store.getState())) {
+        playEarcon(SINE_BUMP, 0.3)
+        consoleStatus(i18n.t("daw.needsSync"))
+        uiLogger.event("cannot_inspect", "editor", { error: "needsSync" })
+        reporter.keyboardShortcut("editor cannot_inspect: needsSync")
+        return
+    }
+
+    // Prefer the parent clip (non-loopChild) so fitMedia/insertMedia jumps land on the representative button.
+    // Searches both clip buttons and automation point circles (both carry data-source-line).
+    const directTarget = (
+        document.querySelector(`[data-source-line="${lineNumber}"]:not(.loop)`) ??
+        document.querySelector(`[data-source-line="${lineNumber}"]`)
+    ) as HTMLElement | null
+
+    let target = directTarget
+    let outerCallMatches: HTMLElement[] = []
+
+    // Fall back: cursor may be on an outer call site (e.g. a user-defined function that
+    // calls EarSketch API functions) — search full call stack on all DAW elements.
+    if (!target) {
+        const allElements = Array.from(document.querySelectorAll("[data-source-lines]")) as HTMLElement[]
+        outerCallMatches = allElements.filter(el => {
+            const lines = (el.getAttribute("data-source-lines") ?? "").split(",").map(Number)
+            return lines.includes(lineNumber)
+        })
+        target = outerCallMatches.find(el => !el.classList.contains("loop")) ?? outerCallMatches[0] ?? null
+    }
+
+    if (target) {
+        const originalLabel = target.getAttribute("aria-label") ?? ""
+        // For Ctrl+I, announce the family-range description stored in data-family-aria
+        // (covers the full span of all clips sharing this source line), not the
+        // individual-clip description in aria-label (which Tab reads).
+        let announcedLabel = target.getAttribute("data-family-aria") ?? originalLabel
+
+        // If the cursor was on a user-defined function call (not a direct API call) that produced
+        // clips on multiple tracks, prepend a summary and isolate all of tracks on focus.
+        if (!directTarget && target.getAttribute("data-track") !== null) {
+            const tracks = new Set<number>()
+            for (const el of outerCallMatches) {
+                const trackAttr = el.getAttribute("data-track")
+                if (trackAttr !== null) tracks.add(Number(trackAttr))
+            }
+            if (tracks.size > 1) {
+                const sortedTracks = Array.from(tracks).sort((a, b) => a - b)
+                announcedLabel = `${i18n.t("ariaDescriptors:daw.multiTrackJump", { tracks: sortedTracks.join(", ") })} ${announcedLabel}`
+                daw.setPendingTrackIsolation(sortedTracks)
+            }
+        }
+
+        daw.setPendingJumpToDAW()
+        target.setAttribute("aria-label", `Focus shifted to DAW, ${announcedLabel}`)
+        target.focus({ preventScroll: true })
+        scrollDAWToElement(target)
+        window.setTimeout(() => target!.setAttribute("aria-label", originalLabel), 1000)
+    } else {
+        playEarcon(SINE_BUMP, 0.3)
+        uiLogger.event("cannot_inspect", "editor", { error: "noTarget" })
+        reporter.keyboardShortcut("editor cannot_inspect: noTarget")
+    }
+}
+
+let lastDispatchedCursorLine: number | null = null
+
+function syncCursorLine(state: EditorState) {
+    const line = state.doc.lineAt(state.selection.main.head).number
+    if (line === lastDispatchedCursorLine) return
+    lastDispatchedCursorLine = line
+    store.dispatch(setEditorCursorLine(line))
 }
 
 // Callbacks
@@ -521,7 +724,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     }, [soundNames])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden">
-        <div id="editor" className="code-container" style={{ fontSize }}>
+        <div id="editor" className="code-container" style={{ fontSize }} role="tabpanel" aria-labelledby={`${activeScript?.shareid}-tab`}>
             <div ref={blocksElement} className={"h-full w-full absolute" + (inBlocksMode ? "" : " invisible")} onClick={shakeImportButton} />
             <div
                 ref={editorElement} className={"h-full w-full" + (inBlocksMode ? " hidden" : "")}

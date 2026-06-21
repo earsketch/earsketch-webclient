@@ -19,14 +19,17 @@ import * as editor from "./Editor"
 import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
+import { ExtensionHost } from "../extensions/ExtensionHost"
 import { setReady } from "../bubble/bubbleState"
 import { dismiss } from "../bubble/bubbleThunks"
 import { callbacks as bubbleCallbacks } from "../bubble/Bubble"
+import { callbacks as commandPaletteCallbacks } from "../app/CommandPalette"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
 import { openModal } from "../app/modal"
 import { reloadRecommendations } from "../app/reloadRecommender"
 import reporter from "../app/reporter"
+import * as uiLogger from "../app/uiLogger"
 import * as runner from "../app/runner"
 import { ScriptCreator } from "../app/ScriptCreator"
 import store from "../reducers"
@@ -113,7 +116,7 @@ function switchToShareMode() {
 
 let setLoading: (loading: boolean) => void
 
-function saveScript() {
+export function saveScript() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
     const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
@@ -129,6 +132,8 @@ window.addEventListener("keydown", event => {
     if ((event.ctrlKey || event.metaKey) && event.key === "s") {
         event.preventDefault()
         saveScript()
+        uiLogger.shortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+S`, "editor")
+        reporter.keyboardShortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+S`)
     }
 })
 
@@ -277,12 +282,17 @@ curriculum.callbacks.import = importExample
 async function runScript() {
     if (isWaitingForServerResponse) return
 
+    const state = store.getState()
+    if (!appState.selectHideEditor(state) && tabs.selectOpenTabs(state).length === 0) {
+        store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("editor.noScriptsLoaded") }))
+        return
+    }
+
     isWaitingForServerResponse = true
 
     setLoading(true)
 
     const startTime = Date.now()
-    const state = store.getState()
     const hideEditor = appState.selectHideEditor(state)
     const scriptName = (hideEditor ? appState.selectEmbeddedScriptName(state) : tabs.selectActiveTabScript(state)!.name)!
     const language = ESUtils.parseLanguage(scriptName)
@@ -360,6 +370,7 @@ async function runScript() {
 
 dawCallbacks.runScript = runScript
 bubbleCallbacks.runScript = runScript
+commandPaletteCallbacks.runScript = runScript
 
 export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }: {
     closeAllTabs: () => void, importScript: (s: Script) => void, shareScript: (s: Script) => void, downloadScript: (s: Script) => void
@@ -383,6 +394,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
 
     const logs = useSelector(ide.selectLogs)
     const consoleContainer = useRef<HTMLDivElement>(null)
+    const [focusedConsoleIndex, setFocusedConsoleIndex] = useState(-1)
 
     const [loading, _setLoading] = useState(false)
 
@@ -396,11 +408,29 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
         if (consoleContainer.current) {
             consoleContainer.current.scrollTop = consoleContainer.current.scrollHeight
         }
+        setFocusedConsoleIndex(logs.length - 1)
     }, [logs])
+
+    const handleConsoleKeyDown = (e: React.KeyboardEvent<HTMLLIElement>, index: number) => {
+        let newIndex: number | null = null
+        if (e.key === "ArrowUp") newIndex = Math.max(0, index - 1)
+        else if (e.key === "ArrowDown") newIndex = Math.min(logs.length - 1, index + 1)
+        else if (e.key === "Home") newIndex = 0
+        else if (e.key === "End") newIndex = logs.length - 1
+        else return
+        e.preventDefault()
+        const items = consoleContainer.current?.querySelectorAll<HTMLElement>("li")
+        items?.[newIndex]?.focus()
+    }
+
+    useEffect(() => {
+        dispatch(layout.setWestSizeForFontSize(fontSize))
+    }, [fontSize])
 
     const gutterSize = hideEditor ? 0 : 9
     const isWestOpen = useSelector(layout.isWestOpen)
     const isEastOpen = useSelector(layout.isEastOpen)
+    const eastContent = useSelector(appState.selectEastContent)
     const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
     const maxWidths = embedMode ? [0, Infinity, 0] : [isWestOpen ? Infinity : layout.COLLAPSED_WIDTH, Infinity, isEastOpen ? Infinity : layout.COLLAPSED_WIDTH]
     const minHeights = embedMode ? [layout.MIN_DAW_HEIGHT, 0, 0] : [layout.MIN_DAW_HEIGHT, layout.MIN_EDITOR_HEIGHT, layout.MIN_DAW_HEIGHT]
@@ -470,35 +500,51 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                         </div>
                     </div>
 
-                    <div ref={consoleContainer} id="console-frame" aria-live="assertive" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
-                        <div className="row">
-                            <div id="console">
-                                {logs.length === 0 && <span>&nbsp;</span> /* hack for screen readers */}
-                                {logs.map((msg: ide.Log, index: number) => {
-                                    const consoleLineClass = classNames({
-                                        "console-line": true,
-                                        "console-warn": msg.level === "warn",
-                                        "console-error": msg.level === "error",
-                                    })
-                                    return <div key={index} className={consoleLineClass} style={{ fontSize }}>
-                                        {["warn", "error"].includes(msg.level) && (msg.level === "error"
-                                            ? <span title={t("console:error")} className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
-                                            : <span title={t("console:warning")} className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
-                                        <span>
-                                            {msg.text}{" "}
-                                            {msg.level === "error" && <>
-                                                —{" "}
-                                                <a className="cursor-pointer" onClick={() => {
-                                                    dispatch(curriculum.openErrorPage(msg.text))
-                                                }}>
-                                                    Click here for more information.
-                                                </a>
-                                            </>}
-                                        </span>
-                                    </div>
-                                })}
-                            </div>
-                        </div>
+                    <div ref={consoleContainer} id="console-frame" role="region" aria-label={t("console:output")} className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
+                        <ul id="console" aria-live="assertive" aria-atomic="false">
+                            {logs.length === 0 && <li>&nbsp;</li> /* hack for screen readers */}
+                            {logs.map((msg: ide.Log, index: number) => {
+                                const consoleLineClass = classNames({
+                                    "console-line": true,
+                                    "console-warn": msg.level === "warn",
+                                    "console-error": msg.level === "error",
+                                })
+                                return <li
+                                    key={index}
+                                    className={consoleLineClass}
+                                    style={{ fontSize }}
+                                    tabIndex={focusedConsoleIndex === index ? 0 : -1}
+                                    aria-current={focusedConsoleIndex === index ? "true" : undefined}
+                                    onFocus={(e) => {
+                                        setFocusedConsoleIndex(index)
+                                        // Announce "Focus shifted to Console" before the message text, so
+                                        // it's clear from anywhere (Tab, arrow keys, or a panel jump) that
+                                        // focus landed in the console rather than just reading the message.
+                                        const target = e.currentTarget
+                                        const originalLabel = target.getAttribute("aria-label") ?? ""
+                                        target.setAttribute("aria-label", `${t("ariaDescriptors:console.focusAnnouncement")} ${target.textContent ?? ""}`)
+                                        window.setTimeout(() => target.setAttribute("aria-label", originalLabel), 1000)
+                                    }}
+                                    onKeyDown={(e) => handleConsoleKeyDown(e, index)}
+                                >
+                                    {["warn", "error"].includes(msg.level) && (msg.level === "error"
+                                        ? <span aria-hidden="true" className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
+                                        : <span aria-hidden="true" className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
+                                    <span>
+                                        {["warn", "error"].includes(msg.level) && <span className="sr-only">{msg.level === "error" ? t("console:error") : t("console:warning")}: </span>}
+                                        {msg.text}{" "}
+                                        {msg.level === "error" && <>
+                                            —{" "}
+                                            <a className="cursor-pointer" aria-label={t("console:moreInfoLabel", { error: msg.text })} onClick={() => {
+                                                dispatch(curriculum.openErrorPage(msg.text))
+                                            }}>
+                                                {t("console:clickHereForMoreInfo")}
+                                            </a>
+                                        </>}
+                                    </span>
+                                </li>
+                            })}
+                        </ul>
                     </div>
                 </Split>
 
@@ -510,7 +556,8 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                 : <CAI />)}
                         </div>)}
                     <div className={showCai ? "h-full hidden" : "h-full"}>
-                        <Curriculum />
+                        <div className={eastContent !== "curriculum" ? "hidden" : "h-full"}><Curriculum /></div>
+                        <div className={eastContent === "curriculum" ? "hidden" : "h-full"}><ExtensionHost /></div>
                     </div>
                 </div>
             </Split>

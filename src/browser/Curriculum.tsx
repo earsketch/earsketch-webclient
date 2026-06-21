@@ -3,6 +3,7 @@ import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "..
 import { Hilitor } from "../../lib/hilitor"
 
 import * as appState from "../app/appState"
+import * as uiLogger from "../app/uiLogger"
 import { Collapsed, SearchBar } from "./Utils"
 import * as curriculum from "./curriculumState"
 import * as ESUtils from "../esutils"
@@ -14,6 +15,7 @@ import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { Language } from "common"
+import { selectExtensionIcon32, selectExtensionName } from "../extensions/extensionState"
 
 const SECTION_URL_CHARACTER = ":"
 
@@ -21,6 +23,7 @@ const copyURL = (language: Language, currentLocation: number[]) => {
     const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
     const url = `${SITE_BASE_URI}/?curriculum=${page}&language=${language}`
     window.navigator.clipboard.writeText(url)
+    uiLogger.event("copy", "curriculum", { content: url })
     userNotification.show("Curriculum URL was copied to the clipboard")
 }
 
@@ -75,28 +78,27 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: number, ch: c
             className="ltr:pl-5 rtl:pr-5 py-0.5"
             onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}
         >
-            <span className="inline-grid grid-flow-col "
-                style={{ gridTemplateColumns: "17px 1fr" }}>
+            <div className="flex items-start">
                 <span>
                     {ch.sections && ch.sections.length > 0 &&
-                    <button className="text-sm" aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapterDescriptive", { title: ch.title }) : t("curriculum.expandChapterDescriptive", { title: ch.title })}`} title={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")}`}><i className={`ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
+                    <button className="scale:text-sm scale:ltr:mr-1 scale:rtl:ml-1" aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapterDescriptive", { title: ch.title }) : t("curriculum.expandChapterDescriptive", { title: ch.title })}`} title={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")}`}><i className={`icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
                 </span>
                 <a href="#"
-                    className="text-sm text-black dark:text-white flex"
+                    className="scale:text-sm text-black dark:text-white flex"
                     onClick={e => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
                     <span>{chNumForDisplay}{chNumForDisplay && <>.</>}</span>
-                    <span className="ltr:pl-1 rtl:pr-1">{ch.title}</span>
+                    <span className="scale:ltr:pl-1 scale:rtl:pr-1">{ch.title}</span>
                 </a>
-            </span>
+            </div>
             <ul>
                 {focus[1] === chIdx && ch.sections &&
                 ch.sections.map((sec, secIdx) =>
                     <li role="button" aria-label={t("curriculum.openSection", { section: sec.title })} key={secIdx}
-                        className={"py-1" + (isCurrentChapter && location[2] === secIdx ? " bg-blue-100 dark:bg-gray-700" : "")}
+                        className={"scale:py-1" + (isCurrentChapter && location[2] === secIdx ? " bg-blue-100 dark:bg-gray-700" : "")}
                     >
-                        <span className="ltr:pl-10 rtl:pr-10 flex">
+                        <span className="scale:ltr:pl-10 scale:rtl:pr-10 flex">
                             <a href="#"
-                                className="text-sm text-black dark:text-white flex"
+                                className="scale:text-sm text-black dark:text-white flex"
                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}
                                 aria-current={isCurrentChapter && location[2] === secIdx ? "page" : "false"}
                             >
@@ -119,7 +121,7 @@ const TableOfContents = () => {
     const { t } = useTranslation()
     return (
         <>
-            <div className="inline-block text-sm font-bold text-center w-full">{t("curriculum.toc")}</div>
+            <div className="inline-block scale:text-sm font-bold text-center w-full">{t("curriculum.toc")}</div>
             <hr className="border-1 my-1 border-black dark:border-white" />
             <ul id="toc" className="select-none">
                 {toc.map((unit, unitIdx) => (
@@ -130,9 +132,9 @@ const TableOfContents = () => {
                             {unit.chapters && unit.chapters.length > 0 &&
                             <button aria-label={focus[0] === unitIdx ? t("curriculum.collapseUnitDescriptive", { title: unit.title }) : t("curriculum.expandUnitDescriptive", { title: unit.title })}
                                 title={focus[0] === unitIdx ? t("curriculum.collapseUnit") : t("curriculum.expandUnit")}>
-                                <i className={`text-sm ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} />
+                                <i className={`scale:text-sm ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} />
                             </button>}
-                            <a href="#" className="text-black text-sm dark:text-white"
+                            <a href="#" className="text-black scale:text-sm dark:text-white"
                                 aria-current={currentLocation.length === 1 && currentLocation[0] === unitIdx ? "page" : "false"}
                                 onClick={e => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}
                             </a>
@@ -150,10 +152,11 @@ const TableOfContents = () => {
 
 const CurriculumHeader = () => {
     const dispatch = useDispatch()
+    // CurriculumHeader is always rendered in the curriculum pane
 
     return (
         <div id="curriculum-header" style={{ position: "relative" }}>
-            <TitleBar />
+            <TitleBar isCurriculumPane={true} />
             <NavigationBar />
 
             <div onFocus={() => dispatch(curriculum.showResults(true))}
@@ -167,11 +170,12 @@ const CurriculumHeader = () => {
 
 const CurriculumSearchBar = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const searchText = useSelector(curriculum.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(curriculum.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(curriculum.setSearchText(""))
     const highlight = useSelector(cai.selectHighlight).zone === "curriculumSearchBar"
-    return <SearchBar {... { searchText, dispatchSearch, dispatchReset, id: "curriculumSearchBar", highlight }} />
+    return <SearchBar {... { searchText, dispatchSearch, dispatchReset, id: "curriculumSearchBar", aria: t("ariaDescriptors:curriculum.searchBar"), highlight }} />
 }
 
 const CurriculumSearchResults = () => {
@@ -192,13 +196,16 @@ const CurriculumSearchResults = () => {
         : null
 }
 
-export const TitleBar = () => {
+export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
-    const currentLocale = useSelector(appState.selectLocale)
     const location = useSelector(curriculum.selectCurrentLocation)
     const pageTitle = useSelector(curriculum.selectPageTitle)
-    const { t } = useTranslation()
+    const extensionIcon32 = useSelector(selectExtensionIcon32)
+    const extensionName = useSelector(selectExtensionName)
+    const paneTitle = isCurriculumPane ? t("curriculum.title") : t("extension")
+    const closeButtonTitle = isCurriculumPane ? t("curriculum.close") : t("extension.close")
 
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         useEffect(() => {
@@ -209,39 +216,57 @@ export const TitleBar = () => {
     }
 
     return (
-        <div className="flex items-center p-2">
+        <div className="flex items-center p-2 text-base bg-white text-black dark:bg-gray-900 dark:text-white">
             <div className="ltr:pl-2 ltr:pr-4 rtl:pl-4 rtl:pr-3 font-semibold truncate">
-                <h2>{t("curriculum.title").toLocaleUpperCase()}</h2>
+                <h2>{paneTitle.toLocaleUpperCase()}</h2>
             </div>
             <div>
                 <button
                     className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                     onClick={() => dispatch(layout.setEast({ open: false }))}
-                    title={t("curriculum.close")}
-                    aria-label={t("curriculum.close")}
+                    title={closeButtonTitle}
+                    aria-label={closeButtonTitle}
                 >
                     <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
                 </button>
             </div>
-            {/* TODO: upgrade to tailwind 3 for rtl modifiers to remove ternary operator */}
-            <div className={currentLocale.direction === "rtl" ? "mr-auto" : "ml-auto"}>
-                <button className="px-2 -my-1 align-middle text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
-                    <i className="icon icon-link" />
-                </button>
-                <button className="border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-text-bottom"
-                    title={t("ariaDescriptors:curriculum.switchScriptLanguage", { language: language === "python" ? "javascript" : "python" })}
-                    onClick={() => {
-                        const newLanguage = (language === "python" ? "javascript" : "python")
-                        dispatch(appState.setScriptLanguage(newLanguage))
-                    }}>
-                    {language === "python" ? "PY" : "JS"}
-                </button>
+            <div className="flex items-center ltr:ml-auto rtl:mr-auto">
+                {isCurriculumPane && <>
+                    <button className="px-2 -my-1 text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
+                        <i className="icon icon-link" />
+                    </button>
+                    <button className="h-fit border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-middle"
+                        title={t("ariaDescriptors:curriculum.switchScriptLanguage", { language: language === "python" ? "javascript" : "python" })}
+                        onClick={() => {
+                            const newLanguage = (language === "python" ? "javascript" : "python")
+                            dispatch(appState.setScriptLanguage(newLanguage))
+                        }}>
+                        {language === "python" ? "PY" : "JS"}
+                    </button>
+                    {extensionIcon32 && (
+                        <button
+                            className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
+                            title={t("extension.switchToExtension", { extensionName })}
+                            onClick={() => { dispatch(appState.setEastContent("extension")) }}>
+                            <img src={extensionIcon32} alt="" className="w-5 h-5" />
+                        </button>
+                    )}
+                </>}
+                {!isCurriculumPane && (
+                    <button
+                        className="inline-flex items-center p-1 text-xs rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700 ml-2"
+                        title={t("curriculum.title")}
+                        onClick={() => { dispatch(appState.setEastContent("curriculum")) }}>
+                        {t("curriculum.title").toLocaleUpperCase()}
+                    </button>
+                )}
             </div>
         </div>
     )
 }
 
 const CurriculumPane = () => {
+    const dispatch = useDispatch()
     const { t } = useTranslation()
     const language = useSelector(appState.selectScriptLanguage)
     const currentLocale = useSelector(appState.selectLocale)
@@ -250,14 +275,30 @@ const CurriculumPane = () => {
     const paneIsOpen = useSelector(layout.isEastOpen)
     const content = useSelector(curriculum.selectContent)
     const curriculumBody = useRef<HTMLElement>(null)
+    const focusPending = useSelector(curriculum.selectFocusPending)
 
     useEffect(() => {
         if (content && curriculumBody.current) {
             curriculumBody.current.appendChild(content)
             curriculumBody.current.scrollTop = 0
+            // Make all headings programmatically focusable for keyboard and screen reader navigation
+            ;(content as Element).querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((el: Element) => {
+                (el as HTMLElement).setAttribute("tabindex", "-1")
+            })
             return () => content.remove()
         }
     }, [content, paneIsOpen])
+
+    // Runs after the content-appending effect (effects fire in declaration order).
+    // When the command palette navigates to a curriculum page, focusPending is true
+    // and we move focus to the first heading of the freshly-appended content.
+    useEffect(() => {
+        if (content && focusPending && curriculumBody.current) {
+            dispatch(curriculum.setFocusPending(false))
+            const heading = curriculumBody.current.querySelector<HTMLElement>("h1, h2, h3, h4, h5, h6")
+            if (heading) heading.focus()
+        }
+    }, [content, focusPending, dispatch])
 
     useEffect(() => {
         // <script> tags in the content may add elements to the DOM,
@@ -293,15 +334,18 @@ const CurriculumPane = () => {
         return () => hilitor.remove()
     }, [content, searchText])
 
+    const scaledFontSize = useSelector(appState.selectScaledFontSize)
+
     return (
-        <div dir={currentLocale.direction} className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
+        <div dir={currentLocale.direction} style={{ fontSize: `${scaledFontSize}px` }}
+            className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
             {paneIsOpen
                 ? (
                     <>
                         <CurriculumHeader />
                         <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
                             {content
-                                ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
+                                ? <article ref={curriculumBody} id="curriculum-body" aria-label={t("curriculum.title")} className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
                                 : <div className="flex flex-col items-center">
                                     <div className="text-2xl text-center py-8">Loading curriculum...</div>
                                     <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />
@@ -349,9 +393,9 @@ const NavigationBar = () => {
                         <i className={`icon icon-arrow-${currentLocale.direction === "rtl" ? "right2" : "left2"}`} />
                     </button>}
                 <button ref={triggerRef} className="w-full" title={t("curriculum.showTOC")} onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
-                    <h3 className="text-sm" aria-label={t("curriculum.showTOC")} title={t("curriculum.showTOC")}>
+                    <h3 className="scale:text-sm" aria-label={t("curriculum.showTOC")} title={t("curriculum.showTOC")}>
                         {pageTitle}
-                        <i className="icon icon-arrow-down2 text-xs p-1" />
+                        <i className="icon icon-arrow-down2 scale:text-xs scale:p-1" />
                     </h3>
                 </button>
                 {((location + "") === (tocPages[tocPages.length - 1] + ""))

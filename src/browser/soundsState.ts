@@ -25,6 +25,8 @@ export interface Filters {
     keys: string[]
 }
 
+export type FilterTabs = Omit<Filters, "favorites">
+
 export interface SoundsState {
     standardSounds: Sounds
     userSounds: Sounds
@@ -40,6 +42,7 @@ export interface SoundsState {
         value: Preview | null
         nodes: AudioBufferSourceNode[]
     }
+    auditionRequest: string | null
 }
 
 export interface SoundPreview {
@@ -82,6 +85,7 @@ const soundsSlice = createSlice({
             value: null,
             nodes: [],
         },
+        auditionRequest: null,
     } as SoundsState,
     reducers: {
         setStandardSounds(state, { payload }) {
@@ -163,6 +167,9 @@ const soundsSlice = createSlice({
             state.preview.value = null
             state.preview.nodes = []
         },
+        setAuditionRequest(state, { payload }: { payload: string | null }) {
+            state.auditionRequest = payload
+        },
     },
 })
 
@@ -188,6 +195,7 @@ export const {
     setPreview,
     setPreviewNodes,
     resetPreview,
+    setAuditionRequest,
 } = soundsSlice.actions
 
 /* Selectors */
@@ -443,3 +451,4 @@ export const selectNumItemsSelected = createSelector(
 
 export const selectPreview = (state: RootState) => state.sounds.preview.value
 export const selectPreviewNodes = (state: RootState) => state.sounds.preview.nodes
+export const selectAuditionRequest = (state: RootState) => state.sounds.auditionRequest

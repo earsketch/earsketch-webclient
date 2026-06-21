@@ -111,5 +111,13 @@ export const selectOtherTabsHeight = createSelector(
     }
 )
 
+export const setWestSizeForFontSize = createAsyncThunk<void, number, ThunkAPI>(
+    "layout/setWestSizeForFontSize",
+    (fontSize, { dispatch }) => {
+        const scaledSize = Math.max(MIN_WIDTH, (fontSize / 14) * MIN_WIDTH)
+        dispatch(setWest({ size: scaledSize }))
+    }
+)
+
 export const selectWestKind = (state: RootState) => state.layout.west.kind
 export const selectEastKind = (state: RootState) => state.layout.east.kind

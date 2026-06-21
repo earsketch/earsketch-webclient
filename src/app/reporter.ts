@@ -130,7 +130,21 @@ function blocksMode(enterBlocksMode: boolean) {
     })
 }
 
-export default { exception, readererror, compile, share, localeSelection, localeMiss, blocksMode, ...module } as { [key: string]: Function }
+function keyboardShortcut(shortcut: string) {
+    gtag("event", "keyboard_shortcut", {
+        event_category: "keyboard",
+        event_label: shortcut,
+    })
+}
+
+function commandSelected(command: string, category: string) {
+    gtag("event", "command_selected", {
+        event_category: category,
+        event_label: command,
+    })
+}
+
+export default { exception, readererror, compile, share, localeSelection, localeMiss, blocksMode, keyboardShortcut, commandSelected, ...module } as { [key: string]: Function }
 
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 

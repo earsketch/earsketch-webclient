@@ -22,6 +22,12 @@ export type ScriptType = "regular" | "shared" | "readonly" | "deleted";
 
 export type Language = "python" | "javascript"
 
+export const enum SoundType {
+    User, // Not in the standard bucket, should not be visible (unless owned by the user)
+    Public, // In the standard bucket, should be visible
+    Hidden, // In the standard bucket, should not be visible
+}
+
 export interface SoundEntity {
     name: string
     genreGroup: string
@@ -29,13 +35,13 @@ export interface SoundEntity {
     folder: string
     artist: string
     year: string
-    public: number // Should this appear in the sound browser, autocomplete, etc.?
+    public: number // TODO: Currently: 0 or 1. Soon: 0, 1, or 2 (corresponding to `SoundType` enum).
     genre: string
     instrument: string
     keySignature?: string
     keyConfidence?: number
     tempo?: number // TODO: Server should omit or set to null to indicate no tempo, rather than -1.
-    standard: boolean // Is this a standard sound (as opposed to a user sound)? (client-only flag)
+    type: SoundType
 }
 
 export interface Clip {
@@ -51,7 +57,7 @@ export interface Clip {
     tempo?: number
     loop: boolean
     scale: number
-    sourceLine: number
+    sourceLines: number[]
 }
 
 export type TransformedClip = SlicedClip | StretchedClip
@@ -73,7 +79,7 @@ interface AutomationPoint {
     measure: number
     value: number
     shape: "square" | "linear"
-    sourceLine: number
+    sourceLines: number[]
 }
 
 export type Effect = { [key: string]: Envelope }
