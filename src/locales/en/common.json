@@ -364,6 +364,7 @@
     "shortcuts.jumpToCurriculum": "Jump to Curriculum",
     "shortcuts.jumpToUtility": "Jump to Keyboard Shortcuts",
     "shortcuts.jumpToSoundPreview": "Jump to Audition Panel",
+    "shortcuts.jumpToConsole": "Jump to Console",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
@@ -471,6 +472,7 @@
     "daw.clipSourceLine": "source line {{line}}",
     "daw.automationPoint": "{{effect}} {{parameter}} automation point, measure {{measure}}, value {{value}}, source line {{line}}",
     "daw.multiTrackJump": "This call also placed clips on tracks: {{tracks}}.",
+    "console.focusAnnouncement": "Focus shifted to Console.",
     "editor.lineAnnouncement": "Line {{number}}: {{text}}",
     "editor.emptyLine": "empty line",
     "editor.indentLevel": "indent {{count}}",
@@ -1430,6 +1432,9 @@
   "console": {
     "warning": "Warning",
     "error": "Error",
+    "output": "Console output",
+    "clickHereForMoreInfo": "Click here for more information.",
+    "moreInfoLabel": "More information about: {{error}}",
     "errors": {
       "AssertionError": "An assert statement failed",
       "AttributeError": "There is a mismatch between the object and the attribute",

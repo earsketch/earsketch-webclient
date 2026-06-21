@@ -77,6 +77,7 @@ type PanelEntry =
     | { panel: "editor" }
     | { panel: "east"; kind: "CURRICULUM"; elementSelector: string }
     | { panel: "utilities"; elementSelector: string }
+    | { panel: "console" }
 
 export const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
     Digit1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
@@ -92,6 +93,7 @@ export const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
         elementSelector: "#sound-preview-play-button",
         onBeforeFocus: () => store.dispatch(appState.setShowSoundPreviewWidget(true)),
     },
+    Digit9: { panel: "console" },
 }
 
 export function navigateTo(entry: PanelEntry) {
@@ -103,6 +105,12 @@ export function navigateTo(entry: PanelEntry) {
 
     if (entry.panel === "editor") {
         editor.focus()
+    } else if (entry.panel === "console") {
+        // The console <li>'s own onFocus handler announces "Focus shifted to Console".
+        window.requestAnimationFrame(() => {
+            const items = document.querySelectorAll<HTMLElement>("#console li")
+            items[items.length - 1]?.focus()
+        })
     } else if ("elementSelector" in entry) {
         if (entry.panel === "west") entry.onBeforeFocus?.()
         window.requestAnimationFrame(() => {
@@ -389,7 +397,7 @@ const KeyboardShortcuts = () => {
         jumpToCurriculum: ["Ctrl", "Shift", "6"],
         jumpToUtility: ["Ctrl", "Shift", "7"],
         jumpToSoundPreview: ["Ctrl", "Shift", "8"],
-
+        jumpToConsole: ["Ctrl", "Shift", "9"],
     }
 
     return <Popover>
