@@ -1,5 +1,5 @@
 import i18n from "i18next"
-import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
+import { Dialog, DialogPanel, Menu, Popover, Transition } from "@headlessui/react"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
@@ -1214,9 +1214,9 @@ export const ModalContainer = () => {
                     leaveFrom="opacity-100 scale-100"
                     leaveTo="opacity-0 scale-95"
                 >
-                    <div className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
+                    <DialogPanel className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
                         {Modal && <Modal close={close} />}
-                    </div>
+                    </DialogPanel>
                 </Transition.Child>
             </div>
         </Dialog>
