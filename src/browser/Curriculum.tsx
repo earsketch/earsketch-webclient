@@ -3,6 +3,7 @@ import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "..
 import { Hilitor } from "../../lib/hilitor"
 
 import * as appState from "../app/appState"
+import * as uiLogger from "../app/uiLogger"
 import { Collapsed, SearchBar } from "./Utils"
 import * as curriculum from "./curriculumState"
 import * as ESUtils from "../esutils"
@@ -22,6 +23,7 @@ const copyURL = (language: Language, currentLocation: number[]) => {
     const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
     const url = `${SITE_BASE_URI}/?curriculum=${page}&language=${language}`
     window.navigator.clipboard.writeText(url)
+    uiLogger.event("copy", "curriculum", { content: url })
     userNotification.show("Curriculum URL was copied to the clipboard")
 }
 

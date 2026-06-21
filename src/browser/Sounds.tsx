@@ -527,7 +527,11 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                 <div className="pl-2 pr-4">
                     <button
                         className="scale:text-xs pr-1.5"
-                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewState !== "play" ? " stop" : " play")) }}
+                        onClick={() => {
+                            dispatch(soundsThunks.togglePreview({ name, kind: "sound" }))
+                            addUIClick("sound preview - " + name + (previewState !== "play" ? " stop" : " play"))
+                            if (previewState === "play") uiLogger.event("preview", "sound-browser", { sound: name })
+                        }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
@@ -782,6 +786,7 @@ const SoundPreview = () => {
 
         if (!(preview?.kind === "sound" && preview.name === name)) {
             dispatch(soundsThunks.togglePreview({ name, kind: "sound" })) // ON new
+            uiLogger.event("preview", "audition-panel", { sound: name })
         }
     }
 
@@ -805,6 +810,7 @@ const SoundPreview = () => {
         } else {
             dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" })) // ON
         }
+        uiLogger.event("preview", "audition-panel", { sound: currentName, restart: true })
     }
 
     const goPrev = () => {
@@ -870,6 +876,7 @@ const SoundPreview = () => {
 
     const copyToClipboard = (value: string) => {
         window.navigator.clipboard.writeText(value)
+        uiLogger.event("copy", "audition-panel", { content: value })
     }
     const [buffer, setBuffer] = useState<AudioBuffer | null>(null)
     const [bufferReady, setBufferReady] = useState(false)
@@ -916,7 +923,11 @@ const SoundPreview = () => {
                 <div className="flex items-center justify-evenly mt-2">
                     <button
                         type="button"
-                        onClick={() => setRecommendationMode(1 - recommendationMode)}
+                        onClick={() => {
+                            const next = 1 - recommendationMode
+                            setRecommendationMode(next)
+                            uiLogger.event("button_click", "audition-panel-recommendation-mode", { setStateTo: next })
+                        }}
                         aria-label={recommendationMode ? t("ariaDescriptors:sounds.preview.switchToOrderedMode") : t("ariaDescriptors:sounds.preview.switchToRecommendationMode")}
                         title={recommendationMode ? t("ariaDescriptors:sounds.preview.switchToOrderedMode") : t("ariaDescriptors:sounds.preview.switchToRecommendationMode")}
                         className="sound-btn-ghost"
@@ -944,6 +955,9 @@ const SoundPreview = () => {
                         type="button"
                         onClick={() => {
                             if (!currentName) return
+                            if (!(preview?.kind === "sound" && preview.name === currentName)) {
+                                uiLogger.event("preview", "audition-panel", { sound: currentName })
+                            }
                             dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
                         }}
                         disabled={!currentName}
@@ -1005,6 +1019,7 @@ const SoundPreview = () => {
                                 if (!currentName) return
                                 editor.pasteCode(currentName)
                                 addUIClick("sound copy - " + currentName)
+                                uiLogger.event("paste", "audition-panel", { content: currentName })
                             }}
                             title={t("soundBrowser.clip.tooltip.paste")}
                             aria-label={t("ariaDescriptors:sounds.paste", { name: currentName })}

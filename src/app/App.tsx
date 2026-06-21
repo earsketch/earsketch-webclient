@@ -1058,6 +1058,29 @@ export const App = () => {
         }
     }
 
+    useEffect(() => {
+        const handleCopy = () => {
+            const content = window.getSelection()?.toString() ?? ""
+            uiLogger.event("copy", getPanelId(document.activeElement ?? document.body), { content: content.slice(0, 500) })
+        }
+        const handleCut = () => {
+            const content = window.getSelection()?.toString() ?? ""
+            uiLogger.event("cut", getPanelId(document.activeElement ?? document.body), { content: content.slice(0, 500) })
+        }
+        const handlePaste = (e: ClipboardEvent) => {
+            const content = e.clipboardData?.getData("text") ?? ""
+            uiLogger.event("paste", getPanelId(document.activeElement ?? document.body), { content: content.slice(0, 500) })
+        }
+        document.addEventListener("copy", handleCopy)
+        document.addEventListener("cut", handleCut)
+        document.addEventListener("paste", handlePaste)
+        return () => {
+            document.removeEventListener("copy", handleCopy)
+            document.removeEventListener("cut", handleCut)
+            document.removeEventListener("paste", handlePaste)
+        }
+    }, [])
+
     return <>
         <nav role="navigation">
             <ul className="skip-links">
