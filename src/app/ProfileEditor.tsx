@@ -66,7 +66,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
             <ModalBody>
                 <Alert message={error}></Alert>
                 <input type="email" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.emailOptional")}
-                    value={email} onChange={e => setEmail(e.target.value.trim())} />
+                    value={email} onChange={e => setEmail(e.target.value.trim())} autoFocus />
 
                 <input type="password" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.currentPassword")}
                     value={password} onChange={e => setPassword(e.target.value)} required id="current-password" autoComplete="current-password" />

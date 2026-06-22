@@ -1,5 +1,5 @@
 import i18n from "i18next"
-import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
+import { Dialog, DialogPanel, Menu, Popover, Transition } from "@headlessui/react"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
@@ -384,6 +384,8 @@ const KeyboardShortcuts = () => {
         undo: { keys: [modifier, "Z"], group: "editor" },
         redo: { keys: [modifier, "Shift", "Z"], group: "editor" },
         comment: { keys: [modifier, "/"], group: "editor" },
+        findReplace: { keys: [modifier, "G"], group: "editor" },
+        goToLine: { keys: [modifier, "Alt", "G"], group: "editor" },
         escapeEditor: { keys: <><kbd>{localize("Esc")}</kbd> then <kbd>{localize("Tab")}</kbd></>, group: "editor" },
         playPause: { keys: ["Ctrl", "Space"], group: "daw" },
         jumpToCodeDaw: { keys: ["Ctrl", "I"], group: "daw" },
@@ -1214,9 +1216,9 @@ export const ModalContainer = () => {
                     leaveFrom="opacity-100 scale-100"
                     leaveTo="opacity-0 scale-95"
                 >
-                    <div className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
+                    <DialogPanel className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
                         {Modal && <Modal close={close} />}
-                    </div>
+                    </DialogPanel>
                 </Transition.Child>
             </div>
         </Dialog>
