@@ -134,7 +134,7 @@ export function fixEffects(result: DAWData) {
                 envelope.sort((a, b) => a.measure - b.measure)
                 // If the automation start in the middle, fill the time before with the startValue of the earliest automation.
                 if (envelope[0].measure > 1) {
-                    envelope.unshift({ measure: 1, value: envelope[0].value, shape: "square", sourceLine: envelope[0].sourceLine })
+                    envelope.unshift({ measure: 1, value: envelope[0].value, shape: "square", sourceLines: envelope[0].sourceLines })
                 }
             }
         }
@@ -326,9 +326,9 @@ export function checkOverlap(result: DAWData) {
                 const other = clips[j]
                 const otherEnd = other.measure + other.end - other.start
                 if (clip.measure < (otherEnd - margin) && clipEnd > (other.measure + margin)) {
-                    userConsole.warn(`Removing ${other.filekey} (line ${other.sourceLine})` +
+                    userConsole.warn(`Removing ${other.filekey} (line ${other.sourceLines[0]})` +
                                      ` due to overlap at track ${trackIndex}, measure ${other.measure}` +
-                                     ` with ${clip.filekey} (line ${clip.sourceLine})`)
+                                     ` with ${clip.filekey} (line ${clip.sourceLines[0]})`)
                     if (ES_WEB_SHOW_CAI) {
                         overlaps.push([clip.filekey, other.filekey, trackIndex])
                     }

@@ -28,7 +28,7 @@ export async function createScript(page: Page, scriptName: string) {
     await page.locator("#scriptName").fill(scriptName)
     await page.locator("input").filter({ hasText: "CREATE" }).click()
     await expect(page.locator("#scriptName")).toHaveCount(0, { timeout: 10000 })
-    await expect(page.locator("div[id^='headlessui-dialog-']")).toHaveCount(0, { timeout: 10000 })
+    await expect(page.locator("div[id^='headlessui-dialog-'][data-open]")).toHaveCount(0, { timeout: 10000 })
     // Tab off the New Script button so AutoSizer can re-render before we try
     // to open the script menu.
     await page.keyboard.press("Tab")

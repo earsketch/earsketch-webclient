@@ -13,7 +13,6 @@ import * as user from "../user/userState"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { ScriptDropdownMenu } from "./ScriptsMenus"
-import { BrowserTabType } from "./BrowserTab"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
@@ -30,8 +29,8 @@ const CreateScriptButton = () => {
     const { t } = useTranslation()
     return (
         <button className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer" onClick={callbacks.create} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} data-test="newScript" >
-            <i className="icon icon-plus2 text-xs mr-1" />
-            <div className="text-sm">
+            <i className="icon icon-plus2 scale:text-xs scale:mr-1" />
+            <div className="scale:text-sm">
                 {t("newScript")}
             </div>
         </button>
@@ -40,10 +39,13 @@ const CreateScriptButton = () => {
 
 const ScriptSearchBar = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const searchText = useSelector(scripts.selectSearchText)
+    const count = useSelector(scripts.selectFilteredActiveScriptIDs).length
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(scripts.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(scripts.setSearchText(""))
-    const props = { id: "scriptSearchBar", searchText, dispatchSearch, dispatchReset }
+    const liveMessage = t("scriptsFound", { count })
+    const props = { id: "scriptSearchBar", aria: t("ariaDescriptors:scripts.searchBar"), liveMessage, firstResultSelector: "#panel-1 [data-test=\"scriptEntry\"]", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -64,11 +66,11 @@ export const FilterItem = ({ value, isClearItem = false, active, selected = fals
         ${active ? "bg-blue-200 dark:bg-blue-500" : ""}
       `}
         >
-            <div className="w-5" aria-hidden>
+            <div className="scale:w-5" aria-hidden>
                 <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
             </div>
 
-            <div className="text-sm">
+            <div className="scale:text-sm">
                 {isClearItem ? t("clear") : value}
             </div>
         </div>
@@ -87,6 +89,7 @@ export const SortBySelector = () => {
     const dispatch = useDispatch()
     const sortBy = useSelector((state: any) => state.scripts.filters.sortBy)
     const { t } = useTranslation()
+    const scaledFontSize = useSelector(appState.selectScaledFontSize)
 
     // Local state for the selected option
     const [selectedId, setSelectedId] = useState<string>(
@@ -114,7 +117,7 @@ export const SortBySelector = () => {
                 dispatch(scripts.setSortBy({ attribute: option.attribute, ascending: option.ascending }))
             }}
         >
-            <div className="relative w-1/3 ml-2">
+            <div className="relative scale:w-1/3 ml-2">
                 <ListboxButton
                     className={`flex justify-between w-full border-b-2 cursor-pointer select-none ${theme === "light" ? "border-black" : "border-white"
                     }`}
@@ -123,11 +126,12 @@ export const SortBySelector = () => {
                     <span className="truncate">
                         {t("scriptBrowser.filterDropdown.sortBy")}
                     </span>
-                    <i className="icon icon-arrow-down2 text-xs p-1" />
+                    <i className="icon icon-arrow-down2 scale:text-xs p-1" />
                 </ListboxButton>
 
                 <ListboxOptions
                     anchor="bottom start"
+                    style={{ fontSize: `${scaledFontSize}px` }}
                     className={`border p-2 z-50 [--anchor-gap:4px] focus:outline-none
                       bg-white text-black dark:bg-black dark:text-white border-black`}
                 >
@@ -138,10 +142,10 @@ export const SortBySelector = () => {
                                     className={`flex items-center px-2 py-1 ${active ? "bg-blue-200 dark:bg-blue-500" : ""
                                     }`}
                                 >
-                                    <div className="w-5 mr-2" aria-hidden>
+                                    <div className="scale:w-5 mr-2" aria-hidden>
                                         <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
                                     </div>
-                                    <div aria-label={t("scriptBrowser.filterDropdown.sortByName", { filtername: t(option.label) })} className="text-sm">{t(option.label)}</div>
+                                    <div aria-label={t("scriptBrowser.filterDropdown.sortByName", { filtername: t(option.label) })} className="scale:text-sm">{t(option.label)}</div>
                                 </div>
                             )}
                         </ListboxOption>
@@ -160,7 +164,7 @@ const Filters = () => {
 
     return (
         <div className="p-3">
-            <div className="pb-2 text-xs">{t("filter").toLocaleUpperCase()}</div>
+            <div className="pb-2 scale:text-xs">{t("filter").toLocaleUpperCase()}</div>
             <div className="flex justify-between">
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.owner")}
@@ -194,6 +198,7 @@ const ShowDeletedScripts = () => {
             <div className="pr-1.5">
                 <input
                     type="checkbox"
+                    className="scale:w-4 scale:h-4"
                     aria-label={t("scriptBrowser.showDeleted")}
                     title={t("scriptBrowser.showDeleted")}
                     role="checkbox"
@@ -203,7 +208,7 @@ const ShowDeletedScripts = () => {
                     }}
                 />
             </div>
-            <div className="pr-1 text-sm">
+            <div className="pr-1 scale:text-sm">
                 {t("scriptBrowser.showDeleted")}
             </div>
         </div>
@@ -214,7 +219,7 @@ const PillButton = ({ script, fn, aria, icon, children }: { script: Script, fn: 
     const { t } = useTranslation()
     const descriptor = t(aria, { scriptname: script.name })
     return <button
-        className="flex items-center space-x-2 border border-gray-800 rounded-full px-2 py-1 text-sm bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
+        className="flex items-center space-x-2 border border-gray-800 rounded-full px-2 py-1 scale:text-sm bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
         onClick={(event) => {
             event.preventDefault()
             event.stopPropagation()
@@ -255,7 +260,7 @@ const SharedScriptInfoButton = ({ script }: { script: Script }) => {
 
     return (
         <Popover className="">
-            <PopoverButton><i className="icon-info text-lg align-middle" /></PopoverButton>
+            <PopoverButton><i className="icon-info scale:text-lg align-middle" /></PopoverButton>
             <PopoverPanel anchor="bottom start" className="border border-black p-2 z-50 bg-white dark:bg-black">
                 {script && (<>
                     <SharedScriptInfoItem
@@ -294,17 +299,24 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
 
     const shared = script.creator || script.isShared
     const ariaLabel = type === "deleted" ? "" : t("scriptBrowser.openInEditor", { name: script.name })
+    const openScript = () => {
+        if (type === "regular" || type === "shared") {
+            dispatch(setActiveTabAndEditor(script.shareid))
+        }
+        if (highlight) {
+            dispatch(caiThunks.highlight({ zone: null }))
+        }
+    }
     return (
         <div
             className={`flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
-            onClick={() => {
-                if (type === "regular") {
-                    dispatch(setActiveTabAndEditor(script.shareid))
-                } else if (type === "shared") {
-                    dispatch(setActiveTabAndEditor(script.shareid))
-                }
-                if (highlight) {
-                    dispatch(caiThunks.highlight({ zone: null }))
+            data-test="scriptEntry"
+            tabIndex={type === "deleted" ? -1 : 0}
+            onClick={openScript}
+            onKeyDown={(e) => {
+                if (type !== "deleted" && (e.key === "Enter" || e.key === " ")) {
+                    e.preventDefault()
+                    openScript()
                 }
             }}
             title={ariaLabel}
@@ -312,10 +324,10 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
         >
             <div className={`h-auto border-l-4 ${tabIndicator}`} />
             <div
-                className="flex grow truncate px-2 text-sm"
+                className="flex grow truncate px-2 scale:text-sm"
             >
-                <div className="h-11 flex grow items-center truncate justify-between">
-                    <div className="flex justify-start items-center truncate font-medium space-x-2">
+                <div className="scale:h-11 flex grow items-center truncate justify-between">
+                    <div className="flex justify-start items-center truncate font-medium scale:space-x-2">
                         <div className="truncate">
                             {script.name}
                         </div>
@@ -423,7 +435,7 @@ export const ScriptBrowser = () => {
                 <CreateScriptButton />
             </div>
 
-            <div className="h-full flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Script}>
+            <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel">
                 <RegularScriptCollection />
                 <SharedScriptCollection />
                 <DeletedScriptCollection />

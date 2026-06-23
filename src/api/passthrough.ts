@@ -10,7 +10,7 @@ import { Clip, DAWData, SlicedClip, StretchedClip, Track } from "common"
 import * as audioLibrary from "../app/audiolibrary"
 import { blastConfetti } from "../app/Confetti"
 import * as postRun from "../app/postRun"
-import { getLineNumber } from "../app/runner"
+import { getSourceLines } from "../app/runner"
 import { TempoMap } from "../app/tempo"
 import * as analyzer from "../audio/analyzer"
 import audioContext from "../audio/context"
@@ -44,7 +44,7 @@ export function init() {
         finish: false,
         length: 0,
         tracks: [{
-            effects: { TEMPO: { TEMPO: [{ measure: 1, value: 120, shape: "square", sourceLine: 1 }] } },
+            effects: { TEMPO: { TEMPO: [{ measure: 1, value: 120, shape: "square", sourceLines: [1] }] } },
             clips: [],
         }],
         transformedClips: {},
@@ -1021,7 +1021,7 @@ export const addClip = (result: DAWData, clip: Clip, silence: number | undefined
         } as unknown as Track)
     }
 
-    clip.sourceLine = getLineNumber()
+    clip.sourceLines = getSourceLines()
     result.tracks[clip.track].clips.push(clip)
 }
 
@@ -1061,12 +1061,12 @@ export function addEffect(
         result.tracks[track].effects[name][parameter] = []
     }
 
-    const sourceLine = getLineNumber()
+    const sourceLines = getSourceLines()
     const automation = result.tracks[track].effects[name][parameter]
     if (endMeasure === 0) {
-        automation.push({ measure: startMeasure, value: startValue, shape: "square", sourceLine })
+        automation.push({ measure: startMeasure, value: startValue, shape: "square", sourceLines })
     } else {
-        automation.push({ measure: startMeasure, value: startValue, shape: "linear", sourceLine })
-        automation.push({ measure: endMeasure, value: endValue, shape: "square", sourceLine })
+        automation.push({ measure: startMeasure, value: startValue, shape: "linear", sourceLines })
+        automation.push({ measure: endMeasure, value: endValue, shape: "square", sourceLines })
     }
 }

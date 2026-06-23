@@ -16,16 +16,36 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
-import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
-import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
+import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines, jumpToLine } from "../ide/Editor"
+import { selectEditorCursorLine, selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
+import * as uiLogger from "../app/uiLogger"
+import reporter from "../app/reporter"
 
 export const callbacks = {
     runScript: () => {},
+    toggleMetronome: () => {},
+    toggleLoop: () => {},
+    toggleMute: () => {},
+    focusVolumeSlider: () => {},
+    reset: () => {},
 }
 
 // Width of track control box
 const X_OFFSET = 110
+
+function formatSourceLines(sourceLines: number[]): string {
+    return `Line: ${sourceLines[0] ?? 0}`
+}
+
+// Ctrl+I is a native browser shortcut in some browsers (e.g. Firefox's Page Info dialog),
+// so jump-to-editor handlers must prevent it before running their own action.
+function onCtrlI(e: React.KeyboardEvent, action: () => void) {
+    if (e.ctrlKey && e.key === "i") {
+        e.preventDefault()
+        action()
+    }
+}
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void }) => {
     const dispatch = useDispatch()
@@ -54,7 +74,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         setPlayPosition(1)
     }
 
-    const play = () => {
+    const play = (range?: { start: number, end: number }) => {
         if (bubble.active && bubble.currentPage === 4 && !bubble.readyToProceed) {
             dispatch(setReady(true))
         }
@@ -68,13 +88,16 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
         dispatch(daw.setPlaying(false))
 
-        if (playPosition >= playLength) {
+        if (range) {
+            player.startPreview()
+        } else if (playPosition >= playLength) {
             setPlayPosition(loop.selection ? loop.start : 1)
         }
 
         player.callbacks.onStartedCallback = playbackStartedCallback
         player.callbacks.onFinishedCallback = playbackEndedCallback
-        player.play(playPosition)
+        player.play(range?.start ?? playPosition, 0, range?.end ?? 0)
+        uiLogger.event("play", "daw", { preview: !!range })
 
         // player does not preserve volume state between plays
         player.setVolume(volumeMuted ? -60 : volume)
@@ -83,6 +106,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const pause = () => {
         player.pause()
         dispatch(daw.setPlaying(false))
+        uiLogger.event("pause", "daw")
     }
 
     const toggleMetronome = () => {
@@ -129,21 +153,31 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         }
     }
 
+    callbacks.toggleMetronome = toggleMetronome
+    callbacks.toggleLoop = toggleLoop
+    callbacks.toggleMute = () => mute(!volumeMuted)
+    callbacks.focusVolumeSlider = () =>
+        (document.getElementById("dawVolumeSlider") as HTMLInputElement | null)?.focus()
+    callbacks.reset = reset
+
     const [titleKey, setTitleKey] = useState<string | null>(null)
 
-    const usePlayPauseShortcut = (playing: boolean, play: () => void, pause: () => void, hasDAWData: boolean) => {
+    const usePlayPauseShortcut = (playing: boolean, play: (range?: { start: number, end: number }) => void, pause: () => void, hasDAWData: boolean) => {
         useEffect(() => {
             const handleKeyPress = (event: KeyboardEvent) => {
             // Ctrl (ctrlKey) and spacebar key press
                 if ((event.ctrlKey) && event.key === " " && hasDAWData) {
                     event.preventDefault()
 
-                    // Toggle between play and pause based on current state
+                    // Toggle between play and pause based on current state.
+                    // If a clip is currently focused, play just its (already-soloed) range.
                     if (playing) {
                         pause()
                     } else {
-                        play()
+                        play(focusedClipRange ?? undefined)
                     }
+                    uiLogger.shortcut("Ctrl+Space", "daw")
+                    reporter.keyboardShortcut("Ctrl+Space")
                 }
             }
             // Attach keydown event listener
@@ -199,7 +233,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             <a target="_blank" href={shareScriptLink} rel="noreferrer"> Click here to view in EarSketch </a>
         </div>}
         {/* Transport Buttons */}
-        <div className="daw-transport-container space-x-5">
+        <nav className="daw-transport-container space-x-5" aria-label={t("ariaDescriptors:daw.transportControls")}>
             {/* Beginning */}
             <span className="daw-transport-button">
                 <button aria-label={t("daw.tooltip.reset")} type="submit" className="dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.reset")} onClick={reset}>
@@ -207,22 +241,19 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                 </button>
             </span>
 
-            <span id="daw-play-button">
-                {/* Play */}
-                {/* Prevent embedded mode race condition by waiting for embeddedScriptName to populate before showing */}
-                {!playing && (!embedMode || (embedMode && embeddedScriptName)) && <span className="daw-transport-button">
-                    <button aria-label={t("daw.tooltip.play")} type="submit" className={"hover:opacity-70 text-green-600" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
-                        <span className="icon icon-play4"></span>
-                    </button>
-                </span>}
-
-                {/* Pause */}
-                {playing && <span className="daw-transport-button">
-                    <button aria-label={t("daw.tooltip.pause")} type="submit" className="dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); addUIClick("project - pause") }}>
-                        <span className="icon icon-pause2"></span>
-                    </button>
-                </span>}
-            </span>
+            {/* Play/Pause — single button so focus is retained when toggling via keyboard */}
+            {/* Prevent embedded mode race condition by waiting for embeddedScriptName to populate before showing */}
+            {(!embedMode || (embedMode && embeddedScriptName)) && <span id="daw-play-button" className="daw-transport-button">
+                <button
+                    aria-label={playing ? t("daw.tooltip.pause") : t("daw.tooltip.play")}
+                    type="button"
+                    className={playing ? "dark:text-white hover:opacity-70" : ("hover:opacity-70 text-green-600" + (needCompile ? " flashButton" : ""))}
+                    title={playing ? t("daw.tooltip.pause") : t("daw.tooltip.play")}
+                    onClick={() => { if (playing) { pause(); addUIClick("project - pause") } else { play(); addUIClick("project - play") } }}
+                >
+                    <span className={playing ? "icon icon-pause2" : "icon icon-play4"}></span>
+                </button>
+            </span>}
 
             {/* Loop */}
             <span className="daw-transport-button">
@@ -256,7 +287,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                     <input id="dawVolumeSlider" type="range" min={minVolume} max="0" value={volumeMuted ? minVolume : volume} onChange={e => changeVolume(+e.target.value)} title="Volume Control" aria-label="Volume Control"/>
                 </span>
             </span>
-        </div>
+        </nav>
     </div>
 }
 
@@ -339,6 +370,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
             <div className="dawTrackCtrl flex sticky left-0 border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50">
+                <h3 className="sr-only">{t("ariaDescriptors:daw.track", { label: track.label })}</h3>
                 <div className="dawTrackName text-gray-700 dark:text-gray-400 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <div className="justify-center items-center flex space-x-3 w-4/5">
@@ -347,7 +379,39 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 </div>}
             </div>
             <div className={trackClasses}>
-                {track.clips.map((clip: types.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
+                {(() => {
+                    // Group clips by primary source line to compute family extents, sizes,
+                    // and per-clip positions (for beat pattern aria descriptions).
+                    const familyRanges: Record<number, { start: number, end: number }> = {}
+                    const familyCounts: Record<number, number> = {}
+                    const familyHasLoopChildren: Record<number, boolean> = {}
+                    for (const c of track.clips) {
+                        const key = c.sourceLines[0]
+                        if (key === undefined) continue
+                        const cStart = c.measure
+                        const cEnd = c.measure + c.end - c.start
+                        familyCounts[key] = (familyCounts[key] ?? 0) + 1
+                        if (c.loopChild) familyHasLoopChildren[key] = true
+                        if (!familyRanges[key]) {
+                            familyRanges[key] = { start: cStart, end: cEnd }
+                        } else {
+                            familyRanges[key].start = Math.min(familyRanges[key].start, cStart)
+                            familyRanges[key].end = Math.max(familyRanges[key].end, cEnd)
+                        }
+                    }
+                    const familyIndexCounters: Record<number, number> = {}
+                    return track.clips.map((clip: types.Clip, index: number) => {
+                        const key = clip.sourceLines[0]
+                        familyIndexCounters[key] = (familyIndexCounters[key] ?? 0) + 1
+                        return <Clip
+                            key={index} color={color} clip={clip}
+                            familyRange={familyRanges[key]}
+                            familyIndex={familyIndexCounters[key]}
+                            familySize={familyCounts[key] ?? 1}
+                            familyHasLoopChildren={familyHasLoopChildren[key] ?? false}
+                        />
+                    })
+                })()}
             </div>
         </div>
         {showEffects &&
@@ -390,15 +454,50 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
+const Clip = ({ color, clip, familyRange, familyIndex, familySize, familyHasLoopChildren }: { color: daw.Color, clip: types.Clip, familyRange?: { start: number, end: number }, familyIndex: number, familySize: number, familyHasLoopChildren: boolean }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const editorCursorLine = useSelector(selectEditorCursorLine)
+    const tracks = useSelector(daw.selectTracks)
+    const soloMute = useSelector(daw.selectSoloMute)
+    const metronome = useSelector(daw.selectMetronome)
     const { t } = useTranslation()
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
-    const element = useRef<HTMLDivElement>(null)
+    const element = useRef<HTMLButtonElement>(null)
+    const focusedFromCtrlI = useRef(false)
+    const sourceLines = clip.sourceLines
+    const primaryLine = sourceLines[0]
+    const sourceHighlight = scriptMatchesDAW && editorCursorLine != null && sourceLines.includes(editorCursorLine)
+    const playStart = familyRange?.start ?? clip.measure
+    const playEnd = familyRange?.end ?? (clip.measure + clip.end - clip.start)
+
+    // Classify clip type for aria-label.
+    const singleClipEnd = clip.measure + clip.end - clip.start
+    const actuallyLoops = clip.loop && playEnd > singleClipEnd + 0.01
+    // makeBeat: loop=false. makeBeatSlice: loop=true but no loopChildren (unlike fitMedia expansion).
+    const isBeatPattern = !clip.loop || (!familyHasLoopChildren && familySize > 1)
+    const clipLengthMeasures = clip.end - clip.start
+    // Family-range clip type (used for Ctrl+I announcement).
+    // isBeatPattern checked first: makeBeatSlice has loop=true but is still a beat pattern.
+    let clipType: string
+    if (isBeatPattern) {
+        clipType = t("ariaDescriptors:daw.clipBeatPattern", { index: familyIndex, count: familySize })
+    } else if (actuallyLoops) {
+        clipType = t("ariaDescriptors:daw.clipLooping", { end: playEnd.toFixed(2) })
+    } else {
+        clipType = t("ariaDescriptors:daw.clipLength", { count: clipLengthMeasures })
+    }
+    // For Tab navigation, start/end already convey the range, so only call out beat patterns.
+    const clipTypeForTab = isBeatPattern
+        ? t("ariaDescriptors:daw.clipBeatPattern", { index: familyIndex, count: familySize })
+        : t("ariaDescriptors:daw.clip")
+    const sourceLineDesc = t("ariaDescriptors:daw.clipSourceLine", { line: primaryLine })
+    // Tab reads aria-label (individual clip range); Ctrl+I reads data-family-aria (full family range).
+    const clipAriaLabel = t("ariaDescriptors:daw.clipDescriptionTab", { track: clip.track, start: clip.measure.toFixed(2), end: singleClipEnd.toFixed(2), type: clipTypeForTab, filekey: clip.filekey })
+    const familyAriaLabel = t("ariaDescriptors:daw.clipDescription", { track: clip.track, start: playStart.toFixed(2), end: playEnd.toFixed(2), type: clipType, filekey: clip.filekey, callStack: sourceLineDesc })
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -407,17 +506,71 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         }
     }, [clip, xScale, trackHeight])
 
-    return <div
-        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
+    return <button
+        ref={element}
+        className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border${sourceHighlight ? " source-highlight" : ""}`}
+        data-source-line={primaryLine}
+        data-source-lines={sourceLines.join(",")}
+        data-track={clip.track}
+        data-family-aria={familyAriaLabel}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
-        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+        onMouseEnter={() => {
+            scriptMatchesDAW && setDAWHoverLine(color, sourceLines)
+        }} onMouseLeave={clearDAWHoverLine}
+        onMouseDown={(e: React.MouseEvent) => {
+            // A plain click should do nothing at all; only Option/Alt+click focuses the clip
+            // (for solo-isolation and Ctrl+Space preview scoping), same as Tab and Ctrl+I.
+            if (!e.altKey) e.preventDefault()
+        }}
+        onFocus={() => {
+            // Jumping here from the editor (Ctrl+I) isolates this clip's track (or, if this
+            // call site generated clips on several tracks, all of those tracks) so the
+            // listener can hear and see just what they jumped to.
+            if (savedSoloMute === null) savedSoloMute = soloMute
+            focusedFromCtrlI.current = daw.takePendingJumpToDAW()
+            const tracksToIsolate = daw.takePendingTrackIsolation()
+            const isolated: Record<number, daw.SoloMute> = {}
+            for (const t of tracksToIsolate ?? [clip.track]) isolated[t] = "solo"
+            store.dispatch(daw.setSoloMute(isolated))
+            player.setMutedTracks(daw.getMuted(tracks, isolated, metronome))
+            // Remember this clip's range so Ctrl+Space plays just this clip (or, if this focus
+            // came from a Ctrl+I jump, the full family range) instead of the whole arrangement.
+            focusedClipRange = {
+                start: focusedFromCtrlI.current ? playStart : clip.measure,
+                end: focusedFromCtrlI.current ? playEnd : singleClipEnd,
+            }
+        }}
+        onBlur={() => {
+            // Leaving the clip (Tab to another element, click elsewhere, Ctrl+I back to the
+            // editor) restores normal solo/mute so nothing stays isolated unattended. Only stop
+            // playback if this clip's own preview is what's playing — leave unrelated
+            // whole-arrangement playback alone.
+            focusedClipRange = null
+            if (player.isPreviewing()) {
+                player.pause()
+                store.dispatch(daw.setPlaying(false))
+                player.clearPreview()
+            }
+            const restored = savedSoloMute ?? soloMute
+            store.dispatch(daw.setSoloMute(restored))
+            player.setMutedTracks(daw.getMuted(tracks, restored, metronome))
+            savedSoloMute = null
+        }}
+        title={scriptMatchesDAW ? formatSourceLines(sourceLines) : t("daw.needsSync")}
+        aria-label={clipAriaLabel}
+        onKeyDown={(e: React.KeyboardEvent) => onCtrlI(e, () => {
+            // The subsequent onBlur (triggered by jumpToLine shifting focus to the editor)
+            // restores normal playback and visuals.
+            jumpToLine(primaryLine)
+            uiLogger.shortcut("Ctrl+I", "daw-clip")
+            reporter.keyboardShortcut("Ctrl+I")
+        })}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
         </div>
-    </div>
+    </button>
 }
 
 const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName }: {
@@ -427,6 +580,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
     const xScale = useSelector(daw.selectXScale)
     const effectHeight = useSelector(daw.selectEffectHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    // const editorCursorLine = useSelector(selectEditorCursorLine)
     const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
@@ -462,17 +616,34 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
         {effect !== "TEMPO" && showName && <div className="clipName">{effect}</div>}
         <svg className="effectSvg">
             <path></path>
-            {envelope.map((point, i) => <React.Fragment key={i}>
-                <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
-                <circle
-                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
-                    onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, point.sourceLine) }}
-                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
-                >
-                    {/* eslint-disable-next-line react/jsx-indent */}
-                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
-                </circle>
-            </React.Fragment>)}
+            {envelope.map((point, i) => {
+                const pointLines = point.sourceLines
+                // const sourceHighlight = scriptMatchesDAW && editorCursorLine != null && pointLines.includes(editorCursorLine)
+                return <React.Fragment key={i}>
+                    <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
+                    <circle
+                        cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
+                        tabIndex={0}
+                        aria-label={t("ariaDescriptors:daw.automationPoint", { effect, parameter, measure: point.measure.toFixed(2), value: point.value < 0 ? `negative ${Math.abs(point.value)}` : point.value, line: pointLines[0] })}
+                        data-source-line={pointLines[0]}
+                        data-source-lines={pointLines.join(",")}
+                        onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
+                        onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
+                        onFocus={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, pointLines) }}
+                        onBlur={() => { setFocusedPoint(null); clearDAWHoverLine() }}
+                        onKeyDown={(e: React.KeyboardEvent) => onCtrlI(e, () => {
+                            jumpToLine(pointLines[0])
+                            uiLogger.shortcut("Ctrl+I", "daw-automation")
+                            reporter.keyboardShortcut("Ctrl+I")
+                        })}
+                    >
+                        {/* eslint-disable-next-line react/jsx-indent */}
+                        <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? formatSourceLines(pointLines) : t("daw.needsSync")}</title>
+                    </circle>
+                    {/* TODO: re-enable once accessible styling is decided */}
+                    {/* {sourceHighlight && <circle cx={x(point.measure)} cy={y(point.value)} r={7} fill="none" stroke="rgb(255, 153, 0)" strokeWidth={3} pointerEvents="none" />} */}
+                </React.Fragment>
+            })}
         </svg>
     </div>
 }
@@ -493,6 +664,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
     const hideMixTrackLabel = trackWidth < 950
 
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
+        <h3 className="sr-only">{track.label}</h3>
         <div className="dawTrackContainer" style={{ height: mixTrackHeight + "px" }}>
             <div className="dawTrackCtrl border-gray-300 border-b" style={{ left: xScroll + "px" }}>
                 <div className="mixTrackFiller text-gray-700 dark:text-gray-400">{track.label}</div>
@@ -563,11 +735,41 @@ const SchedPlayhead = () => {
     return pendingPosition === null ? null : <div className="daw-sched-marker" style={{ left: xScale(pendingPosition) }}></div>
 }
 
-const Measureline = () => {
+const Measureline = ({ setCursorPosition }: { setCursorPosition: (pos: number) => void }) => {
+    const dispatch = useDispatch()
     const xScale = useSelector(daw.selectXScale)
     const intervals = useSelector(daw.selectMeasurelineZoomIntervals)
     const playLength = useSelector(daw.selectPlayLength)
+    const playing = useSelector(daw.selectPlaying)
     const element = useRef<HTMLDivElement>(null)
+    const [focusedMeasure, setFocusedMeasure] = useState(1)
+    const { t } = useTranslation()
+
+    const moveTo = (measure: number) => {
+        setFocusedMeasure(measure)
+        setCursorPosition(xScale(measure))
+    }
+
+    const handleSliderKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "ArrowRight") {
+            e.preventDefault()
+            moveTo(Math.min(focusedMeasure + 1, playLength))
+            uiLogger.shortcut("ArrowRight", "daw-measureline")
+            reporter.keyboardShortcut("daw-measureline: ArrowRight")
+        } else if (e.key === "ArrowLeft") {
+            e.preventDefault()
+            moveTo(Math.max(focusedMeasure - 1, 1))
+            uiLogger.shortcut("ArrowLeft", "daw-measureline")
+            reporter.keyboardShortcut("daw-measureline: ArrowLeft")
+        } else if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            player.setPosition(focusedMeasure)
+            _setPlayPosition?.(focusedMeasure)
+            dispatch(daw.setPendingPosition(playing ? focusedMeasure : null))
+            uiLogger.shortcut(e.key, "daw-measureline")
+            reporter.keyboardShortcut(`daw-measureline: ${e.key}`)
+        }
+    }
 
     useEffect(() => {
         let n = 1
@@ -636,11 +838,28 @@ const Measureline = () => {
         }
     })
 
-    return <div ref={element} id="daw-measureline" className="relative w-full" style={{ top: "-1px", minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
-        <svg className="axis">
-            <g></g>
-        </svg>
-    </div>
+    return <>
+        <h2 id="daw-measureline-heading" className="sr-only">{t("ariaDescriptors:daw.timeline")}</h2>
+        <div
+            ref={element}
+            id="daw-measureline"
+            role="slider"
+            aria-labelledby="daw-measureline-heading"
+            aria-label={t("ariaDescriptors:daw.measurelineLabel")}
+            aria-valuenow={focusedMeasure}
+            aria-valuemin={1}
+            aria-valuemax={playLength}
+            aria-valuetext={t("ariaDescriptors:daw.measureValueText", { measure: focusedMeasure, total: playLength })}
+            tabIndex={0}
+            className="relative w-full"
+            style={{ top: "-1px", minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}
+            onKeyDown={handleSliderKeyDown}
+        >
+            <svg className="axis">
+                <g></g>
+            </svg>
+        </div>
+    </>
 }
 
 const Timeline = () => {
@@ -719,6 +938,66 @@ const prepareWaveforms = (tracks: types.Track[], tempoMap: TempoMap) => {
 let lastTab: string | null = null
 // TODO: Temporary hack:
 let _setPlayPosition: ((a: number) => void) | null = null
+
+// Solo/mute state saved when Ctrl+I focus-isolates a clip's track, so it can be restored
+// when jumping back to the editor. null means no isolation is currently active.
+let savedSoloMute: Record<number, daw.SoloMute> | null = null
+
+// Start/end measures of the currently focused clip (Tab or Ctrl+I), so Ctrl+Space can play
+// just that clip's range instead of the whole arrangement. null means no clip is focused.
+let focusedClipRange: { start: number, end: number } | null = null
+
+// Scroll the DAW so that `element` is within the visible area of the track timeline.
+// Updates ghost bars (#daw-x-scroll, #daw-y-scroll) as the primary mechanism — the useEffect
+// reads them after every render to keep the container in sync. Also sets the container directly
+// as a timing guard for browsers that fire scroll events asynchronously (e.g. Safari).
+export function scrollDAWToElement(element: HTMLElement) {
+    const container = window.document.getElementById("daw-container") as HTMLDivElement | null
+    const xScroll = window.document.getElementById("daw-x-scroll") as HTMLDivElement | null
+    const yScroll = window.document.getElementById("daw-y-scroll") as HTMLDivElement | null
+    if (!container) return
+
+    // Horizontal: element.offsetLeft is relative to .daw-track (position: relative), which
+    // itself starts at X_OFFSET inside the scrollable content. So the clip's position within
+    // the visible timeline region is just element.offsetLeft (no X_OFFSET subtraction needed).
+    if (xScroll) {
+        const clipLeft = element.offsetLeft
+        const clipRight = clipLeft + element.offsetWidth
+        const viewLeft = container.scrollLeft
+        const viewRight = viewLeft + container.clientWidth - X_OFFSET
+        let newScrollLeft: number | null = null
+        if (clipLeft < viewLeft) {
+            newScrollLeft = Math.max(0, clipLeft)
+        } else if (clipRight > viewRight) {
+            newScrollLeft = clipRight - (container.clientWidth - X_OFFSET)
+        }
+        if (newScrollLeft !== null) {
+            container.scrollLeft = newScrollLeft
+            const frac = newScrollLeft / (container.scrollWidth - container.clientWidth)
+            xScroll.scrollLeft = frac * (xScroll.scrollWidth - xScroll.clientWidth)
+        }
+    }
+
+    // Vertical: use getBoundingClientRect to get viewport-relative positions so we don't need
+    // to know the clip's exact offsetTop chain. Account for the sticky Timeline+Measureline header.
+    if (yScroll) {
+        const elRect = element.getBoundingClientRect()
+        const cRect = container.getBoundingClientRect()
+        const stickyHeader = container.querySelector(".sticky") as HTMLElement | null
+        const stickyHeight = stickyHeader?.offsetHeight ?? 0
+        let newScrollTop: number | null = null
+        if (elRect.top < cRect.top + stickyHeight) {
+            newScrollTop = Math.max(0, container.scrollTop + elRect.top - cRect.top - stickyHeight)
+        } else if (elRect.bottom > cRect.bottom) {
+            newScrollTop = container.scrollTop + elRect.bottom - cRect.bottom
+        }
+        if (newScrollTop !== null) {
+            container.scrollTop = newScrollTop
+            const frac = newScrollTop / (container.scrollHeight - container.clientHeight)
+            yScroll.scrollTop = frac * (yScroll.scrollHeight - yScroll.clientHeight)
+        }
+    }
+}
 
 export function setDAWData(result: types.DAWData) {
     const { dispatch, getState } = store
@@ -953,8 +1232,12 @@ export const DAW = () => {
     const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === "+" || event.key === "=") {
             zoomX(1)
+            uiLogger.shortcut(event.key, "daw")
+            reporter.keyboardShortcut(`daw: ${event.key}`)
         } else if (event.key === "-") {
             zoomX(-1)
+            uiLogger.shortcut("-", "daw")
+            reporter.keyboardShortcut("daw: -")
         }
     }
 
@@ -1033,7 +1316,9 @@ export const DAW = () => {
                     const end = clip.measure + clip.end - clip.start
                     if (start <= position && position <= end) {
                         const color = trackColors[index % trackColors.length]
-                        active.push({ color, lineNumber: clip.sourceLine })
+                        if (clip.sourceLines[0] !== undefined) {
+                            active.push({ color, lineNumber: clip.sourceLines[0] })
+                        }
                     }
                 }
             }
@@ -1094,7 +1379,8 @@ export const DAW = () => {
         }
     }, [playing, xScale, autoScroll])
 
-    return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
+    return <section className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`} aria-label={t("daw.title")}>
+        <div id="daw-live-region" aria-live="polite" aria-atomic="true" className="sr-only"></div>
         {hideEditor &&
         <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
@@ -1115,7 +1401,7 @@ export const DAW = () => {
                     <div className="relative">
                         <div className="sticky top-0 z-10">
                             <Timeline />
-                            <Measureline />
+                            <Measureline setCursorPosition={setCursorPosition} />
                         </div>
 
                         <div className="daw-track-group-container" style={{ marginBottom: "14px" }}>
@@ -1155,7 +1441,7 @@ export const DAW = () => {
                     <button onMouseDown={zoomOutY} className="zoom-out leading-none" title={t("ariaDescriptors:daw.verticalZoomOut")} aria-label={t("ariaDescriptors:daw.verticalZoomOut")}><i className="icon-minus text-[10px]"></i></button>
                 </div>
 
-                <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
+                <div ref={yScrollEl} id="daw-y-scroll" className="absolute overflow-y-scroll z-20"
                     title={t("ariaDescriptors:daw.verticalScroll")}
                     style={{ width: "15px", top: "32px", right: "2px", bottom: "40px" }}
                     onScroll={e => {
@@ -1167,7 +1453,7 @@ export const DAW = () => {
                     <div style={{ width: "1px", height: `max(${totalTrackHeight}px, 100.5%)` }}></div>
                 </div>
 
-                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20"
+                <div ref={xScrollEl} id="daw-x-scroll" className="absolute overflow-x-scroll z-20"
                     title={t("ariaDescriptors:daw.horizontalScroll")}
                     style={{ height: "15px", left: X_OFFSET + "px", right: "45px", bottom: "2px" }}
                     onScroll={e => {
@@ -1181,5 +1467,5 @@ export const DAW = () => {
                 </div>
             </div>
         </div>}
-    </div>
+    </section>
 }

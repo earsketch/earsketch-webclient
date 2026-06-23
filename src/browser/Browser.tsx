@@ -1,8 +1,9 @@
-import React from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
+import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/react"
 
 import * as layout from "../ide/layoutState"
+import * as appState from "../app/appState"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { SoundBrowser } from "./Sounds"
@@ -23,7 +24,7 @@ export const TitleBar = () => {
             className="flex items-center p-2"
             style={{ minHeight: "fit-content" }} // Safari-specific issue
         >
-            <div className="pl-2 pr-4 font-semibold truncate">
+            <div className="text-base pl-2 pr-4 font-semibold truncate">
                 <h2>{t("contentManager.title").toLocaleUpperCase()}</h2>
             </div>
             <button
@@ -41,32 +42,27 @@ export const TitleBar = () => {
     )
 }
 
-const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabType, children: React.ReactNode }) => {
+const BrowserTabButton = ({ name, type, icon }: { name: string, type: BrowserTabType, icon: string }) => {
     const dispatch = useDispatch()
     const isSelected = useSelector(layout.selectWestKind) === type
     const highlight = useSelector(caiState.selectHighlight).zone === name.toLowerCase()
     const activeProject = useSelector(tabState.selectActiveTabID)
-
     const { t } = useTranslation()
 
     return (
-        <button
-            id={name}
-            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "text-amber border-amber border-b-4" : (highlight ? "border-yellow-400 border-4" : "border-b-4 border-transparent")} truncate`}
-            style={isSelected
-                ? {
-                    color: "#F5AE3C",
-                    borderColor: "#F5AE3C",
-                }
-                : {}}
+        <Tab
+            className={`px-1 py-2 w-1/3 cursor-pointer truncate ${
+                isSelected
+                    ? "text-amber border-amber border-b-4"
+                    : highlight
+                        ? "border-yellow-400 border-4"
+                        : "border-b-4 border-transparent"
+            }`}
+            style={isSelected ? { color: "#F5AE3C", borderColor: "#F5AE3C" } : {}}
             onClick={() => {
-                dispatch(layout.setWest({
-                    open: true,
-                    kind: type,
-                }))
                 if (!isSelected) { addUIClick(name + " tab") }
                 if (highlight) {
-                    if (type === 1) {
+                    if (type === BrowserTabType.Script) {
                         dispatch(caiThunks.highlight({ zone: "script", id: activeProject || undefined }))
                     } else {
                         dispatch(caiThunks.highlight({ zone: "apiSearchBar" }))
@@ -75,40 +71,12 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
             }}
             title={t("contentManager.openTab", { name })}
             aria-label={t("contentManager.openTab", { name })}
-            role="tab"
-            aria-selected={isSelected ? "true" : "false"}
-            aria-controls={"panel-" + type}
         >
-            <h3 className="text-sm truncate">
-                {children}
+            <h3 className="scale:text-sm truncate">
+                <i className={`${icon} pr-2`} />
                 {name}
             </h3>
-        </button>
-    )
-}
-
-export const BrowserTabs = () => {
-    const { t } = useTranslation()
-    return (
-        <div
-            className="flex justify-between text-center text-white bg-blue"
-            id="browser-tabs"
-            role="tablist"
-            aria-label="Content manager tabs"
-            style={{
-                minHeight: "fit-content", // Safari-specific issue
-            }}
-        >
-            <BrowserTab name={t("soundBrowser.title").toLocaleUpperCase()} type={BrowserTabType.Sound}>
-                <i className="icon-headphones pr-2" />
-            </BrowserTab>
-            <BrowserTab name={t("script", { count: 0 }).toLocaleUpperCase()} type={BrowserTabType.Script}>
-                <i className="icon-embed2 pr-2" />
-            </BrowserTab>
-            <BrowserTab name="API" type={BrowserTabType.API}>
-                <i className="icon-book pr-2" />
-            </BrowserTab>
-        </div>
+        </Tab>
     )
 }
 
@@ -116,15 +84,10 @@ export const Header = ({ title }: { title: string }) => (
     <div className="p-1 hidden">{title}</div>
 )
 
-// Keys are weirdly all caps because of the shared usage in the layout reducer as well as component's title-bar prop.
-const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
-    [BrowserTabType.Sound]: SoundBrowser,
-    [BrowserTabType.Script]: ScriptBrowser,
-    [BrowserTabType.API]: APIBrowser,
-}
-
 export const Browser = () => {
     const open = useSelector((state: RootState) => state.layout.west.open)
+    const scaledFontSize = useSelector(appState.selectScaledFontSize)
+    const dispatch = useDispatch()
     const { t } = useTranslation()
     let kind: BrowserTabType = useSelector(layout.selectWestKind)
 
@@ -135,19 +98,32 @@ export const Browser = () => {
     return (
         <div
             className="flex flex-col h-full w-full text-left font-sans bg-white text-black dark:bg-gray-900 dark:text-white"
+            style={{ fontSize: `${scaledFontSize}px` }}
             id="content-manager">
             {open
-                ? <div className="flex flex-col h-full">
+                ? <TabGroup
+                    as="div"
+                    className="flex flex-col h-full"
+                    selectedIndex={kind}
+                    onChange={(i) => dispatch(layout.setWest({ open: true, kind: i as BrowserTabType }))}
+                >
                     <TitleBar />
-                    <BrowserTabs />
-                    {Object.entries(BrowserComponents).map(([type, TabBody]) =>
-                        <div
-                            key={type}
-                            id={"panel-" + type}
-                            role="tabpanel"
-                            className={"flex flex-col grow min-h-0" + (+type === kind ? "" : " hidden")}
-                        ><TabBody /></div>)}
-                </div>
+                    <TabList
+                        className="flex justify-between text-center text-white bg-blue"
+                        id="browser-tabs"
+                        aria-label={t("ariaDescriptors:contentManager.tabs")}
+                        style={{ minHeight: "fit-content" }}
+                    >
+                        <BrowserTabButton name={t("soundBrowser.title").toLocaleUpperCase()} type={BrowserTabType.Sound} icon="icon-headphones" />
+                        <BrowserTabButton name={t("script", { count: 0 }).toLocaleUpperCase()} type={BrowserTabType.Script} icon="icon-embed2" />
+                        <BrowserTabButton name="API" type={BrowserTabType.API} icon="icon-book" />
+                    </TabList>
+                    <TabPanels className="flex flex-col grow min-h-0">
+                        <TabPanel unmount={false} id="panel-0" className={`flex flex-col grow min-h-0 ${kind !== BrowserTabType.Sound ? "hidden" : ""}`}><SoundBrowser /></TabPanel>
+                        <TabPanel unmount={false} id="panel-1" className={`flex flex-col grow min-h-0 ${kind !== BrowserTabType.Script ? "hidden" : ""}`}><ScriptBrowser /></TabPanel>
+                        <TabPanel unmount={false} id="panel-2" className={`flex flex-col grow min-h-0 ${kind !== BrowserTabType.API ? "hidden" : ""}`}><APIBrowser /></TabPanel>
+                    </TabPanels>
+                </TabGroup>
                 : <Collapsed title={t("contentManager.title").toLocaleUpperCase()} position="west" />}
         </div>
     )
