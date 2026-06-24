@@ -17,8 +17,8 @@ export interface AudioMeta {
     instrument?: string
     name: string
     path: string
-    public: 0 | 1
     tempo?: number
+    type: 0 | 1 | 2
     year?: number
 }
 
@@ -78,8 +78,8 @@ const standardLibraryDefault = (sounds: AudioMeta[] = []): AudioMeta[] => sounds
     folder: "EARSKETCH",
     name: `METRONOME0${i}`,
     path: `standard-library/EarSketch/METRONOME0${i}.flac`,
-    public: 0 as const,
     tempo: -1,
+    type: 2 as const,
 })))
 
 function fulfillJson(route: Route, body: unknown, status = 200) {
