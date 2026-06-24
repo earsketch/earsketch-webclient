@@ -741,12 +741,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                                 }}>
                                     <div className="relative">
                                         {/* Search input */}
-                                        <div className="flex items-center border-b dark:border-gray-600 px-4">
-                                            <i className="icon icon-search text-gray-400 mr-3 flex-shrink-0" />
+                                        <div className="flex items-center border-b dark:border-gray-600 scale:px-4">
+                                            <i className="icon icon-search text-gray-400 scale:mr-3 flex-shrink-0" />
                                             <Combobox.Input
                                                 ref={inputRef}
                                                 data-testid="command-palette-input"
-                                                className="h-12 w-full border-0 bg-transparent pl-0 pr-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:ring-0 outline-none"
+                                                className="scale:h-12 w-full border-0 bg-transparent scale:pl-0 scale:pr-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:ring-0 outline-none"
                                                 placeholder={t("commandPalette.placeholder")}
                                                 value={query}
                                                 onChange={e => setQuery(e.target.value)}
@@ -755,16 +755,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                                         </div>
 
                                         {/* Results */}
-                                        <Combobox.Options static className="max-h-96 scroll-py-2 overflow-y-auto py-2">
+                                        <Combobox.Options static className="max-h-96 scroll-py-2 overflow-y-auto scale:py-2">
                                             {Object.keys(groupedCommands).length === 0
                                                 ? (
-                                                    <div className="px-4 py-8 text-center scale:text-sm text-gray-500 dark:text-gray-400">
+                                                    <div className="scale:px-4 scale:py-8 text-center scale:text-sm text-gray-500 dark:text-gray-400">
                                                         {t("commandPalette.noResultsFor", { query: debouncedQuery })}
                                                     </div>
                                                 )
                                                 : Object.entries(groupedCommands).map(([category, items]) => (
-                                                    <div key={category} className="mb-2">
-                                                        <h3 className="px-4 py-1.5 scale:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                                                    <div key={category} className="scale:mb-2">
+                                                        <h3 className="scale:px-4 scale:py-1.5 scale:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                                                             {categoryLabel(category)}
                                                         </h3>
                                                         {items.map(item => (
@@ -772,11 +772,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                                                                 key={item.id}
                                                                 value={item}
                                                                 className={({ active }) =>
-                                                                    `cursor-pointer select-none px-4 py-2 flex items-center ${active ? "bg-blue-600 text-white" : "text-gray-900 dark:text-gray-100"}`}
+                                                                    `cursor-pointer select-none scale:px-4 scale:py-2 flex items-center ${active ? "bg-blue-600 text-white" : "text-gray-900 dark:text-gray-100"}`}
                                                             >
                                                                 {({ active }) => (
                                                                     <>
-                                                                        <span className="mr-3 scale:text-lg flex-shrink-0 w-[1em] text-center inline-block">
+                                                                        <span className="scale:mr-3 scale:text-lg flex-shrink-0 w-[1em] text-center inline-block">
                                                                             {item.icon && (
                                                                                 <i className={`${item.icon} ${active ? "text-white" : "text-gray-400"}`} />
                                                                             )}
