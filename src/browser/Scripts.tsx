@@ -314,7 +314,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
             tabIndex={type === "deleted" ? -1 : 0}
             onClick={openScript}
             onKeyDown={(e) => {
-                if (type !== "deleted" && (e.key === "Enter" || e.key === " ")) {
+                if (type !== "deleted" && (e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) {
                     e.preventDefault()
                     openScript()
                 }
