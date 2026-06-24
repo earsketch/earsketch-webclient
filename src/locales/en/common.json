@@ -514,6 +514,8 @@
     "scriptBrowser.share": "Share {{scriptname}}",
     "sounds.clearFilter": "Clear sound browser search and filters",
     "sounds.paste": "Paste {{name}} to the code editor",
+    "sounds.favoriteAdd": "Mark {{name}} as favorite",
+    "sounds.favoriteRemove": "Remove {{name}} from favorites",
     "sounds.preview.open": "Open Audition panel",
     "sounds.preview.close": "Close Audition panel",
     "sounds.preview": "Preview sound {{name}}",
