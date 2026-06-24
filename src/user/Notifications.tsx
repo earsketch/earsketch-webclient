@@ -1,14 +1,15 @@
-import React, { useEffect, useRef, useState } from "react"
-import { Popover } from "@headlessui/react"
+import React, { useRef, useState } from "react"
 import { useSelector } from "react-redux"
+import { Popover } from "@headlessui/react"
 
-import * as ESUtils from "../esutils"
-import * as userNotification from "./notification"
-import * as user from "./userState"
 import { useTranslation } from "react-i18next"
 import * as appState from "../app/appState"
-import * as request from "../request"
+import * as ESUtils from "../esutils"
+import { getAuth } from "../request"
 import broadcastIcon from "./broadcast.svg"
+import * as userNotification from "./notification"
+import { useNotificationLongPolling } from "./useNotificationLongPolling"
+import * as user from "./userState"
 
 interface Message {
     text: string
@@ -98,62 +99,6 @@ export const NotificationPopup = () => {
             }}>X</span>
         </div>
     </div>
-}
-
-/** Automatically fetch notifications every X minutes when logged in */
-const useNotificationLongPolling = () => {
-    const FETCH_INTERVAL_MS = 5 * 60 * 1000 // 5 minutes
-
-    const isLoggedIn = useSelector(user.selectLoggedIn)
-
-    useEffect(() => {
-        if (!isLoggedIn) return
-
-        const fetchNotifications = async () => {
-            try {
-                const result = await request.getAuth("/users/notifications")
-                if (Array.isArray(result)) {
-                    userNotification.loadHistory(result)
-                }
-            } catch (error) {
-                console.error("Error fetching notifications:", error)
-            }
-        }
-
-        let intervalId: number | null = null
-
-        const startPolling = () => {
-            if (intervalId != null) return
-            fetchNotifications()
-            intervalId = window.setInterval(fetchNotifications, FETCH_INTERVAL_MS)
-        }
-
-        const stopPolling = () => {
-            if (intervalId == null) return
-            window.clearInterval(intervalId)
-            intervalId = null
-        }
-
-        const onVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
-                console.log("Visibility change: Start notification polling", new Date().toLocaleTimeString())
-                startPolling()
-            } else {
-                console.log("Visibility change: Stop notification polling", new Date().toLocaleTimeString())
-                stopPolling()
-            }
-        }
-
-        // start based on initial visibility
-        onVisibilityChange()
-
-        document.addEventListener("visibilitychange", onVisibilityChange)
-
-        return () => {
-            stopPolling()
-            document.removeEventListener("visibilitychange", onVisibilityChange)
-        }
-    }, [isLoggedIn])
 }
 
 /** Small blue bullhorn indicator used for broadcast announcements. */
@@ -273,7 +218,7 @@ export const NotificationList = ({ openSharedScript, showHistory, close }: {
 
         // Fetch the latest notifications and immediately update the state
         try {
-            const result = await request.getAuth("/users/notifications")
+            const result = await getAuth("/users/notifications")
             if (result && Array.isArray(result)) {
                 userNotification.loadHistory(result)
             }
