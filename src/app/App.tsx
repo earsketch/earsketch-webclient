@@ -55,7 +55,7 @@ import { status as consoleStatus } from "../ide/console"
 import { playEarcon, SINE_BUMP } from "../audio/earcon"
 import { pushFocus, updateNewerFocus, stepBackward, stepForward, selectNewerFocus, selectAtNavOffset, FocusRecord } from "./focusHistoryState"
 import { ExtensionLoader } from "../extensions/ExtensionLoader"
-import { clearExtension } from "../extensions/extensionState"
+import { clearExtension, selectExtensionUrl } from "../extensions/extensionState"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -113,8 +113,12 @@ export function navigateTo(entry: PanelEntry) {
         })
     } else if ("elementSelector" in entry) {
         if (entry.panel === "west") entry.onBeforeFocus?.()
+        const isExtensionPaneActive = entry.panel === "east" &&
+            appState.selectEastContent(store.getState()) === "extension" &&
+            selectExtensionUrl(store.getState()) !== ""
+        const elementSelector = isExtensionPaneActive ? "#extensionTitleBar" : entry.elementSelector
         window.requestAnimationFrame(() => {
-            const el = document.querySelector(entry.elementSelector) as HTMLElement | null
+            const el = document.querySelector(elementSelector) as HTMLElement | null
             el?.focus()
         })
     }
