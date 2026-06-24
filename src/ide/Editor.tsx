@@ -344,9 +344,12 @@ export function createSession(id: string, language: Language, contents: string) 
                 ...keyBindings,
             ]),
             // NOTE: Avoid the default autocomplete trigger when ctrl+space is used in the code editor
+            // Also avoid basicSetup's foldKeymap stealing Ctrl-Alt-[/] from the global focus-history shortcut.
             Prec.highest(
                 keymap.of([
                     { key: "Ctrl-Space", run: () => { return true } },
+                    { key: "Ctrl-Alt-[", run: () => { return true } },
+                    { key: "Ctrl-Alt-]", run: () => { return true } },
                 ])
             ),
             EditorView.updateListener.of(update => {
