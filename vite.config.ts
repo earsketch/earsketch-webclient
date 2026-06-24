@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === "production") {
     buildType = process.env.ES_BUILD_TYPE ?? "production"
     UI_LOGGER_URL = process.env.ES_UI_LOGGER_URL ?? "builderror"
 } else {
-    apiHost = "https://api-dev.ersktch.gatech.edu"
+    apiHost = "https://api-dev-gw.ersktch.gatech.edu"
     const wsHost = apiHost.replace("http", "ws")
     URL_WEBSOCKET = `${wsHost}/EarSketchWS`
     const clientPath = process.env.path ? "/" + process.env.path : ""
