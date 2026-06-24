@@ -1,8 +1,7 @@
-import { afterAll, beforeAll, beforeEach, expect, it, vi } from "vitest"
+import { beforeEach, expect, it, vi } from "vitest"
 import { Provider } from "react-redux"
 import { render, waitFor } from "@testing-library/react"
 import d3 from "d3"
-import ResizeObserver from "resize-observer-polyfill"
 
 import "../../AudioContextMock/AudioContext.mock"
 import store from "../../../../src/reducers"
@@ -11,15 +10,20 @@ import { setTracks, setPlayLength } from "../../../../src/daw/dawState"
 import { setEditorCursorLine, setScriptMatchesDAW } from "../../../../src/ide/ideState"
 
 window.d3 = d3
-window.ResizeObserver = ResizeObserver
 
-// jsdom simulates requestAnimationFrame via a real setTimeout. If a rAF is
-// pending when the jsdom document is destroyed at suite teardown, it fires
-// against a null document and throws. Faking only rAF/cancelAnimationFrame
-// prevents that real setTimeout from ever being scheduled, while leaving
-// waitFor's setTimeout/setInterval untouched.
-beforeAll(() => { vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame"] }) })
-afterAll(() => { vi.useRealTimers() })
+// jsdom has no ResizeObserver. The real resize-observer-polyfill captures a
+// reference to the native requestAnimationFrame at import time and runs its
+// own internal setTimeout/rAF polling loop outside of Vitest's control, which
+// can fire after this file's jsdom environment is torn down (a flaky
+// "Cannot read properties of null (reading '_location')" crash, more likely
+// on slower/throttled CI). This test only asserts on clip CSS classes, not
+// the DAW's resize-driven title text, so a no-op stub is sufficient and
+// avoids scheduling any real timers.
+window.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+}
 
 vi.mock("react-i18next")
 vi.mock("../../../../src/app/audiolibrary")
