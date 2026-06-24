@@ -1071,6 +1071,28 @@
     },
 
     "makeBeatSlice1": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound. Slices default to sixteenth notes.",
+      "parameters": {
+        "sound": {
+          "description": "A single sound. Typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Track to place pattern onto"
+        },
+        "start": {
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+        }
+      },
+      "example": {
+        "python": "# Slice by default sixteenth notes\nsound = HIPHOP_DUSTYGROOVE_006\nmakeBeatSlice(sound, 1, 1, \"0122252289A2CCEC\")",
+        "javascript": "// Slice by default sixteenth notes\nvar sound = HIPHOP_DUSTYGROOVE_006;\nmakeBeatSlice(sound, 1, 1, \"0122252289A2CCEC\");"
+      }
+    },
+
+    "makeBeatSlice2": {
       "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
       "parameters": {
         "sound": {
@@ -1095,7 +1117,7 @@
       }
     },
 
-    "makeBeatSlice2": {
+    "makeBeatSlice3": {
       "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
       "parameters": {
         "sound": {
@@ -1120,6 +1142,19 @@
       "example": {
         "python": "# Slice and rearrange by eighth notes\nsound = HIPHOP_TRAPHOP_BEAT_002\neighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"01261264\"\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8)",
         "javascript": "// Slice and rearrange by eighth notes\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
+      }
+    },
+
+    "sliceEveryNth": {
+      "description": "Generates a list of slice start positions evenly spaced by note duration. For example, sliceEveryNth(16) returns positions spaced by sixteenth notes, and sliceEveryNth(8) returns positions spaced by eighth notes.",
+      "parameters": {
+        "n": {
+          "description": "The number of evenly spaced slices per measure. Use 16 for sixteenth notes, 8 for eighth notes, 4 for quarter notes."
+        }
+      },
+      "example": {
+        "python": "# Slice by eighth notes\nslices = sliceEveryNth(8)\nmakeBeatSlice(HIPHOP_DUSTYGROOVE_006, 1, 1, \"01261264\", slices)",
+        "javascript": "// Slice by eighth notes\nvar slices = sliceEveryNth(8);\nmakeBeatSlice(HIPHOP_DUSTYGROOVE_006, 1, 1, \"01261264\", slices);"
       }
     },
 
