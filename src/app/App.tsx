@@ -392,8 +392,8 @@ const KeyboardShortcuts = () => {
         zoomHorizontal: { keys: <><kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd></>, group: "daw" },
         zoomVertical: { keys: [modifier, "Shift", "Wheel"], group: "daw" },
         commandPalette: { keys: [modifier, "Shift", "P"], group: "navigation" },
-        jumpBackInFocus: { keys: ["Ctrl", "Shift", "["], group: "navigation" },
-        jumpForwardInFocus: { keys: ["Ctrl", "Shift", "]"], group: "navigation" },
+        jumpBackInFocus: { keys: ["Ctrl", "Alt", "["], group: "navigation" },
+        jumpForwardInFocus: { keys: ["Ctrl", "Alt", "]"], group: "navigation" },
         jumpToSounds: { keys: ["Ctrl", "Shift", "1"], group: "navigation" },
         jumpToScripts: { keys: ["Ctrl", "Shift", "2"], group: "navigation" },
         jumpToApi: { keys: ["Ctrl", "Shift", "3"], group: "navigation" },
@@ -627,7 +627,7 @@ const USER_STATE_KEY = "userstate"
 const userstate = window.localStorage.getItem(USER_STATE_KEY)
 const savedLoginInfo = userstate === null ? undefined : JSON.parse(userstate)
 
-// Prevents focus history from recording the programmatic focus caused by Ctrl+Shift+[/].
+// Prevents focus history from recording the programmatic focus caused by Ctrl+Alt+[/].
 let isNavigatingFocusHistory = false
 
 // WeakMap assigns a stable string key to every element that receives focus.
@@ -881,49 +881,49 @@ export const App = () => {
         return () => window.removeEventListener("focusin", handleFocusIn, true)
     }, [])
 
-    // Ctrl+Shift+[ = step backward through focus history; Ctrl+Shift+] = step forward.
+    // Ctrl+Alt+[ = step backward through focus history; Ctrl+Alt+] = step forward.
     useEffect(() => {
         const handleFocusNav = (e: KeyboardEvent) => {
-            if (!e.ctrlKey || !e.shiftKey || e.altKey || e.metaKey) return
+            if (!e.ctrlKey || !e.altKey || e.shiftKey || e.metaKey) return
             if (e.code !== "BracketLeft" && e.code !== "BracketRight") return
             e.preventDefault()
             const { count, navOffset } = store.getState().focusHistory
             if (count === 0) {
                 consoleStatus(i18n.t("focusHistory.empty"))
                 playEarcon(SINE_BUMP, 0.3)
-                uiLogger.event("keyboard_shortcut", `Ctrl+Shift+${e.code}`, { error: "empty" })
-                reporter.keyboardShortcut(`Ctrl+Shift+${e.code}`)
+                uiLogger.event("keyboard_shortcut", `Ctrl+Alt+${e.code}`, { error: "empty" })
+                reporter.keyboardShortcut(`Ctrl+Alt+${e.code}`)
                 return
             }
             if (e.code === "BracketLeft") {
                 if (navOffset >= count - 1) {
                     consoleStatus(i18n.t("focusHistory.startOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
-                    uiLogger.event("keyboard_shortcut", "Ctrl+Shift+[", { error: "startOfBuffer" })
-                    reporter.keyboardShortcut("Ctrl+Shift+[")
+                    uiLogger.event("keyboard_shortcut", "Ctrl+Alt+[", { error: "startOfBuffer" })
+                    reporter.keyboardShortcut("Ctrl+Alt+[")
                     return
                 }
                 store.dispatch(stepBackward())
                 const record = selectAtNavOffset(store.getState())
                 if (record) {
                     navigateToRecord(record)
-                    uiLogger.shortcut("Ctrl+Shift+[", record.panelId)
-                    reporter.keyboardShortcut("Ctrl+Shift+[")
+                    uiLogger.shortcut("Ctrl+Alt+[", record.panelId)
+                    reporter.keyboardShortcut("Ctrl+Alt+[")
                 }
             } else {
                 if (navOffset <= 0) {
                     consoleStatus(i18n.t("focusHistory.endOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
-                    uiLogger.event("keyboard_shortcut", "Ctrl+Shift+]", { error: "endOfBuffer" })
-                    reporter.keyboardShortcut("Ctrl+Shift+]")
+                    uiLogger.event("keyboard_shortcut", "Ctrl+Alt+]", { error: "endOfBuffer" })
+                    reporter.keyboardShortcut("Ctrl+Alt+]")
                     return
                 }
                 store.dispatch(stepForward())
                 const record = selectAtNavOffset(store.getState())
                 if (record) {
                     navigateToRecord(record)
-                    uiLogger.shortcut("Ctrl+Shift+]", record.panelId)
-                    reporter.keyboardShortcut("Ctrl+Shift+]")
+                    uiLogger.shortcut("Ctrl+Alt+]", record.panelId)
+                    reporter.keyboardShortcut("Ctrl+Alt+]")
                 }
             }
         }
