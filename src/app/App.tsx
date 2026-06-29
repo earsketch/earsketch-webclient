@@ -213,6 +213,42 @@ async function postLogin(username: string) {
     const saved = scriptsState.selectRegularScripts(state)
     const openTabs = tabs.selectOpenTabs(state)
 
+    // TEMPORARY: Debug information for login process
+    const loginDebug = ((window as any).__ES_LOGIN_DEBUG ??= {
+        postLoginCount: 0,
+        appInstanceID: Math.random().toString(36).slice(2),
+    })
+
+    const postLoginID = ++loginDebug.postLoginCount
+    const savedScripts = Object.values(saved)
+    const localScripts = savedScripts.filter(script => script.shareid.startsWith("local/"))
+    const serverScripts = savedScripts.filter(script => !script.shareid.startsWith("local/"))
+
+    console.group(`[login-debug] postLogin #${postLoginID}`)
+    console.log("appInstanceID", loginDebug.appInstanceID)
+    console.log("username", username)
+    console.log("saved snapshot count", savedScripts.length)
+    console.log("local scripts", localScripts.length)
+    console.log("server scripts", serverScripts.length)
+    savedScripts.map(script => (console.log({
+        shareid: script.shareid,
+        name: script.name,
+        local: script.shareid.startsWith("local/"),
+        soft_delete: script.soft_delete,
+        sourceLength: script.source_code?.length,
+    })))
+
+    if (serverScripts.length > 0) {
+        console.error("[login-debug] SERVER SCRIPTS PRESENT IN MIGRATION SNAPSHOT", serverScripts)
+    }
+
+    // eslint-disable-next-line no-debugger
+    debugger
+
+    console.groupEnd()
+
+    // END TEMPORARY: Debug information for login process
+
     // Fetch the user's scripts now that they're logged in.
     // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
     await refreshScriptBrowser()
