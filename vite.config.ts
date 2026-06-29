@@ -10,12 +10,16 @@ let apiHost
 let URL_WEBSOCKET
 let SITE_BASE_URI
 let baseURL
+let buildType
+let UI_LOGGER_URL
 const port = process.env.port ? +process.env.port : 8888
 if (process.env.NODE_ENV === "production") {
     apiHost = process.env.ES_API_HOST ?? "builderror"
     URL_WEBSOCKET = apiHost.replace("http", "ws") + "/EarSketchWS"
     SITE_BASE_URI = process.env.ES_BASE_URI ?? "https://earsketch.gatech.edu/earsketch2"
     baseURL = process.env.ES_BASE_URL ?? "/earsketch2/"
+    buildType = process.env.ES_BUILD_TYPE ?? "production"
+    UI_LOGGER_URL = process.env.ES_UI_LOGGER_URL ?? "builderror"
 } else {
     apiHost = "https://api-dev-gw.ersktch.gatech.edu"
     const wsHost = apiHost.replace("http", "ws")
@@ -23,8 +27,9 @@ if (process.env.NODE_ENV === "production") {
     const clientPath = process.env.path ? "/" + process.env.path : ""
     SITE_BASE_URI = `http://localhost:${port}${clientPath}`
     baseURL = process.env.ES_BASE_URL ?? "/"
+    buildType = process.env.ES_BUILD_TYPE ?? "test"
+    UI_LOGGER_URL = "https://l-test.ersktch.gatech.edu"
 }
-
 const nrConfig = process.env.ES_NEWRELIC_CONFIG ?? "dev"
 
 const isTest = !!process.env.VITEST
@@ -53,6 +58,7 @@ export default ({ mode }: { mode: string }) => {
                     autograder: path.resolve(__dirname, "autograder/index.html"),
                 },
             },
+            sourcemap: buildType === "review",
         },
         test: {
             projects: [
@@ -98,6 +104,7 @@ export default ({ mode }: { mode: string }) => {
             URL_DOMAIN: JSON.stringify(`${apiHost}/EarSketchWS`),
             URL_WEBSOCKET: JSON.stringify(URL_WEBSOCKET),
             SITE_BASE_URI: JSON.stringify(SITE_BASE_URI),
+            UI_LOGGER_URL: JSON.stringify(UI_LOGGER_URL),
             "import.meta.env.ES_NEWRELIC_CONFIG": JSON.stringify(nrConfig),
             ...env,
         },

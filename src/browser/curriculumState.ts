@@ -57,7 +57,9 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
         this.field("text")
 
         searchData.forEach((doc: SearchDoc) => {
-            this.add(doc)
+            // Boost core curriculum: pages under the /v2/ subdirectory
+            const isCore = doc.id.includes("/v2/")
+            this.add(isCore ? { ...doc, boost: 10 } : doc)
         }, this)
     })
 
@@ -250,7 +252,8 @@ interface CurriculumState {
     contentCache: any,
     tableOfContents: TOCItem[],
     pages: number[][],
-    searchDoc: SearchDoc[]
+    searchDoc: SearchDoc[],
+    focusPending: boolean
 }
 
 const curriculumSlice = createSlice({
@@ -265,6 +268,7 @@ const curriculumSlice = createSlice({
         tableOfContents: [],
         pages: [],
         searchDoc: [],
+        focusPending: false,
     } as CurriculumState,
     reducers: {
         setSearchText(state, { payload }) {
@@ -315,6 +319,9 @@ const curriculumSlice = createSlice({
         setContentCache(state, { payload }) {
             state.contentCache = payload
         },
+        setFocusPending(state, { payload }: { payload: boolean }) {
+            state.focusPending = payload
+        },
     },
     extraReducers: builder => {
         builder.addCase(fetchContent.fulfilled, (state: CurriculumState, action: { payload: any }) => {
@@ -340,6 +347,7 @@ export const {
     setFocus,
     toggleFocus,
     showResults,
+    setFocusPending,
 } = curriculumSlice.actions
 
 export const selectTableOfContents = (state: RootState) => state.curriculum.tableOfContents
@@ -360,6 +368,8 @@ export const selectShowTableOfContents = (state: RootState) => state.curriculum.
 
 export const selectFocus = (state: RootState) => state.curriculum.focus
 
+export const selectFocusPending = (state: RootState) => state.curriculum.focusPending
+
 export interface SearchDoc {
     title: string
     id: string
@@ -369,6 +379,7 @@ export interface SearchDoc {
 export interface SearchResult {
     id: lunr.Index.Result["ref"],
     title: string
+    text: string
 }
 
 export const open = createAsyncThunk<void, string, ThunkAPI>(
@@ -388,15 +399,15 @@ export const selectSearchResults = createSelector(
     (searchText, searchDoc): SearchResult[] => {
         if (!searchText || !idx) { return [] }
         try {
-            return idx.search(searchText).map((res) => {
+            return idx.search(searchText).flatMap((res) => {
                 // @ts-ignore: TODO: handle not-found cases.
-                const title = searchDoc.find((doc) => {
-                    return doc.id === res.ref
-                }).title
-                return {
+                const doc = searchDoc.find((doc) => doc.id === res.ref)
+                if (!doc) return []
+                return [{
                     id: res.ref,
-                    title,
-                }
+                    title: doc.title,
+                    text: doc.text,
+                }]
             })
         } catch (error) {
             // Not very concerning; searching for 'foo:', for example, causes a parse error.

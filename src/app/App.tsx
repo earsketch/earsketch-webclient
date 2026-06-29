@@ -1,5 +1,5 @@
 import i18n from "i18next"
-import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
+import { Dialog, DialogPanel, Menu, Popover, Transition } from "@headlessui/react"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
@@ -27,6 +27,7 @@ import { NotificationBar, NotificationMenu } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameSound } from "./Rename"
 import reporter from "./reporter"
+import * as uiLogger from "./uiLogger"
 import * as scriptsState from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as sounds from "../browser/Sounds"
@@ -40,12 +41,21 @@ import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
 import { Prompt, PromptChoice, confirm } from "../Utils"
+import { CommandPalette } from "./CommandPalette"
 
 import esLogo from "./ES_logo_extract.svg"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 import { downloadScript, shareScript } from "./scriptActions"
+import { BrowserTabType } from "../browser/BrowserTab"
+import * as editor from "../ide/Editor"
+import * as ide from "../ide/ideState"
+import { status as consoleStatus } from "../ide/console"
+import { playEarcon, SINE_BUMP } from "../audio/earcon"
+import { pushFocus, updateNewerFocus, stepBackward, stepForward, selectNewerFocus, selectAtNavOffset, FocusRecord } from "./focusHistoryState"
+import { ExtensionLoader } from "../extensions/ExtensionLoader"
+import { clearExtension } from "../extensions/extensionState"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -60,6 +70,55 @@ import { downloadScript, shareScript } from "./scriptActions"
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36, 40]
+
+type PanelEntry =
+    | { panel: "west"; kind: BrowserTabType; elementSelector: string; onBeforeFocus?: () => void }
+    | { panel: "daw"; elementSelector: string }
+    | { panel: "editor" }
+    | { panel: "east"; kind: "CURRICULUM"; elementSelector: string }
+    | { panel: "utilities"; elementSelector: string }
+    | { panel: "console" }
+
+export const PANEL_SHORTCUTS: Record<string, PanelEntry> = {
+    Digit1: { panel: "west", kind: BrowserTabType.Sound, elementSelector: "#soundSearchBar" },
+    Digit2: { panel: "west", kind: BrowserTabType.Script, elementSelector: "#scriptSearchBar" },
+    Digit3: { panel: "west", kind: BrowserTabType.API, elementSelector: "#apiSearchBar" },
+    Digit4: { panel: "daw", elementSelector: "#daw-play-button button" },
+    Digit5: { panel: "editor" },
+    Digit6: { panel: "east", kind: "CURRICULUM", elementSelector: "#curriculumSearchBar" },
+    Digit7: { panel: "utilities", elementSelector: "#utilityPanelAnchor" },
+    Digit8: {
+        panel: "west",
+        kind: BrowserTabType.Sound,
+        elementSelector: "#sound-preview-play-button",
+        onBeforeFocus: () => store.dispatch(appState.setShowSoundPreviewWidget(true)),
+    },
+    Digit9: { panel: "console" },
+}
+
+export function navigateTo(entry: PanelEntry) {
+    if (entry.panel === "west") {
+        store.dispatch(layout.setWest({ open: true, kind: entry.kind }))
+    } else if (entry.panel === "east") {
+        store.dispatch(layout.setEast({ open: true, kind: entry.kind }))
+    }
+
+    if (entry.panel === "editor") {
+        editor.focus()
+    } else if (entry.panel === "console") {
+        // The console <li>'s own onFocus handler announces "Focus shifted to Console".
+        window.requestAnimationFrame(() => {
+            const items = document.querySelectorAll<HTMLElement>("#console li")
+            items[items.length - 1]?.focus()
+        })
+    } else if ("elementSelector" in entry) {
+        if (entry.panel === "west") entry.onBeforeFocus?.()
+        window.requestAnimationFrame(() => {
+            const el = document.querySelector(entry.elementSelector) as HTMLElement | null
+            el?.focus()
+        })
+    }
+}
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
 
@@ -134,6 +193,7 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
 async function postLogin(username: string) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
+    uiLogger.init()
 
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
@@ -298,6 +358,10 @@ function reportError() {
     openModal(ErrorForm, { email })
 }
 
+function loadExtension() {
+    openModal(ExtensionLoader)
+}
+
 function forgotPass() {
     openModal(ForgotPassword)
 }
@@ -309,37 +373,77 @@ const KeyboardShortcuts = () => {
 
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
 
-    const shortcuts = {
-        run: [modifier, "Enter"],
-        save: [modifier, "S"],
-        undo: [modifier, "Z"],
-        redo: [modifier, "Shift", "Z"],
-        comment: [modifier, "/"],
-        playPause: ["Ctrl", "Space"],
-        zoomHorizontal: <>
-            <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
-        </>,
-        zoomVertical: [modifier, "Shift", "Wheel"],
-        escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
+    const renderKeys = (keys: string[] | React.ReactNode) =>
+        Array.isArray(keys)
+            ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
+            : keys
+
+    const shortcuts: Record<string, { keys: string[] | React.ReactNode; group: string }> = {
+        run: { keys: [modifier, "Enter"], group: "editor" },
+        save: { keys: [modifier, "S"], group: "editor" },
+        undo: { keys: [modifier, "Z"], group: "editor" },
+        redo: { keys: [modifier, "Shift", "Z"], group: "editor" },
+        comment: { keys: [modifier, "/"], group: "editor" },
+        findReplace: { keys: [modifier, "G"], group: "editor" },
+        goToLine: { keys: [modifier, "Alt", "G"], group: "editor" },
+        escapeEditor: { keys: <><kbd>{localize("Esc")}</kbd> then <kbd>{localize("Tab")}</kbd></>, group: "editor" },
+        playPause: { keys: ["Ctrl", "Space"], group: "daw" },
+        jumpToCodeDaw: { keys: ["Ctrl", "I"], group: "daw" },
+        zoomHorizontal: { keys: <><kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd></>, group: "daw" },
+        zoomVertical: { keys: [modifier, "Shift", "Wheel"], group: "daw" },
+        commandPalette: { keys: [modifier, "Shift", "P"], group: "navigation" },
+        jumpBackInFocus: { keys: ["Ctrl", "Alt", "["], group: "navigation" },
+        jumpForwardInFocus: { keys: ["Ctrl", "Alt", "]"], group: "navigation" },
+        jumpToSounds: { keys: ["Ctrl", "Shift", "1"], group: "navigation" },
+        jumpToScripts: { keys: ["Ctrl", "Shift", "2"], group: "navigation" },
+        jumpToApi: { keys: ["Ctrl", "Shift", "3"], group: "navigation" },
+        jumpToDaw: { keys: ["Ctrl", "Shift", "4"], group: "navigation" },
+        jumpToEditor: { keys: ["Ctrl", "Shift", "5"], group: "navigation" },
+        jumpToCurriculum: { keys: ["Ctrl", "Shift", "6"], group: "navigation" },
+        jumpToUtility: { keys: ["Ctrl", "Shift", "7"], group: "navigation" },
+        jumpToSoundPreview: { keys: ["Ctrl", "Shift", "8"], group: "navigation" },
+        jumpToConsole: { keys: ["Ctrl", "Shift", "9"], group: "navigation" },
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
+        <Popover.Button id="utilityPanelAnchor" className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-1/2 w-max">
-            <table>
-                <tbody>
-                    {Object.entries(shortcuts).map(([action, keys], index, arr) =>
-                        <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
-                            <td className="text-sm p-2">{t(`shortcuts.${action}`)}</td>
-                            <td>{Array.isArray(keys)
-                                ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
-                                : keys}
-                            </td>
-                        </tr>)}
-                </tbody>
-            </table>
+        <Popover.Panel className="absolute z-10 mt-1 -translate-x-1/2 w-max">
+            <div tabIndex={0} className="bg-gray-100 shadow-lg max-h-[70vh] overflow-y-auto p-2">
+                <table>
+                    <thead className="sr-only">
+                        <tr>
+                            <th scope="col">{t("shortcuts.action")}</th>
+                            <th scope="col">{t("shortcuts.keys")}</th>
+                        </tr>
+                    </thead>
+                    {Object.entries(shortcuts).reduce<{ group: string; entries: [string, typeof shortcuts[string]][] }[]>(
+                        (acc, entry) => {
+                            const last = acc[acc.length - 1]
+                            if (last?.group === entry[1].group) last.entries.push(entry)
+                            else acc.push({ group: entry[1].group, entries: [entry] })
+                            return acc
+                        }, []
+                    ).map(({ group, entries }) => (
+                        <tbody key={group}>
+                            <tr>
+                                <th role="presentation" scope="rowgroup" colSpan={2} className="px-2 pt-3 pb-0.5 text-left">
+                                    <h2 className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                                        {t(`shortcuts.group.${group}`)}
+                                    </h2>
+                                </th>
+                            </tr>
+                            {entries.map(([action, { keys }], index, arr) => (
+                                <tr key={action} className={index < arr.length - 1 ? "border-b border-gray-200" : ""}>
+                                    <th scope="row" className="text-sm p-2 text-left font-normal pl-4">{t(`shortcuts.${action}`)}</th>
+                                    <td className="p-2">{renderKeys(keys)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    ))}
+                </table>
+            </div>
         </Popover.Panel>
     </Popover>
 }
@@ -395,6 +499,7 @@ const MiscActionMenu = () => {
     const actions = [
         { nameKey: "startQuickTour", action: resumeQuickTour },
         { nameKey: "reportError", action: reportError },
+        { nameKey: "extensions", action: loadExtension },
     ]
 
     const links = [
@@ -522,6 +627,80 @@ const USER_STATE_KEY = "userstate"
 const userstate = window.localStorage.getItem(USER_STATE_KEY)
 const savedLoginInfo = userstate === null ? undefined : JSON.parse(userstate)
 
+// Prevents focus history from recording the programmatic focus caused by Ctrl+Alt+[/].
+let isNavigatingFocusHistory = false
+
+// WeakMap assigns a stable string key to every element that receives focus.
+// The key is stored in Redux; the actual element reference lives here so it can be GC'd.
+const elementKeys = new WeakMap<Element, string>()
+const keyedElements = new Map<string, WeakRef<Element>>()
+let focusKeyCounter = 0
+
+function getOrCreateKey(el: Element): string {
+    if (!elementKeys.has(el)) {
+        const key = `fh-${focusKeyCounter++}`
+        elementKeys.set(el, key)
+        keyedElements.set(key, new WeakRef(el))
+    }
+    return elementKeys.get(el)!
+}
+
+// Walk up the DOM to find the nearest meaningful panel boundary.
+// Tries progressively broader containers so that e.g. the filter section
+// and the sound list resolve to different panelIds even though they share
+// a common browser ancestor.
+// data-focus-panel is checked first so a component can declare a stable panel
+// boundary that takes priority over any [id] on descendant elements.
+function getPanelId(element: Element): string {
+    const panelBoundary = element.closest("[data-focus-panel]")
+    if (panelBoundary) return panelBoundary.getAttribute("data-focus-panel")!
+    const candidates = element.closest([
+        ".cm-editor",
+        "[role='tabpanel']",
+        "[role='region']",
+        "section",
+        "nav",
+        "header",
+        "aside",
+        "main",
+        "[role='navigation']",
+        "[role='list']",
+        "[role='grid']",
+        "[id]",
+    ].join(","))
+    if (!candidates) return "root"
+    return (
+        candidates.id ||
+        candidates.getAttribute("aria-label") ||
+        candidates.getAttribute("aria-labelledby") ||
+        candidates.getAttribute("role") ||
+        candidates.tagName
+    )
+}
+
+function getFocusRecord(element: Element): FocusRecord {
+    const el = element as HTMLElement
+    if (element.closest(".cm-editor")) {
+        const line = editor.getEditorLine()
+        return { type: "editor", line, label: `Line ${line}`, panelId: "editor" }
+    }
+    const panelId = getPanelId(element)
+    const key = getOrCreateKey(el)
+    const label = (el.getAttribute("aria-label") || el.title || el.textContent?.trim() || el.tagName).slice(0, 60)
+    return { type: "element", key, label, panelId }
+}
+
+function navigateToRecord(record: FocusRecord) {
+    isNavigatingFocusHistory = true
+    if (record.type === "editor") {
+        editor.jumpToLine(record.line)
+    } else {
+        const el = keyedElements.get(record.key)?.deref() as HTMLElement | undefined
+        el?.focus()
+    }
+    window.setTimeout(() => { isNavigatingFocusHistory = false }, 100)
+}
+
 export const App = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
@@ -540,6 +719,10 @@ export const App = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
+    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+
+    const openCommandPalette = () => setIsCommandPaletteOpen(true)
+    const closeCommandPalette = () => setIsCommandPaletteOpen(false)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
@@ -553,6 +736,21 @@ export const App = () => {
         dispatch(appState.setLocaleCode(lng))
         dispatch(curriculum.fetchLocale({ }))
     }
+
+    // Command Palette keyboard shortcut
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "p") {
+                event.preventDefault()
+                openCommandPalette()
+                uiLogger.shortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+Shift+P`)
+                reporter.keyboardShortcut(`${event.metaKey ? "Cmd" : "Ctrl"}+Shift+P`)
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [])
 
     useEffect(() => {
         (async () => {
@@ -617,6 +815,121 @@ export const App = () => {
             changeLanguage(ENGLISH_LOCALE.localeCode)
         }
     }, [currentLocale])
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) {
+                const entry = PANEL_SHORTCUTS[e.code]
+                if (entry) {
+                    e.preventDefault()
+                    if (entry.panel === "editor" && tabs.selectOpenTabs(store.getState()).length === 0) {
+                        store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("editor.noScriptsLoaded") }))
+                        return
+                    }
+                    if ("elementSelector" in entry && entry.elementSelector === "#sound-preview-play-button" &&
+                        soundsState.selectFilteredRegularNames(store.getState()).length === 0) {
+                        store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("soundBrowser.noResultsToPreview") }))
+                        return
+                    }
+                    navigateTo(entry)
+                    uiLogger.shortcut(`Ctrl+Shift+${e.code}`, entry.panel)
+                    reporter.keyboardShortcut(`Ctrl+Shift+${e.code}`)
+                }
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [])
+
+    // Track focus history: record every meaningful focus change into the ring buffer.
+    useEffect(() => {
+        const handleFocusIn = (e: FocusEvent) => {
+            const el = e.target as Element | null
+            if (!el || el === document.body) return
+            const record = getFocusRecord(el)
+            uiLogger.event("focus", record.label, {
+                type: record.type,
+                panelId: record.panelId,
+                ...(record.type === "editor" ? { line: record.line } : { key: record.key }),
+            })
+            if (isNavigatingFocusHistory) return
+            let newer = selectNewerFocus(store.getState())
+            // Cursor movement within the editor doesn't re-trigger focusin, so a stale
+            // "editor" entry's line can lag behind the actual cursor position. Refresh
+            // it before it gets demoted to "older" by a focus change to another panel.
+            if (newer?.type === "editor" && newer.panelId !== record.panelId) {
+                const line = editor.getEditorLine()
+                newer = { ...newer, line, label: `Line ${line}` }
+                store.dispatch(updateNewerFocus(newer))
+            }
+            // Skip exact duplicate.
+            if (newer && newer.type === record.type && (
+                (newer.type === "editor" && record.type === "editor" && newer.line === record.line) ||
+                (newer.type === "element" && record.type === "element" && newer.key === record.key)
+            )) return
+            if (newer && newer.panelId === record.panelId) {
+                // Same panel: update the newer slot in place so the ring doesn't fill
+                // up with every item scrolled through inside one panel.
+                store.dispatch(updateNewerFocus(record))
+            } else {
+                // Different panel: push and advance the ring.
+                store.dispatch(pushFocus(record))
+            }
+        }
+        window.addEventListener("focusin", handleFocusIn, true)
+        return () => window.removeEventListener("focusin", handleFocusIn, true)
+    }, [])
+
+    // Ctrl+Alt+[ = step backward through focus history; Ctrl+Alt+] = step forward.
+    useEffect(() => {
+        const handleFocusNav = (e: KeyboardEvent) => {
+            if (!e.ctrlKey || !e.altKey || e.shiftKey || e.metaKey) return
+            if (e.code !== "BracketLeft" && e.code !== "BracketRight") return
+            e.preventDefault()
+            const { count, navOffset } = store.getState().focusHistory
+            if (count === 0) {
+                consoleStatus(i18n.t("focusHistory.empty"))
+                playEarcon(SINE_BUMP, 0.3)
+                uiLogger.event("keyboard_shortcut", `Ctrl+Alt+${e.code}`, { error: "empty" })
+                reporter.keyboardShortcut(`Ctrl+Alt+${e.code}`)
+                return
+            }
+            if (e.code === "BracketLeft") {
+                if (navOffset >= count - 1) {
+                    consoleStatus(i18n.t("focusHistory.startOfBuffer"))
+                    playEarcon(SINE_BUMP, 0.3)
+                    uiLogger.event("keyboard_shortcut", "Ctrl+Alt+[", { error: "startOfBuffer" })
+                    reporter.keyboardShortcut("Ctrl+Alt+[")
+                    return
+                }
+                store.dispatch(stepBackward())
+                const record = selectAtNavOffset(store.getState())
+                if (record) {
+                    navigateToRecord(record)
+                    uiLogger.shortcut("Ctrl+Alt+[", record.panelId)
+                    reporter.keyboardShortcut("Ctrl+Alt+[")
+                }
+            } else {
+                if (navOffset <= 0) {
+                    consoleStatus(i18n.t("focusHistory.endOfBuffer"))
+                    playEarcon(SINE_BUMP, 0.3)
+                    uiLogger.event("keyboard_shortcut", "Ctrl+Alt+]", { error: "endOfBuffer" })
+                    reporter.keyboardShortcut("Ctrl+Alt+]")
+                    return
+                }
+                store.dispatch(stepForward())
+                const record = selectAtNavOffset(store.getState())
+                if (record) {
+                    navigateToRecord(record)
+                    uiLogger.shortcut("Ctrl+Alt+]", record.panelId)
+                    reporter.keyboardShortcut("Ctrl+Alt+]")
+                }
+            }
+        }
+        window.addEventListener("keydown", handleFocusNav)
+        return () => window.removeEventListener("keydown", handleFocusNav)
+    }, [])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
         if (loginInProgressRef.current) {
@@ -712,6 +1025,7 @@ export const App = () => {
         }
         userNotification.clearHistory()
         reporter.logout()
+        uiLogger.destroy()
 
         if (keepUnsavedTabs) {
             // Close unmodified tabs/scripts.
@@ -738,6 +1052,8 @@ export const App = () => {
         dispatch(soundsState.resetUserSounds())
         dispatch(soundsState.resetFavorites())
         dispatch(soundsState.resetAllFilters())
+        dispatch(clearExtension())
+        dispatch(appState.setEastContent("curriculum"))
 
         // Clear out all the values set at login.
         setUsername("")
@@ -768,6 +1084,29 @@ export const App = () => {
             }
         }
     }
+
+    useEffect(() => {
+        const handleCopy = () => {
+            const content = window.getSelection()?.toString() ?? ""
+            uiLogger.event("copy", getPanelId(document.activeElement ?? document.body), { content: content.slice(0, 500) })
+        }
+        const handleCut = () => {
+            const content = window.getSelection()?.toString() ?? ""
+            uiLogger.event("cut", getPanelId(document.activeElement ?? document.body), { content: content.slice(0, 500) })
+        }
+        const handlePaste = (e: ClipboardEvent) => {
+            const content = e.clipboardData?.getData("text") ?? ""
+            uiLogger.event("paste", getPanelId(document.activeElement ?? document.body), { content: content.slice(0, 500) })
+        }
+        document.addEventListener("copy", handleCopy)
+        document.addEventListener("cut", handleCut)
+        document.addEventListener("paste", handlePaste)
+        return () => {
+            document.removeEventListener("copy", handleCopy)
+            document.removeEventListener("cut", handleCut)
+            document.removeEventListener("paste", handlePaste)
+        }
+    }, [])
 
     return <>
         <nav role="navigation">
@@ -809,7 +1148,7 @@ export const App = () => {
                             </i>
                         </button>}
 
-                    {ES_WEB_SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
+                    <LocaleSelector handleSelection={changeLanguage}/>
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />
@@ -821,6 +1160,8 @@ export const App = () => {
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
         </div>
         <Bubble />
+        {/* Always mounted so Headless UI's Dialog never fires focus restoration on close */}
+        <CommandPalette isOpen={isCommandPaletteOpen} onClose={closeCommandPalette} email={email} />
         <ModalContainer />
     </>
 }
@@ -875,9 +1216,9 @@ export const ModalContainer = () => {
                     leaveFrom="opacity-100 scale-100"
                     leaveTo="opacity-0 scale-95"
                 >
-                    <div className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
+                    <DialogPanel className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
                         {Modal && <Modal close={close} />}
-                    </div>
+                    </DialogPanel>
                 </Transition.Child>
             </div>
         </Dialog>

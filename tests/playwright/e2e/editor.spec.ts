@@ -2,6 +2,12 @@ import { test, expect } from "@playwright/test"
 import { setupBackend, TEST_USER, type Script } from "../helpers/mocks"
 import { skipTour, login, waitForHeadlessDialog } from "../helpers/actions"
 
+const TEST_SOUND_META_1 = {
+    folder: "STUB FOLDER",
+    name: "OS_CLAP00",
+    public: 1 as const,
+    path: "standard-library/filename/placeholder/here.wav",
+}
 const TEST_SOUND_META = {
     folder: "STUB FOLDER",
     name: "OS_CLAP01",
@@ -14,7 +20,7 @@ test.describe("Editor", () => {
 
     test.beforeEach(async ({ page }) => {
         await setupBackend(page, {
-            standardAudio: [TEST_SOUND_META],
+            standardAudio: [TEST_SOUND_META_1, TEST_SOUND_META],
             standardAudioMeta: TEST_SOUND_META,
             interceptAudioSample: true,
         })
@@ -31,7 +37,7 @@ test.describe("Editor", () => {
 
     test("runs the template script", async ({ page }) => {
         await page.locator("button", { hasText: "RUN" }).click()
-        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator("#console-frame", { hasText: "Script ran successfully" })).toBeVisible()
         await expect(page.locator("#console", { hasText: "Script ran successfully" })).toBeVisible()
     })
 
@@ -43,7 +49,7 @@ test.describe("Editor", () => {
         await editor.pressSequentially(`\nprint("${message}")`)
         await page.locator("button", { hasText: "RUN" }).click()
         await expect(page.locator("#console-frame", { hasText: message })).toBeVisible()
-        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator("#console-frame", { hasText: "Script ran successfully" })).toBeVisible()
     })
 
     test("surfaces an error for a bad script", async ({ page }) => {
@@ -130,7 +136,7 @@ print(5 % 2)
         await page.keyboard.press("Delete")
         await editor.pressSequentially("\nfitMedia(OS_CLAP01, 1, 1, 2);\n")
         await page.locator("button", { hasText: "RUN" }).click()
-        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator("#console-frame", { hasText: "Script ran successfully" })).toBeVisible()
     })
 
     test("calls fetch exactly once per sound", async ({ page }) => {
@@ -153,7 +159,7 @@ from earsketch import *
 makeBeat(OS_CLAP01, 1, 1, "0000", 4)
 `)
         await page.locator("button", { hasText: "RUN" }).click()
-        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator("#console-frame", { hasText: "Script ran successfully" })).toBeVisible()
 
         // Expect 3 sample fetches: METRONOME01, METRONOME02, OS_CLAP01
         expect(counter.count("audio_sample")).toBe(3)
@@ -211,8 +217,8 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         // Both anonymous scripts get saved on login
         await expect.poll(() => counter.count("scripts_save"), { timeout: 10000 }).toBeGreaterThanOrEqual(2)
 
-        await page.locator("#coder").locator(`button[title="${anonymousScriptName}.py"]`).click()
-        await page.locator("#coder").locator(`button[title="${anonymousScriptName2}.py"]`).click()
+        await page.locator("#coder").locator(`div[title="${anonymousScriptName}.py"]`).click()
+        await page.locator("#coder").locator(`div[title="${anonymousScriptName2}.py"]`).click()
         await page.locator(`[title="Open ${scriptName} in Code Editor"]`).click()
         await page.locator("#coder").locator(`[title="${scriptName}"]`).click()
 
@@ -223,12 +229,11 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
 
         // Modified-script indicator
         await expect(
-            page.locator("button").filter({ hasText: scriptName }).locator("..")
-        ).toHaveClass(/text-red-500/)
+            page.getByRole("tab").filter({ hasText: scriptName })).toHaveClass(/text-red-500/)
 
         await page.locator("button", { hasText: "RUN" }).click()
         await expect(page.locator("#console-frame", { hasText: message })).toBeVisible()
-        await expect(page.locator('#console-frame', { hasText: "Script ran successfully" })).toBeVisible()
+        await expect(page.locator("#console-frame", { hasText: "Script ran successfully" })).toBeVisible()
 
         // Save via keyboard shortcut
         const message2 = "another message"
@@ -236,8 +241,7 @@ makeBeat(OS_CLAP01, 1, 1, "0000", 4)
         await page.keyboard.press("End")
         await editor.pressSequentially(`\nprint("${message2}")`)
         await expect(
-            page.locator("button").filter({ hasText: scriptName }).locator("..")
-        ).toHaveClass(/text-red-500/)
+            page.getByRole("tab").filter({ hasText: scriptName })).toHaveClass(/text-red-500/)
         await page.keyboard.press("ControlOrMeta+s")
 
         await expect(page.locator("#console-frame")).not.toContainText(message2)

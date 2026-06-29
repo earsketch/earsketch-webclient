@@ -1,8 +1,10 @@
-import React, { useRef, useEffect, ChangeEvent, useState, useMemo, useCallback } from "react"
+import React, { useRef, useEffect, useContext, ChangeEvent, useState, useMemo, useCallback } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
 import classNames from "classnames"
+import store from "../reducers"
+import { recommend } from "../app/recommender"
 
 import { addUIClick } from "../cai/dialogue/student"
 import * as sounds from "./soundsState"
@@ -14,10 +16,25 @@ import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
-import { BrowserTabType } from "./BrowserTab"
 import * as Tooltip from "@radix-ui/react-tooltip"
 
 import { SearchBar } from "./Utils"
+import * as uiLogger from "../app/uiLogger"
+import reporter from "../app/reporter"
+import { Waveform } from "../app/Recorder"
+import * as audioLibrary from "../app/audiolibrary"
+
+const TABBABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+// Focus the next (or previous, if reverse=true) tabbable element in the document
+// relative to `from`. Elements with tabIndex={-1} are excluded by the selector,
+// so callers don't need a ref to the target — it's found by DOM order automatically.
+function focusNextTabbableFrom(from: HTMLElement, reverse = false) {
+    const all = Array.from(document.querySelectorAll<HTMLElement>(TABBABLE_SELECTOR))
+    const index = all.indexOf(from)
+    if (index === -1) return
+    all[reverse ? index - 1 : index + 1]?.focus()
+}
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -28,10 +45,13 @@ export const callbacks = {
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const searchText = useSelector(sounds.selectSearchText)
+    const count = useSelector(sounds.selectFilteredRegularNames).length
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(sounds.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(sounds.setSearchText(""))
-    const props = { id: "soundSearchBar", searchText, dispatchSearch, dispatchReset }
+    const liveMessage = t("soundsFound", { count })
+    const props = { id: "soundSearchBar", aria: t("ariaDescriptors:sounds.searchBar"), liveMessage, firstResultSelector: "#panel-0 h5", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -58,7 +78,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
         <div
             role="option"
             aria-selected={selected}
-            tabIndex={0}
+            tabIndex={-1}
             className={classnames}
             onClick={handleToggle}
             onKeyDown={(e) => {
@@ -126,6 +146,22 @@ const ButtonFilterList = ({ category, ariaListBox, items, justification, showMaj
                 if (e.key === "Escape") {
                     e.preventDefault()
                     tabButtonRef?.current?.focus()
+                } else if (e.key === "Tab") {
+                    if (e.shiftKey) {
+                        // Shift+Tab walks backward from the current tab button, landing on
+                        // the previous tabbable element (e.g. Genres button from Instruments panel).
+                        if (tabButtonRef?.current) {
+                            e.preventDefault()
+                            focusNextTabbableFrom(tabButtonRef.current, true)
+                        }
+                    } else if (tabButtonRef?.current) {
+                        // Tab walks forward from the current tab button to find the next
+                        // tabbable element. Panel options have tabIndex={-1} so they are
+                        // invisible to the query: for Artists/Genres/Instruments this lands
+                        // on the next tab button; for Keys it exits past the Filters component.
+                        e.preventDefault()
+                        focusNextTabbableFrom(tabButtonRef.current)
+                    }
                 } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
                     e.preventDefault()
                     const options = Array.from(
@@ -223,12 +259,14 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
             <button
                 role="radio"
                 aria-checked={showMajMinPageOne}
+                tabIndex={-1}
                 className={majorButtonClass}
                 onClick={chooseMaj}
             >Major</button>
             <button
                 role="radio"
                 aria-checked={!showMajMinPageOne}
+                tabIndex={-1}
                 className={minorButtonClass}
                 onClick={chooseMin}
             >Minor</button>
@@ -236,7 +274,7 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
     </div>
 }
 
-const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab, userExpandedTab, onOpen, tabButtonRef }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters, userExpandedTab: keyof sounds.Filters | null, onOpen: () => void, tabButtonRef: React.RefObject<HTMLButtonElement> }) => {
+const SoundFilterTab = ({ soundFilterKey, numItemsSelected, currentFilterTab, userExpandedTab, onOpen, tabButtonRef }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, currentFilterTab: keyof sounds.Filters, userExpandedTab: keyof sounds.Filters | null, onOpen: () => void, tabButtonRef: React.RefObject<HTMLButtonElement> }) => {
     const { t } = useTranslation()
     const isCurrentTab = currentFilterTab === soundFilterKey
     const isExpanded = userExpandedTab === soundFilterKey
@@ -253,18 +291,11 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
                     ? <div className={spanClass} aria-hidden="true">{numItemsSelected}</div>
                     : null}
                 <button
-                    ref={isCurrentTab ? tabButtonRef : undefined}
+                    ref={tabButtonRef}
                     aria-expanded={isExpanded}
                     aria-controls={`sound-filter-panel-${soundFilterKey}`}
                     className={tabClass}
-                    onClick={() => {
-                        setCurrentFilterTab(soundFilterKey)
-                        onOpen()
-                    }}
-                    onKeyDown={(e) => {
-                        // Prevent Space from scrolling the virtual list. The click still fires on keyup.
-                        if (e.key === " ") e.preventDefault()
-                    }}
+                    onClick={onOpen}
                 >
                     {t(`soundBrowser.filterDropdown.${soundFilterKey}`)}
                     {numItemsSelected > 0
@@ -289,9 +320,15 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
     // Set to true when a tab is opened via keyboard and we still need to move
     // focus into the panel. ButtonFilterList clears this after calling focus.
     const pendingKeyboardFocusRef = useRef(false)
-    // Points to the currently-visible SoundFilterTab button so that
-    // Escape in the ButtonFilterList can return focus to it.
-    const activeTabButtonRef = useRef<HTMLButtonElement>(null)
+    // One stable ref per tab button (rather than a single ref shared/swapped
+    // across tabs) so Escape in ButtonFilterList always returns focus to the
+    // correct tab, with no attach/detach race during tab switches.
+    const tabButtonRefs: Record<keyof sounds.FilterTabs, React.RefObject<HTMLButtonElement>> = {
+        artists: useRef<HTMLButtonElement>(null),
+        genres: useRef<HTMLButtonElement>(null),
+        instruments: useRef<HTMLButtonElement>(null),
+        keys: useRef<HTMLButtonElement>(null),
+    }
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
@@ -319,11 +356,10 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                         key={name}
                         soundFilterKey={name as keyof sounds.Filters}
                         numItemsSelected={num}
-                        setCurrentFilterTab={setCurrentFilterTab}
                         currentFilterTab={currentFilterTab}
                         userExpandedTab={userExpandedTab}
                         onOpen={() => handleOpen(name as keyof sounds.Filters)}
-                        tabButtonRef={activeTabButtonRef} />
+                        tabButtonRef={tabButtonRefs[name as keyof sounds.FilterTabs]} />
                 })}
             </div>
 
@@ -336,7 +372,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 justification="flex"
                 focusFirstOptionRef={focusFirstOptionRef}
                 pendingKeyboardFocusRef={pendingKeyboardFocusRef}
-                tabButtonRef={activeTabButtonRef}
+                tabButtonRef={tabButtonRefs.artists}
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -347,7 +383,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 justification="flex"
                 focusFirstOptionRef={focusFirstOptionRef}
                 pendingKeyboardFocusRef={pendingKeyboardFocusRef}
-                tabButtonRef={activeTabButtonRef}
+                tabButtonRef={tabButtonRefs.genres}
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
@@ -358,7 +394,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 justification="flex"
                 focusFirstOptionRef={focusFirstOptionRef}
                 pendingKeyboardFocusRef={pendingKeyboardFocusRef}
-                tabButtonRef={activeTabButtonRef}
+                tabButtonRef={tabButtonRefs.instruments}
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
@@ -371,7 +407,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 setShowMajMinPageOne={setShowMajMinPageOne}
                 focusFirstOptionRef={focusFirstOptionRef}
                 pendingKeyboardFocusRef={pendingKeyboardFocusRef}
-                tabButtonRef={activeTabButtonRef}
+                tabButtonRef={tabButtonRefs.keys}
             />}
         </div>
     )
@@ -472,7 +508,7 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                     <Tooltip.Provider delayDuration={600} disableHoverableContent>
                         <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                                <h5 className="scale:text-sm truncate pl-2 cursor-default">{name}</h5>
+                                <h5 className="scale:text-sm truncate pl-2 cursor-default" tabIndex={-1}>{name}</h5>
                             </Tooltip.Trigger>
                             <Tooltip.Portal>
                                 <Tooltip.Content
@@ -491,7 +527,11 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                 <div className="pl-2 pr-4">
                     <button
                         className="scale:text-xs pr-1.5"
-                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewState !== "play" ? " stop" : " play")) }}
+                        onClick={() => {
+                            dispatch(soundsThunks.togglePreview({ name, kind: "sound" }))
+                            addUIClick("sound preview - " + name + (previewState !== "play" ? " stop" : " play"))
+                            if (previewState === "play") uiLogger.event("preview", "sound-browser", { sound: name })
+                        }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
@@ -506,7 +546,9 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                             <button
                                 className="scale:text-xs px-1.5"
                                 onClick={() => dispatch(soundsThunks.markFavorite({ name, isFavorite }))}
-                                title={t("soundBrowser.clip.tooltip.markFavorite")}
+                                title={isFavorite ? t("ariaDescriptors:sounds.favoriteRemove", { name }) : t("ariaDescriptors:sounds.favoriteAdd", { name })}
+                                aria-label={isFavorite ? t("ariaDescriptors:sounds.favoriteRemove", { name }) : t("ariaDescriptors:sounds.favoriteAdd", { name })}
+                                aria-pressed={isFavorite}
                             >
                                 {isFavorite
                                     ? <i className="icon icon-star-full2 text-orange-600" />
@@ -617,16 +659,382 @@ interface SoundSearchAndFiltersProps {
 }
 
 const SoundFilters = ({ currentFilterTab, setCurrentFilterTab }: SoundSearchAndFiltersProps) => {
+    const dispatch = useDispatch()
+    const showPreview = useSelector(appState.selectShowSoundPreviewWidget)
+    const loggedIn = useSelector(user.selectLoggedIn)
+    const { t } = useTranslation()
     return (
-        <div className="pb-1">
+        <div>
             <div className="pb-1">
                 <Filters
                     currentFilterTab={currentFilterTab}
                     setCurrentFilterTab={setCurrentFilterTab}/>
             </div>
             <div className="flex justify-between px-1.5 py-1 mb-0.5">
-                <ShowOnlyFavorites />
+                {loggedIn && <ShowOnlyFavorites />}
                 <AddSound />
+            </div>
+            <div data-focus-panel="audition-panel">
+                <h4 className="sr-only">{t("sounds.preview.title").toLocaleUpperCase()}</h4>
+                <button
+                    type="button"
+                    onClick={() => dispatch(appState.setShowSoundPreviewWidget(!showPreview))}
+                    aria-expanded={showPreview}
+                    aria-controls="sound-preview-panel"
+                    title={showPreview ? t("ariaDescriptors:sounds.preview.close") : t("ariaDescriptors:sounds.preview.open")}
+                    aria-label={showPreview ? t("ariaDescriptors:sounds.preview.close") : t("ariaDescriptors:sounds.preview.open")}
+                    className="flex bg-blue text-white w-full justify-center items-center gap-1 text-sm p-1"
+                >
+                    <span>{t("sounds.preview.title").toLocaleUpperCase()}</span>
+                    <i className={`icon ${showPreview ? "icon-arrow-up3" : "icon-arrow-down3"} text-xs`} aria-hidden="true" />
+                </button>
+                <div
+                    id="sound-preview-panel"
+                    aria-hidden={!showPreview}
+                    style={{ display: showPreview ? undefined : "none" }}
+                    className="bg-blue"
+                >
+                    <SoundPreview />
+                </div>
+            </div>
+        </div>
+    )
+}
+
+const SoundPreview = () => {
+    const { t } = useTranslation()
+    const dispatch = useDispatch()
+
+    const [recommendationMode, setRecommendationMode] = useState(0)
+
+    // folder-structured filtered data
+    const folders = useSelector(sounds.selectFilteredRegularFolders)
+    const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    const filters = useSelector(sounds.selectFilters)
+
+    // preview state
+    const preview = useSelector(sounds.selectPreview)
+    const previewNodes = useSelector(sounds.selectPreviewNodes)
+
+    const loggedIn = useSelector(user.selectLoggedIn)
+    const favorites = useSelector(sounds.selectFavorites)
+    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+
+    // Build a folder-first queue: [{folder, name}, ...]
+    const [queue, setQueue] = useState<Array<{ folder: string; name: string }>>([])
+
+    useEffect(() => {
+        (async () => {
+            setQueue([])
+            const out: Array<{ folder: string; name: string }> = []
+            if (recommendationMode) {
+                const recommendations = await recommend([], 1, 1, filters.genres, filters.instruments, [], 100, filters.keys, filters.artists)
+                for (const name of recommendations) out.push({ folder: "", name })
+            } else {
+                for (const folder of folders) {
+                    const names: string[] = namesByFolders?.[folder] ?? []
+                    for (const name of names) out.push({ folder, name })
+                }
+            }
+            setQueue(out)
+        })()
+    }, [folders, namesByFolders, recommendationMode, filters])
+
+    const [index, setIndex] = useState(0)
+
+    // Reset to the first sound whenever filters/search change the queue
+    useEffect(() => {
+        setIndex(0)
+    }, [queue.map((x) => `${x.folder}/${x.name}`).join("|")])
+
+    const current = queue[index] ?? null
+    const currentName = current?.name ?? null
+
+    const isFavorite = useMemo(() => {
+        if (!loggedIn || !currentName) return false
+        return favorites.includes(currentName)
+    }, [loggedIn, favorites, currentName])
+
+    const canPrev = index > 0
+    const canNext = index < queue.length - 1
+
+    // Respond to audition requests from the command palette
+    const auditionRequest = useSelector(sounds.selectAuditionRequest)
+    useEffect(() => {
+        if (!auditionRequest) return
+        const idx = queue.findIndex(q => q.name === auditionRequest)
+        if (idx !== -1) {
+            stopIfPlaying(currentName)
+            setIndex(idx)
+            playNow(auditionRequest)
+            dispatch(sounds.setAuditionRequest(null))
+            window.requestAnimationFrame(() => {
+                const playBtn = document.getElementById("sound-preview-play-button")
+                ;(playBtn ?? playerRef.current)?.focus()
+            })
+        }
+    }, [auditionRequest, queue])
+
+    const stopIfPlaying = (name: string | null) => {
+        if (!name) return
+        if (preview?.kind === "sound" && preview.name === name) {
+            dispatch(soundsThunks.togglePreview({ name, kind: "sound" })) // OFF
+        }
+    }
+
+    const playNow = (name: string | null) => {
+        if (!name) return
+
+        if (preview?.kind === "sound" && preview.name && preview.name !== name) {
+            dispatch(soundsThunks.togglePreview({ name: preview.name, kind: "sound" })) // OFF old
+        }
+
+        if (!(preview?.kind === "sound" && preview.name === name)) {
+            dispatch(soundsThunks.togglePreview({ name, kind: "sound" })) // ON new
+            uiLogger.event("preview", "audition-panel", { sound: name })
+        }
+    }
+
+    const goTo = (nextIndex: number) => {
+        const next = queue[nextIndex]
+        if (!next) return
+        stopIfPlaying(currentName)
+        setIndex(nextIndex)
+        playNow(next.name)
+    }
+
+    const restartCurrent = () => {
+        if (!currentName) return
+        const isPlaying = preview?.kind === "sound" && preview.name === currentName
+        if (isPlaying) {
+            // stop, then start again next frame so the audio nodes tear down first
+            dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" })) // OFF
+            window.requestAnimationFrame(() => {
+                dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" })) // ON
+            })
+        } else {
+            dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" })) // ON
+        }
+        uiLogger.event("preview", "audition-panel", { sound: currentName, restart: true })
+    }
+
+    const goPrev = () => {
+        if (canPrev) goTo(index - 1)
+        else restartCurrent()
+    }
+    const goNext = () => canNext && goTo(index + 1)
+
+    // stop reliably on unmount (no stale preview)
+    useEffect(() => {
+        return () => {
+            const state = store.getState()
+            const p = state.sounds?.preview?.value ?? state.sounds?.preview
+            if (p?.kind === "sound" && p.name) {
+                dispatch(soundsThunks.togglePreview({ name: p.name, kind: "sound" }))
+            }
+        }
+    }, [dispatch])
+
+    /**
+     * Keyboard navigation (ONLY when player is focused)
+     */
+    const playerRef = useRef<HTMLDivElement>(null)
+
+    const onPlayerKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const tag = (e.target as HTMLElement)?.tagName
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return
+
+        switch (e.key) {
+            case "j":
+            case "J":
+            case "ArrowLeft":
+                e.preventDefault()
+                goPrev()
+                uiLogger.shortcut(e.key, "audition-panel")
+                reporter.keyboardShortcut(`audition-panel: ${e.key}`)
+                break
+
+            case "l":
+            case "L":
+            case "ArrowRight":
+                e.preventDefault()
+                goNext()
+                uiLogger.shortcut(e.key, "audition-panel")
+                reporter.keyboardShortcut(`audition-panel: ${e.key}`)
+                break
+
+            case "k":
+            case "K":
+                e.preventDefault()
+                if (!currentName) return
+                dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
+                uiLogger.shortcut(e.key, "audition-panel")
+                reporter.keyboardShortcut(`audition-panel: ${e.key}`)
+                break
+        }
+    }
+
+    const focusPlayer = (e: React.MouseEvent<HTMLDivElement>) => {
+        if ((e.target as HTMLElement).closest("button, input, select, textarea, a")) return
+        playerRef.current?.focus()
+    }
+
+    const copyToClipboard = (value: string) => {
+        window.navigator.clipboard.writeText(value)
+        uiLogger.event("copy", "audition-panel", { content: value })
+    }
+    const [buffer, setBuffer] = useState<AudioBuffer | null>(null)
+    const [bufferReady, setBufferReady] = useState(false)
+
+    useEffect(() => {
+        setBufferReady(false)
+        if (!currentName) return
+        let cancelled = false
+        audioLibrary.getSound(currentName).then((sound) => {
+            if (!cancelled && sound) {
+                setBuffer(sound.buffer)
+                setBufferReady(true)
+            }
+        })
+        return () => { cancelled = true }
+    }, [currentName])
+
+    return (
+        <div className="flex border border-blue flex-col items-center justify-center bg-white dark:bg-transparent">
+            <div className="flex items-center text-sm mt-2 text-center">
+                <div className="max-w-52 truncate" title={currentName ?? t("soundBrowser.noSoundsFound")}>{currentName ?? t("soundBrowser.noSoundsFound")}</div>
+                {currentName && <button aria-label={t("scriptShare.copyClipboard")} onClick={() => { copyToClipboard(currentName) }} className="text-blue-400 hover:text-blue-600 active:text-blue-950 text-sm p-2" title={t("scriptShare.copyClipboard")}>
+                    <i className="icon icon-copy"></i>
+                </button>}
+            </div>
+
+            <div
+                ref={playerRef}
+                tabIndex={0}
+                role="group"
+                aria-label={t("ariaDescriptors:sounds.preview.player")}
+                onKeyDown={onPlayerKeyDown}
+                onMouseDown={focusPlayer}
+                className="w-full max-w-4xl outline-none rounded-2xl focus-visible:ring-2 focus-visible:ring-black"
+            >
+                <div className="flex items-center justify-center px-6">
+                    {bufferReady && buffer
+                        ? <Waveform buffer={buffer} fluid height={40} />
+                        : <div style={{ width: "100%", height: 40 }} className="flex items-center justify-center text-xs text-gray-400">
+                            {currentName ? <i className="animate-spin es-spinner" /> : null}
+                        </div>}
+                </div>
+
+                <div className="flex items-center justify-evenly mt-2">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const next = 1 - recommendationMode
+                            setRecommendationMode(next)
+                            uiLogger.event("button_click", "audition-panel-recommendation-mode", { setStateTo: next })
+                        }}
+                        aria-label={recommendationMode ? t("ariaDescriptors:sounds.preview.switchToOrderedMode") : t("ariaDescriptors:sounds.preview.switchToRecommendationMode")}
+                        title={recommendationMode ? t("ariaDescriptors:sounds.preview.switchToOrderedMode") : t("ariaDescriptors:sounds.preview.switchToRecommendationMode")}
+                        className="sound-btn-ghost"
+                    >
+                        {recommendationMode ? <i className="icon icon-star" /> : <i className="icon icon-list2" />}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={goPrev}
+                        disabled={!currentName}
+                        aria-label={canPrev
+                            ? t("ariaDescriptors:sounds.preview.previousSound")
+                            : t("ariaDescriptors:sounds.preview.restartSound")}
+                        title={canPrev
+                            ? t("ariaDescriptors:sounds.preview.previousTitle")
+                            : t("ariaDescriptors:sounds.preview.restartTitle")}
+                        className="sound-btn-ghost"
+                    >
+                        <i className="icon icon-first"></i>
+                    </button>
+
+                    <button
+                        id="sound-preview-play-button"
+                        type="button"
+                        onClick={() => {
+                            if (!currentName) return
+                            if (!(preview?.kind === "sound" && preview.name === currentName)) {
+                                uiLogger.event("preview", "audition-panel", { sound: currentName })
+                            }
+                            dispatch(soundsThunks.togglePreview({ name: currentName, kind: "sound" }))
+                        }}
+                        disabled={!currentName}
+                        aria-label={preview?.kind === "sound" && preview.name === currentName ? t("ariaDescriptors:sounds.preview.stop") : t("ariaDescriptors:sounds.preview.play")}
+                        title={preview?.kind === "sound" && preview.name === currentName ? t("ariaDescriptors:sounds.preview.stop") : t("ariaDescriptors:sounds.preview.play")}
+                        className="sound-btn-main"
+                    >
+                        {preview?.kind === "sound" && preview.name === currentName
+                            ? (
+                                previewNodes
+                                    ? (
+                                        <i className="icon icon-stop2"></i>
+                                    )
+                                    : (
+                                        <div className="animate-spin w-6 h-6 border-2 border-black border-t-transparent rounded-full" />
+                                    )
+                            )
+                            : (
+                                <i className="icon icon-play4"></i>
+                            )}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={goNext}
+                        disabled={!canNext}
+                        aria-label={t("ariaDescriptors:sounds.preview.nextSound")}
+                        title={t("ariaDescriptors:sounds.preview.nextTitle")}
+                        className="sound-btn-ghost"
+                    >
+                        <i className="icon icon-last"></i>
+                    </button>
+
+                    {loggedIn && (
+                        <button
+                            className="text-xs px-1.5"
+                            onClick={() => {
+                                if (!currentName) return
+                                dispatch(soundsThunks.markFavorite({ name: currentName, isFavorite }))
+                            }}
+                            title={currentName && (isFavorite ? t("ariaDescriptors:sounds.favoriteRemove", { name: currentName }) : t("ariaDescriptors:sounds.favoriteAdd", { name: currentName }))}
+                            aria-label={currentName && (isFavorite ? t("ariaDescriptors:sounds.favoriteRemove", { name: currentName }) : t("ariaDescriptors:sounds.favoriteAdd", { name: currentName }))}
+                            aria-pressed={isFavorite}
+                            disabled={!currentName}
+                        >
+                            {isFavorite
+                                ? (
+                                    <i className="icon icon-star-full2 text-orange-600" />
+                                )
+                                : (
+                                    <i className="icon icon-star-empty3 text-orange-600" />
+                                )}
+                        </button>
+                    )}
+
+                    {tabsOpen && (
+                        <button
+                            className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
+                            onClick={() => {
+                                if (!currentName) return
+                                editor.pasteCode(currentName)
+                                addUIClick("sound copy - " + currentName)
+                                uiLogger.event("paste", "audition-panel", { content: currentName })
+                            }}
+                            title={t("soundBrowser.clip.tooltip.paste")}
+                            aria-label={t("ariaDescriptors:sounds.paste", { name: currentName })}
+                            disabled={!currentName}
+                        >
+                            <i className="icon icon-paste2" />
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     )
@@ -645,20 +1053,20 @@ const SoundFiltersContext = React.createContext<SoundFiltersContextValue | null>
 // filterHeight so that react-window's absolute-positioned items are pushed down
 // to start below the filters. SoundFilters is never touched by react-window so
 // focus inside it is completely stable.
-const SoundListHeader = ({ currentFilterTab, setCurrentFilterTab, t }: {
-    currentFilterTab: keyof sounds.Filters,
-    setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>,
-    t: (key: string) => string
-}) => (
-    <>
-        <h3 className="sr-only">{t("soundBrowser.filterHeader")}</h3>
-        <SoundFilters
-            currentFilterTab={currentFilterTab}
-            setCurrentFilterTab={setCurrentFilterTab}
-        />
-        <h3 className="sr-only">{t("soundBrowser.soundHeader")}</h3>
-    </>
-)
+const SoundListHeader = () => {
+    const { t } = useTranslation()
+    const { currentFilterTab, setCurrentFilterTab } = useContext(SoundFiltersContext)!
+    return (
+        <>
+            <h3 className="sr-only">{t("soundBrowser.filterHeader")}</h3>
+            <SoundFilters
+                currentFilterTab={currentFilterTab}
+                setCurrentFilterTab={setCurrentFilterTab}
+            />
+            <h3 className="sr-only">{t("soundBrowser.soundHeader")}</h3>
+        </>
+    )
+}
 
 const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
     title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
@@ -678,23 +1086,11 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     })
     const scrollToTopRef = useRef<HTMLDivElement>(null)
 
-    const soundListClassnames = "grow"
+    const soundListClassnames = "grow min-h-0 overflow-hidden"
     const extraFilterControlsClassnames = "sticky top-0 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
     const scrolltoTopClassnames = "absolute bottom-4 right-4 z-10 opacity-0 transform translate-y-full transition-all duration-300 pointer-events-none"
 
     const virtuosoRef = useRef<VirtuosoHandle>(null)
-
-    const Header = useMemo(() => {
-        const SoundBrowserHeader = () => (
-            <SoundListHeader
-                currentFilterTab={currentFilterTab}
-                setCurrentFilterTab={setCurrentFilterTab}
-                t={t}
-            />
-        )
-        SoundBrowserHeader.displayName = "SoundBrowserHeader"
-        return SoundBrowserHeader
-    }, [currentFilterTab, setCurrentFilterTab])
 
     const overscanSize = Math.round(2500 * scalar)
     const increaseViewportSize = Math.round(3500 * scalar)
@@ -708,7 +1104,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     ), [namesByFolders])
 
     return (
-        <div className="flex flex-col grow relative">
+        <div className="flex flex-col grow min-h-0 relative">
             <SoundSearchBar />
             <div className={extraFilterControlsClassnames}>
                 <button
@@ -747,7 +1143,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                             }
                         }}
                         components={{
-                            Header,
+                            Header: SoundListHeader,
                         }}
                         itemContent={itemContent}
                     />
@@ -796,7 +1192,7 @@ const DefaultSoundCollection = () => {
 
 export const SoundBrowser = () => {
     return (
-        <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
+        <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel">
             <DefaultSoundCollection />
         </div>
     )

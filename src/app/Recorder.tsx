@@ -104,12 +104,11 @@ const SPACING = 3
 const BAR_WIDTH = 1
 const NUM_BARS = Math.round(WIDTH / SPACING)
 
-function drawWaveform(context: CanvasRenderingContext2D, buf: Float32Array, amp: number) {
-    const step = Math.ceil(buf.length / WIDTH)
-    context.clearRect(0, 0, WIDTH, HEIGHT)
+function drawWaveform(context: CanvasRenderingContext2D, buf: Float32Array, amp: number, width: number = WIDTH, height: number = HEIGHT) {
+    const step = Math.ceil(buf.length / width)
+    context.clearRect(0, 0, width, height)
     context.fillStyle = "gray"
-
-    for (let i = 0; i < WIDTH; i++) {
+    for (let i = 0; i < width; i++) {
         let max = -1.0
         let min = 1.0
 
@@ -149,26 +148,56 @@ const drawSpectrogram = (context: CanvasRenderingContext2D) => {
     }
 }
 
-export const Waveform = ({ buffer }: { buffer: AudioBuffer | null }) => {
+export const Waveform = ({ buffer, fluid = false, width: propWidth, height: propHeight }: {
+    buffer: AudioBuffer | null,
+    fluid?: boolean,
+    width?: number,
+    height?: number
+}) => {
     const canvas = useRef<HTMLCanvasElement>(null)
+    const wrapperRef = useRef<HTMLDivElement>(null)
     const handle = useRef<number>(0)
+    const resolvedHeight = propHeight ?? HEIGHT
+    const [measuredWidth, setMeasuredWidth] = useState(propWidth ?? WIDTH)
+
+    useEffect(() => {
+        if (!fluid) return
+        const el = wrapperRef.current
+        if (!el) return
+        const ro = new ResizeObserver(entries => {
+            const w = entries[0].contentRect.width
+            if (w > 0) setMeasuredWidth(w)
+        })
+        ro.observe(el)
+        setMeasuredWidth(el.clientWidth)
+        return () => ro.disconnect()
+    }, [fluid])
 
     useEffect(() => {
         if (!canvas.current) return
-        const context = canvas.current!.getContext("2d")!
+        const context = canvas.current.getContext("2d")!
+        const resolvedWidth = fluid ? measuredWidth : (propWidth ?? WIDTH)
         if (buffer) {
             window.cancelAnimationFrame(handle.current)
             handle.current = 0
-            drawWaveform(context, buffer.getChannelData(0), HEIGHT / 2)
+            drawWaveform(context, buffer.getChannelData(0), resolvedHeight / 2, resolvedWidth, resolvedHeight)
         } else if (!handle.current) {
-            context.clearRect(0, 0, WIDTH, HEIGHT)
+            context.clearRect(0, 0, resolvedWidth, resolvedHeight)
             const loop = () => {
                 drawSpectrogram(context)
                 handle.current = window.requestAnimationFrame(loop)
             }
             loop()
         }
-    }, [buffer])
+    }, [buffer, measuredWidth, fluid, propWidth, resolvedHeight])
 
-    return <canvas ref={canvas} width={WIDTH} height={HEIGHT}></canvas>
+    if (fluid) {
+        return (
+            <div ref={wrapperRef} style={{ width: "100%", height: resolvedHeight }}>
+                <canvas ref={canvas} width={measuredWidth} height={resolvedHeight} style={{ width: "100%", height: resolvedHeight }} />
+            </div>
+        )
+    }
+
+    return <canvas ref={canvas} width={propWidth ?? WIDTH} height={resolvedHeight} />
 }
