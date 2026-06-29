@@ -230,6 +230,45 @@ async function postLogin(username: string) {
     console.log("saved snapshot count", savedScripts.length)
     console.log("local scripts", localScripts.length)
     console.log("server scripts", serverScripts.length)
+
+    const persistedScriptsRaw = window.localStorage.getItem("persist:scripts")
+    const persistedUserRaw = window.localStorage.getItem("persist:user")
+    if (persistedScriptsRaw) {
+        try {
+            const persistedScriptsState = JSON.parse(persistedScriptsRaw)
+            const persistedRegularScriptsRaw = persistedScriptsState.regularScripts
+            const persistedRegularScripts = typeof persistedRegularScriptsRaw === "string"
+                ? JSON.parse(persistedRegularScriptsRaw) as Record<string, Script>
+                : (persistedRegularScriptsRaw ?? {}) as Record<string, Script>
+            const persistedScriptList = Object.values(persistedRegularScripts)
+            const persistedLocalScripts = persistedScriptList.filter(script => script.shareid.startsWith("local/"))
+            const persistedServerScripts = persistedScriptList.filter(script => !script.shareid.startsWith("local/"))
+
+            console.log("persist:scripts raw length", persistedScriptsRaw.length)
+            console.log("persist:user raw token field", persistedUserRaw ? JSON.parse(persistedUserRaw).token : "missing persist:user")
+            console.log("persisted regularScripts count", persistedScriptList.length)
+            console.log("persisted local scripts", persistedLocalScripts.length)
+            console.log("persisted server scripts", persistedServerScripts.length)
+            persistedScriptList.map(script => (console.log({
+                persistedShareid: script.shareid,
+                persistedName: script.name,
+                persistedLocal: script.shareid.startsWith("local/"),
+                persistedSoftDelete: script.soft_delete,
+                persistedSourceLength: script.source_code?.length,
+            })))
+
+            if (persistedServerScripts.length > 0) {
+                console.error("[login-debug] SERVER SCRIPTS PRESENT IN persist:scripts", persistedServerScripts)
+                // eslint-disable-next-line no-debugger
+                debugger
+            }
+        } catch (error) {
+            console.error("[login-debug] could not parse persist:scripts", error, persistedScriptsRaw)
+        }
+    } else {
+        console.log("persist:scripts missing")
+    }
+
     savedScripts.map(script => (console.log({
         shareid: script.shareid,
         name: script.name,
