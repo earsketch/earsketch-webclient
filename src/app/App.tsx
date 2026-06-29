@@ -240,10 +240,12 @@ async function postLogin(username: string) {
 
     if (serverScripts.length > 0) {
         console.error("[login-debug] SERVER SCRIPTS PRESENT IN MIGRATION SNAPSHOT", serverScripts)
+        // eslint-disable-next-line no-debugger
+        debugger
     }
 
     // eslint-disable-next-line no-debugger
-    debugger
+    // debugger
 
     console.groupEnd()
 
@@ -252,6 +254,26 @@ async function postLogin(username: string) {
     // Fetch the user's scripts now that they're logged in.
     // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
     await refreshScriptBrowser()
+
+    // TEMPORARY: Test "fast script fetch, slow save"
+    // Add a delay after server scripts populate, before migration saves
+    // This tests the “fast first script fetch, then second login while migration is still open” hypothesis.
+
+    // In browser dev tools run:
+    // localStorage.setItem("debug:delayAfterScriptFetch", "15000")
+    // localStorage.getItem("debug:delayAfterScriptFetch")
+    // during the delay, try different actions:
+    //     plain browser reload;
+    //     Vite Fast Refresh by editing/saving a source file;
+    //     login modal / auto-login weirdness if reachable;
+    //     network reconnect/offline/online if that’s part of the local behavior.
+    if (window.localStorage.getItem("debug:delayAfterScriptFetch")) {
+        const ms = Number(window.localStorage.getItem("debug:delayAfterScriptFetch"))
+        console.warn(`[login-debug] delaying after refreshScriptBrowser for ${ms}ms`)
+        await new Promise(resolve => window.setTimeout(resolve, ms))
+        console.warn(`[login-debug] delay after refreshScriptBrowser complete after ${ms}ms`)
+    }
+    // END TEMPORARY: Add delay
 
     const promises = []
     for (const script of Object.values(saved)) {
