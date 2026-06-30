@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export const API_HOST = "api-dev.ersktch.gatech.edu"
+export const API_HOST = "api-dev-gw.ersktch.gatech.edu"
 export const CLOUDFRONT_HOST = "earsketch-test.ersktch.gatech.edu"
 export const TEST_USER = "tester"
 
