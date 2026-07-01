@@ -11,8 +11,8 @@ const TEST_SOUND_META_1 = {
 const TEST_SOUND_META = {
     folder: "STUB FOLDER",
     name: "OS_CLAP01",
-    public: 1 as const,
     path: "standard-library/filename/placeholder/here.wav",
+    type: 1 as const,
 }
 
 test.describe("Editor", () => {
