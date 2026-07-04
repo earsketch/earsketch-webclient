@@ -306,6 +306,11 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
     checkRange("start", start, { min: 1 })
     checkRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
+    for (const sliceStart of sliceStarts) {
+        checkType("sliceStarts", "number", sliceStart)
+        checkRange("sliceStarts", sliceStart, { min: 1 })
+    }
+
     stepsPerMeasure = 1.0 / stepsPerMeasure
 
     const SUSTAIN = "+"
