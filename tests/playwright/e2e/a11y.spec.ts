@@ -152,6 +152,8 @@ test.describe("Accessibility", () => {
         await checkA11y(page)
         await page.getByLabel(`Open ${scriptName} in Code Editor`).click()
         await expect(page.locator("#coder").getByText(scriptName).first()).toBeVisible()
+        // TODO: this isn't opening the share dialog
+        await page.locator("button[title='Share']").click()
         await checkA11y(page)
     })
 })

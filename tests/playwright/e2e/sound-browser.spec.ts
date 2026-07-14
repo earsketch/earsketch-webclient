@@ -13,7 +13,7 @@ const TEST_SOUND_META: AudioMeta = {
     genreGroup: "DUBSTEP",
     instrument: "SYNTH",
     name: "DUBSTEP_BASS_WOBBLE_002",
-    path: "standard-library/filename/placeholder/here.wav",
+    path: "standard-library/DUBSTEP_140_BPM__DUBBASSWOBBLE/DUBSTEP_BASS_WOBBLE_002.wav",
     public: 1,
     tempo: 140,
     year: 2012,
@@ -32,10 +32,22 @@ test.describe("preview sound", () => {
         // Wait for the standard audio library to load
         await expect.poll(() => counter.count("audio_standard")).toBeGreaterThan(0)
 
-        await expect(page.locator("i.icon.icon-play4").first()).toBeVisible()
-        await page.locator("button[title='Preview sound']").first().click()
+        // Locate the specific row for DUBSTEP_BASS_WOBBLE_002 by its h5 label
+        const soundRow = page.locator("div.flex.flex-row.justify-start").filter({
+            has: page.locator("h5", { hasText: "DUBSTEP_BASS_WOBBLE_002" }),
+        })
+        await expect(soundRow.locator("i.icon.icon-play4")).toBeVisible()
+
+        // Click the play button in that row
+        await soundRow.locator("button[title='Preview sound']").click()
+
+        // Wait for the audio sample request to be made
         await expect.poll(() => counter.count("audio_sample"), { timeout: 10000 }).toBeGreaterThan(0)
-        await expect(page.locator("i.icon.icon-play4").first()).toBeVisible()
+
+        // Verify the stop icon is showing while the longer countdown sample plays
+        await expect(soundRow.locator("i.icon.icon-stop2")).toBeVisible({ timeout: 5000 })
+
+        await expect(soundRow.locator("i.icon.icon-play4")).toBeVisible()
     })
 })
 

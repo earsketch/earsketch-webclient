@@ -3,6 +3,7 @@ import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "..
 import { Hilitor } from "../../lib/hilitor"
 
 import * as appState from "../app/appState"
+import * as uiLogger from "../app/uiLogger"
 import { Collapsed, SearchBar } from "./Utils"
 import * as curriculum from "./curriculumState"
 import * as ESUtils from "../esutils"
@@ -22,6 +23,7 @@ const copyURL = (language: Language, currentLocation: number[]) => {
     const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
     const url = `${SITE_BASE_URI}/?curriculum=${page}&language=${language}`
     window.navigator.clipboard.writeText(url)
+    uiLogger.event("copy", "curriculum", { content: url })
     userNotification.show("Curriculum URL was copied to the clipboard")
 }
 
@@ -265,6 +267,7 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
 }
 
 const CurriculumPane = () => {
+    const dispatch = useDispatch()
     const { t } = useTranslation()
     const language = useSelector(appState.selectScriptLanguage)
     const currentLocale = useSelector(appState.selectLocale)
@@ -273,14 +276,30 @@ const CurriculumPane = () => {
     const paneIsOpen = useSelector(layout.isEastOpen)
     const content = useSelector(curriculum.selectContent)
     const curriculumBody = useRef<HTMLElement>(null)
+    const focusPending = useSelector(curriculum.selectFocusPending)
 
     useEffect(() => {
         if (content && curriculumBody.current) {
             curriculumBody.current.appendChild(content)
             curriculumBody.current.scrollTop = 0
+            // Make all headings programmatically focusable for keyboard and screen reader navigation
+            ;(content as Element).querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((el: Element) => {
+                (el as HTMLElement).setAttribute("tabindex", "-1")
+            })
             return () => content.remove()
         }
     }, [content, paneIsOpen])
+
+    // Runs after the content-appending effect (effects fire in declaration order).
+    // When the command palette navigates to a curriculum page, focusPending is true
+    // and we move focus to the first heading of the freshly-appended content.
+    useEffect(() => {
+        if (content && focusPending && curriculumBody.current) {
+            dispatch(curriculum.setFocusPending(false))
+            const heading = curriculumBody.current.querySelector<HTMLElement>("h1, h2, h3, h4, h5, h6")
+            if (heading) heading.focus()
+        }
+    }, [content, focusPending, dispatch])
 
     useEffect(() => {
         // <script> tags in the content may add elements to the DOM,
@@ -327,7 +346,7 @@ const CurriculumPane = () => {
                         <CurriculumHeader />
                         <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
                             {content
-                                ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
+                                ? <article ref={curriculumBody} id="curriculum-body" aria-label={t("curriculum.title")} className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
                                 : <div className="flex flex-col items-center">
                                     <div className="text-2xl text-center py-8">Loading curriculum...</div>
                                     <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />

@@ -17,13 +17,15 @@ import { gutter, GutterMarker, keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setPreview, previewPlugin, setAppLocale, setShowBeatStringAnnotation } from "./EditorWidgets"
-
+import { playEarcon, SINE_BUMP } from "../audio/earcon"
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorCursorLine, setScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setEditorCursorLine, setScriptMatchesDAW, selectScriptMatchesDAW, selectShowBeatStringAnnotation } from "./ideState"
+import * as daw from "../daw/dawState"
+import { scrollDAWToElement } from "../daw/DAW"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
@@ -31,6 +33,9 @@ import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
 import * as scripts from "../browser/scriptsState"
+import { status as consoleStatus } from "./console"
+import * as uiLogger from "../app/uiLogger"
+import reporter from "../app/reporter"
 
 Object.assign(window, { Sk, ace }) // for droplet
 
@@ -233,28 +238,65 @@ const pythonAutocomplete: CompletionSource = (context) => autocompleteEnabled ? 
 // Internal state
 let view: EditorView = null as unknown as EditorView
 let sessions: { [key: string]: EditorSession } = {}
-const keyBindings: { key: string, run: () => boolean }[] = []
+const keyBindings: { key: string, run: () => boolean }[] = [
+    {
+        key: "Ctrl-i",
+        run: () => {
+            const currentLine = view.state.doc.lineAt(view.state.selection.main.head)
+            jumpToDAWClip(currentLine.number)
+            uiLogger.shortcut("Ctrl+I", "editor")
+            reporter.keyboardShortcut("Ctrl+I")
+            return true
+        },
+    },
+]
 let resolveReady: () => void
 let droplet: any
 
 let srLineEl: HTMLElement | null = null
 let lastAnnouncedLine = -1
 
+function getIndentLevel(lineText: string): number {
+    const trimmed = lineText.trimStart()
+    if (!trimmed) return 0
+    const leading = lineText.length - trimmed.length
+    if (leading === 0) return 0
+    // Find the smallest non-zero indent in the document to use as the unit.
+    const doc = view.state.doc
+    let unit = 0
+    for (let i = 1; i <= doc.lines; i++) {
+        const t = doc.line(i).text
+        if (!t.trim()) continue
+        const n = t.length - t.trimStart().length
+        if (n > 0 && (unit === 0 || n < unit)) unit = n
+    }
+    return unit > 0 ? Math.round(leading / unit) : 0
+}
+
 function announceLineNumber(lineNumber: number) {
     if (!srLineEl) {
         srLineEl = document.createElement("div")
         srLineEl.setAttribute("aria-live", "assertive")
         srLineEl.setAttribute("aria-atomic", "true")
-        srLineEl.style.cssText = "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)"
+        srLineEl.setAttribute("class", "sr-only")
         document.body.appendChild(srLineEl)
     }
     srLineEl.textContent = ""
     window.setTimeout(() => {
         const line = view.state.doc.line(lineNumber)
         if (srLineEl) {
-            srLineEl.textContent = line.text
-                ? i18n.t("editor.lineAnnouncement", { number: lineNumber, text: line.text })
-                : i18n.t("editor.emptyLineAnnouncement", { number: lineNumber })
+            const indentLevel = getIndentLevel(line.text)
+            const content = line.text.trim() || i18n.t("ariaDescriptors:editor.emptyLine")
+            const text = indentLevel > 0
+                ? i18n.t("ariaDescriptors:editor.indentLevel", { count: indentLevel }) + ", " + content
+                : content
+            let boundary = ""
+            if (lineNumber === 1) {
+                boundary = ` (${i18n.t("ariaDescriptors:editor.firstLine")})`
+            } else if (lineNumber === view.state.doc.lines) {
+                boundary = ` (${i18n.t("ariaDescriptors:editor.lastLine")})`
+            }
+            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, boundary, text })
         }
     }, 10)
 }
@@ -277,7 +319,11 @@ export const changeListeners: ((deletion?: boolean) => void)[] = []
 export function bindKey(key: string, fn: () => void) {
     keyBindings.push({
         key,
-        run: () => { fn(); return true },
+        run: () => {
+            fn()
+            uiLogger.shortcut(key.replace("-", "+"), "editor")
+            return true
+        },
     })
 }
 
@@ -298,9 +344,12 @@ export function createSession(id: string, language: Language, contents: string) 
                 ...keyBindings,
             ]),
             // NOTE: Avoid the default autocomplete trigger when ctrl+space is used in the code editor
+            // Also avoid basicSetup's foldKeymap stealing Ctrl-Alt-[/] from the global focus-history shortcut.
             Prec.highest(
                 keymap.of([
                     { key: "Ctrl-Space", run: () => { return true } },
+                    { key: "Ctrl-Alt-[", run: () => { return true } },
+                    { key: "Ctrl-Alt-]", run: () => { return true } },
                 ])
             ),
             EditorView.updateListener.of(update => {
@@ -354,6 +403,20 @@ export function setContents(contents: string, id?: string, doUpdateBlocks = fals
 export function setReadOnly(value: boolean) {
     view.dispatch({ effects: readOnly.reconfigure(EditorState.readOnly.of(value)) })
     droplet.setReadOnly(value)
+}
+
+export function getEditorLine(): number {
+    const { from } = view.state.selection.main
+    return view.state.doc.lineAt(from).number
+}
+
+export function jumpToLine(lineNumber: number) {
+    const line = view.state.doc.line(lineNumber)
+    const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
+    view.contentDOM.setAttribute("aria-label", i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, boundary: "", text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") }))
+    view.dispatch({ selection: { anchor: line.from }, scrollIntoView: true })
+    view.focus()
+    window.setTimeout(() => view.contentDOM.setAttribute("aria-label", originalLabel), 1000)
 }
 
 export function focus() {
@@ -467,6 +530,70 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
             return { color: p.color, pos: line.from }
         })),
     })
+}
+
+function jumpToDAWClip(lineNumber: number) {
+    if (!selectScriptMatchesDAW(store.getState())) {
+        playEarcon(SINE_BUMP, 0.3)
+        consoleStatus(i18n.t("daw.needsSync"))
+        uiLogger.event("cannot_inspect", "editor", { error: "needsSync" })
+        reporter.keyboardShortcut("editor cannot_inspect: needsSync")
+        return
+    }
+
+    // Prefer the parent clip (non-loopChild) so fitMedia/insertMedia jumps land on the representative button.
+    // Searches both clip buttons and automation point circles (both carry data-source-line).
+    const directTarget = (
+        document.querySelector(`[data-source-line="${lineNumber}"]:not(.loop)`) ??
+        document.querySelector(`[data-source-line="${lineNumber}"]`)
+    ) as HTMLElement | null
+
+    let target = directTarget
+    let outerCallMatches: HTMLElement[] = []
+
+    // Fall back: cursor may be on an outer call site (e.g. a user-defined function that
+    // calls EarSketch API functions) — search full call stack on all DAW elements.
+    if (!target) {
+        const allElements = Array.from(document.querySelectorAll("[data-source-lines]")) as HTMLElement[]
+        outerCallMatches = allElements.filter(el => {
+            const lines = (el.getAttribute("data-source-lines") ?? "").split(",").map(Number)
+            return lines.includes(lineNumber)
+        })
+        target = outerCallMatches.find(el => !el.classList.contains("loop")) ?? outerCallMatches[0] ?? null
+    }
+
+    if (target) {
+        const originalLabel = target.getAttribute("aria-label") ?? ""
+        // For Ctrl+I, announce the family-range description stored in data-family-aria
+        // (covers the full span of all clips sharing this source line), not the
+        // individual-clip description in aria-label (which Tab reads).
+        let announcedLabel = target.getAttribute("data-family-aria") ?? originalLabel
+
+        // If the cursor was on a user-defined function call (not a direct API call) that produced
+        // clips on multiple tracks, prepend a summary and isolate all of tracks on focus.
+        if (!directTarget && target.getAttribute("data-track") !== null) {
+            const tracks = new Set<number>()
+            for (const el of outerCallMatches) {
+                const trackAttr = el.getAttribute("data-track")
+                if (trackAttr !== null) tracks.add(Number(trackAttr))
+            }
+            if (tracks.size > 1) {
+                const sortedTracks = Array.from(tracks).sort((a, b) => a - b)
+                announcedLabel = `${i18n.t("ariaDescriptors:daw.multiTrackJump", { tracks: sortedTracks.join(", ") })} ${announcedLabel}`
+                daw.setPendingTrackIsolation(sortedTracks)
+            }
+        }
+
+        daw.setPendingJumpToDAW()
+        target.setAttribute("aria-label", `Focus shifted to DAW, ${announcedLabel}`)
+        target.focus({ preventScroll: true })
+        scrollDAWToElement(target)
+        window.setTimeout(() => target!.setAttribute("aria-label", originalLabel), 1000)
+    } else {
+        playEarcon(SINE_BUMP, 0.3)
+        uiLogger.event("cannot_inspect", "editor", { error: "noTarget" })
+        reporter.keyboardShortcut("editor cannot_inspect: noTarget")
+    }
 }
 
 let lastDispatchedCursorLine: number | null = null
@@ -606,7 +733,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     }, [soundNames])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden">
-        <div id="editor" className="code-container" style={{ fontSize }}>
+        <div id="editor" className="code-container" style={{ fontSize }} role="tabpanel" aria-labelledby={`${activeScript?.shareid}-tab`}>
             <div ref={blocksElement} className={"h-full w-full absolute" + (inBlocksMode ? "" : " invisible")} onClick={shakeImportButton} />
             <div
                 ref={editorElement} className={"h-full w-full" + (inBlocksMode ? " hidden" : "")}

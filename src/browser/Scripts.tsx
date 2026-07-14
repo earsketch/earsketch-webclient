@@ -13,7 +13,6 @@ import * as user from "../user/userState"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { ScriptDropdownMenu } from "./ScriptsMenus"
-import { BrowserTabType } from "./BrowserTab"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
@@ -46,7 +45,7 @@ const ScriptSearchBar = () => {
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(scripts.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(scripts.setSearchText(""))
     const liveMessage = t("scriptsFound", { count })
-    const props = { id: "scriptSearchBar", aria: t("ariaDescriptors:scripts.searchBar"), liveMessage, firstResultSelector: "#panel-1 button", searchText, dispatchSearch, dispatchReset }
+    const props = { id: "scriptSearchBar", aria: t("ariaDescriptors:scripts.searchBar"), liveMessage, firstResultSelector: "#panel-1 [data-test=\"scriptEntry\"]", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -300,17 +299,24 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
 
     const shared = script.creator || script.isShared
     const ariaLabel = type === "deleted" ? "" : t("scriptBrowser.openInEditor", { name: script.name })
+    const openScript = () => {
+        if (type === "regular" || type === "shared") {
+            dispatch(setActiveTabAndEditor(script.shareid))
+        }
+        if (highlight) {
+            dispatch(caiThunks.highlight({ zone: null }))
+        }
+    }
     return (
         <div
             className={`flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
-            onClick={() => {
-                if (type === "regular") {
-                    dispatch(setActiveTabAndEditor(script.shareid))
-                } else if (type === "shared") {
-                    dispatch(setActiveTabAndEditor(script.shareid))
-                }
-                if (highlight) {
-                    dispatch(caiThunks.highlight({ zone: null }))
+            data-test="scriptEntry"
+            tabIndex={type === "deleted" ? -1 : 0}
+            onClick={openScript}
+            onKeyDown={(e) => {
+                if (type !== "deleted" && (e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) {
+                    e.preventDefault()
+                    openScript()
                 }
             }}
             title={ariaLabel}
@@ -365,7 +371,7 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = 
                 data={scriptIDs}
                 itemContent={(index, ID) => (
                     <div className={index % 2 === 0
-                        ? "bg-white dark:bg-gray-900"
+                        ? "bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
                         : "bg-gray-300 dark:bg-gray-800 hover:bg-blue-200 dark:hover:bg-blue-500"}>
                         <ScriptEntry script={entities[ID]} type={type} />
                     </div>
@@ -429,7 +435,7 @@ export const ScriptBrowser = () => {
                 <CreateScriptButton />
             </div>
 
-            <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Script}>
+            <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel">
                 <RegularScriptCollection />
                 <SharedScriptCollection />
                 <DeletedScriptCollection />
