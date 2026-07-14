@@ -213,9 +213,106 @@ async function postLogin(username: string) {
     const saved = scriptsState.selectRegularScripts(state)
     const openTabs = tabs.selectOpenTabs(state)
 
+    // TEMPORARY: Debug information for login process
+    const loginDebug = ((window as any).__ES_LOGIN_DEBUG ??= {
+        postLoginCount: 0,
+        appInstanceID: Math.random().toString(36).slice(2),
+    })
+
+    const postLoginID = ++loginDebug.postLoginCount
+    const savedScripts = Object.values(saved)
+    const localScripts = savedScripts.filter(script => script.shareid.startsWith("local/"))
+    const serverScripts = savedScripts.filter(script => !script.shareid.startsWith("local/"))
+
+    console.group(`[login-debug] postLogin #${postLoginID}`)
+    console.log("appInstanceID", loginDebug.appInstanceID)
+    console.log("username", username)
+    console.log("saved snapshot count", savedScripts.length)
+    console.log("local scripts", localScripts.length)
+    console.log("server scripts", serverScripts.length)
+
+    const persistedScriptsRaw = window.localStorage.getItem("persist:scripts")
+    const persistedUserRaw = window.localStorage.getItem("persist:user")
+    if (persistedScriptsRaw) {
+        try {
+            const persistedScriptsState = JSON.parse(persistedScriptsRaw)
+            const persistedRegularScriptsRaw = persistedScriptsState.regularScripts
+            const persistedRegularScripts = typeof persistedRegularScriptsRaw === "string"
+                ? JSON.parse(persistedRegularScriptsRaw) as Record<string, Script>
+                : (persistedRegularScriptsRaw ?? {}) as Record<string, Script>
+            const persistedScriptList = Object.values(persistedRegularScripts)
+            const persistedLocalScripts = persistedScriptList.filter(script => script.shareid.startsWith("local/"))
+            const persistedServerScripts = persistedScriptList.filter(script => !script.shareid.startsWith("local/"))
+
+            console.log("persist:scripts raw length", persistedScriptsRaw.length)
+            console.log("persist:user raw token field", persistedUserRaw ? JSON.parse(persistedUserRaw).token : "missing persist:user")
+            console.log("persisted regularScripts count", persistedScriptList.length)
+            console.log("persisted local scripts", persistedLocalScripts.length)
+            console.log("persisted server scripts", persistedServerScripts.length)
+            persistedScriptList.map(script => (console.log({
+                persistedShareid: script.shareid,
+                persistedName: script.name,
+                persistedLocal: script.shareid.startsWith("local/"),
+                persistedSoftDelete: script.soft_delete,
+                persistedSourceLength: script.source_code?.length,
+            })))
+
+            if (persistedServerScripts.length > 0) {
+                console.error("[login-debug] SERVER SCRIPTS PRESENT IN persist:scripts", persistedServerScripts)
+                // eslint-disable-next-line no-debugger
+                debugger
+            }
+        } catch (error) {
+            console.error("[login-debug] could not parse persist:scripts", error, persistedScriptsRaw)
+        }
+    } else {
+        console.log("persist:scripts missing")
+    }
+
+    savedScripts.map(script => (console.log({
+        shareid: script.shareid,
+        name: script.name,
+        local: script.shareid.startsWith("local/"),
+        soft_delete: script.soft_delete,
+        sourceLength: script.source_code?.length,
+    })))
+
+    if (serverScripts.length > 0) {
+        console.error("[login-debug] SERVER SCRIPTS PRESENT IN MIGRATION SNAPSHOT", serverScripts)
+        // eslint-disable-next-line no-debugger
+        debugger
+    }
+
+    // eslint-disable-next-line no-debugger
+    // debugger
+
+    console.groupEnd()
+
+    // END TEMPORARY: Debug information for login process
+
     // Fetch the user's scripts now that they're logged in.
     // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
     await refreshScriptBrowser()
+
+    // TEMPORARY: Test "fast script fetch, slow save"
+    // Add a delay after server scripts populate, before migration saves
+    // This tests the “fast first script fetch, then second login while migration is still open” hypothesis.
+
+    // In browser dev tools run:
+    // localStorage.setItem("debug:delayAfterScriptFetch", "15000")
+    // localStorage.getItem("debug:delayAfterScriptFetch")
+    // during the delay, try different actions:
+    //     plain browser reload;
+    //     Vite Fast Refresh by editing/saving a source file;
+    //     login modal / auto-login weirdness if reachable;
+    //     network reconnect/offline/online if that’s part of the local behavior.
+    if (window.localStorage.getItem("debug:delayAfterScriptFetch")) {
+        const ms = Number(window.localStorage.getItem("debug:delayAfterScriptFetch"))
+        console.warn(`[login-debug] delaying after refreshScriptBrowser for ${ms}ms`)
+        await new Promise(resolve => window.setTimeout(resolve, ms))
+        console.warn(`[login-debug] delay after refreshScriptBrowser complete after ${ms}ms`)
+    }
+    // END TEMPORARY: Add delay
 
     const promises = []
     for (const script of Object.values(saved)) {
