@@ -289,18 +289,32 @@ export function makeBeat(result: DAWData, soundConstant: string | string[], trac
     return result
 }
 
+// Generates slice start positions, evenly spaced by note duration (every 16ths, 8ths, ...)
+// Ex: sliceEveryNth(4) -> [1, 1.25, 1.5, 1.75, ...]
+export function sliceEveryNth(_result: DAWData, n: number) {
+    const args = [...arguments].slice(1)
+    esconsole("Calling sliceEveryNth with parameters" + args.join(", "), ["debug", "PT"])
+
+    checkArgCount("sliceEveryNth", args, 1, 1)
+    checkType("n", "number", n)
+
+    return Array.from({ length: n }, (_, x) => 1 + x / n)
+}
+
 // Make a beat from media clip slices.
-export function makeBeatSlice(result: DAWData, soundConstant: string, track: number, start: number, beat: string, sliceStarts: number[], stepsPerMeasure: number = 16) {
+export function makeBeatSlice(result: DAWData, soundConstant: string, track: number, start: number, beat: string, sliceStarts?: number[], stepsPerMeasure: number = 16) {
     const args = [...arguments].slice(1)
     esconsole("Calling makeBeatSlice with parameters" + args.join(", "), ["debug", "PT"])
 
-    checkArgCount("makeBeatSlice", args, 5, 6)
+    checkArgCount("makeBeatSlice", args, 4, 6)
     checkType("sound", "string", soundConstant)
     checkType("track", "int", track)
     checkType("start", "number", start)
     checkType("beat", "string", beat)
-    checkType("sliceStarts", "array", sliceStarts)
     checkType("stepsPerMeasure", "number", stepsPerMeasure)
+
+    if (!sliceStarts) sliceStarts = sliceEveryNth(result, 16)
+    checkType("sliceStarts", "array", sliceStarts)
 
     checkRange("track", track, { min: 1 })
     checkRange("start", start, { min: 1 })
