@@ -110,19 +110,19 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
             <div className="mb-4">
                 <button
                     type="button"
-                    className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                    className="text-sm text-amber hover:text-amber-300 font-bold"
                     onClick={() => setMode("login")}
                 >
                     ← {t("accountMenu.backToLogin")}
                 </button>
             </div>
             <Alert message={error} />
-            <div>
+            <div className="text-white">
                 <label>
                     {t("formfieldPlaceholder.username")}
                     <input
                         type="text"
-                        className="form-input w-full mb-2 dark:bg-transparent"
+                        className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent"
                         name="username"
                         value={username}
                         onChange={e => setUsernameLocal(e.target.value)}
@@ -133,12 +133,12 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
                     />
                 </label>
             </div>
-            <div className="flex">
+            <div className="flex text-white">
                 <label className="w-full mr-2">
                     {t("formfieldPlaceholder.password")}
                     <input
                         type="password"
-                        className="form-input mb-2 w-full dark:bg-transparent"
+                        className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent"
                         name="password"
                         value={password}
                         onChange={e => setPasswordLocal(e.target.value)}
@@ -150,7 +150,7 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
                     {t("formfieldPlaceholder.confirmPassword")}
                     <input
                         type="password"
-                        className="form-input mb-2 w-full dark:bg-transparent"
+                        className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent"
                         name="passwordconfirm"
                         onChange={e => {
                             e.target.setCustomValidity(e.target.value === password ? "" : t("messages:createaccount.pwdfail"))
@@ -161,10 +161,10 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
                     />
                 </label>
             </div>
-            <div>
+            <div className="text-white">
                 <label>{t("formFieldPlaceholder.emailOptional")}
                     <p className="text-sm">{t("formFieldPlaceholder.emailOptional.usedFor")}</p>
-                    <input type="email" className="form-input w-full dark:bg-transparent" name="email" value={emailLocal} onChange={e => setEmailLocal(e.target.value)} />
+                    <input type="email" className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent" name="email" value={emailLocal} onChange={e => setEmailLocal(e.target.value)} />
                 </label>
             </div>
             <ModalFooter submit="accountCreator.submit" close={close} />
@@ -196,12 +196,21 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
         </div>
         <DialogTitle className="p-3.5 text-2xl text-white">{t("forgotPassword.title")}</DialogTitle>
         <form onSubmit={handleRecoverPassword}>
-            <ModalBody>
+            <div className="mb-4">
+                <button
+                    type="button"
+                    className="text-sm text-amber hover:text-amber-300 font-bold"
+                    onClick={() => setMode("login")}
+                >
+                    ← {t("accountMenu.backToLogin")}
+                </button>
+            </div>
+            <div className="text-white">
                 <label className="w-full text-sm">
                     {t("forgotPassword.prompt")}
                     <input
                         type="email"
-                        className="form-input w-full dark:bg-transparent placeholder:text-gray-300"
+                        className="text-black form-input w-full mt-1 dark:bg-transparent placeholder:text-gray-300"
                         name="email"
                         placeholder={t("forgotPassword.email")}
                         required
@@ -210,7 +219,7 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
                         onChange={e => setRecoverEmail(e.target.value)}
                     />
                 </label>
-            </ModalBody>
+            </div>
             <ModalFooter submit="forgotPassword.submit" close={close} />
         </form>
     </div>
