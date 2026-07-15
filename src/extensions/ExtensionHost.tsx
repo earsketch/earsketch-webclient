@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 
 import { TitleBar } from "../browser/Curriculum"
-import { selectTracks } from "../daw/dawState"
+import { selectPlaybackStateChangeTimestamp, selectPlaying, selectTracks } from "../daw/dawState"
 import { useAppSelector as useSelector } from "../hooks"
 import { Log, selectLogs } from "../ide/ideState"
 import { Track } from "../types/common"
@@ -81,6 +81,13 @@ export const ExtensionHost = () => {
             const currentTracks = tracksRef.current
             // TODO return a cleaned version of the daw state that can be serialized
             return JSON.stringify(currentTracks)
+        },
+        getPlaybackStatus() {
+            const state = store.getState()
+            return {
+                isPlaying: selectPlaying(state),
+                lastChangeTimestamp: selectPlaybackStateChangeTimestamp(state),
+            }
         },
         getColorTheme() {
             const currentColorTheme = colorThemeRef.current
