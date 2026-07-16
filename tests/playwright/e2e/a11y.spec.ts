@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test"
 import AxeBuilder from "@axe-core/playwright"
 import { setupBackend, TEST_USER, type Script } from "../helpers/mocks"
-import { skipTour, login } from "../helpers/actions"
+import { skipTour, login, waitForHeadlessDialog } from "../helpers/actions"
 
 const username = TEST_USER
 const scriptName = "RecursiveMelody.py"
@@ -111,11 +111,13 @@ test.describe("Accessibility", () => {
     })
 
     async function testCreateAccountModal(page: Page) {
-        await page.locator("button", { hasText: "Create / Reset Account" }).click()
-        await page.locator("button", { hasText: "Register a New Account" }).click()
+        await page.locator("button[title='Login']").click()
+        await waitForHeadlessDialog(page)
+        await page.locator("button", { hasText: "Join now" }).click()
         const dialog = page.getByRole("dialog")
+        await expect(page.locator("input[name='username']")).toHaveCount(1, { timeout: 15000 })
+        await checkA11y(page)
         await dialog.locator("input[name='username']").fill("test")
-        await dialog.locator("input[name='username']").fill("")
         await checkA11y(page)
     }
 
