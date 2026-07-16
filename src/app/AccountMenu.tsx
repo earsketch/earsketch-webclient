@@ -75,7 +75,12 @@ const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, err
                     </div>
                 </ModalBody>
                 <div className="p-3.5">
-                    <button className="bg-sky-700 hover:bg-sky-500 p-3.5 rounded w-full" type="submit">{t("accountMenu.login")}</button>
+                    <button className="bg-sky-700 hover:bg-sky-500 p-3.5 rounded w-full"
+                        title={t("accountMenu.login")}
+                        aria-label={t("accountMenu.login")}
+                        type="submit">
+                        {t("accountMenu.login")}
+                    </button>
                 </div>
             </form>
             <div className="text-center">New to EarSketch? <button className="text-amber hover:text-amber-300 font-bold" onClick={() => setMode("register")}>Join now</button></div>
