@@ -290,7 +290,13 @@ function announceLineNumber(lineNumber: number) {
             const text = indentLevel > 0
                 ? i18n.t("ariaDescriptors:editor.indentLevel", { count: indentLevel }) + ", " + content
                 : content
-            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text })
+            let boundary = ""
+            if (lineNumber === 1) {
+                boundary = ` (${i18n.t("ariaDescriptors:editor.firstLine")})`
+            } else if (lineNumber === view.state.doc.lines) {
+                boundary = ` (${i18n.t("ariaDescriptors:editor.lastLine")})`
+            }
+            srLineEl.textContent = i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, boundary, text })
         }
     }, 10)
 }
@@ -338,9 +344,12 @@ export function createSession(id: string, language: Language, contents: string) 
                 ...keyBindings,
             ]),
             // NOTE: Avoid the default autocomplete trigger when ctrl+space is used in the code editor
+            // Also avoid basicSetup's foldKeymap stealing Ctrl-Alt-[/] from the global focus-history shortcut.
             Prec.highest(
                 keymap.of([
                     { key: "Ctrl-Space", run: () => { return true } },
+                    { key: "Ctrl-Alt-[", run: () => { return true } },
+                    { key: "Ctrl-Alt-]", run: () => { return true } },
                 ])
             ),
             EditorView.updateListener.of(update => {
@@ -404,7 +413,7 @@ export function getEditorLine(): number {
 export function jumpToLine(lineNumber: number) {
     const line = view.state.doc.line(lineNumber)
     const originalLabel = view.contentDOM.getAttribute("aria-label") ?? ""
-    view.contentDOM.setAttribute("aria-label", i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") }))
+    view.contentDOM.setAttribute("aria-label", i18n.t("ariaDescriptors:editor.lineAnnouncement", { number: lineNumber, boundary: "", text: line.text || i18n.t("ariaDescriptors:editor.emptyLine") }))
     view.dispatch({ selection: { anchor: line.from }, scrollIntoView: true })
     view.focus()
     window.setTimeout(() => view.contentDOM.setAttribute("aria-label", originalLabel), 1000)

@@ -70,7 +70,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
                         {t("formFieldPlaceholder.emailOptional")}
                         <p className="text-sm">{t("formFieldPlaceholder.emailOptional.usedFor")}</p>
                         <input type="email" className="form-input w-full mb-4 dark:bg-transparent" name="email"
-                            value={email} onChange={e => setEmail(e.target.value.trim())} />
+                            value={email} onChange={e => setEmail(e.target.value.trim())} autoFocus />
                     </label>
                 </div>
 

@@ -1,5 +1,5 @@
 import i18n from "i18next"
-import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
+import { Dialog, DialogPanel, Menu, Popover, Transition } from "@headlessui/react"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
@@ -379,14 +379,16 @@ const KeyboardShortcuts = () => {
         undo: { keys: [modifier, "Z"], group: "editor" },
         redo: { keys: [modifier, "Shift", "Z"], group: "editor" },
         comment: { keys: [modifier, "/"], group: "editor" },
+        findReplace: { keys: [modifier, "G"], group: "editor" },
+        goToLine: { keys: [modifier, "Alt", "G"], group: "editor" },
         escapeEditor: { keys: <><kbd>{localize("Esc")}</kbd> then <kbd>{localize("Tab")}</kbd></>, group: "editor" },
         playPause: { keys: ["Ctrl", "Space"], group: "daw" },
         jumpToCodeDaw: { keys: ["Ctrl", "I"], group: "daw" },
         zoomHorizontal: { keys: <><kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd></>, group: "daw" },
         zoomVertical: { keys: [modifier, "Shift", "Wheel"], group: "daw" },
         commandPalette: { keys: [modifier, "Shift", "P"], group: "navigation" },
-        jumpBackInFocus: { keys: ["Ctrl", "["], group: "navigation" },
-        jumpForwardInFocus: { keys: ["Ctrl", "]"], group: "navigation" },
+        jumpBackInFocus: { keys: ["Ctrl", "Alt", "["], group: "navigation" },
+        jumpForwardInFocus: { keys: ["Ctrl", "Alt", "]"], group: "navigation" },
         jumpToSounds: { keys: ["Ctrl", "Shift", "1"], group: "navigation" },
         jumpToScripts: { keys: ["Ctrl", "Shift", "2"], group: "navigation" },
         jumpToApi: { keys: ["Ctrl", "Shift", "3"], group: "navigation" },
@@ -627,7 +629,7 @@ const USER_STATE_KEY = "userstate"
 const userstate = window.localStorage.getItem(USER_STATE_KEY)
 const savedLoginInfo = userstate === null ? undefined : JSON.parse(userstate)
 
-// Prevents focus history from recording the programmatic focus caused by Ctrl+[/].
+// Prevents focus history from recording the programmatic focus caused by Ctrl+Alt+[/].
 let isNavigatingFocusHistory = false
 
 // WeakMap assigns a stable string key to every element that receives focus.
@@ -881,49 +883,49 @@ export const App = () => {
         return () => window.removeEventListener("focusin", handleFocusIn, true)
     }, [])
 
-    // Ctrl+[ = step backward through focus history; Ctrl+] = step forward.
+    // Ctrl+Alt+[ = step backward through focus history; Ctrl+Alt+] = step forward.
     useEffect(() => {
         const handleFocusNav = (e: KeyboardEvent) => {
-            if (!e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return
-            if (e.key !== "[" && e.key !== "]") return
+            if (!e.ctrlKey || !e.altKey || e.shiftKey || e.metaKey) return
+            if (e.code !== "BracketLeft" && e.code !== "BracketRight") return
             e.preventDefault()
             const { count, navOffset } = store.getState().focusHistory
             if (count === 0) {
                 consoleStatus(i18n.t("focusHistory.empty"))
                 playEarcon(SINE_BUMP, 0.3)
-                uiLogger.event("keyboard_shortcut", `Ctrl+${e.key}`, { error: "empty" })
-                reporter.keyboardShortcut(`Ctrl+${e.key}`)
+                uiLogger.event("keyboard_shortcut", `Ctrl+Alt+${e.code}`, { error: "empty" })
+                reporter.keyboardShortcut(`Ctrl+Alt+${e.code}`)
                 return
             }
-            if (e.key === "[") {
+            if (e.code === "BracketLeft") {
                 if (navOffset >= count - 1) {
                     consoleStatus(i18n.t("focusHistory.startOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
-                    uiLogger.event("keyboard_shortcut", "Ctrl+[", { error: "startOfBuffer" })
-                    reporter.keyboardShortcut("Ctrl+[")
+                    uiLogger.event("keyboard_shortcut", "Ctrl+Alt+[", { error: "startOfBuffer" })
+                    reporter.keyboardShortcut("Ctrl+Alt+[")
                     return
                 }
                 store.dispatch(stepBackward())
                 const record = selectAtNavOffset(store.getState())
                 if (record) {
                     navigateToRecord(record)
-                    uiLogger.shortcut("Ctrl+[", record.panelId)
-                    reporter.keyboardShortcut("Ctrl+[")
+                    uiLogger.shortcut("Ctrl+Alt+[", record.panelId)
+                    reporter.keyboardShortcut("Ctrl+Alt+[")
                 }
             } else {
                 if (navOffset <= 0) {
                     consoleStatus(i18n.t("focusHistory.endOfBuffer"))
                     playEarcon(SINE_BUMP, 0.3)
-                    uiLogger.event("keyboard_shortcut", "Ctrl+]", { error: "endOfBuffer" })
-                    reporter.keyboardShortcut("Ctrl+]")
+                    uiLogger.event("keyboard_shortcut", "Ctrl+Alt+]", { error: "endOfBuffer" })
+                    reporter.keyboardShortcut("Ctrl+Alt+]")
                     return
                 }
                 store.dispatch(stepForward())
                 const record = selectAtNavOffset(store.getState())
                 if (record) {
                     navigateToRecord(record)
-                    uiLogger.shortcut("Ctrl+]", record.panelId)
-                    reporter.keyboardShortcut("Ctrl+]")
+                    uiLogger.shortcut("Ctrl+Alt+]", record.panelId)
+                    reporter.keyboardShortcut("Ctrl+Alt+]")
                 }
             }
         }
@@ -1216,9 +1218,9 @@ export const ModalContainer = () => {
                     leaveFrom="opacity-100 scale-100"
                     leaveTo="opacity-0 scale-95"
                 >
-                    <div className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
+                    <DialogPanel className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
                         {Modal && <Modal close={close} />}
-                    </div>
+                    </DialogPanel>
                 </Transition.Child>
             </div>
         </Dialog>

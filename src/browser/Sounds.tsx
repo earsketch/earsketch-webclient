@@ -546,7 +546,9 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                             <button
                                 className="scale:text-xs px-1.5"
                                 onClick={() => dispatch(soundsThunks.markFavorite({ name, isFavorite }))}
-                                title={t("soundBrowser.clip.tooltip.markFavorite")}
+                                title={isFavorite ? t("ariaDescriptors:sounds.favoriteRemove", { name }) : t("ariaDescriptors:sounds.favoriteAdd", { name })}
+                                aria-label={isFavorite ? t("ariaDescriptors:sounds.favoriteRemove", { name }) : t("ariaDescriptors:sounds.favoriteAdd", { name })}
+                                aria-pressed={isFavorite}
                             >
                                 {isFavorite
                                     ? <i className="icon icon-star-full2 text-orange-600" />
@@ -1001,8 +1003,9 @@ const SoundPreview = () => {
                                 if (!currentName) return
                                 dispatch(soundsThunks.markFavorite({ name: currentName, isFavorite }))
                             }}
-                            title={t("soundBrowser.clip.tooltip.markFavorite")}
-                            aria-label={t("soundBrowser.clip.tooltip.markFavorite")}
+                            title={currentName && (isFavorite ? t("ariaDescriptors:sounds.favoriteRemove", { name: currentName }) : t("ariaDescriptors:sounds.favoriteAdd", { name: currentName }))}
+                            aria-label={currentName && (isFavorite ? t("ariaDescriptors:sounds.favoriteRemove", { name: currentName }) : t("ariaDescriptors:sounds.favoriteAdd", { name: currentName }))}
+                            aria-pressed={isFavorite}
                             disabled={!currentName}
                         >
                             {isFavorite
