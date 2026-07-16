@@ -219,6 +219,7 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
             <ModalFooter
                 submit="forgotPassword.submit"
                 close={close}
+                showBorder={false}
                 left={<button
                     type="button"
                     className="text-sm text-amber hover:text-amber-300 font-bold"
