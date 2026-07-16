@@ -4,7 +4,7 @@ import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
 import { post } from "../request"
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
-import { DialogTitle } from "@headlessui/react"
+import { DialogTitle, Transition } from "@headlessui/react"
 import esLogo from "./ES_logo_extract.svg"
 
 export type AccountMenuMode = "login" | "register" | "recover"
@@ -22,7 +22,7 @@ interface LoginViewProps {
 
 const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, error, handleLogin, setMode, close }: LoginViewProps) => {
     const { t } = useTranslation()
-    return <div className="animate-slide-in-from-left">
+    return <div>
         <div className="flex justify-end">
             <button className="m-2" onClick={close} title={t("cancel")}><i className="icon icon-cross2 text-2xl"></i></button>
         </div>
@@ -102,8 +102,14 @@ interface RegisterViewProps {
 const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, confirmPassword, setConfirmPassword, emailLocal, setEmailLocal, error, handleRegister, setMode, close }: RegisterViewProps) => {
     const { t } = useTranslation()
     const containerRef = useRef<HTMLDivElement>(null)
-    useEffect(() => { containerRef.current?.focus() }, [])
-    return <div ref={containerRef} tabIndex={-1} className="p-3.5 outline-none animate-slide-in-from-right">
+    // Move the screen-reader cursor into the view, but only after the slide-in
+    // finishes — focusing mid-transition interrupts it (the entering view just
+    // appears). preventScroll guards the case where the modal overflows the viewport.
+    useEffect(() => {
+        const id = window.setTimeout(() => containerRef.current?.focus({ preventScroll: true }), 250)
+        return () => window.clearTimeout(id)
+    }, [])
+    return <div ref={containerRef} tabIndex={-1} className="p-3.5 outline-none">
         <DialogTitle className="text-2xl text-white">{t("accountCreator.prompt")}</DialogTitle>
 
         <form onSubmit={handleRegister}>
@@ -183,18 +189,15 @@ interface RecoverViewProps {
 const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, setMode, close }: RecoverViewProps) => {
     const { t } = useTranslation()
     const containerRef = useRef<HTMLDivElement>(null)
-    useEffect(() => { containerRef.current?.focus() }, [])
-    return <div ref={containerRef} tabIndex={-1} className="outline-none">
-        <div className="mb-4">
-            <button
-                type="button"
-                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                onClick={() => setMode("login")}
-            >
-                ← {t("accountMenu.backToLogin")}
-            </button>
-        </div>
-        <DialogTitle className="p-3.5 text-2xl text-white">{t("forgotPassword.title")}</DialogTitle>
+    // Move the screen-reader cursor into the view, but only after the slide-in
+    // finishes — focusing mid-transition interrupts it (the entering view just
+    // appears). preventScroll guards the case where the modal overflows the viewport.
+    useEffect(() => {
+        const id = window.setTimeout(() => containerRef.current?.focus({ preventScroll: true }), 250)
+        return () => window.clearTimeout(id)
+    }, [])
+    return <div ref={containerRef} tabIndex={-1} className="p-3.5 outline-none">
+        <DialogTitle className="text-2xl text-white">{t("forgotPassword.title")}</DialogTitle>
         <form onSubmit={handleRecoverPassword}>
             <div className="mb-4">
                 <button
@@ -309,43 +312,87 @@ export const AccountMenu = ({
         })
     }
 
-    const view = mode === "register"
-        ? <RegisterView
-            username={username}
-            setUsernameLocal={setUsernameLocal}
-            password={password}
-            setPasswordLocal={setPasswordLocal}
-            confirmPassword={confirmPassword}
-            setConfirmPassword={setConfirmPassword}
-            emailLocal={emailLocal}
-            setEmailLocal={setEmailLocal}
-            error={error}
-            handleRegister={handleRegister}
-            setMode={setMode}
-            close={close}
-        />
-        : mode === "recover"
-            ? <RecoverView
-                recoverEmail={recoverEmail}
-                setRecoverEmail={setRecoverEmail}
-                handleRecoverPassword={handleRecoverPassword}
-                setMode={setMode}
-                close={close}
-            />
-            : <LoginView
-                username={username}
-                setUsernameLocal={setUsernameLocal}
-                password={password}
-                setPasswordLocal={setPasswordLocal}
-                error={error}
-                handleLogin={handleLogin}
-                setMode={setMode}
-                close={close}
-            />
+    // Smoothly tween the modal's height when swapping between views of different heights
+    // instead of snapping. We observe the INNER grid's natural height and animate the
+    // OUTER clipper's height: because animating the outer never changes what we measure
+    // (the inner), the ResizeObserver can't feed back into itself. Pure DOM — no React
+    // state/re-render — so it can't interfere with the slide.
+    const outerRef = useRef<HTMLDivElement>(null)
+    const innerRef = useRef<HTMLDivElement>(null)
+    useEffect(() => {
+        const outer = outerRef.current
+        const inner = innerRef.current
+        if (!outer || !inner) return
+        let previous = inner.getBoundingClientRect().height
+        let animation: Animation | null = null
+        const observer = new ResizeObserver(() => {
+            const next = inner.getBoundingClientRect().height
+            if (Math.abs(next - previous) < 1) return
+            const from = previous
+            previous = next
+            animation?.cancel()
+            animation = outer.animate([{ height: `${from}px` }, { height: `${next}px` }], { duration: 200, easing: "ease-out" })
+        })
+        observer.observe(inner)
+        return () => { observer.disconnect(); animation?.cancel() }
+    }, [])
 
+    // Grid cell-stacking (every view shares col/row 1) keeps the leaving and entering
+    // views overlaid and sizes the container to the taller of the two mid-swap, so it
+    // never collapses under the slide. Headless UI's data-attribute transition API drives
+    // the slide: `data-[closed]` is the off-screen state and `transition-transform` tweens
+    // it. With no `appear` prop the first view shown on open does not animate. Login is the
+    // "left" panel and register/recover the "right" panel, so each slides to/from its own
+    // edge for both enter and leave. overflow-hidden clips the off-screen views.
     return (
         <div className="bg-blue text-white overflow-x-hidden ring-2 ring-gray-700/50 ring-inset">
-            {view}
+            <div ref={outerRef} className="overflow-hidden">
+                <div ref={innerRef} className="grid">
+                    <Transition show={mode === "login"}>
+                        <div className="col-start-1 row-start-1 transition-transform duration-200 ease-out data-[closed]:-translate-x-full">
+                            <LoginView
+                                username={username}
+                                setUsernameLocal={setUsernameLocal}
+                                password={password}
+                                setPasswordLocal={setPasswordLocal}
+                                error={error}
+                                handleLogin={handleLogin}
+                                setMode={setMode}
+                                close={close}
+                            />
+                        </div>
+                    </Transition>
+                    <Transition show={mode === "register"}>
+                        <div className="col-start-1 row-start-1 transition-transform duration-200 ease-out data-[closed]:translate-x-full">
+                            <RegisterView
+                                username={username}
+                                setUsernameLocal={setUsernameLocal}
+                                password={password}
+                                setPasswordLocal={setPasswordLocal}
+                                confirmPassword={confirmPassword}
+                                setConfirmPassword={setConfirmPassword}
+                                emailLocal={emailLocal}
+                                setEmailLocal={setEmailLocal}
+                                error={error}
+                                handleRegister={handleRegister}
+                                setMode={setMode}
+                                close={close}
+                            />
+                        </div>
+                    </Transition>
+                    <Transition show={mode === "recover"}>
+                        <div className="col-start-1 row-start-1 transition-transform duration-200 ease-out data-[closed]:translate-x-full">
+                            <RecoverView
+                                recoverEmail={recoverEmail}
+                                setRecoverEmail={setRecoverEmail}
+                                handleRecoverPassword={handleRecoverPassword}
+                                setMode={setMode}
+                                close={close}
+                            />
+                        </div>
+                    </Transition>
+                </div>
+            </div>
         </div>
     )
 }
