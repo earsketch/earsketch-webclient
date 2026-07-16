@@ -85,8 +85,8 @@ export const ModalSectionHeader: React.FC<Props> = ({ children }) => {
     return <div className="p-3.5 bg-gray-300 text-black">{children}</div>
 }
 
-export const ModalFooter = ({ submit, cancel, ready, progress, type, close, showBorder = true }: {
-    submit?: string, cancel?: string, ready?: boolean, progress?: number, type?: string, close?: () => void, showBorder?: boolean
+export const ModalFooter = ({ submit, cancel, ready, progress, type, close, showBorder = true, left }: {
+    submit?: string, cancel?: string, ready?: boolean, progress?: number, type?: string, close?: () => void, showBorder?: boolean, left?: React.ReactNode
 }) => {
     const { t } = useTranslation()
     const btnClass = classNames({
@@ -95,13 +95,22 @@ export const ModalFooter = ({ submit, cancel, ready, progress, type, close, show
         "bg-red-600 text-white hover:text-white hover:bg-red-700": type === "danger",
     })
     const divClass = classNames({
-        "flex items-center justify-end p-3.5": true,
+        "flex items-center p-3.5": true,
+        "justify-between": left !== undefined,
+        "justify-end": left === undefined,
         "border-t": showBorder,
     })
-    return <div className={divClass}>
+    const buttons = <>
         {progress !== undefined && <ProgressBar progress={progress} />}
         {close !== undefined && <input type="button" className="btn text-sm py-1.5 px-3 bg-white text-black hover:text-black hover:bg-gray-200" onClick={() => close()} value={t(cancel ?? "cancel").toLocaleUpperCase()} />}
         {submit && <input type="submit" className={btnClass} value={t(submit).toLocaleUpperCase()} disabled={!(ready ?? true)}/>}
+    </>
+    // `left` is only used alongside close/submit (no `progress`), so grouping the
+    // buttons in their own flex child to keep them together against `justify-between`
+    // doesn't affect the ProgressBar's `grow` sizing for the existing (no-`left`) callers.
+    return <div className={divClass}>
+        {left}
+        {left !== undefined ? <div className="flex items-center">{buttons}</div> : buttons}
     </div>
 }
 

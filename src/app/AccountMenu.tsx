@@ -113,15 +113,6 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
         <DialogTitle className="text-2xl text-white">{t("accountCreator.prompt")}</DialogTitle>
 
         <form onSubmit={handleRegister}>
-            <div className="mb-4">
-                <button
-                    type="button"
-                    className="text-sm text-amber hover:text-amber-300 font-bold"
-                    onClick={() => setMode("login")}
-                >
-                    ← {t("accountMenu.backToLogin")}
-                </button>
-            </div>
             <Alert message={error} />
             <div className="text-white">
                 <label>
@@ -173,7 +164,17 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
                     <input type="email" className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent" name="email" value={emailLocal} onChange={e => setEmailLocal(e.target.value)} />
                 </label>
             </div>
-            <ModalFooter submit="accountCreator.submit" close={close} />
+            <ModalFooter
+                submit="accountCreator.submit"
+                close={close}
+                left={<button
+                    type="button"
+                    className="text-sm text-amber hover:text-amber-300 font-bold"
+                    onClick={() => setMode("login")}
+                >
+                    ← {t("accountMenu.backToLogin")}
+                </button>}
+            />
         </form>
     </div>
 }
@@ -199,15 +200,6 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
     return <div ref={containerRef} tabIndex={-1} className="p-3.5 outline-none">
         <DialogTitle className="text-2xl text-white">{t("forgotPassword.title")}</DialogTitle>
         <form onSubmit={handleRecoverPassword}>
-            <div className="mb-4">
-                <button
-                    type="button"
-                    className="text-sm text-amber hover:text-amber-300 font-bold"
-                    onClick={() => setMode("login")}
-                >
-                    ← {t("accountMenu.backToLogin")}
-                </button>
-            </div>
             <div className="text-white">
                 <label className="w-full text-sm">
                     {t("forgotPassword.prompt")}
@@ -223,7 +215,17 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
                     />
                 </label>
             </div>
-            <ModalFooter submit="forgotPassword.submit" close={close} />
+            <ModalFooter
+                submit="forgotPassword.submit"
+                close={close}
+                left={<button
+                    type="button"
+                    className="text-sm text-amber hover:text-amber-300 font-bold"
+                    onClick={() => setMode("login")}
+                >
+                    ← {t("accountMenu.backToLogin")}
+                </button>}
+            />
         </form>
     </div>
 }
