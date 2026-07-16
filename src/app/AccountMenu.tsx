@@ -39,7 +39,7 @@ const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, err
                             {t("formfieldPlaceholder.username")}
                             <input
                                 type="text"
-                                className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent"
+                                className="text-black form-input w-full mt-1 mb-2 dark:bg-gray-300"
                                 name="username"
                                 value={username}
                                 onChange={e => setUsernameLocal(e.target.value)}
@@ -54,7 +54,7 @@ const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, err
                             {t("formfieldPlaceholder.password")}
                             <input
                                 type="password"
-                                className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent"
+                                className="text-black form-input w-full mt-1 mb-2 dark:bg-gray-300"
                                 name="password"
                                 value={password}
                                 onChange={e => setPasswordLocal(e.target.value)}
@@ -119,7 +119,7 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
                     {t("formfieldPlaceholder.username")}
                     <input
                         type="text"
-                        className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent"
+                        className="text-black form-input w-full mt-1 mb-2 dark:bg-gray-300"
                         name="username"
                         value={username}
                         onChange={e => setUsernameLocal(e.target.value)}
@@ -135,7 +135,7 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
                     {t("formfieldPlaceholder.password")}
                     <input
                         type="password"
-                        className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent"
+                        className="text-black form-input w-full mt-1 mb-2 dark:bg-gray-300"
                         name="password"
                         value={password}
                         onChange={e => setPasswordLocal(e.target.value)}
@@ -147,7 +147,7 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
                     {t("formfieldPlaceholder.confirmPassword")}
                     <input
                         type="password"
-                        className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent"
+                        className="text-black form-input w-full mt-1 mb-2 dark:bg-gray-300"
                         name="passwordconfirm"
                         onChange={e => {
                             e.target.setCustomValidity(e.target.value === password ? "" : t("messages:createaccount.pwdfail"))
@@ -161,12 +161,13 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
             <div className="text-white">
                 <label>{t("formFieldPlaceholder.emailOptional")}
                     <p className="text-sm">{t("formFieldPlaceholder.emailOptional.usedFor")}</p>
-                    <input type="email" className="text-black form-input w-full mt-1 mb-2 dark:bg-transparent" name="email" value={emailLocal} onChange={e => setEmailLocal(e.target.value)} />
+                    <input type="email" className="text-black form-input w-full mt-1 mb-2 dark:bg-gray-300" name="email" value={emailLocal} onChange={e => setEmailLocal(e.target.value)} />
                 </label>
             </div>
             <ModalFooter
                 submit="accountCreator.submit"
                 close={close}
+                showBorder={false}
                 left={<button
                     type="button"
                     className="text-sm text-amber hover:text-amber-300 font-bold"
@@ -205,7 +206,7 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
                     {t("forgotPassword.prompt")}
                     <input
                         type="email"
-                        className="text-black form-input w-full mt-1 dark:bg-transparent placeholder:text-gray-300"
+                        className="text-black form-input w-full mt-1 dark:bg-gray-300 placeholder:text-gray-500"
                         name="email"
                         placeholder={t("forgotPassword.email")}
                         required
