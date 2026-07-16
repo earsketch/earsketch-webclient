@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
 import { post } from "../request"
-import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
+import { Alert, ModalBody, ModalFooter, ModalHeader, useAnimatedHeight } from "../Utils"
 import { DialogTitle, Transition } from "@headlessui/react"
 import esLogo from "./ES_logo_extract.svg"
 
@@ -312,30 +312,8 @@ export const AccountMenu = ({
         })
     }
 
-    // Smoothly tween the modal's height when swapping between views of different heights
-    // instead of snapping. We observe the INNER grid's natural height and animate the
-    // OUTER clipper's height: because animating the outer never changes what we measure
-    // (the inner), the ResizeObserver can't feed back into itself. Pure DOM — no React
-    // state/re-render — so it can't interfere with the slide.
-    const outerRef = useRef<HTMLDivElement>(null)
-    const innerRef = useRef<HTMLDivElement>(null)
-    useEffect(() => {
-        const outer = outerRef.current
-        const inner = innerRef.current
-        if (!outer || !inner) return
-        let previous = inner.getBoundingClientRect().height
-        let animation: Animation | null = null
-        const observer = new ResizeObserver(() => {
-            const next = inner.getBoundingClientRect().height
-            if (Math.abs(next - previous) < 1) return
-            const from = previous
-            previous = next
-            animation?.cancel()
-            animation = outer.animate([{ height: `${from}px` }, { height: `${next}px` }], { duration: 200, easing: "ease-out" })
-        })
-        observer.observe(inner)
-        return () => { observer.disconnect(); animation?.cancel() }
-    }, [])
+    // Tween the modal's height smoothly when swapping between views of different heights.
+    const { outer: outerRef, inner: innerRef } = useAnimatedHeight()
 
     // Grid cell-stacking (every view shares col/row 1) keeps the leaving and entering
     // views overlaid and sizes the container to the taller of the two mid-swap, so it

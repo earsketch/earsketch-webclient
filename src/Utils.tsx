@@ -25,6 +25,37 @@ export const useHeightLimiter = (show: boolean, marginBottom: string|null = null
     return [el, { maxHeight: height, overflowY: "auto" }]
 }
 
+// Smoothly tween a wrapper's height as the content it wraps changes size, instead of
+// snapping. Attach `outer` to a clipping wrapper (`overflow-hidden`) and `inner` to the
+// content inside it. A ResizeObserver watches the inner's natural height and a Web
+// Animation tweens the outer's height to match. We measure the inner but animate the
+// outer so the animation never changes what we measure — otherwise the observer would
+// feed back into itself. Pure DOM, no React state, so it won't cause re-renders.
+export const useAnimatedHeight = (duration = 200): { outer: MutableRefObject<HTMLDivElement|null>, inner: MutableRefObject<HTMLDivElement|null> } => {
+    const outer = useRef<HTMLDivElement|null>(null)
+    const inner = useRef<HTMLDivElement|null>(null)
+
+    useEffect(() => {
+        const outerEl = outer.current
+        const innerEl = inner.current
+        if (!outerEl || !innerEl) return
+        let previous = innerEl.getBoundingClientRect().height
+        let animation: Animation | null = null
+        const observer = new ResizeObserver(() => {
+            const next = innerEl.getBoundingClientRect().height
+            if (Math.abs(next - previous) < 1) return
+            const from = previous
+            previous = next
+            animation?.cancel()
+            animation = outerEl.animate([{ height: `${from}px` }, { height: `${next}px` }], { duration, easing: "ease-out" })
+        })
+        observer.observe(innerEl)
+        return () => { observer.disconnect(); animation?.cancel() }
+    }, [duration])
+
+    return { outer, inner }
+}
+
 const ProgressBar = ({ progress }: { progress: number }) => {
     const percent = Math.floor(progress * 100) + "%"
     return <div className="progress grow mb-0 mr-3">
