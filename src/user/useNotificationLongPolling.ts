@@ -18,12 +18,14 @@ export const useNotificationLongPolling = () => {
         let timeoutId: number | null = null
         let intervalIndex = 0
         let isPolling = false
+        let didCancel = false
         let hasFetchedInitialNotifications = false
         let latestNotificationCount: number | null = null
 
         const fetchNotifications = async () => {
             try {
                 const result = await request.getAuth("/users/notifications")
+                if (didCancel) return
                 if (Array.isArray(result)) {
                     // Reset to the shortest polling interval if we detect new notifications
                     if (latestNotificationCount !== null && result.length > latestNotificationCount) {
@@ -90,6 +92,7 @@ export const useNotificationLongPolling = () => {
         document.addEventListener("visibilitychange", onVisibilityChange)
 
         return () => {
+            didCancel = true // Handle mid-fetch logout - or any unmount
             stopPolling()
             document.removeEventListener("visibilitychange", onVisibilityChange)
         }
