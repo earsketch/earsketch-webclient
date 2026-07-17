@@ -584,6 +584,19 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
         )
     }
 
+    if (loginState === "logging-in") {
+        return (
+            <button
+                className="mx-3 whitespace-nowrap py-1 px-2 rounded-md border border-amber text-amber disabled:opacity-75 disabled:cursor-not-allowed"
+                disabled
+                title={t("loading")}
+                aria-label={t("loading")}
+            >
+                <i className="es-spinner animate-spin"></i>
+            </button>
+        )
+    }
+
     return (
         <button
             className="mx-3 whitespace-nowrap py-1 px-2 rounded-md border border-amber text-amber  hover:text-black hover:bg-amber"
@@ -714,7 +727,10 @@ export const App = () => {
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
     const [isAdmin, setIsAdmin] = useState(false)
-    const [loginState, setLoginState] = useState<LoginState>("logged-out")
+    // Start in "logging-in" so the nav-bar login button shows a spinner from the very
+    // first paint, rather than briefly showing the enabled Login button before we've had
+    // a chance to check for saved credentials/token and attempt an auto-login.
+    const [loginState, setLoginState] = useState<LoginState>("logging-in")
     /** When a login is in progress, callers (e.g. Strict Mode’s second useEffect) await
      * this promise instead of returning early. */
     const loginInProgressRef = useRef<Promise<void> | null>(null)
@@ -775,6 +791,9 @@ export const App = () => {
                 const token = user.selectToken(store.getState())
                 if (token !== null) {
                     await login({ token })
+                } else {
+                    // No saved credentials or token to try — we're definitively logged out.
+                    setLoginState("logged-out")
                 }
             }
 
