@@ -30,7 +30,7 @@ const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, err
         <div className="mx-32 mt-2 mb-10">
             <div className="flex justify-center"><img className="h-11" src={esLogo} alt="EarSketch Logo" /></div>
 
-            <DialogTitle className="mt-10 text-center text-2xl">{t("accountMenu.loginCallToAction")}</DialogTitle>
+            <h2 className="mt-10 text-center text-2xl">{t("accountMenu.loginCallToAction")}</h2>
             <form onSubmit={handleLogin}>
                 <ModalBody>
                     <Alert message={error} />
@@ -115,7 +115,7 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
         return () => window.clearTimeout(id)
     }, [])
     return <div ref={containerRef} tabIndex={-1} className="p-3.5 outline-none">
-        <DialogTitle className="text-2xl text-white">{t("accountCreator.prompt")}</DialogTitle>
+        <h2 className="text-2xl text-white">{t("accountCreator.prompt")}</h2>
 
         <form onSubmit={handleRegister}>
             <Alert message={error} />
@@ -204,7 +204,7 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
         return () => window.clearTimeout(id)
     }, [])
     return <div ref={containerRef} tabIndex={-1} className="p-3.5 outline-none">
-        <DialogTitle className="text-2xl text-white">{t("forgotPassword.title")}</DialogTitle>
+        <h2 className="text-2xl text-white">{t("forgotPassword.title")}</h2>
         <form onSubmit={handleRecoverPassword}>
             <div className="text-white">
                 <label className="w-full text-sm">
@@ -324,6 +324,12 @@ export const AccountMenu = ({
     // Tween the modal's height smoothly when swapping between views of different heights.
     const { outer: outerRef, inner: innerRef } = useAnimatedHeight()
 
+    const titleKey = {
+        login: "accountMenu.loginCallToAction",
+        register: "accountCreator.prompt",
+        recover: "forgotPassword.title",
+    }[mode]
+
     // Grid cell-stacking (every view shares col/row 1) keeps the leaving and entering
     // views overlaid and sizes the container to the taller of the two mid-swap, so it
     // never collapses under the slide. Headless UI's data-attribute transition API drives
@@ -331,8 +337,16 @@ export const AccountMenu = ({
     // it. With no `appear` prop the first view shown on open does not animate. Login is the
     // "left" panel and register/recover the "right" panel, so each slides to/from its own
     // edge for both enter and leave. overflow-hidden clips the off-screen views.
+    // A single DialogTitle that lives for the whole time the dialog is open (its text just
+    // tracks `mode`), rather than one per view. Headless UI's Dialog stores only one
+    // titleId, and DialogTitle clears that id unconditionally on unmount; with a separate
+    // DialogTitle per sliding view, the leaving view's unmount (which happens ~200ms after
+    // the entering view already claimed the id) would wipe out the id the entering view
+    // had just set. Visually hidden — each view still renders its own visible heading as a
+    // plain <h2>.
     return (
         <div className="bg-blue text-white overflow-x-hidden ring-2 ring-gray-700/50 ring-inset">
+            <DialogTitle className="sr-only">{t(titleKey)}</DialogTitle>
             <div ref={outerRef} className="overflow-hidden">
                 <div ref={innerRef} className="grid">
                     <Transition show={mode === "login"}>
