@@ -15,12 +15,13 @@ interface LoginViewProps {
     password: string
     setPasswordLocal: (v: string) => void
     error: string
+    loggingIn: boolean
     handleLogin: (e: React.FormEvent) => void
     setMode: (mode: AccountMenuMode) => void
     close: () => void
 }
 
-const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, error, handleLogin, setMode, close }: LoginViewProps) => {
+const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, error, loggingIn, handleLogin, setMode, close }: LoginViewProps) => {
     const { t } = useTranslation()
     return <div>
         <div className="flex justify-end">
@@ -75,11 +76,14 @@ const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, err
                     </div>
                 </ModalBody>
                 <div className="p-3.5">
-                    <button className="bg-sky-700 hover:bg-sky-500 p-3.5 rounded w-full"
+                    <button className="bg-sky-700 hover:bg-sky-500 disabled:opacity-75 disabled:cursor-not-allowed p-3.5 rounded w-full"
                         title={t("accountMenu.login")}
                         aria-label={t("accountMenu.login")}
-                        type="submit">
-                        {t("accountMenu.login")}
+                        type="submit"
+                        disabled={loggingIn}>
+                        {loggingIn
+                            ? <><i className="es-spinner animate-spin mr-3"></i>{t("loading")}</>
+                            : t("accountMenu.login")}
                     </button>
                 </div>
             </form>
@@ -271,9 +275,11 @@ export const AccountMenu = ({
     const [emailLocal, setEmailLocal] = useState("")
     const [recoverEmail, setRecoverEmail] = useState("")
     const [error, setError] = useState("")
+    const [loggingIn, setLoggingIn] = useState(false)
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (loggingIn) return
         setError("")
         if (!username || !password) {
             setError("Please enter both username and password")
@@ -281,8 +287,13 @@ export const AccountMenu = ({
         }
         setUsername(username)
         setPassword(password)
-        await onLogin(username, password)
-        close()
+        setLoggingIn(true)
+        try {
+            await onLogin(username, password)
+            close()
+        } finally {
+            setLoggingIn(false)
+        }
     }
 
     const handleRegister = async (e: React.FormEvent) => {
@@ -357,6 +368,7 @@ export const AccountMenu = ({
                                 password={password}
                                 setPasswordLocal={setPasswordLocal}
                                 error={error}
+                                loggingIn={loggingIn}
                                 handleLogin={handleLogin}
                                 setMode={setMode}
                                 close={close}
