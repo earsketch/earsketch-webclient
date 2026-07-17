@@ -587,12 +587,12 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
     if (loginState === "logging-in") {
         return (
             <button
-                className="mx-3 whitespace-nowrap py-1 px-2 rounded-md border border-amber text-amber disabled:opacity-75 disabled:cursor-not-allowed"
+                className="mx-3 whitespace-nowrap py-1 px-2 rounded-md border border-amber text-amber disabled:opacity-75 disabled:cursor-not-allowed inline-flex items-center justify-center"
                 disabled
                 title={t("loading")}
                 aria-label={t("loading")}
             >
-                <i className="es-spinner animate-spin"></i>
+                <i className="es-spinner es-spinner-amber animate-spin"></i>
             </button>
         )
     }
