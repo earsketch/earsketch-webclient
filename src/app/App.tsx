@@ -577,7 +577,7 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
                     {[{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
                         .map(({ name, action }) =>
                             <Menu.Item key={name}>
-                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{name}</button>}
+                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action} type="button">{name}</button>}
                             </Menu.Item>)}
                 </Menu.Items>
             </Menu>
