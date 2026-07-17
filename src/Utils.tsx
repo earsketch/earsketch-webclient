@@ -25,6 +25,37 @@ export const useHeightLimiter = (show: boolean, marginBottom: string|null = null
     return [el, { maxHeight: height, overflowY: "auto" }]
 }
 
+// Smoothly tween a wrapper's height as the content it wraps changes size, instead of
+// snapping. Attach `outer` to a clipping wrapper (`overflow-hidden`) and `inner` to the
+// content inside it. A ResizeObserver watches the inner's natural height and a Web
+// Animation tweens the outer's height to match. We measure the inner but animate the
+// outer so the animation never changes what we measure — otherwise the observer would
+// feed back into itself. Pure DOM, no React state, so it won't cause re-renders.
+export const useAnimatedHeight = (duration = 200): { outer: MutableRefObject<HTMLDivElement|null>, inner: MutableRefObject<HTMLDivElement|null> } => {
+    const outer = useRef<HTMLDivElement|null>(null)
+    const inner = useRef<HTMLDivElement|null>(null)
+
+    useEffect(() => {
+        const outerEl = outer.current
+        const innerEl = inner.current
+        if (!outerEl || !innerEl) return
+        let previous = innerEl.getBoundingClientRect().height
+        let animation: Animation | null = null
+        const observer = new ResizeObserver(() => {
+            const next = innerEl.getBoundingClientRect().height
+            if (Math.abs(next - previous) < 1) return
+            const from = previous
+            previous = next
+            animation?.cancel()
+            animation = outerEl.animate([{ height: `${from}px` }, { height: `${next}px` }], { duration, easing: "ease-out" })
+        })
+        observer.observe(innerEl)
+        return () => { observer.disconnect(); animation?.cancel() }
+    }, [duration])
+
+    return { outer, inner }
+}
+
 const ProgressBar = ({ progress }: { progress: number }) => {
     const percent = Math.floor(progress * 100) + "%"
     return <div className="progress grow mb-0 mr-3">
@@ -54,8 +85,8 @@ export const ModalSectionHeader: React.FC<Props> = ({ children }) => {
     return <div className="p-3.5 bg-gray-300 text-black">{children}</div>
 }
 
-export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
-    submit?: string, cancel?: string, ready?: boolean, progress?: number, type?: string, close?: () => void
+export const ModalFooter = ({ submit, cancel, ready, progress, type, close, showBorder = true, left }: {
+    submit?: string, cancel?: string, ready?: boolean, progress?: number, type?: string, close?: () => void, showBorder?: boolean, left?: React.ReactNode
 }) => {
     const { t } = useTranslation()
     const btnClass = classNames({
@@ -63,10 +94,23 @@ export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
         "bg-sky-700 text-white hover:text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-75": !type,
         "bg-red-600 text-white hover:text-white hover:bg-red-700": type === "danger",
     })
-    return <div className="flex items-center justify-end border-t p-3.5">
+    const divClass = classNames({
+        "flex items-center p-3.5": true,
+        "justify-between": left !== undefined,
+        "justify-end": left === undefined,
+        "border-t": showBorder,
+    })
+    const buttons = <>
         {progress !== undefined && <ProgressBar progress={progress} />}
         {close !== undefined && <input type="button" className="btn text-sm py-1.5 px-3 bg-white text-black hover:text-black hover:bg-gray-200" onClick={() => close()} value={t(cancel ?? "cancel").toLocaleUpperCase()} />}
         {submit && <input type="submit" className={btnClass} value={t(submit).toLocaleUpperCase()} disabled={!(ready ?? true)}/>}
+    </>
+    // `left` is only used alongside close/submit (no `progress`), so grouping the
+    // buttons in their own flex child to keep them together against `justify-between`
+    // doesn't affect the ProgressBar's `grow` sizing for the existing (no-`left`) callers.
+    return <div className={divClass}>
+        {left}
+        {left !== undefined ? <div className="flex items-center">{buttons}</div> : buttons}
     </div>
 }
 
