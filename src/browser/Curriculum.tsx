@@ -248,10 +248,11 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
                         <button
                             className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
                             title={t("extension.switchToExtension", { extensionName })}
+                            aria-label={t("extension.switchToExtension", { extensionName })}
                             onClick={() => { dispatch(appState.setEastContent("extension")) }}>
                             {extensionIcon32
-                                ? <img src={extensionIcon32} alt={t("extension.iconAlt", { extensionName })} className="w-5 h-5" />
-                                : <span className="flex items-center justify-center w-5 h-5 rounded bg-gray-300 dark:bg-gray-600 text-black dark:text-white text-xs font-bold">{t("extension.iconLetter")}</span>}
+                                ? <img src={extensionIcon32} alt="" className="w-5 h-5" />
+                                : <span aria-hidden="true" className="flex items-center justify-center w-5 h-5 rounded bg-gray-300 dark:bg-gray-600 text-black dark:text-white text-xs font-bold">{t("extension.iconLetter")}</span>}
                         </button>
                     )}
                 </>}
