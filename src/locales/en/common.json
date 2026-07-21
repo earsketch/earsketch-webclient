@@ -52,6 +52,7 @@
     "extension.showDetails": "Show Details",
     "extension.hideDetails": "Hide Details",
     "extension.remove": "Remove",
+    "extension.iconLetter": "E",
     "whatsNew": "What's New",
     "leave": "Leave",
     "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",
