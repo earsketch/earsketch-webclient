@@ -46,6 +46,7 @@
     "extension.permission.getEditorContents": "Read editor contents",
     "extension.permission.getScriptExecutionResult": "Access script execution results",
     "extension.permission.getDawState": "Access DAW state",
+    "extension.permission.getPlaybackStatus": "Access playback status",
     "extension.permission.getColorTheme": "Read color theme",
     "extension.permission.getCurrentUser": "Read current user information",
     "extension.currentlyLoaded": "Currently loaded",
