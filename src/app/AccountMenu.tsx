@@ -350,7 +350,7 @@ export const AccountMenu = ({
             <div ref={outerRef} className="overflow-hidden">
                 <div ref={innerRef} className="grid">
                     <Transition show={mode === "login"}>
-                        <div className="col-start-1 row-start-1 transition-transform duration-200 ease-out data-[closed]:-translate-x-full">
+                        <div className="col-start-1 row-start-1 transition-transform duration-300 ease-out data-[closed]:-translate-x-full">
                             <LoginView
                                 username={username}
                                 setUsernameLocal={setUsernameLocal}
@@ -365,7 +365,7 @@ export const AccountMenu = ({
                         </div>
                     </Transition>
                     <Transition show={mode === "register"}>
-                        <div className="col-start-1 row-start-1 transition-transform duration-200 ease-out data-[closed]:translate-x-full">
+                        <div className="col-start-1 row-start-1 transition-transform duration-300 ease-out data-[closed]:translate-x-full">
                             <RegisterView
                                 username={username}
                                 setUsernameLocal={setUsernameLocal}
@@ -383,7 +383,7 @@ export const AccountMenu = ({
                         </div>
                     </Transition>
                     <Transition show={mode === "recover"}>
-                        <div className="col-start-1 row-start-1 transition-transform duration-200 ease-out data-[closed]:translate-x-full">
+                        <div className="col-start-1 row-start-1 transition-transform duration-300 ease-out data-[closed]:translate-x-full">
                             <RecoverView
                                 recoverEmail={recoverEmail}
                                 setRecoverEmail={setRecoverEmail}
