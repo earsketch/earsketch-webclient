@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
 import { post } from "../request"
-import { Alert, ModalBody, ModalFooter, ModalHeader, useAnimatedHeight } from "../Utils"
+import { Alert, ModalBody, ModalFooter, useAnimatedHeight } from "../Utils"
 import { DialogTitle, Transition } from "@headlessui/react"
 import esLogo from "./ES_logo_extract.svg"
 
@@ -243,27 +243,16 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
 
 export const AccountMenu = ({
     close,
-    loggedIn,
-    isAdmin,
     username: initialUsername,
     password: initialPassword,
     onLogin,
-    onEditProfile,
-    onLogout,
-    onAdminWindow,
     setUsername,
     setPassword,
 }: {
     close: () => void
-    loggedIn: boolean
-    isAdmin?: boolean
     username?: string
     password?: string
-    email?: string
     onLogin: (username: string, password: string) => void
-    onEditProfile: () => void
-    onLogout: () => void
-    onAdminWindow?: () => void
     setUsername: (u: string) => void
     setPassword: (p: string) => void
 }) => {

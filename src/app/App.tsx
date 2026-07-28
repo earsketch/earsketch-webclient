@@ -554,14 +554,9 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
 
     const openAccountMenu = () => {
         openModal(AccountMenu, {
-            loggedIn: false,
             username,
             password,
-            email,
             onLogin: (u, p) => login({ username: u, password: p }),
-            onEditProfile: editProfile,
-            onLogout: logout,
-            onAdminWindow: openAdminWindow,
             setUsername,
             setPassword,
         })
