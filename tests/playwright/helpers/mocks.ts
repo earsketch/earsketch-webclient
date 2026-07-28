@@ -111,7 +111,7 @@ export async function setupBackend(page: Page, opts: MockOptions = {}): Promise<
 
     // Standard audio library — always set if anything is mocked
     const standardAudio = standardLibraryDefault(opts.standardAudio ?? [])
-    await page.route(`https://${CLOUDFRONT_HOST}/backend-static/audio-standard_2.json`, (route) => {
+    await page.route(`https://${CLOUDFRONT_HOST}/backend-static/audio-standard_4.json`, (route) => {
         counter.bump("audio_standard")
         return fulfillJson(route, standardAudio)
     })
