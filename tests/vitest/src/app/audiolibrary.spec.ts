@@ -13,7 +13,7 @@ beforeEach(() => {
     vi.resetAllMocks()
 })
 
-it("defaults an undefined sound type to user without replacing an explicit type", async () => {
+it("defaults an undefined sound type to hidden without replacing an explicit type", async () => {
     const withoutType = {
         name: "USER_SOUND",
         tempo: -1,
@@ -26,7 +26,7 @@ it("defaults an undefined sound type to user without replacing an explicit type"
 
     const sounds = await getUserSounds("tester")
 
-    expect(sounds[0].type).toBe(SoundType.User)
+    expect(sounds[0].type).toBe(SoundType.Hidden)
     expect(sounds[0].tempo).toBeUndefined()
     expect(sounds[1].type).toBe(SoundType.Public)
 })
