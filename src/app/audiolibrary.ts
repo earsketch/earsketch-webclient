@@ -197,5 +197,6 @@ function fixMetadata(metadata: SoundEntity) {
     if (metadata.tempo === -1) {
         metadata.tempo = undefined
     }
+    metadata.type ??= SoundType.Hidden
     return metadata
 }
