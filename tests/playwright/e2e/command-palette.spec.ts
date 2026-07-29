@@ -8,8 +8,8 @@ const TECHNO_SOUND: AudioMeta = {
     genre: "TECHNO",
     name: "TECHNO_LOOP_001",
     path: "standard-library/TECHNO_TEST/TECHNO_LOOP_001.wav",
-    public: 1,
     tempo: 140,
+    type: 1,
     year: 2020,
 }
 

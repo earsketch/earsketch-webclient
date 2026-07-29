@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { Language } from "common"
-import { selectExtensionIcon32, selectExtensionName } from "../extensions/extensionState"
+import { selectExtensionIcon32, selectExtensionName, selectExtensionUrl } from "../extensions/extensionState"
 
 const SECTION_URL_CHARACTER = ":"
 
@@ -204,6 +204,7 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const extensionIcon32 = useSelector(selectExtensionIcon32)
     const extensionName = useSelector(selectExtensionName)
+    const extensionUrl = useSelector(selectExtensionUrl)
     const paneTitle = isCurriculumPane ? t("curriculum.title") : t("extension")
     const closeButtonTitle = isCurriculumPane ? t("curriculum.close") : t("extension.close")
 
@@ -243,12 +244,15 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
                         }}>
                         {language === "python" ? "PY" : "JS"}
                     </button>
-                    {extensionIcon32 && (
+                    {extensionUrl && (
                         <button
                             className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
                             title={t("extension.switchToExtension", { extensionName })}
+                            aria-label={t("extension.switchToExtension", { extensionName })}
                             onClick={() => { dispatch(appState.setEastContent("extension")) }}>
-                            <img src={extensionIcon32} alt="" className="w-5 h-5" />
+                            {extensionIcon32
+                                ? <img src={extensionIcon32} alt="" className="w-5 h-5" />
+                                : <span aria-hidden="true" className="flex items-center justify-center w-5 h-5 rounded bg-gray-300 dark:bg-gray-600 text-black dark:text-white text-xs font-bold">{t("extension.iconLetter")}</span>}
                         </button>
                     )}
                 </>}
@@ -256,7 +260,8 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
                     <button
                         className="inline-flex items-center p-1 text-xs rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700 ml-2"
                         title={t("curriculum.title")}
-                        onClick={() => { dispatch(appState.setEastContent("curriculum")) }}>
+                        onClick={() => { dispatch(appState.setEastContent("curriculum")) }}
+                        type="button">
                         {t("curriculum.title").toLocaleUpperCase()}
                     </button>
                 )}

@@ -5,14 +5,14 @@ import { skipTour, login, waitForHeadlessDialog } from "../helpers/actions"
 const TEST_SOUND_META_1 = {
     folder: "STUB FOLDER",
     name: "OS_CLAP00",
-    public: 1 as const,
     path: "standard-library/filename/placeholder/here.wav",
+    type: 1 as const,
 }
 const TEST_SOUND_META = {
     folder: "STUB FOLDER",
     name: "OS_CLAP01",
-    public: 1 as const,
     path: "standard-library/filename/placeholder/here.wav",
+    type: 1 as const,
 }
 
 test.describe("Editor", () => {
