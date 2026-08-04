@@ -2,8 +2,9 @@ import { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
-import { useAppDispatch as useDispatch } from "../hooks"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import * as layout from "../ide/layoutState"
+import { selectExtensionIcon32, selectExtensionName } from "./extensionState"
 
 /** The title bar for east-pane components - with menu icons provided using the `children` prop */
 export const TitleBar = ({ title, closeButtonTitle, children }: { title: string, closeButtonTitle: string, children?: ReactNode }) => {
@@ -35,15 +36,19 @@ export const TitleBar = ({ title, closeButtonTitle, children }: { title: string,
 export const ExtensionsTitleBar = () => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
+    const extensionIcon32 = useSelector(selectExtensionIcon32)
+    const extensionName = useSelector(selectExtensionName)
 
     return (
         <TitleBar title={t("extensions")} closeButtonTitle={t("extension.close")}>
-            <button
-                className="inline-flex items-center p-1 text-xs rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700 ml-2"
-                title={t("curriculum.title")}
-                onClick={() => { dispatch(appState.setEastContent("curriculum")) }}>
-                {t("curriculum.title").toLocaleUpperCase()}
-            </button>
+            {extensionIcon32 && (
+                <button
+                    className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
+                    title={t("extension.switchToExtension", { extensionName })}
+                    onClick={() => { dispatch(appState.setEastContent("extension")) }}>
+                    <img src={extensionIcon32} alt="" className="w-5 h-5" />
+                </button>
+            )}
         </TitleBar>
     )
 }

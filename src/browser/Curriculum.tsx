@@ -15,7 +15,6 @@ import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { Language } from "common"
-import { selectExtensionIcon32, selectExtensionName } from "../extensions/extensionState"
 import { TitleBar } from "../extensions/TitleBar"
 
 const SECTION_URL_CHARACTER = ":"
@@ -203,8 +202,6 @@ export const CurriculumTitleBar = () => {
     const language = useSelector(appState.selectScriptLanguage)
     const location = useSelector(curriculum.selectCurrentLocation)
     const pageTitle = useSelector(curriculum.selectPageTitle)
-    const extensionIcon32 = useSelector(selectExtensionIcon32)
-    const extensionName = useSelector(selectExtensionName)
 
     useEffect(() => {
         if ((ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) && !pageTitle?.includes("Loading")) {
@@ -225,14 +222,6 @@ export const CurriculumTitleBar = () => {
                 }}>
                 {language === "python" ? "PY" : "JS"}
             </button>
-            {extensionIcon32 && (
-                <button
-                    className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
-                    title={t("extension.switchToExtension", { extensionName })}
-                    onClick={() => { dispatch(appState.setEastContent("extension")) }}>
-                    <img src={extensionIcon32} alt="" className="w-5 h-5" />
-                </button>
-            )}
         </TitleBar>
     )
 }
