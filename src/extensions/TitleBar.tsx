@@ -32,7 +32,7 @@ export const TitleBar = ({ title, closeButtonTitle, children }: { title: string,
     )
 }
 
-/** The extensions title bar with extension launch icons */
+/** The title bar for the pane with extension launch icons */
 export const ExtensionsTitleBar = () => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
@@ -42,13 +42,32 @@ export const ExtensionsTitleBar = () => {
     return (
         <TitleBar title={t("extensions")} closeButtonTitle={t("extension.close")}>
             {extensionIcon32 && (
-                <button
-                    className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
-                    title={t("extension.switchToExtension", { extensionName })}
-                    onClick={() => { dispatch(appState.setEastContent("extension")) }}>
-                    <img src={extensionIcon32} alt="" className="w-5 h-5" />
-                </button>
+                <ExtensionLaunchIcon
+                    extensionName={extensionName}
+                    extensionIcon32={extensionIcon32}
+                    onClick={() => { dispatch(appState.setEastContent("extension")) }}
+                />
             )}
         </TitleBar>
+    )
+}
+
+type ExtensionLaunchIconProps = {
+    extensionName: string
+    extensionIcon32: string
+    onClick?: () => void
+}
+
+/** An icon for launching an extension */
+const ExtensionLaunchIcon = ({ extensionName, extensionIcon32, onClick }: ExtensionLaunchIconProps) => {
+    const { t } = useTranslation()
+
+    return (
+        <button
+            className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
+            title={t("extension.switchToExtension", { extensionName })}
+            onClick={onClick}>
+            <img src={extensionIcon32} alt="" className="w-5 h-5" />
+        </button>
     )
 }
