@@ -156,7 +156,7 @@ const CurriculumHeader = () => {
 
     return (
         <div id="curriculum-header" style={{ position: "relative" }}>
-            <TitleBar isCurriculumPane={true} />
+            <CurriculumTitleBar />
             <NavigationBar />
 
             <div onFocus={() => dispatch(curriculum.showResults(true))}
@@ -196,29 +196,13 @@ const CurriculumSearchResults = () => {
         : null
 }
 
-export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) => {
-    const { t } = useTranslation()
+const TitleBar = ({ title, closeButtonTitle, children }: { title: string, closeButtonTitle: string, children?: React.ReactNode }) => {
     const dispatch = useDispatch()
-    const language = useSelector(appState.selectScriptLanguage)
-    const location = useSelector(curriculum.selectCurrentLocation)
-    const pageTitle = useSelector(curriculum.selectPageTitle)
-    const extensionIcon32 = useSelector(selectExtensionIcon32)
-    const extensionName = useSelector(selectExtensionName)
-    const paneTitle = isCurriculumPane ? t("curriculum.title") : t("extensions")
-    const closeButtonTitle = isCurriculumPane ? t("curriculum.close") : t("extension.close")
-
-    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
-        useEffect(() => {
-            if (!pageTitle?.includes("Loading")) {
-                dispatch(caiThunks.curriculumPage([location, pageTitle]))
-            }
-        }, [location, pageTitle])
-    }
 
     return (
         <div className="flex items-center p-2 text-base bg-white text-black dark:bg-gray-900 dark:text-white">
             <div className="ltr:pl-2 ltr:pr-4 rtl:pl-4 rtl:pr-3 font-semibold truncate">
-                <h2>{paneTitle.toLocaleUpperCase()}</h2>
+                <h2>{title.toLocaleUpperCase()}</h2>
             </div>
             <div>
                 <button
@@ -231,37 +215,65 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
                 </button>
             </div>
             <div className="flex items-center ltr:ml-auto rtl:mr-auto">
-                {isCurriculumPane && <>
-                    <button className="px-2 -my-1 text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
-                        <i className="icon icon-link" />
-                    </button>
-                    <button className="h-fit border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-middle"
-                        title={t("ariaDescriptors:curriculum.switchScriptLanguage", { language: language === "python" ? "javascript" : "python" })}
-                        onClick={() => {
-                            const newLanguage = (language === "python" ? "javascript" : "python")
-                            dispatch(appState.setScriptLanguage(newLanguage))
-                        }}>
-                        {language === "python" ? "PY" : "JS"}
-                    </button>
-                    {extensionIcon32 && (
-                        <button
-                            className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
-                            title={t("extension.switchToExtension", { extensionName })}
-                            onClick={() => { dispatch(appState.setEastContent("extension")) }}>
-                            <img src={extensionIcon32} alt="" className="w-5 h-5" />
-                        </button>
-                    )}
-                </>}
-                {!isCurriculumPane && (
-                    <button
-                        className="inline-flex items-center p-1 text-xs rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700 ml-2"
-                        title={t("curriculum.title")}
-                        onClick={() => { dispatch(appState.setEastContent("curriculum")) }}>
-                        {t("curriculum.title").toLocaleUpperCase()}
-                    </button>
-                )}
+                {children}
             </div>
         </div>
+    )
+}
+
+export const CurriculumTitleBar = () => {
+    const { t } = useTranslation()
+    const dispatch = useDispatch()
+    const language = useSelector(appState.selectScriptLanguage)
+    const location = useSelector(curriculum.selectCurrentLocation)
+    const pageTitle = useSelector(curriculum.selectPageTitle)
+    const extensionIcon32 = useSelector(selectExtensionIcon32)
+    const extensionName = useSelector(selectExtensionName)
+
+    useEffect(() => {
+        if ((ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) && !pageTitle?.includes("Loading")) {
+            dispatch(caiThunks.curriculumPage([location, pageTitle]))
+        }
+    }, [dispatch, location, pageTitle])
+
+    return (
+        <TitleBar title={t("curriculum.title")} closeButtonTitle={t("curriculum.close")}>
+            <button className="px-2 -my-1 text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
+                <i className="icon icon-link" />
+            </button>
+            <button className="h-fit border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-middle"
+                title={t("ariaDescriptors:curriculum.switchScriptLanguage", { language: language === "python" ? "javascript" : "python" })}
+                onClick={() => {
+                    const newLanguage = (language === "python" ? "javascript" : "python")
+                    dispatch(appState.setScriptLanguage(newLanguage))
+                }}>
+                {language === "python" ? "PY" : "JS"}
+            </button>
+            {extensionIcon32 && (
+                <button
+                    className="inline-flex items-center justify-center w-8 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
+                    title={t("extension.switchToExtension", { extensionName })}
+                    onClick={() => { dispatch(appState.setEastContent("extension")) }}>
+                    <img src={extensionIcon32} alt="" className="w-5 h-5" />
+                </button>
+            )}
+        </TitleBar>
+    )
+}
+
+export const ExtensionsTitleBar = () => {
+    const { t } = useTranslation()
+    const dispatch = useDispatch()
+
+    return (
+        <TitleBar title={t("extensions")} closeButtonTitle={t("extension.close")}>
+            <button
+                className="inline-flex items-center p-1 text-xs rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700 ml-2"
+                title={t("curriculum.title")}
+                onClick={() => { dispatch(appState.setEastContent("curriculum")) }}>
+                {t("curriculum.title").toLocaleUpperCase()}
+            </button>
+        </TitleBar>
     )
 }
 

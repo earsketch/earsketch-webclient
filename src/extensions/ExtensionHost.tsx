@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 
-import { TitleBar } from "../browser/Curriculum"
+import { ExtensionsTitleBar } from "../browser/Curriculum"
 import { selectPlaybackStateChangeTimestamp, selectPlaying, selectTracks } from "../daw/dawState"
 import { useAppSelector as useSelector } from "../hooks"
 import { Log, selectLogs } from "../ide/ideState"
@@ -186,7 +186,7 @@ export const ExtensionHost = () => {
     return (
         <>
             <div dir={currentLocale.direction} className={`h-full ${paneIsOpen ? "" : "hidden"}`}>
-                <TitleBar isCurriculumPane={false} />
+                <ExtensionsTitleBar />
                 <div className="w-full flex justify-between items-stretch select-none text-white bg-blue">
                     <div className="flex items-center gap-2 p-2.5 text-amber">
                         {extensionIcon32 && <img src={extensionIcon32} alt="" className="w-5 h-5 border border-gray-300 dark:border-gray-400 rounded" />}
