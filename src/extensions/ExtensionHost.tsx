@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 
-import { ExtensionsTitleBar } from "../browser/Curriculum"
+import { ExtensionsTitleBar } from "./TitleBar"
 import { selectPlaybackStateChangeTimestamp, selectPlaying, selectTracks } from "../daw/dawState"
 import { useAppSelector as useSelector } from "../hooks"
 import { Log, selectLogs } from "../ide/ideState"
