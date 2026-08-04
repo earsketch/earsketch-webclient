@@ -7,6 +7,7 @@ import { Log, selectLogs } from "../ide/ideState"
 import { Track } from "../types/common"
 import { selectColorTheme, selectLocale } from "../app/appState"
 import { selectExtensionUrl, selectExtensionName, selectExtensionIcon32, selectExtensionPermissions } from "./extensionState"
+import { getTempoMap } from "./extensionApi"
 import * as tabState from "../ide/tabState"
 import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
@@ -89,6 +90,7 @@ export const ExtensionHost = () => {
                 lastChangeTimestamp: selectPlaybackStateChangeTimestamp(state),
             }
         },
+        getTempoMap,
         getColorTheme() {
             const currentColorTheme = colorThemeRef.current
             return currentColorTheme
