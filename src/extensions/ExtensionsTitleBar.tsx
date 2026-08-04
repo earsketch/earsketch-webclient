@@ -15,7 +15,7 @@ export const ExtensionsTitleBar = () => {
     return (
         <TitleBar title={t("extensions")} closeButtonTitle={t("extension.close")}>
             {extensionIcon32 && (
-                <ExtensionLaunchIcon
+                <ExtensionLaunchButton
                     extensionName={extensionName}
                     extensionIcon32={extensionIcon32}
                     onClick={() => { dispatch(appState.setEastContent("extension")) }}
@@ -25,14 +25,14 @@ export const ExtensionsTitleBar = () => {
     )
 }
 
-type ExtensionLaunchIconProps = {
+type ExtensionLaunchButtonProps = {
     extensionName: string
     extensionIcon32: string
     onClick?: () => void
 }
 
 /** An icon for launching an extension */
-const ExtensionLaunchIcon = ({ extensionName, extensionIcon32, onClick }: ExtensionLaunchIconProps) => {
+const ExtensionLaunchButton = ({ extensionName, extensionIcon32, onClick }: ExtensionLaunchButtonProps) => {
     const { t } = useTranslation()
 
     return (
