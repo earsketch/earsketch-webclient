@@ -204,7 +204,7 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const extensionIcon32 = useSelector(selectExtensionIcon32)
     const extensionName = useSelector(selectExtensionName)
-    const paneTitle = isCurriculumPane ? t("curriculum.title") : t("extension")
+    const paneTitle = isCurriculumPane ? t("curriculum.title") : t("extensions")
     const closeButtonTitle = isCurriculumPane ? t("curriculum.close") : t("extension.close")
 
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {

@@ -202,9 +202,7 @@ export const ExtensionHost = () => {
                     title="EarSketch Extension"
                 />
             </div>
-            {!paneIsOpen &&
-            <Collapsed title={t("extension.collapsedTitle", { extensionName }).toLocaleUpperCase()} position="east"
-            />}
+            {!paneIsOpen && <Collapsed position="east" title={`${extensionName ? `${t("extensions")}: ${extensionName}` : t("extensions")}`.toLocaleUpperCase()} />}
         </>)
 }
 
