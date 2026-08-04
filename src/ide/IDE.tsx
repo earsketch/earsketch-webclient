@@ -8,11 +8,8 @@ import Split from "react-split"
 import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
-import { CAI } from "../cai/CAI"
 import * as caiThunks from "../cai/caiThunks"
-import { Chat } from "../cai/Chat"
 import { Language, Script } from "common"
-import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { callbacks as dawCallbacks, DAW, setDAWData } from "../daw/DAW"
 import * as editor from "./Editor"
@@ -399,8 +396,6 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
     const bubbleActive = useSelector(bubble.selectActive)
     const bubblePage = useSelector(bubble.selectCurrentPage)
 
-    const showCai = useSelector(layout.selectEastKind) === "CAI" && (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT)
-
     const logs = useSelector(ide.selectLogs)
     const consoleContainer = useRef<HTMLDivElement>(null)
     const [focusedConsoleIndex, setFocusedConsoleIndex] = useState(-1)
@@ -439,7 +434,6 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
     const gutterSize = hideEditor ? 0 : 9
     const isWestOpen = useSelector(layout.isWestOpen)
     const isEastOpen = useSelector(layout.isEastOpen)
-    const eastContent = useSelector(appState.selectEastContent)
     const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
     const maxWidths = embedMode ? [0, Infinity, 0] : [isWestOpen ? Infinity : layout.COLLAPSED_WIDTH, Infinity, isEastOpen ? Infinity : layout.COLLAPSED_WIDTH]
     const minHeights = embedMode ? [layout.MIN_DAW_HEIGHT, 0, 0] : [layout.MIN_DAW_HEIGHT, layout.MIN_EDITOR_HEIGHT, layout.MIN_DAW_HEIGHT]
