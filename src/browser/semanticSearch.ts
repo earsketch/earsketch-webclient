@@ -15,22 +15,10 @@ env.backends.onnx.wasm.wasmPaths = "/ort/"
 
 const MODEL_ID = "Xenova/clap-htsat-unfused"
 
-// Doc mentions 7 dictionaries; ESC50_class_labels_indices_space.json is left out
-// pending confirmation on whether it's a duplicate or an intentionally distinct variant.
-const LABEL_FILES = [
-    "ESC50_class_labels_indices.json",
-    "FSD50k_class_labels_indices.json",
-    "GTZAN_class_labels.json",
-    "UrbanSound8K_class_labels_indices.json",
-    "VGGSound_class_labels_indices.json",
-    "audioset_class_labels_indices.json",
-    "audioset_fsd50k_class_labels_indices.json",
-]
-const LABEL_BATCH_SIZE = 64
-
 interface SearchResult {
     songId: number
     filename: string
+    entityName: string
     similarity: number
 }
 
@@ -38,6 +26,11 @@ interface SongData {
     filename: string
     path: string
     embedding?: number[]
+    // The real EarSketch sound-library entity name for this clip, added by
+    // tools/relabel_audio_embeddings.js via a (parent folder, filename) path match against the
+    // library's own metadata. null for the ~5% of clips that script couldn't confidently match
+    // (e.g. packs reorganized/removed from the library since the embeddings were computed).
+    entityName?: string | null
 }
 
 interface LabelEmbedding {
@@ -98,41 +91,15 @@ class AudioSearchEngine {
         this.songsData = await (await fetch("/embeddings/audio_embeddings.json")).json() as SongsDatabase
         console.log("Songs data loaded:", this.songsData.length, "songs")
 
-        console.log("Loading prompt converter labels...")
-        const labels = await this._loadAllLabels()
-        console.log(`Encoding ${labels.length} unique labels in batches...`)
-        this.labelEmbeddings = await this._encodeLabels(labels)
+        // Precomputed offline by tools/precompute_label_embeddings.js — avoids running ~15
+        // sequential model forward passes (one per batch of labels) on every page load.
+        // Re-run that script if public/embeddings/prompt_converters/*.json changes.
+        console.log("Loading precomputed label embeddings...")
+        this.labelEmbeddings = await (await fetch("/embeddings/label_embeddings.json")).json() as LabelEmbedding[]
         console.log(`Label embeddings ready (${this.labelEmbeddings.length} labels)`)
 
         this.isReady = true
         console.log(`Audio search engine ready with ${this.songsData.length} songs and ${this.labelEmbeddings.length} prompt labels`)
-    }
-
-    private async _loadAllLabels(): Promise<string[]> {
-        const labelSet = new Set<string>()
-        for (const file of LABEL_FILES) {
-            const dict: Record<string, number> = await (await fetch(`/embeddings/prompt_converters/${file}`)).json()
-            Object.keys(dict).forEach(label => labelSet.add(label))
-        }
-        return Array.from(labelSet)
-    }
-
-    private async _encodeLabels(labels: string[]): Promise<LabelEmbedding[]> {
-        const result: LabelEmbedding[] = []
-        for (let i = 0; i < labels.length; i += LABEL_BATCH_SIZE) {
-            const batch = labels.slice(i, i + LABEL_BATCH_SIZE)
-            const inputs = this.tokenizer(batch, { padding: true, truncation: true })
-            const output = await this.textModel(inputs) as any
-            const flatData: Float32Array = output.text_embeds.data
-            const embeddingDim = flatData.length / batch.length
-            for (let j = 0; j < batch.length; j++) {
-                result.push({
-                    label: batch[j],
-                    embedding: Array.from(flatData.slice(j * embeddingDim, (j + 1) * embeddingDim)),
-                })
-            }
-        }
-        return result
     }
 
     private cosineSimilarity(a: number[], b: number[]): number {
@@ -188,9 +155,9 @@ class AudioSearchEngine {
         // Stage 3: score all audio embeddings against the composite search embedding
         const results: SearchResult[] = []
         this.songsData.forEach((songData, index) => {
-            if (!songData.embedding) return
+            if (!songData.embedding || !songData.entityName) return
             const similarity = this.cosineSimilarity(searchEmbedding, songData.embedding)
-            results.push({ songId: index, filename: songData.filename, similarity })
+            results.push({ songId: index, filename: songData.filename, entityName: songData.entityName, similarity })
         })
 
         return results
@@ -198,10 +165,12 @@ class AudioSearchEngine {
             .slice(0, topK)
     }
 
-    async searchFilenames(query: string, topK: number = 20): Promise<string[]> {
+    // Real EarSketch entity names, in rank order — safe to look up directly in the sound
+    // library (e.g. allEntities[name]), no fuzzy matching required.
+    async searchEntityNames(query: string, topK: number = 20): Promise<string[]> {
         const results = await this.search(query, topK)
-        console.log("Search results:", results.map(r => ({ filename: r.filename, similarity: r.similarity })))
-        return results.map(r => r.filename.replace(/\.[^.]+$/, ""))
+        console.log("Search results:", results.map(r => ({ entityName: r.entityName, similarity: r.similarity })))
+        return results.map(r => r.entityName)
     }
 
     getIsReady(): boolean {

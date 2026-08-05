@@ -38,6 +38,10 @@ EarSketchRecommendations/utils
 EarSketchRecommendations/*.txt
 EarSketchRecommendations/*.json
 
+# CLAP search dev tooling / local reference data
+/tools/
+public/embeddings/file_list.txt
+
 # Test reports
 tests/vitest/reports/
 tests/playwright/test-results/
