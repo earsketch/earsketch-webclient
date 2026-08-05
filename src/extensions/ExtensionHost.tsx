@@ -7,7 +7,7 @@ import { Log, selectLogs } from "../ide/ideState"
 import { Track } from "../types/common"
 import { selectColorTheme, selectLocale } from "../app/appState"
 import { selectExtensionUrl, selectExtensionName, selectExtensionIcon32, selectExtensionPermissions } from "./extensionState"
-import { getTempoMap } from "./extensionApi"
+import { getTempoMap, pasteCode } from "./extensionApi"
 import * as tabState from "../ide/tabState"
 import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
@@ -91,6 +91,7 @@ export const ExtensionHost = () => {
             }
         },
         getTempoMap,
+        pasteCode,
         getColorTheme() {
             const currentColorTheme = colorThemeRef.current
             return currentColorTheme
@@ -121,8 +122,9 @@ export const ExtensionHost = () => {
 
                 const fn: string = data.fn
                 if (isExtensionFunction(fn)) {
+                    const extensionFunction = extensionFunctions[fn] as (request: any) => any
                     result = permissions.includes(fn)
-                        ? extensionFunctions[fn]()
+                        ? extensionFunction(data)
                         : { error: `Permission denied: ${fn}` }
                 } else {
                     result = { error: `Unknown function: ${fn}` }
