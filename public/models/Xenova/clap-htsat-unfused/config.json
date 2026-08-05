@@ -1,0 +1,27 @@
+{
+  "_name_or_path": "laion/clap-htsat-unfused",
+  "architectures": [
+    "ClapModel"
+  ],
+  "audio_config": {
+    "fusion_num_hidden_layers": 2,
+    "model_type": "clap_audio_model",
+    "projection_hidden_size": 768
+  },
+  "hidden_size": 768,
+  "initializer_factor": 1.0,
+  "logit_scale_init_value": 14.285714285714285,
+  "model_type": "clap",
+  "num_hidden_layers": 16,
+  "projection_dim": 512,
+  "projection_hidden_act": "relu",
+  "text_config": {
+    "classifier_dropout": null,
+    "fusion_hidden_size": 768,
+    "fusion_num_hidden_layers": 2,
+    "initializer_range": 0.02,
+    "model_type": "clap_text_model",
+    "projection_hidden_size": 768
+  },
+  "transformers_version": "4.36.0.dev0"
+}
