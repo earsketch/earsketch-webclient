@@ -1,3 +1,7 @@
+import { useTranslation } from "react-i18next"
+
+import { openModal } from "../app/modal"
+import { ExtensionLoader } from "./ExtensionLoader"
 import { ExtensionLaunchButton } from "./ExtensionLaunchButton"
 import { loadExtension } from "./loadExtension"
 
@@ -36,9 +40,27 @@ export const TipOfTheDay = () => {
     )
 }
 
+export const ExtensionLoaderButton = () => {
+    const { t } = useTranslation()
+    const title = t("loadExtension")
+
+    return (
+        <button
+            type="button"
+            className="inline-flex items-center justify-center w-4 h-8 ml-2 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-inner hover:bg-gray-200 dark:hover:bg-gray-700"
+            title={title}
+            aria-label={title}
+            onClick={() => openModal(ExtensionLoader)}>
+            {/* <span className="icon icon-plus2" aria-hidden="true" /> */}
+            <div>+</div>
+        </button>
+    )
+}
+
 export const TrustedExtensions = () => (
     <>
         <CodeViz />
         <TipOfTheDay />
+        <ExtensionLoaderButton />
     </>
 )
