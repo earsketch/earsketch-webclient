@@ -231,7 +231,7 @@ export const {
 const SEMANTIC_SEARCH_DEBOUNCE_MS = 500
 const SEMANTIC_SEARCH_TOP_K = 20
 
-let semanticSearchDebounceTimer: ReturnType<typeof window.setTimeout> | null = null
+let semanticSearchDebounceTimer: number | null = null
 let semanticSearchRequestId = 0
 
 async function runSemanticSearch(query: string) {
