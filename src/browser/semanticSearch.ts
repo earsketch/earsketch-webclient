@@ -8,10 +8,15 @@ import { AutoTokenizer, ClapTextModelWithProjection, env } from "@xenova/transfo
 // Serve the model + wasm runtime from public/ instead of CDN/HuggingFace, so search works
 // fully offline. allowRemoteModels is off so a path typo hard-fails instead of silently
 // falling back to a ~500 MB download from HuggingFace.
+//
+// BASE_URL (not a hardcoded "/") matters here: review-app deployments serve the whole site
+// under a subpath (e.g. "/pr-1054/", set via ES_BASE_URL in buildspec.yml), so public/ assets
+// live at "/pr-1054/models/...", not "/models/...". BASE_URL always has a trailing slash.
+const BASE_URL = import.meta.env.BASE_URL
 env.allowLocalModels = true
 env.allowRemoteModels = false
-env.localModelPath = "/models/"
-env.backends.onnx.wasm.wasmPaths = "/ort/"
+env.localModelPath = `${BASE_URL}models/`
+env.backends.onnx.wasm.wasmPaths = `${BASE_URL}ort/`
 
 const MODEL_ID = "Xenova/clap-htsat-unfused"
 
@@ -88,14 +93,14 @@ class AudioSearchEngine {
         console.log("Text model loaded successfully")
 
         console.log("Loading audio embeddings...")
-        this.songsData = await (await fetch("/embeddings/audio_embeddings.json")).json() as SongsDatabase
+        this.songsData = await (await fetch(`${BASE_URL}embeddings/audio_embeddings.json`)).json() as SongsDatabase
         console.log("Songs data loaded:", this.songsData.length, "songs")
 
         // Precomputed offline by tools/precompute_label_embeddings.js — avoids running ~15
         // sequential model forward passes (one per batch of labels) on every page load.
         // Re-run that script if public/embeddings/prompt_converters/*.json changes.
         console.log("Loading precomputed label embeddings...")
-        this.labelEmbeddings = await (await fetch("/embeddings/label_embeddings.json")).json() as LabelEmbedding[]
+        this.labelEmbeddings = await (await fetch(`${BASE_URL}embeddings/label_embeddings.json`)).json() as LabelEmbedding[]
         console.log(`Label embeddings ready (${this.labelEmbeddings.length} labels)`)
 
         this.isReady = true
