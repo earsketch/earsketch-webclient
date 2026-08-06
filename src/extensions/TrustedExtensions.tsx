@@ -7,6 +7,7 @@ import { loadExtension } from "./loadExtension"
 
 const CODE_VIZ_URL = "http://localhost:5173"
 const TIP_OF_THE_DAY_URL = "http://localhost:5174"
+const CHATBOT_URL = "https://emlbot1.lmc.gatech.edu/"
 
 export const CodeViz = () => {
     const launch = async () => {
@@ -40,6 +41,22 @@ export const TipOfTheDay = () => {
     )
 }
 
+export const Chatbot = () => {
+    const launch = async () => {
+        try {
+            await loadExtension(CHATBOT_URL)
+        } catch (error) {
+            console.error("Failed to load Chatbot extension:", error)
+        }
+    }
+
+    return (
+        <ExtensionLaunchButton extensionName="Chatbot" onClick={launch}>
+            <span className="icon icon-bubbles" aria-hidden="true" />
+        </ExtensionLaunchButton>
+    )
+}
+
 export const ExtensionLoaderButton = () => {
     const { t } = useTranslation()
     const title = t("loadExtension")
@@ -59,8 +76,9 @@ export const ExtensionLoaderButton = () => {
 
 export const TrustedExtensions = () => (
     <>
-        <CodeViz />
         <TipOfTheDay />
+        <CodeViz />
+        <Chatbot />
         <ExtensionLoaderButton />
     </>
 )
