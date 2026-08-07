@@ -56,7 +56,7 @@ export default ({ mode }: { mode: string }) => {
                 input: {
                     main: path.resolve(__dirname, "index.html"),
                     autograder: path.resolve(__dirname, "autograder/index.html"),
-                    codeAnalyzer: path.resolve(__dirname, "codeAnalyzer/index.html "),
+                    codeAnalyzer: path.resolve(__dirname, "codeAnalyzer/index.html"),
                 },
             },
             sourcemap: buildType === "review",
