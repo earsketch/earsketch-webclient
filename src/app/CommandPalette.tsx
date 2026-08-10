@@ -662,6 +662,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                 subtitle: result.text,
                 category: "Curriculum",
                 action: () => {
+                    dispatch(appState.setEastContent("curriculum"))
                     dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
                     // Signal Curriculum.tsx to focus the first heading once the new
                     // content is appended. Set this before fetchContent so the flag

@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client"
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import lunr from "lunr"
 
+import * as appState from "../app/appState"
 import esconsole from "../esconsole"
 import * as layout from "../ide/layoutState"
 import type { RootState, ThunkAPI, AppDispatch } from "../reducers"
@@ -385,6 +386,7 @@ export interface SearchResult {
 export const open = createAsyncThunk<void, string, ThunkAPI>(
     "curriculum/open",
     (url, { dispatch }) => {
+        dispatch(appState.setEastContent("curriculum"))
         dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
         dispatch(fetchContent({ url }))
     }

@@ -100,6 +100,7 @@ export function navigateTo(entry: PanelEntry) {
     if (entry.panel === "west") {
         store.dispatch(layout.setWest({ open: true, kind: entry.kind }))
     } else if (entry.panel === "east") {
+        store.dispatch(appState.setEastContent("curriculum"))
         store.dispatch(layout.setEast({ open: true, kind: entry.kind }))
     }
 
@@ -1076,6 +1077,7 @@ export const App = () => {
             }
             dispatch(caiThunks.autoScrollCai())
         } else {
+            dispatch(appState.setEastContent("curriculum"))
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
             dispatch(caiState.setHasSwitchedToCurriculum(true))
             dispatch(caiThunks.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))

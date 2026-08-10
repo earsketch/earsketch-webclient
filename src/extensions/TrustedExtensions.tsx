@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next"
 
+import * as appState from "../app/appState"
 import { openModal } from "../app/modal"
+import { useAppDispatch as useDispatch } from "../hooks"
+import * as layout from "../ide/layoutState"
 import { ExtensionLoader } from "./ExtensionLoader"
 import { ExtensionLaunchButton } from "./ExtensionLaunchButton"
 import { loadExtension } from "./loadExtension"
@@ -8,6 +11,23 @@ import { loadExtension } from "./loadExtension"
 const CODE_VIZ_URL = "http://localhost:5173"
 const TIP_OF_THE_DAY_URL = "http://localhost:5174"
 const CHATBOT_URL = "https://emlbot1.lmc.gatech.edu/"
+
+export const CurriculumExtension = () => {
+    const dispatch = useDispatch()
+    const { t } = useTranslation()
+    const extensionName = t("curriculum.title")
+
+    const launch = () => {
+        dispatch(appState.setEastContent("curriculum"))
+        dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
+    }
+
+    return (
+        <ExtensionLaunchButton extensionName={extensionName} onClick={launch}>
+            <span className="icon icon-book" aria-hidden="true" />
+        </ExtensionLaunchButton>
+    )
+}
 
 export const CodeViz = () => {
     const launch = async () => {
@@ -76,6 +96,7 @@ export const ExtensionLoaderButton = () => {
 
 export const TrustedExtensions = () => (
     <>
+        <CurriculumExtension />
         <TipOfTheDay />
         <CodeViz />
         <Chatbot />
