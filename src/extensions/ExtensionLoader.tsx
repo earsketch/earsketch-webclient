@@ -7,6 +7,71 @@ import { setEastContent } from "../app/appState"
 import store from "../reducers"
 import { useAppSelector } from "../hooks"
 import { setExtension, clearExtension, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon128 } from "./extensionState"
+import { loadExtension as loadTrustedExtension } from "./loadExtension"
+
+const extensionCards = [
+    {
+        id: "code-viz",
+        name: "CodeViz",
+        descriptionKey: "extension.catalog.codeVizDescription",
+        iconClass: "icon-code",
+        url: "http://localhost:5173",
+    },
+    {
+        id: "tip-of-the-day",
+        name: "Tip of the Day",
+        descriptionKey: "extension.catalog.tipOfTheDayDescription",
+        iconClass: "icon-star",
+        url: "http://localhost:5174",
+    },
+    {
+        id: "chatbot",
+        name: "EarSketch Chatbot",
+        descriptionKey: "extension.catalog.chatbotDescription",
+        iconClass: "icon-bubbles",
+        url: "https://emlbot1.lmc.gatech.edu/",
+    },
+] as const
+
+type ExtensionCardData = typeof extensionCards[number]
+
+const ExtensionCard = ({ extension, adding, disabled, onAdd }: {
+    extension: ExtensionCardData
+    adding: boolean
+    disabled: boolean
+    onAdd: () => void
+}) => {
+    const { t } = useTranslation()
+
+    return (
+        <article className="flex min-h-36 flex-col rounded-lg border border-gray-300 bg-white p-4 shadow-sm dark:border-gray-600 dark:bg-gray-800">
+            <div className="flex items-start gap-3">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-sky-100 text-2xl text-sky-700 dark:bg-sky-900/40 dark:text-sky-300">
+                    <span className={`icon ${extension.iconClass}`} aria-hidden="true" />
+                </div>
+                <div className="min-w-0">
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {extension.name}
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                        {t(extension.descriptionKey)}
+                    </p>
+                </div>
+            </div>
+            <div className="mt-auto flex justify-end pt-4">
+                <button
+                    type="button"
+                    className="rounded-md bg-sky-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={onAdd}
+                    disabled={disabled}
+                    aria-label={t("extension.catalog.addNamed", { extensionName: extension.name })}
+                >
+                    {adding ? t("extension.catalog.adding") : t("extension.catalog.add")}
+                </button>
+            </div>
+        </article>
+    )
+}
 
 interface ExtensionManifest {
     manifest_version: number
@@ -30,6 +95,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
     const [manifest, setManifest] = useState<ExtensionManifest | null>(null)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+    const [addingExtension, setAddingExtension] = useState<string | null>(null)
     const [showDetails, setShowDetails] = useState(false)
 
     const currentExtensionUrl = useAppSelector(selectExtensionUrl)
@@ -76,6 +142,21 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
         store.dispatch(setEastContent("curriculum"))
     }
 
+    const addExtension = async (id: string, extensionUrl: string) => {
+        setAddingExtension(id)
+        setError("")
+
+        try {
+            await loadTrustedExtension(extensionUrl)
+            close()
+        } catch (err) {
+            console.error("Failed to add extension:", err)
+            setError(t("extension.catalog.addError"))
+        } finally {
+            setAddingExtension(null)
+        }
+    }
+
     const previewExtension = async () => {
         if (!url) return
 
@@ -119,6 +200,28 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
         <ModalHeader>{t("extensions")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); loadExtension() }}>
             <ModalBody>
+                <section aria-labelledby="extension-catalog-heading" className="mb-5">
+                    <h2 id="extension-catalog-heading" className="mb-3 text-base font-semibold text-gray-900 dark:text-white">
+                        {t("extension.catalog.heading")}
+                    </h2>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        {extensionCards.map(extension => (
+                            <ExtensionCard
+                                key={extension.id}
+                                extension={extension}
+                                adding={addingExtension === extension.id}
+                                disabled={addingExtension !== null}
+                                onAdd={() => addExtension(extension.id, extension.url)}
+                            />
+                        ))}
+                    </div>
+                </section>
+
+                <div className="mb-4 border-t border-gray-300 pt-4 dark:border-gray-600">
+                    <h2 className="mb-2 text-base font-semibold text-gray-900 dark:text-white">
+                        {t("extension.catalog.loadFromUrl")}
+                    </h2>
+                </div>
                 {currentExtensionUrl && (
                     <div className="mb-4 p-4 border border-gray-300 dark:border-gray-600 rounded-md bg-blue-50 dark:bg-blue-900/20">
                         <div className="flex items-start gap-4">

@@ -97,9 +97,6 @@ export const ExtensionLoaderButton = () => {
 export const TrustedExtensions = () => (
     <>
         <CurriculumExtension />
-        <TipOfTheDay />
-        <CodeViz />
-        <Chatbot />
         <ExtensionLoaderButton />
     </>
 )
