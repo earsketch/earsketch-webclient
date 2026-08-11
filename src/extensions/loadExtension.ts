@@ -1,7 +1,7 @@
 import { setEastContent } from "../app/appState"
 import * as layout from "../ide/layoutState"
 import store from "../reducers"
-import { ExtensionState, setExtension } from "./extensionState"
+import { LoadedExtension, setExtension } from "./extensionState"
 
 interface ExtensionManifest {
     extension_api_version?: string
@@ -35,7 +35,7 @@ export async function loadExtension(extensionUrl: string) {
         throw new Error("Invalid EarSketch extension manifest")
     }
 
-    const extension: ExtensionState = {
+    const extension: LoadedExtension = {
         url: new URL(manifest.side_panel.default_path, extensionUrl).href,
         name: manifest.name,
         version: manifest.version,

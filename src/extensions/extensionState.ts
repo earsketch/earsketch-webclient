@@ -4,6 +4,7 @@ import storage from "redux-persist/lib/storage"
 
 import type { Language } from "common"
 import type { RootState } from "../reducers"
+import type { CatalogExtensionId } from "./extensionCatalog"
 
 // Assigned by the IDE, which owns the editor and the tab bar. Same pattern as
 // `curriculumState.callbacks`, and for the same reason: the extension host
@@ -13,7 +14,7 @@ export const callbacks = {
     openReadOnlyScript: (_source: string, _name: string, _language: Language) => "",
 }
 
-export interface ExtensionState {
+export interface LoadedExtension {
     url: string
     name: string
     version: string
@@ -22,6 +23,10 @@ export interface ExtensionState {
     icon32: string
     icon128: string
     extensionApiVersion: string
+}
+
+export interface ExtensionState extends LoadedExtension {
+    installedExtensionIds: CatalogExtensionId[]
 }
 
 const initialExtensionState: ExtensionState = {
@@ -33,13 +38,14 @@ const initialExtensionState: ExtensionState = {
     icon32: "",
     icon128: "",
     extensionApiVersion: "1",
+    installedExtensionIds: [],
 }
 
 const extensionSlice = createSlice({
     name: "extension",
     initialState: initialExtensionState,
     reducers: {
-        setExtension(state, { payload }: PayloadAction<ExtensionState>) {
+        setExtension(state, { payload }: PayloadAction<LoadedExtension>) {
             state.url = payload.url
             state.name = payload.name
             state.version = payload.version
@@ -48,6 +54,14 @@ const extensionSlice = createSlice({
             state.icon32 = payload.icon32
             state.icon128 = payload.icon128
             state.extensionApiVersion = payload.extensionApiVersion
+        },
+        installExtension(state, { payload }: PayloadAction<CatalogExtensionId>) {
+            if (!state.installedExtensionIds.includes(payload)) {
+                state.installedExtensionIds.push(payload)
+            }
+        },
+        uninstallExtension(state, { payload }: PayloadAction<CatalogExtensionId>) {
+            state.installedExtensionIds = state.installedExtensionIds.filter(id => id !== payload)
         },
         clearExtension(state) {
             state.url = ""
@@ -62,14 +76,16 @@ const extensionSlice = createSlice({
     },
 })
 
+export const extensionReducer = extensionSlice.reducer
+
 const persistConfig = {
     key: "extension",
     storage,
 }
 
-export default persistReducer(persistConfig, extensionSlice.reducer)
+export default persistReducer(persistConfig, extensionReducer)
 
-export const { setExtension, clearExtension } = extensionSlice.actions
+export const { setExtension, clearExtension, installExtension, uninstallExtension } = extensionSlice.actions
 
 export const selectExtensionUrl = (state: RootState) => state.extension.url
 export const selectExtensionName = (state: RootState) => state.extension.name
@@ -79,3 +95,4 @@ export const selectExtensionPermissions = (state: RootState) => state.extension.
 export const selectExtensionIcon32 = (state: RootState) => state.extension.icon32
 export const selectExtensionIcon128 = (state: RootState) => state.extension.icon128
 export const selectExtensionApiVersion = (state: RootState) => state.extension.extensionApiVersion
+export const selectInstalledExtensionIds = (state: RootState) => state.extension.installedExtensionIds
