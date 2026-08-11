@@ -64,9 +64,11 @@ const ProgressBar = ({ progress }: { progress: number }) => {
 }
 
 export const Alert = ({ message }: { message: string }) => {
-    return <> {message &&
-    <div className="text-sm text-red-800 bg-red-100 p-4 mb-4 rounded border border-red-200">{message}</div>}
-    </>
+    // The live region itself stays mounted so screen readers pick up changes to its
+    // content; toggling the whole element in and out of the DOM is not reliably announced.
+    return <div role="alert" aria-live="assertive" aria-atomic="true">
+        {message && <div className="text-sm text-red-800 bg-red-100 p-4 mb-4 rounded border border-red-200">{message}</div>}
+    </div>
 }
 
 interface Props {
