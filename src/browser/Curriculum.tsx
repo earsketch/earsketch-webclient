@@ -155,7 +155,6 @@ const CurriculumHeader = () => {
 
     return (
         <div id="curriculum-header" style={{ position: "relative" }}>
-            <NavigationBar />
 
             <div className="flex items-center">
                 <div className="relative min-w-0 grow"
@@ -166,6 +165,8 @@ const CurriculumHeader = () => {
                 </div>
                 <CurriculumToolbar />
             </div>
+
+            <NavigationBar />
         </div>
     )
 }
