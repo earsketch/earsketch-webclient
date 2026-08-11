@@ -5,16 +5,14 @@ import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import parse from "html-react-parser"
 import { setEastContent } from "../app/appState"
 import store from "../reducers"
-import { useAppSelector } from "../hooks"
-import { setExtension, clearExtension, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon128 } from "./extensionState"
-import { loadExtension as loadTrustedExtension } from "./loadExtension"
-import { CatalogExtension, extensionCatalog } from "./extensionCatalog"
+import { useAppDispatch, useAppSelector } from "../hooks"
+import { setExtension, clearExtension, installExtension, uninstallExtension, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon128, selectInstalledExtensionIds } from "./extensionState"
+import { CatalogExtension, CatalogExtensionId, extensionCatalog } from "./extensionCatalog"
 
-const ExtensionCard = ({ extension, adding, disabled, onAdd }: {
+const ExtensionCard = ({ extension, installed, onToggle }: {
     extension: CatalogExtension
-    adding: boolean
-    disabled: boolean
-    onAdd: () => void
+    installed: boolean
+    onToggle: () => void
 }) => {
     const { t } = useTranslation()
 
@@ -36,12 +34,13 @@ const ExtensionCard = ({ extension, adding, disabled, onAdd }: {
             <div className="mt-auto flex justify-end pt-4">
                 <button
                     type="button"
-                    className="rounded-md bg-sky-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-60"
-                    onClick={onAdd}
-                    disabled={disabled}
-                    aria-label={t("extension.catalog.addNamed", { extensionName: extension.name })}
+                    className={installed
+                        ? "rounded-md border border-red-600 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        : "rounded-md bg-sky-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-800"}
+                    onClick={onToggle}
+                    aria-label={t(installed ? "extension.catalog.removeNamed" : "extension.catalog.addNamed", { extensionName: extension.name })}
                 >
-                    {adding ? t("extension.catalog.adding") : t("extension.catalog.add")}
+                    {t(installed ? "extension.catalog.remove" : "extension.catalog.add")}
                 </button>
             </div>
         </article>
@@ -66,11 +65,11 @@ interface ExtensionManifest {
 
 export const ExtensionLoader = ({ close }: { close: () => void }) => {
     const { t } = useTranslation()
+    const dispatch = useAppDispatch()
     const [url, setUrl] = useState("")
     const [manifest, setManifest] = useState<ExtensionManifest | null>(null)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-    const [addingExtension, setAddingExtension] = useState<string | null>(null)
     const [showDetails, setShowDetails] = useState(false)
 
     const currentExtensionUrl = useAppSelector(selectExtensionUrl)
@@ -79,6 +78,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
     const currentExtensionDescription = useAppSelector(selectExtensionDescription)
     const currentExtensionPermissions = useAppSelector(selectExtensionPermissions)
     const currentExtensionIcon128 = useAppSelector(selectExtensionIcon128)
+    const installedExtensionIds = useAppSelector(selectInstalledExtensionIds)
 
     const loadExtension = () => {
         if (!manifest?.side_panel?.default_path) {
@@ -117,19 +117,10 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
         store.dispatch(setEastContent("curriculum"))
     }
 
-    const addExtension = async (id: string, extensionUrl: string) => {
-        setAddingExtension(id)
-        setError("")
-
-        try {
-            await loadTrustedExtension(extensionUrl)
-            close()
-        } catch (err) {
-            console.error("Failed to add extension:", err)
-            setError(t("extension.catalog.addError"))
-        } finally {
-            setAddingExtension(null)
-        }
+    const toggleInstalledExtension = (id: CatalogExtensionId) => {
+        dispatch(installedExtensionIds.includes(id)
+            ? uninstallExtension(id)
+            : installExtension(id))
     }
 
     const previewExtension = async () => {
@@ -184,9 +175,8 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
                             <ExtensionCard
                                 key={extension.id}
                                 extension={extension}
-                                adding={addingExtension === extension.id}
-                                disabled={addingExtension !== null}
-                                onAdd={() => addExtension(extension.id, extension.url)}
+                                installed={installedExtensionIds.includes(extension.id)}
+                                onToggle={() => toggleInstalledExtension(extension.id)}
                             />
                         ))}
                     </div>

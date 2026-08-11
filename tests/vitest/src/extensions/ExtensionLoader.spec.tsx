@@ -1,10 +1,11 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 
 import { ExtensionLoader } from "../../../../src/extensions/ExtensionLoader"
-import { loadExtension } from "../../../../src/extensions/loadExtension"
+import { installExtension, uninstallExtension } from "../../../../src/extensions/extensionState"
 
-const { state } = vi.hoisted(() => ({
+const { dispatch, state } = vi.hoisted(() => ({
+    dispatch: vi.fn(),
     state: {
         extension: {
             url: "",
@@ -15,18 +16,17 @@ const { state } = vi.hoisted(() => ({
             icon32: "",
             icon128: "",
             extensionApiVersion: "1",
+            installedExtensionIds: [] as string[],
         },
     },
 }))
 
 vi.mock("../../../../src/hooks", () => ({
+    useAppDispatch: () => dispatch,
     useAppSelector: (selector: (currentState: typeof state) => unknown) => selector(state),
 }))
 vi.mock("../../../../src/reducers", () => ({
     default: { dispatch: vi.fn() },
-}))
-vi.mock("../../../../src/extensions/loadExtension", () => ({
-    loadExtension: vi.fn(),
 }))
 vi.mock("../../../../src/Utils", () => ({
     Alert: ({ message }: { message: string }) => <div role="alert">{message}</div>,
@@ -40,20 +40,21 @@ vi.mock("react-i18next", () => ({
             const translations: Record<string, string> = {
                 "extension.catalog.heading": "Featured extensions",
                 "extension.catalog.add": "Add",
-                "extension.catalog.adding": "Adding...",
+                "extension.catalog.remove": "Remove",
                 "extension.catalog.codeVizDescription": "Explore a visual representation of your EarSketch code.",
                 "extension.catalog.tipOfTheDayDescription": "Discover a new EarSketch tip each day.",
                 "extension.catalog.chatbotDescription": "Get help and ideas while you create music in EarSketch.",
             }
 
             if (key === "extension.catalog.addNamed") return `Add ${values?.extensionName}`
+            if (key === "extension.catalog.removeNamed") return `Remove ${values?.extensionName}`
             return translations[key] ?? key
         },
     }),
 }))
 
 beforeEach(() => {
-    vi.mocked(loadExtension).mockResolvedValue(undefined)
+    state.extension.installedExtensionIds = []
 })
 
 afterEach(() => {
@@ -71,14 +72,21 @@ it("renders the featured extension cards", () => {
     expect(screen.getByRole("button", { name: "Add CodeViz" })).not.toBeNull()
 })
 
-it("loads a featured extension and closes the modal", async () => {
+it("adds a featured extension to the installed extension state", () => {
     const close = vi.fn()
     render(<ExtensionLoader close={close} />)
 
     fireEvent.click(screen.getByRole("button", { name: "Add CodeViz" }))
 
-    await waitFor(() => {
-        expect(loadExtension).toHaveBeenCalledWith("http://localhost:5173")
-        expect(close).toHaveBeenCalledOnce()
-    })
+    expect(dispatch).toHaveBeenCalledWith(installExtension("code-viz"))
+    expect(close).not.toHaveBeenCalled()
+})
+
+it("removes an installed extension", () => {
+    state.extension.installedExtensionIds = ["code-viz"]
+    render(<ExtensionLoader close={vi.fn()} />)
+
+    fireEvent.click(screen.getByRole("button", { name: "Remove CodeViz" }))
+
+    expect(dispatch).toHaveBeenCalledWith(uninstallExtension("code-viz"))
 })
