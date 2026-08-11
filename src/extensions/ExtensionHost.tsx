@@ -6,8 +6,8 @@ import { useAppSelector as useSelector } from "../hooks"
 import { Log, selectLogs } from "../ide/ideState"
 import { Track } from "../types/common"
 import { selectColorTheme, selectLocale } from "../app/appState"
-import { selectExtensionUrl, selectExtensionName, selectExtensionIcon32, selectExtensionPermissions } from "./extensionState"
-import { getTempoMap, pasteCode } from "./extensionApi"
+import { callbacks, selectExtensionUrl, selectExtensionName, selectExtensionIcon32, selectExtensionPermissions } from "./extensionState"
+import { getTempoMap, pasteCode as pasteCodeInEditor } from "./extensionApi"
 import * as tabState from "../ide/tabState"
 import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
@@ -15,6 +15,10 @@ import * as userState from "../user/userState"
 import * as layout from "../ide/layoutState"
 import { Collapsed } from "../browser/Utils"
 import { useTranslation } from "react-i18next"
+
+// Enough for any reasonable EarSketch script, and small enough that a
+// misbehaving extension cannot wedge the editor with a giant string.
+const MAX_SCRIPT_LENGTH = 500_000
 
 export const ExtensionHost = () => {
     const extensionUrl = useSelector(selectExtensionUrl)
@@ -37,9 +41,11 @@ export const ExtensionHost = () => {
     const currentUserRef = useRef(currentUser)
     const extensionPermissionsRef = useRef(extensionPermissions)
     const extensionTargetOriginRef = useRef(extensionTargetOrigin)
+    const extensionNameRef = useRef(extensionName)
 
     useEffect(() => { logsRef.current = logs }, [logs])
     useEffect(() => { tracksRef.current = tracks }, [tracks])
+    useEffect(() => { extensionNameRef.current = extensionName }, [extensionName])
     useEffect(() => { extensionPermissionsRef.current = extensionPermissions }, [extensionPermissions])
     useEffect(() => { extensionTargetOriginRef.current = extensionTargetOrigin }, [extensionTargetOrigin])
     useEffect(() => {
@@ -65,7 +71,9 @@ export const ExtensionHost = () => {
         }
     }, [currentUser, extensionPermissions])
 
-    const extensionFunctions = {
+    // Handlers receive positional `args`; legacy messages without `args` are
+    // passed as a single request object. Each handler validates its arguments.
+    const extensionFunctions: { [name: string]: (...args: unknown[]) => unknown } = {
         getEditorContents() {
             const activeTab = tabState.selectActiveTabID(store.getState())
             if (!activeTab) return ""
@@ -91,7 +99,12 @@ export const ExtensionHost = () => {
             }
         },
         getTempoMap,
-        pasteCode,
+        pasteCode(codeOrRequest: unknown, lineNumber: unknown) {
+            const request = typeof codeOrRequest === "object" && codeOrRequest !== null
+                ? codeOrRequest as { code?: unknown, lineNumber?: unknown }
+                : { code: codeOrRequest, lineNumber }
+            return pasteCodeInEditor(request)
+        },
         getColorTheme() {
             const currentColorTheme = colorThemeRef.current
             return currentColorTheme
@@ -104,9 +117,36 @@ export const ExtensionHost = () => {
                 return currentUser
             }
         },
+        // Opens the given source in a read-only tab, exactly like the copy
+        // buttons in the curriculum. Nothing is written to the user's account:
+        // they choose whether to keep it with the editor's "import to edit"
+        // button.
+        openReadOnlyScript(source: unknown, name: unknown, language: unknown) {
+            if (typeof source !== "string" || source.length === 0) {
+                return { error: "openReadOnlyScript: source must be a non-empty string" }
+            }
+            if (source.length > MAX_SCRIPT_LENGTH) {
+                return { error: `openReadOnlyScript: source exceeds ${MAX_SCRIPT_LENGTH} characters` }
+            }
+            // Omitted arguments arrive as null, because JSON.stringify turns
+            // undefined array entries into null.
+            if (name != null && typeof name !== "string") {
+                return { error: "openReadOnlyScript: name must be a string" }
+            }
+            if (language != null && language !== "python" && language !== "javascript") {
+                return { error: 'openReadOnlyScript: language must be "python" or "javascript"' }
+            }
+
+            const scriptName = callbacks.openReadOnlyScript(
+                source,
+                name ?? extensionNameRef.current,
+                language ?? store.getState().app.scriptLanguage
+            )
+            return { name: scriptName }
+        },
     }
 
-    const isExtensionFunction = (fn: string): fn is keyof typeof extensionFunctions => fn in extensionFunctions
+    const isExtensionFunction = (fn: string) => fn in extensionFunctions
 
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {
@@ -121,10 +161,12 @@ export const ExtensionHost = () => {
                 const permissions = extensionPermissionsRef.current
 
                 const fn: string = data.fn
+                // Functions that take no arguments simply ignore these.
+                const args: unknown[] = Array.isArray(data.args) ? data.args : [data]
+
                 if (isExtensionFunction(fn)) {
-                    const extensionFunction = extensionFunctions[fn] as (request: any) => any
                     result = permissions.includes(fn)
-                        ? extensionFunction(data)
+                        ? extensionFunctions[fn](...args)
                         : { error: `Permission denied: ${fn}` }
                 } else {
                     result = { error: `Unknown function: ${fn}` }
