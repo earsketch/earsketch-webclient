@@ -27,6 +27,11 @@ export interface LoadedExtension {
 
 export interface ExtensionState extends LoadedExtension {
     installedExtensionIds: CatalogExtensionId[]
+    activeCatalogExtensionId: CatalogExtensionId | null
+}
+
+type SetExtensionPayload = LoadedExtension & {
+    catalogExtensionId?: CatalogExtensionId | null
 }
 
 const initialExtensionState: ExtensionState = {
@@ -39,13 +44,14 @@ const initialExtensionState: ExtensionState = {
     icon128: "",
     extensionApiVersion: "1",
     installedExtensionIds: [],
+    activeCatalogExtensionId: null,
 }
 
 const extensionSlice = createSlice({
     name: "extension",
     initialState: initialExtensionState,
     reducers: {
-        setExtension(state, { payload }: PayloadAction<LoadedExtension>) {
+        setExtension(state, { payload }: PayloadAction<SetExtensionPayload>) {
             state.url = payload.url
             state.name = payload.name
             state.version = payload.version
@@ -54,6 +60,7 @@ const extensionSlice = createSlice({
             state.icon32 = payload.icon32
             state.icon128 = payload.icon128
             state.extensionApiVersion = payload.extensionApiVersion
+            state.activeCatalogExtensionId = payload.catalogExtensionId ?? null
         },
         installExtension(state, { payload }: PayloadAction<CatalogExtensionId>) {
             if (!state.installedExtensionIds.includes(payload)) {
@@ -72,6 +79,7 @@ const extensionSlice = createSlice({
             state.icon32 = ""
             state.icon128 = ""
             state.extensionApiVersion = "1"
+            state.activeCatalogExtensionId = null
         },
     },
 })
@@ -96,3 +104,4 @@ export const selectExtensionIcon32 = (state: RootState) => state.extension.icon3
 export const selectExtensionIcon128 = (state: RootState) => state.extension.icon128
 export const selectExtensionApiVersion = (state: RootState) => state.extension.extensionApiVersion
 export const selectInstalledExtensionIds = (state: RootState) => state.extension.installedExtensionIds
+export const selectActiveCatalogExtensionId = (state: RootState) => state.extension.activeCatalogExtensionId

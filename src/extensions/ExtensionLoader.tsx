@@ -6,7 +6,7 @@ import parse from "html-react-parser"
 import { setEastContent } from "../app/appState"
 import store from "../reducers"
 import { useAppDispatch, useAppSelector } from "../hooks"
-import { setExtension, clearExtension, installExtension, uninstallExtension, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon128, selectInstalledExtensionIds } from "./extensionState"
+import { setExtension, clearExtension, installExtension, uninstallExtension, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon128, selectInstalledExtensionIds, selectActiveCatalogExtensionId } from "./extensionState"
 import { CatalogExtension, CatalogExtensionId, extensionCatalog } from "./extensionCatalog"
 
 const ExtensionCard = ({ extension, installed, onToggle }: {
@@ -79,6 +79,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
     const currentExtensionPermissions = useAppSelector(selectExtensionPermissions)
     const currentExtensionIcon128 = useAppSelector(selectExtensionIcon128)
     const installedExtensionIds = useAppSelector(selectInstalledExtensionIds)
+    const activeCatalogExtensionId = useAppSelector(selectActiveCatalogExtensionId)
 
     const loadExtension = () => {
         if (!manifest?.side_panel?.default_path) {
@@ -118,9 +119,15 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
     }
 
     const toggleInstalledExtension = (id: CatalogExtensionId) => {
-        dispatch(installedExtensionIds.includes(id)
-            ? uninstallExtension(id)
-            : installExtension(id))
+        if (installedExtensionIds.includes(id)) {
+            dispatch(uninstallExtension(id))
+            if (activeCatalogExtensionId === id) {
+                dispatch(clearExtension())
+                dispatch(setEastContent("curriculum"))
+            }
+        } else {
+            dispatch(installExtension(id))
+        }
     }
 
     const previewExtension = async () => {

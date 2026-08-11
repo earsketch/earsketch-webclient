@@ -74,5 +74,5 @@ it("loads a catalog extension from its launch button", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Switch to Extension: CodeViz" }))
 
-    expect(loadExtension).toHaveBeenCalledWith("http://localhost:5173")
+    expect(loadExtension).toHaveBeenCalledWith("http://localhost:5173", "code-viz")
 })

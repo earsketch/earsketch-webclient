@@ -30,7 +30,7 @@ export const CurriculumExtension = () => {
 const CatalogExtensionLauncher = ({ extension }: { extension: CatalogExtension }) => {
     const launch = async () => {
         try {
-            await loadExtension(extension.url)
+            await loadExtension(extension.url, extension.id)
         } catch (error) {
             console.error(`Failed to load ${extension.name} extension:`, error)
         }

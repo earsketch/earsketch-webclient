@@ -2,7 +2,8 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 
 import { ExtensionLoader } from "../../../../src/extensions/ExtensionLoader"
-import { installExtension, uninstallExtension } from "../../../../src/extensions/extensionState"
+import { clearExtension, installExtension, uninstallExtension } from "../../../../src/extensions/extensionState"
+import { setEastContent } from "../../../../src/app/appState"
 
 const { dispatch, state } = vi.hoisted(() => ({
     dispatch: vi.fn(),
@@ -17,6 +18,7 @@ const { dispatch, state } = vi.hoisted(() => ({
             icon128: "",
             extensionApiVersion: "1",
             installedExtensionIds: [] as string[],
+            activeCatalogExtensionId: null as string | null,
         },
     },
 }))
@@ -55,6 +57,7 @@ vi.mock("react-i18next", () => ({
 
 beforeEach(() => {
     state.extension.installedExtensionIds = []
+    state.extension.activeCatalogExtensionId = null
 })
 
 afterEach(() => {
@@ -89,4 +92,16 @@ it("removes an installed extension", () => {
     fireEvent.click(screen.getByRole("button", { name: "Remove CodeViz" }))
 
     expect(dispatch).toHaveBeenCalledWith(uninstallExtension("code-viz"))
+})
+
+it("clears an active extension when it is removed from the launch bar", () => {
+    state.extension.installedExtensionIds = ["code-viz"]
+    state.extension.activeCatalogExtensionId = "code-viz"
+    render(<ExtensionLoader close={vi.fn()} />)
+
+    fireEvent.click(screen.getByRole("button", { name: "Remove CodeViz" }))
+
+    expect(dispatch).toHaveBeenNthCalledWith(1, uninstallExtension("code-viz"))
+    expect(dispatch).toHaveBeenNthCalledWith(2, clearExtension())
+    expect(dispatch).toHaveBeenNthCalledWith(3, setEastContent("curriculum"))
 })

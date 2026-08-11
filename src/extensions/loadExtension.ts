@@ -2,6 +2,7 @@ import { setEastContent } from "../app/appState"
 import * as layout from "../ide/layoutState"
 import store from "../reducers"
 import { LoadedExtension, setExtension } from "./extensionState"
+import { CatalogExtensionId } from "./extensionCatalog"
 
 interface ExtensionManifest {
     extension_api_version?: string
@@ -22,7 +23,7 @@ interface ExtensionManifest {
  * Loads an extension without displaying the permission dialog.
  * The caller is responsible for only passing URLs that EarSketch trusts.
  */
-export async function loadExtension(extensionUrl: string) {
+export async function loadExtension(extensionUrl: string, catalogExtensionId: CatalogExtensionId | null = null) {
     const manifestUrl = new URL("es-ext.json", extensionUrl).href
     const response = await fetch(manifestUrl)
 
@@ -50,7 +51,7 @@ export async function loadExtension(extensionUrl: string) {
         extensionApiVersion: manifest.extension_api_version ?? "1",
     }
 
-    store.dispatch(setExtension(extension))
+    store.dispatch(setExtension({ ...extension, catalogExtensionId }))
     store.dispatch(setEastContent("extension"))
     store.dispatch(layout.setEast({ open: true }))
 }
