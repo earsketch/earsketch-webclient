@@ -534,6 +534,10 @@ const MiscActionMenu = () => {
     </Menu>
 }
 
+// Thrown by `login` on any failure whose message is meant to be shown to the user directly
+// (as opposed to an unexpected error, which gets wrapped with a generic message).
+class LoginError extends Error {}
+
 type LoginState = "logged-out" | "logging-in" | "logged-in"
 
 const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }: {
@@ -785,7 +789,11 @@ export const App = () => {
             } else {
                 const token = user.selectToken(store.getState())
                 if (token !== null) {
-                    await login({ token })
+                    try {
+                        await login({ token })
+                    } catch (error) {
+                        userNotification.show((error as Error).message, "failure1", 3.5)
+                    }
                 } else {
                     // No saved credentials or token to try — we're definitively logged out.
                     setLoginState("logged-out")
@@ -968,9 +976,8 @@ export const App = () => {
                     try {
                         token = await request.getBasicAuth("/users/token", loginInfo.username, loginInfo.password)
                     } catch (error) {
-                        userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
                         esconsole(error, ["main", "login"])
-                        return
+                        throw new LoginError(i18n.t("messages:general.loginfailure"))
                     }
                 }
 
@@ -978,8 +985,7 @@ export const App = () => {
                 try {
                     userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
                 } catch {
-                    userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
-                    return
+                    throw new LoginError("Your credentials have expired. Please login again with your username and password.")
                 }
                 const username = userInfo.username
 
@@ -1004,7 +1010,10 @@ export const App = () => {
                 activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
                 succeeded = true
             } catch (err) {
-                userNotification.show("Login failed due to network error.", "failure1", 3.5)
+                if (err instanceof LoginError) {
+                    throw err
+                }
+                throw new LoginError("Login failed due to network error.")
             } finally {
                 if (!succeeded) {
                     setLoginState("logged-out")

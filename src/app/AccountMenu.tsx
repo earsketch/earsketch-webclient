@@ -280,6 +280,8 @@ export const AccountMenu = ({
         try {
             await onLogin(username, password)
             close()
+        } catch (error) {
+            setError((error as Error).message)
         } finally {
             setLoggingIn(false)
         }
