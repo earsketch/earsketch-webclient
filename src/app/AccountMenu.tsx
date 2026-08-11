@@ -252,7 +252,7 @@ export const AccountMenu = ({
     close: () => void
     username?: string
     password?: string
-    onLogin: (username: string, password: string) => void
+    onLogin: (username: string, password: string) => Promise<void>
     setUsername: (u: string) => void
     setPassword: (p: string) => void
 }) => {
