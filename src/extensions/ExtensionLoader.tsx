@@ -8,35 +8,10 @@ import store from "../reducers"
 import { useAppSelector } from "../hooks"
 import { setExtension, clearExtension, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon128 } from "./extensionState"
 import { loadExtension as loadTrustedExtension } from "./loadExtension"
-
-const extensionCards = [
-    {
-        id: "code-viz",
-        name: "CodeViz",
-        descriptionKey: "extension.catalog.codeVizDescription",
-        iconClass: "icon-code",
-        url: "http://localhost:5173",
-    },
-    {
-        id: "tip-of-the-day",
-        name: "Tip of the Day",
-        descriptionKey: "extension.catalog.tipOfTheDayDescription",
-        iconClass: "icon-star",
-        url: "http://localhost:5174",
-    },
-    {
-        id: "chatbot",
-        name: "EarSketch Chatbot",
-        descriptionKey: "extension.catalog.chatbotDescription",
-        iconClass: "icon-bubbles",
-        url: "https://emlbot1.lmc.gatech.edu/",
-    },
-] as const
-
-type ExtensionCardData = typeof extensionCards[number]
+import { CatalogExtension, extensionCatalog } from "./extensionCatalog"
 
 const ExtensionCard = ({ extension, adding, disabled, onAdd }: {
-    extension: ExtensionCardData
+    extension: CatalogExtension
     adding: boolean
     disabled: boolean
     onAdd: () => void
@@ -205,7 +180,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
                         {t("extension.catalog.heading")}
                     </h2>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        {extensionCards.map(extension => (
+                        {extensionCatalog.map(extension => (
                             <ExtensionCard
                                 key={extension.id}
                                 extension={extension}
