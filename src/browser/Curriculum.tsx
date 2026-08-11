@@ -155,13 +155,16 @@ const CurriculumHeader = () => {
 
     return (
         <div id="curriculum-header" style={{ position: "relative" }}>
-            <CurriculumToolbar />
             <NavigationBar />
 
-            <div onFocus={() => dispatch(curriculum.showResults(true))}
-                onBlur={(e: React.FocusEvent<HTMLDivElement>) => (!e.currentTarget.contains(e.relatedTarget as Node)) && dispatch(curriculum.showResults(false))}>
-                <CurriculumSearchBar />
-                <CurriculumSearchResults />
+            <div className="flex items-center">
+                <div className="relative min-w-0 grow"
+                    onFocus={() => dispatch(curriculum.showResults(true))}
+                    onBlur={(e: React.FocusEvent<HTMLDivElement>) => (!e.currentTarget.contains(e.relatedTarget as Node)) && dispatch(curriculum.showResults(false))}>
+                    <CurriculumSearchBar />
+                    <CurriculumSearchResults />
+                </div>
+                <CurriculumToolbar />
             </div>
         </div>
     )
@@ -209,7 +212,7 @@ const CurriculumToolbar = () => {
     }, [dispatch, location, pageTitle])
 
     return (
-        <div className="flex items-center justify-end p-2 text-base bg-white text-black dark:bg-gray-900 dark:text-white">
+        <div className="flex shrink-0 items-center justify-end p-2 text-base bg-white text-black dark:bg-gray-900 dark:text-white">
             <button className="px-2 -my-1 text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
                 <i className="icon icon-link" />
             </button>
