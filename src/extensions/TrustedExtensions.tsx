@@ -56,7 +56,7 @@ export const TipOfTheDay = () => {
 
     return (
         <ExtensionLaunchButton extensionName="TipOfTheDay" onClick={launch}>
-            <span className="icon icon-info" aria-hidden="true" />
+            <span className="icon icon-star" aria-hidden="true" />
         </ExtensionLaunchButton>
     )
 }
