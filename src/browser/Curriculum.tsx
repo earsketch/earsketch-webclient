@@ -83,7 +83,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: number, ch: c
                     <button className="scale:text-sm scale:ltr:mr-1 scale:rtl:ml-1" aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapterDescriptive", { title: ch.title }) : t("curriculum.expandChapterDescriptive", { title: ch.title })}`} title={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")}`}><i className={`icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
                 </span>
                 <a href="#"
-                    className="scale:text-sm text-black dark:text-white flex"
+                    className="scale:text-sm text-black flex"
                     onClick={e => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
                     <span>{chNumForDisplay}{chNumForDisplay && <>.</>}</span>
                     <span className="scale:ltr:pl-1 scale:rtl:pr-1">{ch.title}</span>
@@ -93,11 +93,11 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: number, ch: c
                 {focus[1] === chIdx && ch.sections &&
                 ch.sections.map((sec, secIdx) =>
                     <li role="button" aria-label={t("curriculum.openSection", { section: sec.title })} key={secIdx}
-                        className={"scale:py-1" + (isCurrentChapter && location[2] === secIdx ? " bg-blue-100 dark:bg-gray-700" : "")}
+                        className={"scale:py-1" + (isCurrentChapter && location[2] === secIdx ? " bg-blue-100" : "")}
                     >
                         <span className="scale:ltr:pl-10 scale:rtl:pr-10 flex">
                             <a href="#"
-                                className="scale:text-sm text-black dark:text-white flex"
+                                className="scale:text-sm text-black flex"
                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}
                                 aria-current={isCurrentChapter && location[2] === secIdx ? "page" : "false"}
                             >
@@ -121,19 +121,19 @@ const TableOfContents = () => {
     return (
         <>
             <div className="inline-block scale:text-sm font-bold text-center w-full">{t("curriculum.toc")}</div>
-            <hr className="border-1 my-1 border-black dark:border-white" />
+            <hr className="border-1 my-1 border-black" />
             <ul id="toc" className="select-none">
                 {toc.map((unit, unitIdx) => (
                     <li key={unitIdx}
                         className=""
                         onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
-                        <div className={"p-1 flex items-start" + (currentLocation[0] === unitIdx && currentLocation.length === 1 ? " bg-blue-100 dark:bg-gray-700" : "")}>
+                        <div className={"p-1 flex items-start" + (currentLocation[0] === unitIdx && currentLocation.length === 1 ? " bg-blue-100" : "")}>
                             {unit.chapters && unit.chapters.length > 0 &&
                             <button aria-label={focus[0] === unitIdx ? t("curriculum.collapseUnitDescriptive", { title: unit.title }) : t("curriculum.expandUnitDescriptive", { title: unit.title })}
                                 title={focus[0] === unitIdx ? t("curriculum.collapseUnit") : t("curriculum.expandUnit")}>
                                 <i className={`scale:text-sm ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} />
                             </button>}
-                            <a href="#" className="text-black scale:text-sm dark:text-white"
+                            <a href="#" className="text-black scale:text-sm"
                                 aria-current={currentLocation.length === 1 && currentLocation[0] === unitIdx ? "page" : "false"}
                                 onClick={e => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}
                             </a>
@@ -155,7 +155,6 @@ const CurriculumHeader = () => {
 
     return (
         <div id="curriculum-header" style={{ position: "relative" }}>
-
             <div className="flex items-center">
                 <div className="relative min-w-0 grow"
                     onFocus={() => dispatch(curriculum.showResults(true))}
@@ -350,7 +349,7 @@ const NavigationBar = () => {
 
     return (
         <>
-            <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none text-white bg-blue hover:bg-gray-700">
+            <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none text-black bg-gray-100 hover:bg-gray-200">
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
                     : <button aria-label={t("curriculum.previousPage")} className="p-1.5" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(tocPages, location, -1) }))} title={t("curriculum.previousPage")}>
@@ -370,7 +369,7 @@ const NavigationBar = () => {
             </div>
             <div className={`z-50 pointer-events-none absolute w-full px-2 py-1.5 ${showTableOfContents ? "" : "hidden"}`}>
                 <div ref={dropdownRef} style={tocStyle}
-                    className="w-full pointer-events-auto p-2.5 border border-black bg-white dark:bg-black">
+                    className="w-full pointer-events-auto p-2.5 border border-black bg-white text-black">
                     <TableOfContents />
                 </div>
             </div>
