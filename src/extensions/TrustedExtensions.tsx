@@ -2,15 +2,13 @@ import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import { openModal } from "../app/modal"
-import { useAppDispatch as useDispatch } from "../hooks"
+import { useAppDispatch as useDispatch, useAppSelector } from "../hooks"
 import * as layout from "../ide/layoutState"
+import { CatalogExtension, extensionCatalog } from "./extensionCatalog"
 import { ExtensionLoader } from "./ExtensionLoader"
 import { ExtensionLaunchButton } from "./ExtensionLaunchButton"
+import { selectInstalledExtensionIds } from "./extensionState"
 import { loadExtension } from "./loadExtension"
-
-const CODE_VIZ_URL = "http://localhost:5173"
-const TIP_OF_THE_DAY_URL = "http://localhost:5174"
-const CHATBOT_URL = "https://emlbot1.lmc.gatech.edu/"
 
 export const CurriculumExtension = () => {
     const dispatch = useDispatch()
@@ -29,50 +27,18 @@ export const CurriculumExtension = () => {
     )
 }
 
-export const CodeViz = () => {
+const CatalogExtensionLauncher = ({ extension }: { extension: CatalogExtension }) => {
     const launch = async () => {
         try {
-            await loadExtension(CODE_VIZ_URL)
+            await loadExtension(extension.url)
         } catch (error) {
-            console.error("Failed to load CodeViz extension:", error)
+            console.error(`Failed to load ${extension.name} extension:`, error)
         }
     }
 
     return (
-        <ExtensionLaunchButton extensionName="CodeViz" onClick={launch}>
-            <span className="icon icon-code" aria-hidden="true" />
-        </ExtensionLaunchButton>
-    )
-}
-
-export const TipOfTheDay = () => {
-    const launch = async () => {
-        try {
-            await loadExtension(TIP_OF_THE_DAY_URL)
-        } catch (error) {
-            console.error("Failed to load TipOfTheDay extension:", error)
-        }
-    }
-
-    return (
-        <ExtensionLaunchButton extensionName="TipOfTheDay" onClick={launch}>
-            <span className="icon icon-star" aria-hidden="true" />
-        </ExtensionLaunchButton>
-    )
-}
-
-export const Chatbot = () => {
-    const launch = async () => {
-        try {
-            await loadExtension(CHATBOT_URL)
-        } catch (error) {
-            console.error("Failed to load Chatbot extension:", error)
-        }
-    }
-
-    return (
-        <ExtensionLaunchButton extensionName="Chatbot" onClick={launch}>
-            <span className="icon icon-bubbles" aria-hidden="true" />
+        <ExtensionLaunchButton extensionName={extension.name} onClick={launch}>
+            <span className={`icon ${extension.iconClass}`} aria-hidden="true" />
         </ExtensionLaunchButton>
     )
 }
@@ -94,9 +60,16 @@ export const ExtensionLoaderButton = () => {
     )
 }
 
-export const TrustedExtensions = () => (
-    <>
-        <CurriculumExtension />
-        <ExtensionLoaderButton />
-    </>
-)
+export const TrustedExtensions = () => {
+    const installedExtensionIds = useAppSelector(selectInstalledExtensionIds)
+
+    return (
+        <>
+            <CurriculumExtension />
+            {extensionCatalog
+                .filter(extension => installedExtensionIds.includes(extension.id))
+                .map(extension => <CatalogExtensionLauncher key={extension.id} extension={extension} />)}
+            <ExtensionLoaderButton />
+        </>
+    )
+}
