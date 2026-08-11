@@ -15,7 +15,6 @@ import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import { Language } from "common"
-import { TitleBar } from "../extensions/TitleBar"
 
 const SECTION_URL_CHARACTER = ":"
 
@@ -156,7 +155,7 @@ const CurriculumHeader = () => {
 
     return (
         <div id="curriculum-header" style={{ position: "relative" }}>
-            <CurriculumTitleBar />
+            <CurriculumToolbar />
             <NavigationBar />
 
             <div onFocus={() => dispatch(curriculum.showResults(true))}
@@ -196,7 +195,7 @@ const CurriculumSearchResults = () => {
         : null
 }
 
-export const CurriculumTitleBar = () => {
+const CurriculumToolbar = () => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
@@ -210,7 +209,7 @@ export const CurriculumTitleBar = () => {
     }, [dispatch, location, pageTitle])
 
     return (
-        <TitleBar title={t("curriculum.title")} closeButtonTitle={t("curriculum.close")}>
+        <div className="flex items-center justify-end p-2 text-base bg-white text-black dark:bg-gray-900 dark:text-white">
             <button className="px-2 -my-1 text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
                 <i className="icon icon-link" />
             </button>
@@ -222,7 +221,7 @@ export const CurriculumTitleBar = () => {
                 }}>
                 {language === "python" ? "PY" : "JS"}
             </button>
-        </TitleBar>
+        </div>
     )
 }
 

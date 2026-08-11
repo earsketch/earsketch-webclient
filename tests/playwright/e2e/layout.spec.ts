@@ -21,12 +21,12 @@ test.describe("Layout", () => {
         const cmWidth = await page.locator("div#content-manager").evaluate((el) => (el as HTMLElement).offsetWidth)
         expect(cmWidth).toBeLessThanOrEqual(45)
 
-        // Curriculum pane: same flow
-        await expect(page.locator("button[title='Open CURRICULUM']")).toHaveCount(0)
+        // Extension pane showing Curriculum: same flow
+        await expect(page.locator("button[title='Open EXTENSIONS: CURRICULUM']")).toHaveCount(0)
 
-        await page.locator("button[title='Close Curriculum']").click()
-        await expect(page.locator("button[title='Open CURRICULUM']")).toBeVisible()
-        await expect(page.locator("button[title='Close Curriculum']")).toHaveCount(0)
+        await page.locator("button[title='Close Extension']").click()
+        await expect(page.locator("button[title='Open EXTENSIONS: CURRICULUM']")).toBeVisible()
+        await expect(page.locator("button[title='Close Extension']")).toHaveCount(0)
 
         const curWidth = await page.locator("div#curriculum-container").evaluate((el) => (el as HTMLElement).offsetWidth)
         expect(curWidth).toBeLessThanOrEqual(45)

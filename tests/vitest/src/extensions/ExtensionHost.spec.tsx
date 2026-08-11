@@ -58,6 +58,7 @@ afterEach(cleanup)
 it("renders Curriculum directly when it is the active extension", () => {
     render(<ExtensionHost />)
 
+    expect(screen.getByText("CURRICULUM")).not.toBeNull()
     expect(screen.getByTestId("curriculum")).not.toBeNull()
     expect(screen.queryByTitle("EarSketch Extension")).toBeNull()
 })
@@ -67,6 +68,7 @@ it("renders external extensions in an iframe", () => {
 
     render(<ExtensionHost />)
 
+    expect(screen.getByText("TEST EXTENSION")).not.toBeNull()
     expect(screen.queryByTestId("curriculum")).toBeNull()
     expect(screen.getByTitle("EarSketch Extension")).not.toBeNull()
 })

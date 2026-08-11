@@ -190,23 +190,20 @@ export const ExtensionHost = () => {
         <>
             <div dir={currentLocale.direction} className={`h-full flex flex-col ${paneIsOpen ? "" : "hidden"}`}>
                 <ExtensionsTitleBar />
+                <div className="w-full flex justify-between items-stretch select-none text-white bg-blue">
+                    <div className="flex items-center gap-2 p-2.5 text-amber">
+                        <span>{activeExtensionName.toLocaleUpperCase()}</span>
+                    </div>
+                </div>
                 {eastContent === "curriculum"
                     ? <div className="min-h-0 grow"><Curriculum /></div>
-                    : <>
-                        <div className="w-full flex justify-between items-stretch select-none text-white bg-blue">
-                            <div className="flex items-center gap-2 p-2.5 text-amber">
-                                <span>{extensionName.toLocaleUpperCase()}</span>
-                            </div>
-                        </div>
-
-                        <iframe
-                            ref={iframeRef}
-                            src={extensionPermissions.includes("sidePanel") ? extensionUrl : undefined}
-                            onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOriginRef.current) }}
-                            className="w-full min-h-0 grow border border-gray-300"
-                            title="EarSketch Extension"
-                        />
-                    </>}
+                    : <iframe
+                        ref={iframeRef}
+                        src={extensionPermissions.includes("sidePanel") ? extensionUrl : undefined}
+                        onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOriginRef.current) }}
+                        className="w-full min-h-0 grow border border-gray-300"
+                        title="EarSketch Extension"
+                    />}
             </div>
             {!paneIsOpen && <Collapsed position="east" title={`${activeExtensionName ? `${t("extensions")}: ${activeExtensionName}` : t("extensions")}`.toLocaleUpperCase()} />}
         </>)
