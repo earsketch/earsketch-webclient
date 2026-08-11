@@ -18,10 +18,11 @@ interface LoginViewProps {
     loggingIn: boolean
     handleLogin: (e: React.FormEvent) => void
     setMode: (mode: AccountMenuMode) => void
+    goToRegister: () => void
     close: () => void
 }
 
-const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, error, loggingIn, handleLogin, setMode, close }: LoginViewProps) => {
+const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, error, loggingIn, handleLogin, setMode, goToRegister, close }: LoginViewProps) => {
     const { t } = useTranslation()
     return <div>
         <div className="flex justify-end">
@@ -87,7 +88,7 @@ const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, err
                     </button>
                 </div>
             </form>
-            <div className="text-center">New to EarSketch? <button className="text-amber hover:text-amber-300 font-bold" onClick={() => setMode("register")}>Join now</button></div>
+            <div className="text-center">New to EarSketch? <button className="text-amber hover:text-amber-300 font-bold" onClick={goToRegister}>Join now</button></div>
 
         </div>
     </div>
@@ -104,11 +105,11 @@ interface RegisterViewProps {
     setEmailLocal: (v: string) => void
     error: string
     handleRegister: (e: React.FormEvent) => void
-    setMode: (mode: AccountMenuMode) => void
+    backToLogin: () => void
     close: () => void
 }
 
-const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, confirmPassword, setConfirmPassword, emailLocal, setEmailLocal, error, handleRegister, setMode, close }: RegisterViewProps) => {
+const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, confirmPassword, setConfirmPassword, emailLocal, setEmailLocal, error, handleRegister, backToLogin, close }: RegisterViewProps) => {
     const { t } = useTranslation()
     const containerRef = useRef<HTMLDivElement>(null)
     // Move the screen-reader cursor into the view, but only after the slide-in
@@ -180,7 +181,7 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
                 left={<button
                     type="button"
                     className="text-sm text-amber hover:text-amber-300 font-bold"
-                    onClick={() => setMode("login")}
+                    onClick={backToLogin}
                 >
                     ← {t("accountMenu.backToLogin")}
                 </button>}
@@ -311,6 +312,23 @@ export const AccountMenu = ({
         }
     }
 
+    // Username/password are shared local state between the login and register views (so a
+    // successful login can be pre-filled from a preceding register, etc.), so switching between
+    // them explicitly clears those fields rather than letting one view's input leak into the other.
+    const goToRegister = () => {
+        setUsernameLocal("")
+        setPasswordLocal("")
+        setError("")
+        setMode("register")
+    }
+
+    const backToLogin = () => {
+        setUsernameLocal("")
+        setPasswordLocal("")
+        setError("")
+        setMode("login")
+    }
+
     const handleRecoverPassword = async (e: React.FormEvent) => {
         e.preventDefault()
         post("/users/resetpwd", { email: recoverEmail }).then(() => {
@@ -362,6 +380,7 @@ export const AccountMenu = ({
                                 loggingIn={loggingIn}
                                 handleLogin={handleLogin}
                                 setMode={setMode}
+                                goToRegister={goToRegister}
                                 close={close}
                             />
                         </div>
@@ -379,7 +398,7 @@ export const AccountMenu = ({
                                 setEmailLocal={setEmailLocal}
                                 error={error}
                                 handleRegister={handleRegister}
-                                setMode={setMode}
+                                backToLogin={backToLogin}
                                 close={close}
                             />
                         </div>
