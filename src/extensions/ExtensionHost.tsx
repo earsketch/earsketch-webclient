@@ -191,7 +191,7 @@ export const ExtensionHost = () => {
             <div dir={currentLocale.direction} className={`h-full flex flex-col ${paneIsOpen ? "" : "hidden"}`}>
                 <ExtensionsTitleBar />
                 <div className="w-full flex justify-between items-stretch select-none text-white bg-blue">
-                    <div className="flex items-center gap-2 p-2.5 text-amber">
+                    <div className="flex items-center gap-2 p-2.5 text-white">
                         <span>{activeExtensionName.toLocaleUpperCase()}</span>
                     </div>
                 </div>
