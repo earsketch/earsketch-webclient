@@ -22,7 +22,7 @@ import { useTranslation } from "react-i18next"
 // misbehaving extension cannot wedge the editor with a giant string.
 const MAX_SCRIPT_LENGTH = 500_000
 
-export const ExtensionHost = () => {
+export const ExtensionHost = ({ position = "east" }: { position?: "east" | "west" }) => {
     const extensionUrl = useSelector(selectExtensionUrl)
     const extensionTargetOrigin = extensionUrl ? new URL(extensionUrl).origin : ""
     const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -34,7 +34,7 @@ export const ExtensionHost = () => {
     const extensionName = useSelector(selectExtensionName)
     const extensionPermissions = useSelector(selectExtensionPermissions)
     const eastContent = useSelector(appState.selectEastContent)
-    const paneIsOpen = useSelector(layout.isEastOpen)
+    const paneIsOpen = useSelector(position === "east" ? layout.isEastOpen : layout.isWestOpen)
     const { t } = useTranslation()
     const activeExtensionName = eastContent === "curriculum" ? t("curriculum.title") : extensionName
 
@@ -153,10 +153,10 @@ export const ExtensionHost = () => {
 
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {
-            const isFromLocalOriginIframe = event.source === iframeRef.current?.contentWindow
-            const isFromRemoteOriginIframe = event.origin === extensionTargetOriginRef.current && event.origin !== window.location.origin
+            const isFromExtensionIframe = event.source === iframeRef.current?.contentWindow &&
+                event.origin === extensionTargetOriginRef.current
 
-            if (isFromLocalOriginIframe || isFromRemoteOriginIframe) {
+            if (isFromExtensionIframe) {
                 console.log("Received message from iframe:", event.data)
                 const data = JSON.parse(event.data)
 
@@ -189,7 +189,7 @@ export const ExtensionHost = () => {
     return (
         <>
             <div dir={currentLocale.direction} className={`h-full flex flex-col ${paneIsOpen ? "" : "hidden"}`}>
-                <ExtensionsTitleBar />
+                <ExtensionsTitleBar position={position} />
                 <div className="w-full flex justify-between items-stretch select-none text-white bg-blue">
                     <div className="flex items-center gap-2 p-2.5 text-white">
                         <span>{activeExtensionName.toLocaleUpperCase()}</span>
@@ -205,7 +205,7 @@ export const ExtensionHost = () => {
                         title="EarSketch Extension"
                     />}
             </div>
-            {!paneIsOpen && <Collapsed position="east" title={`${activeExtensionName ? `${t("extensions")}: ${activeExtensionName}` : t("extensions")}`.toLocaleUpperCase()} />}
+            {!paneIsOpen && <Collapsed position={position} title={`${activeExtensionName ? `${t("extensions")}: ${activeExtensionName}` : t("extensions")}`.toLocaleUpperCase()} />}
         </>)
 }
 

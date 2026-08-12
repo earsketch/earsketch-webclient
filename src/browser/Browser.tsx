@@ -14,6 +14,9 @@ import { Collapsed } from "./Utils"
 import { BrowserTabType } from "./BrowserTab"
 import * as tabState from "../ide/tabState"
 import { addUIClick } from "../cai/dialogue/student"
+import { ExtensionHost } from "../extensions/ExtensionHost"
+import { contentManagerExtensionIds } from "../extensions/extensionCatalog"
+import { selectActiveCatalogExtensionId } from "../extensions/extensionState"
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
@@ -87,9 +90,26 @@ export const Header = ({ title }: { title: string }) => (
 export const Browser = () => {
     const open = useSelector((state: RootState) => state.layout.west.open)
     const scaledFontSize = useSelector(appState.selectScaledFontSize)
+    const eastContent = useSelector(appState.selectEastContent)
+    const activeCatalogExtensionId = useSelector(selectActiveCatalogExtensionId)
     const dispatch = useDispatch()
     const { t } = useTranslation()
     let kind: BrowserTabType = useSelector(layout.selectWestKind)
+    const showExtensionHost = eastContent === "extension" &&
+        activeCatalogExtensionId !== null &&
+        contentManagerExtensionIds.includes(activeCatalogExtensionId)
+
+    if (showExtensionHost) {
+        return (
+            <div
+                className="h-full w-full text-left font-sans bg-white text-black dark:bg-gray-900 dark:text-white"
+                style={{ fontSize: `${scaledFontSize}px` }}
+                id="content-manager"
+            >
+                <ExtensionHost position="west" />
+            </div>
+        )
+    }
 
     if (!Object.values(BrowserTabType).includes(kind)) {
         kind = BrowserTabType.Sound

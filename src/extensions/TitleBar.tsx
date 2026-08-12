@@ -3,8 +3,13 @@ import { ReactNode } from "react"
 import { useAppDispatch as useDispatch } from "../hooks"
 import * as layout from "../ide/layoutState"
 
-/** The title bar for east-pane components - with menu icons provided using the `children` prop */
-export const TitleBar = ({ title, closeButtonTitle, children }: { title: string, closeButtonTitle: string, children?: ReactNode }) => {
+/** A title bar for side-pane components, with menu icons provided using the `children` prop. */
+export const TitleBar = ({ title, closeButtonTitle, position = "east", children }: {
+    title: string
+    closeButtonTitle: string
+    position?: "east" | "west"
+    children?: ReactNode
+}) => {
     const dispatch = useDispatch()
 
     return (
@@ -15,7 +20,9 @@ export const TitleBar = ({ title, closeButtonTitle, children }: { title: string,
             <div>
                 <button
                     className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
-                    onClick={() => dispatch(layout.setEast({ open: false }))}
+                    onClick={() => dispatch(position === "east"
+                        ? layout.setEast({ open: false })
+                        : layout.setWest({ open: false }))}
                     title={closeButtonTitle}
                     aria-label={closeButtonTitle}
                 >

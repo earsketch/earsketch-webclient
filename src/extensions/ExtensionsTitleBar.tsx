@@ -3,11 +3,11 @@ import { TitleBar } from "./TitleBar"
 import { TrustedExtensions } from "./TrustedExtensions"
 
 /** The title bar for the pane with extension launch icons */
-export const ExtensionsTitleBar = () => {
+export const ExtensionsTitleBar = ({ position = "east" }: { position?: "east" | "west" }) => {
     const { t } = useTranslation()
 
     return (
-        <TitleBar title={t("extensions")} closeButtonTitle={t("extension.close")}>
+        <TitleBar title={t("extensions")} closeButtonTitle={t("extension.close")} position={position}>
             <TrustedExtensions />
         </TitleBar>
     )

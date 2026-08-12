@@ -9,6 +9,8 @@ import ResizeObserver from "resize-observer-polyfill"
 import { Provider } from "react-redux" // redux
 import store from "../../../../src/reducers" // earsketch redux store
 import { Browser } from "../../../../src/browser/Browser"
+import * as appState from "../../../../src/app/appState"
+import * as extensionState from "../../../../src/extensions/extensionState"
 import * as request from "../../../../src/request"
 import * as soundsThunks from "../../../../src/browser/soundsThunks"
 import * as scriptsState from "../../../../src/browser/scriptsState"
@@ -69,4 +71,28 @@ it("shows and hides content browsers on tab change", async () => {
     expect(divSoundBrowser).toHaveClass("hidden")
     expect(divScriptBrowser).toHaveClass("hidden")
     expect(divApiBrowser).not.toHaveClass("hidden")
+})
+
+it.each(["hydra-viz", "jumping-jacks"])("replaces the content manager with an extension host for %s", (catalogExtensionId) => {
+    store.dispatch(extensionState.setExtension({
+        url: `https://example.com/${catalogExtensionId}/`,
+        name: catalogExtensionId,
+        version: "1",
+        description: "",
+        permissions: ["sidePanel"],
+        icon32: "",
+        icon128: "",
+        extensionApiVersion: "1",
+        catalogExtensionId,
+    }))
+    store.dispatch(appState.setEastContent("extension"))
+
+    const { container, unmount } = render(<Provider store={store}><Browser /></Provider>)
+
+    expect(container.querySelector("#browser-tabs")).toBeNull()
+    expect(container.querySelector('iframe[title="EarSketch Extension"]')).not.toBeNull()
+
+    unmount()
+    store.dispatch(extensionState.clearExtension())
+    store.dispatch(appState.setEastContent("curriculum"))
 })

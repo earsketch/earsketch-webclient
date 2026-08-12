@@ -51,3 +51,8 @@ export const extensionCatalog = [
 
 export type CatalogExtension = typeof extensionCatalog[number]
 export type CatalogExtensionId = CatalogExtension["id"]
+
+export const contentManagerExtensionIds: readonly CatalogExtensionId[] = [
+    "hydra-viz",
+    "jumping-jacks",
+]

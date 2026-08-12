@@ -13,7 +13,7 @@ const { state } = vi.hoisted(() => ({
             permissions: ["sidePanel"],
         },
         ide: { logs: [] },
-        layout: { east: { open: true } },
+        layout: { east: { open: true }, west: { open: true } },
         user: { loggedIn: false, username: null },
     },
 }))
@@ -28,7 +28,9 @@ vi.mock("../../../../src/browser/Utils", () => ({
     Collapsed: () => <div data-testid="collapsed" />,
 }))
 vi.mock("../../../../src/extensions/ExtensionsTitleBar", () => ({
-    ExtensionsTitleBar: () => <div data-testid="extensions-title-bar" />,
+    ExtensionsTitleBar: ({ position }: { position?: "east" | "west" }) => (
+        <div data-testid="extensions-title-bar" data-position={position} />
+    ),
 }))
 vi.mock("../../../../src/ide/tabState", () => ({
     selectActiveTabID: vi.fn(),
@@ -51,6 +53,8 @@ vi.mock("react-i18next", () => ({
 
 beforeEach(() => {
     state.app.eastContent = "curriculum"
+    state.layout.east.open = true
+    state.layout.west.open = true
 })
 
 afterEach(cleanup)
@@ -71,4 +75,15 @@ it("renders external extensions in an iframe", () => {
     expect(screen.getByText("TEST EXTENSION")).not.toBeNull()
     expect(screen.queryByTestId("curriculum")).toBeNull()
     expect(screen.getByTitle("EarSketch Extension")).not.toBeNull()
+})
+
+it("renders a west-pane copy using west-pane controls", () => {
+    state.app.eastContent = "extension"
+    state.layout.east.open = false
+
+    render(<ExtensionHost position="west" />)
+
+    expect(screen.getByTitle("EarSketch Extension")).not.toBeNull()
+    expect(screen.getByTestId("extensions-title-bar").getAttribute("data-position")).toBe("west")
+    expect(screen.queryByTestId("collapsed")).toBeNull()
 })
