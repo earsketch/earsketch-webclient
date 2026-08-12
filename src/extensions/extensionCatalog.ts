@@ -35,6 +35,18 @@ export const extensionCatalog = [
         iconClass: "icon-eye",
         url: "https://earsketch-client-test.s3.us-east-1.amazonaws.com/extensions/hydra-viz/",
     },
+    {
+        id: "teacher-pages",
+        name: "Teacher Pages",
+        iconClass: "icon-book",
+        url: "https://earsketch-client-test.s3.us-east-1.amazonaws.com/extensions/teacher-pages/",
+    },
+    {
+        id: "jumping-jacks",
+        name: "Jumping Jacks",
+        iconClass: "icon-user",
+        url: "https://earsketch-client-test.s3.us-east-1.amazonaws.com/extensions/jumping-jacks/",
+    },
 ] as const
 
 export type CatalogExtension = typeof extensionCatalog[number]
