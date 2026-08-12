@@ -6,7 +6,7 @@ import parse from "html-react-parser"
 import { setEastContent } from "../app/appState"
 import store from "../reducers"
 import { useAppDispatch, useAppSelector } from "../hooks"
-import { setExtension, clearExtension, installExtension, uninstallExtension, selectExtensionUrl, selectExtensionName, selectExtensionVersion, selectExtensionDescription, selectExtensionPermissions, selectExtensionIcon128, selectInstalledExtensionIds, selectActiveCatalogExtensionId } from "./extensionState"
+import { setExtension, clearExtension, installExtension, uninstallExtension, selectInstalledExtensionIds, selectActiveCatalogExtensionId } from "./extensionState"
 import { CatalogExtension, CatalogExtensionId, extensionCatalog } from "./extensionCatalog"
 
 const ExtensionCard = ({ extension, installed, onToggle }: {
@@ -61,14 +61,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
     const [manifest, setManifest] = useState<ExtensionManifest | null>(null)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-    const [showDetails, setShowDetails] = useState(false)
 
-    const currentExtensionUrl = useAppSelector(selectExtensionUrl)
-    const currentExtensionName = useAppSelector(selectExtensionName)
-    const currentExtensionVersion = useAppSelector(selectExtensionVersion)
-    const currentExtensionDescription = useAppSelector(selectExtensionDescription)
-    const currentExtensionPermissions = useAppSelector(selectExtensionPermissions)
-    const currentExtensionIcon128 = useAppSelector(selectExtensionIcon128)
     const installedExtensionIds = useAppSelector(selectInstalledExtensionIds)
     const activeCatalogExtensionId = useAppSelector(selectActiveCatalogExtensionId)
 
@@ -102,11 +95,6 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
         }))
         store.dispatch(setEastContent("extension"))
         close()
-    }
-
-    const removeExtension = () => {
-        store.dispatch(clearExtension())
-        store.dispatch(setEastContent("curriculum"))
     }
 
     const toggleInstalledExtension = (id: CatalogExtensionId) => {
@@ -185,73 +173,6 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
                         {t("extension.catalog.loadFromUrl")}
                     </h2>
                 </div>
-                {currentExtensionUrl && (
-                    <div className="mb-4 p-4 border border-gray-300 dark:border-gray-600 rounded-md bg-blue-50 dark:bg-blue-900/20">
-                        <div className="flex items-start gap-4">
-                            {currentExtensionIcon128 && (
-                                <div className="flex-shrink-0">
-                                    <img
-                                        src={currentExtensionIcon128}
-                                        alt={currentExtensionName}
-                                        className="w-16 h-16 rounded"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).style.display = "none"
-                                        }}
-                                    />
-                                </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                                <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-                                    {currentExtensionName}
-                                </h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                    {t("extension.currentlyLoaded")}
-                                </p>
-                                <div className="flex gap-2">
-                                    <button
-                                        type="button"
-                                        className="px-3 py-1.5 rounded-md text-sm border border-sky-700 text-sky-700 hover:bg-sky-50 dark:hover:bg-sky-900/20"
-                                        onClick={() => setShowDetails(!showDetails)}>
-                                        {showDetails ? t("extension.hideDetails") : t("extension.showDetails")}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="px-3 py-1.5 rounded-md text-sm border border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                        onClick={removeExtension}>
-                                        {t("extension.remove")}
-                                    </button>
-                                </div>
-                                {showDetails && (
-                                    <div className="mt-3 pt-3 border-t border-gray-300 dark:border-gray-600">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                            {t("extension.version")}: {currentExtensionVersion}
-                                        </p>
-                                        {currentExtensionDescription && (
-                                            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                                                {currentExtensionDescription}
-                                            </p>
-                                        )}
-                                        {currentExtensionPermissions && currentExtensionPermissions.length > 0 && (
-                                            <div className="mt-3">
-                                                <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                                                    {t("extension.permissionsHeader")}
-                                                </p>
-                                                <ul className="space-y-1">
-                                                    {currentExtensionPermissions.map((permission, index) => (
-                                                        <li key={index} className="flex items-center text-sm text-gray-700 dark:text-gray-300">
-                                                            <span className="mr-2 text-green-600 dark:text-green-400">✓</span>
-                                                            {t(`extension.permission.${permission}`)}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
                 <div className="mb-3">
                     {parse(t("extensionLoad.description"))}
                 </div>
