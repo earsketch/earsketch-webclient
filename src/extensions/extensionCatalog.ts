@@ -38,7 +38,7 @@ export const extensionCatalog = [
     {
         id: "teacher-pages",
         name: "Teacher Pages",
-        iconClass: "icon-book",
+        iconClass: "icon-palette",
         url: "https://earsketch-client-test.s3.us-east-1.amazonaws.com/extensions/teacher-pages/",
     },
     {
