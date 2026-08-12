@@ -22,7 +22,7 @@ import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
 import { chooseDetectedLanguage, LocaleSelector } from "../top/LocaleSelector"
-import { openModal } from "./modal"
+import { closeOverlays, openModal } from "./modal"
 import { NotificationBar, NotificationMenu } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameSound } from "./Rename"
@@ -831,6 +831,7 @@ export const App = () => {
                         store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("soundBrowser.noResultsToPreview") }))
                         return
                     }
+                    closeOverlays()
                     navigateTo(entry)
                     uiLogger.shortcut(`Ctrl+Shift+${e.code}`, entry.panel)
                     reporter.keyboardShortcut(`Ctrl+Shift+${e.code}`)
@@ -906,6 +907,7 @@ export const App = () => {
                 store.dispatch(stepBackward())
                 const record = selectAtNavOffset(store.getState())
                 if (record) {
+                    closeOverlays()
                     navigateToRecord(record)
                     uiLogger.shortcut("Ctrl+Alt+[", record.panelId)
                     reporter.keyboardShortcut("Ctrl+Alt+[")
@@ -921,6 +923,7 @@ export const App = () => {
                 store.dispatch(stepForward())
                 const record = selectAtNavOffset(store.getState())
                 if (record) {
+                    closeOverlays()
                     navigateToRecord(record)
                     uiLogger.shortcut("Ctrl+Alt+]", record.panelId)
                     reporter.keyboardShortcut("Ctrl+Alt+]")
