@@ -74,5 +74,8 @@ it("loads a catalog extension from its launch button", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Switch to Extension: CodeViz" }))
 
-    expect(loadExtension).toHaveBeenCalledWith("http://localhost:5173", "code-viz")
+    expect(loadExtension).toHaveBeenCalledWith(
+        "https://earsketch-client-test.s3.us-east-1.amazonaws.com/extensions/code-viz/",
+        "code-viz"
+    )
 })

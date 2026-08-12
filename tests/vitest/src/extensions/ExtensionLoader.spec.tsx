@@ -43,9 +43,6 @@ vi.mock("react-i18next", () => ({
                 "extension.catalog.heading": "Featured extensions",
                 "extension.catalog.add": "Add",
                 "extension.catalog.remove": "Remove",
-                "extension.catalog.codeVizDescription": "Explore a visual representation of your EarSketch code.",
-                "extension.catalog.tipOfTheDayDescription": "Discover a new EarSketch tip each day.",
-                "extension.catalog.chatbotDescription": "Get help and ideas while you create music in EarSketch.",
             }
 
             if (key === "extension.catalog.addNamed") return `Add ${values?.extensionName}`
@@ -72,7 +69,13 @@ it("renders the featured extension cards", () => {
     expect(screen.getByRole("heading", { name: "CodeViz" })).not.toBeNull()
     expect(screen.getByRole("heading", { name: "Tip of the Day" })).not.toBeNull()
     expect(screen.getByRole("heading", { name: "EarSketch Chatbot" })).not.toBeNull()
+    expect(screen.getByRole("heading", { name: "Sequencer" })).not.toBeNull()
+    expect(screen.getByRole("heading", { name: "Code Score" })).not.toBeNull()
+    expect(screen.getByRole("heading", { name: "Hydra Viz" })).not.toBeNull()
     expect(screen.getByRole("button", { name: "Add CodeViz" })).not.toBeNull()
+    expect(screen.getByRole("button", { name: "Add Sequencer" })).not.toBeNull()
+    expect(screen.getByRole("button", { name: "Add Code Score" })).not.toBeNull()
+    expect(screen.getByRole("button", { name: "Add Hydra Viz" })).not.toBeNull()
 })
 
 it("adds a featured extension to the installed extension state", () => {

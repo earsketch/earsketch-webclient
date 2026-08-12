@@ -17,32 +17,23 @@ const ExtensionCard = ({ extension, installed, onToggle }: {
     const { t } = useTranslation()
 
     return (
-        <article className="flex min-h-36 flex-col rounded-lg border border-gray-300 bg-white p-4 shadow-sm dark:border-gray-600 dark:bg-gray-800">
-            <div className="flex items-start gap-3">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-sky-100 text-2xl text-sky-700 dark:bg-sky-900/40 dark:text-sky-300">
-                    <span className={`icon ${extension.iconClass}`} aria-hidden="true" />
-                </div>
-                <div className="min-w-0">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {extension.name}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                        {t(extension.descriptionKey)}
-                    </p>
-                </div>
+        <article className="flex items-center gap-2 rounded-md border border-gray-300 bg-white p-3 shadow-sm dark:border-gray-600 dark:bg-gray-800">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-sky-100 text-lg text-sky-700 dark:bg-sky-900/40 dark:text-sky-300">
+                <span className={`icon ${extension.iconClass}`} aria-hidden="true" />
             </div>
-            <div className="mt-auto flex justify-end pt-4">
-                <button
-                    type="button"
-                    className={installed
-                        ? "rounded-md border border-red-600 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                        : "rounded-md bg-sky-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-800"}
-                    onClick={onToggle}
-                    aria-label={t(installed ? "extension.catalog.removeNamed" : "extension.catalog.addNamed", { extensionName: extension.name })}
-                >
-                    {t(installed ? "extension.catalog.remove" : "extension.catalog.add")}
-                </button>
-            </div>
+            <h3 className="min-w-0 flex-1 text-sm font-semibold leading-tight text-gray-900 dark:text-white">
+                {extension.name}
+            </h3>
+            <button
+                type="button"
+                className={installed
+                    ? "rounded border border-red-600 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    : "rounded bg-sky-700 px-2 py-1 text-xs font-medium text-white hover:bg-sky-800"}
+                onClick={onToggle}
+                aria-label={t(installed ? "extension.catalog.removeNamed" : "extension.catalog.addNamed", { extensionName: extension.name })}
+            >
+                {t(installed ? "extension.catalog.remove" : "extension.catalog.add")}
+            </button>
         </article>
     )
 }
@@ -177,7 +168,7 @@ export const ExtensionLoader = ({ close }: { close: () => void }) => {
                     <h2 id="extension-catalog-heading" className="mb-3 text-base font-semibold text-gray-900 dark:text-white">
                         {t("extension.catalog.heading")}
                     </h2>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
                         {extensionCatalog.map(extension => (
                             <ExtensionCard
                                 key={extension.id}
