@@ -7,10 +7,10 @@ import * as layout from "../ide/layoutState"
 import { CatalogExtension, extensionCatalog } from "./extensionCatalog"
 import { ExtensionLoader } from "./ExtensionLoader"
 import { ExtensionLaunchButton } from "./ExtensionLaunchButton"
-import { selectInstalledExtensionIds } from "./extensionState"
+import { selectActiveCatalogExtensionId, selectInstalledExtensionIds } from "./extensionState"
 import { loadExtension } from "./loadExtension"
 
-export const CurriculumExtension = () => {
+export const CurriculumExtension = ({ selected = false }: { selected?: boolean }) => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const extensionName = t("curriculum.title")
@@ -21,13 +21,13 @@ export const CurriculumExtension = () => {
     }
 
     return (
-        <ExtensionLaunchButton extensionName={extensionName} onClick={launch}>
+        <ExtensionLaunchButton extensionName={extensionName} onClick={launch} selected={selected}>
             <span className="icon icon-book" aria-hidden="true" />
         </ExtensionLaunchButton>
     )
 }
 
-const CatalogExtensionLauncher = ({ extension }: { extension: CatalogExtension }) => {
+const CatalogExtensionLauncher = ({ extension, selected = false }: { extension: CatalogExtension, selected?: boolean }) => {
     const launch = async () => {
         try {
             await loadExtension(extension.url, extension.id)
@@ -37,7 +37,7 @@ const CatalogExtensionLauncher = ({ extension }: { extension: CatalogExtension }
     }
 
     return (
-        <ExtensionLaunchButton extensionName={extension.name} onClick={launch}>
+        <ExtensionLaunchButton extensionName={extension.name} onClick={launch} selected={selected}>
             <span className={`icon ${extension.iconClass}`} aria-hidden="true" />
         </ExtensionLaunchButton>
     )
@@ -62,13 +62,21 @@ export const ExtensionLoaderButton = () => {
 
 export const TrustedExtensions = () => {
     const installedExtensionIds = useAppSelector(selectInstalledExtensionIds)
+    const activeCatalogExtensionId = useAppSelector(selectActiveCatalogExtensionId)
+    const eastContent = useAppSelector(appState.selectEastContent)
 
     return (
         <>
-            <CurriculumExtension />
+            <CurriculumExtension selected={eastContent === "curriculum"} />
             {extensionCatalog
                 .filter(extension => installedExtensionIds.includes(extension.id))
-                .map(extension => <CatalogExtensionLauncher key={extension.id} extension={extension} />)}
+                .map(extension => (
+                    <CatalogExtensionLauncher
+                        key={extension.id}
+                        extension={extension}
+                        selected={eastContent === "extension" && activeCatalogExtensionId === extension.id}
+                    />
+                ))}
             <ExtensionLoaderButton />
         </>
     )

@@ -11,8 +11,12 @@ import * as layout from "../../../../src/ide/layoutState"
 const { dispatch, state } = vi.hoisted(() => ({
     dispatch: vi.fn(),
     state: {
+        app: {
+            eastContent: "curriculum" as "curriculum" | "extension",
+        },
         extension: {
             installedExtensionIds: [] as string[],
+            activeCatalogExtensionId: null as string | null,
         },
     },
 }))
@@ -37,7 +41,9 @@ vi.mock("../../../../src/hooks", () => ({
 
 beforeEach(() => {
     vi.clearAllMocks()
+    state.app.eastContent = "curriculum"
     state.extension.installedExtensionIds = []
+    state.extension.activeCatalogExtensionId = null
 })
 
 afterEach(cleanup)
@@ -66,6 +72,17 @@ it("only shows launch buttons for installed catalog extensions", () => {
     expect(screen.getByRole("button", { name: "Switch to Extension: CodeViz" })).not.toBeNull()
     expect(screen.getByRole("button", { name: "Switch to Extension: EarSketch Chatbot" })).not.toBeNull()
     expect(screen.queryByRole("button", { name: "Switch to Extension: Tip of the Day" })).toBeNull()
+})
+
+it("shows an amber ring around the selected extension", () => {
+    state.app.eastContent = "extension"
+    state.extension.installedExtensionIds = ["code-viz"]
+    state.extension.activeCatalogExtensionId = "code-viz"
+    render(<TrustedExtensions />)
+
+    expect(screen.getByRole("button", { name: "Switch to Extension: CodeViz" }).className).toContain("ring-amber")
+    expect(screen.getByRole("button", { name: "Switch to Extension: CodeViz" }).getAttribute("aria-pressed")).toBe("true")
+    expect(screen.getByRole("button", { name: "Switch to Extension: Curriculum" }).className).not.toContain("ring-amber")
 })
 
 it("loads a catalog extension from its launch button", () => {
