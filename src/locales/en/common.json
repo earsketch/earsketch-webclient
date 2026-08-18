@@ -988,16 +988,19 @@
       }
     },
 
-    "sliceEveryNth": {
-      "description": "Generates a list of slice start positions evenly spaced by note duration. For example, sliceEveryNth(16) returns positions spaced by sixteenth notes, and sliceEveryNth(8) returns positions spaced by eighth notes.",
+    "slicesPerMeasure": {
+      "description": "Generates a list of slice start positions evenly spaced by note duration. For example, slicesPerMeasure(16) returns positions spaced by sixteenth notes, and slicesPerMeasure(8) returns positions spaced by eighth notes.",
       "parameters": {
         "n": {
           "description": "The number of evenly spaced slices per measure. Use 16 for sixteenth notes, 8 for eighth notes, 4 for quarter notes."
         }
       },
+      "returns": {
+        "description": "A list of slice start positions evenly spaced by note duration."
+      },
       "example": {
-        "python": "# Slice by eighth notes\nslices = sliceEveryNth(8)\nmakeBeatSlice(HIPHOP_DUSTYGROOVE_006, 1, 1, \"01261264\", slices)",
-        "javascript": "// Slice by eighth notes\nvar slices = sliceEveryNth(8);\nmakeBeatSlice(HIPHOP_DUSTYGROOVE_006, 1, 1, \"01261264\", slices);"
+        "python": "# Slice by eighth notes\nslices = slicesPerMeasure(8)\nmakeBeatSlice(HIPHOP_DUSTYGROOVE_006, 1, 1, \"01261264\", slices)",
+        "javascript": "// Slice by eighth notes\nvar slices = slicesPerMeasure(8);\nmakeBeatSlice(HIPHOP_DUSTYGROOVE_006, 1, 1, \"01261264\", slices);"
       }
     },
 
