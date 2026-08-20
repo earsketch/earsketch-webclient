@@ -403,6 +403,8 @@ const KeyboardShortcuts = () => {
         jumpToUtility: { keys: ["Ctrl", "Shift", "7"], group: "navigation" },
         jumpToSoundPreview: { keys: ["Ctrl", "Shift", "8"], group: "navigation" },
         jumpToConsole: { keys: ["Ctrl", "Shift", "9"], group: "navigation" },
+        closeContentManager: { keys: <><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd></>, group: "collapse" },
+        closeCurriculum: { keys: ["Ctrl", "Alt", "Shift", "6"], group: "collapse" },
     }
 
     return <Popover>
@@ -929,6 +931,45 @@ export const App = () => {
         }
         window.addEventListener("keydown", handleFocusNav)
         return () => window.removeEventListener("keydown", handleFocusNav)
+    }, [])
+
+    useEffect(() => {
+        const closePanel = (panelId: string, toggleId: string, setOpen: (open: boolean) => void, code: string, paneName: string) => {
+            const pane = document.getElementById(panelId)
+            const focusWasInPane = pane?.contains(document.activeElement)
+            const isOpen = panelId === "sidebar-container"
+                ? store.getState().layout.west.open
+                : store.getState().layout.east.open
+
+            if (isOpen) {
+                setOpen(false)
+                consoleStatus(i18n.t("console:PaneClosed", { paneName }))
+
+                if (focusWasInPane) {
+                    window.requestAnimationFrame(() => {
+                        document.getElementById(toggleId)?.focus()
+                    })
+                }
+
+                uiLogger.shortcut(`Ctrl+Alt+Shift+${code}`, panelId)
+                reporter.keyboardShortcut(`Ctrl+Alt+Shift+${code}`)
+            }
+        }
+
+        const handleClosePanel = (e: KeyboardEvent) => {
+            if (!e.ctrlKey || !e.altKey || !e.shiftKey || e.metaKey) return
+
+            if (["Digit1", "Digit2", "Digit3"].includes(e.code)) {
+                e.preventDefault()
+                closePanel("sidebar-container", "westPaneToggle", () => store.dispatch(layout.setWest({ open: false })), e.code, i18n.t("contentManager.title"))
+            } else if (e.code === "Digit6") {
+                e.preventDefault()
+                closePanel("curriculum-container", "eastPaneToggle", () => store.dispatch(layout.setEast({ open: false })), e.code, i18n.t("curriculum.title"))
+            }
+        }
+
+        window.addEventListener("keydown", handleClosePanel)
+        return () => window.removeEventListener("keydown", handleClosePanel)
     }, [])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
