@@ -21,7 +21,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
     const [description, setDescription] = useState("")
 
     const submit = () => {
-        let body = ["@xfreeman", "@heerman", "@manodrum"].join(" ") + "\r\n"
+        let body = ""
         if (name || email) {
             body += "\r\n**Reported by:** " + (name ? name + " " : "") + (email ? `[${email}]` : "") + "\r\n"
             body += username ? "\r\n**Logged in username:** " + username + "\r\n" : ""
