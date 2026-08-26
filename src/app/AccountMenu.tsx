@@ -320,6 +320,7 @@ export const AccountMenu = ({
     const goToRegister = () => {
         setUsernameLocal("")
         setPasswordLocal("")
+        setConfirmPassword("")
         setError("")
         setMode("register")
     }
@@ -327,6 +328,7 @@ export const AccountMenu = ({
     const backToLogin = () => {
         setUsernameLocal("")
         setPasswordLocal("")
+        setConfirmPassword("")
         setError("")
         setMode("login")
     }
