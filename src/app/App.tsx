@@ -543,7 +543,7 @@ type LoginState = "logged-out" | "logging-in" | "logged-in"
 const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }: {
     loginState: LoginState, isAdmin: boolean, username: string, password: string,
     setUsername: (u: string) => void, setPassword: (p: string) => void,
-    login: (i: { username: string, password: string }) => void, logout: () => void,
+    login: (i: { username: string, password: string }) => Promise<void>, logout: () => void,
 }) => {
     const { t } = useTranslation()
 
