@@ -82,7 +82,7 @@ const generateCSV = (results: Result[], useContestID: boolean, options: ReportOp
         row[2] = result.script.shareid
         row[3] = result.version
         row[4] = result.script.modified
-        row[5] = result.error || ""
+        row[5] = (result.error || "").replace(/,/g, " ")
         if (result.reports) {
             for (const [name, report] of Object.entries(result.reports)) {
                 if (options[name as keyof ReportOptions]) {
@@ -91,8 +91,8 @@ const generateCSV = (results: Result[], useContestID: boolean, options: ReportOp
                     }
                 }
             }
-            row[colMap.source_code.source_code] = "\"\"" + JSON.stringify(result.script.source_code) + "\"\""
         }
+        row[colMap.source_code.source_code] = "\"\"" + JSON.stringify(result.script.source_code) + "\"\""
         rows.push(row.join(","))
     }
     return headers.join(",") + "\n" + rows.join("\n")
