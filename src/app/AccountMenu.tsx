@@ -17,12 +17,12 @@ interface LoginViewProps {
     error: string
     loggingIn: boolean
     handleLogin: (e: React.FormEvent) => void
-    setMode: (mode: AccountMenuMode) => void
     goToRegister: () => void
+    goToRecover: () => void
     close: () => void
 }
 
-const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, error, loggingIn, handleLogin, setMode, goToRegister, close }: LoginViewProps) => {
+const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, error, loggingIn, handleLogin, goToRegister, goToRecover, close }: LoginViewProps) => {
     const { t } = useTranslation()
     return <div>
         <div className="flex justify-end">
@@ -70,7 +70,7 @@ const LoginView = ({ username, setUsernameLocal, password, setPasswordLocal, err
                         <button
                             type="button"
                             className="text-amber hover:text-amber-300 font-bold"
-                            onClick={() => setMode("recover")}
+                            onClick={goToRecover}
                         >
                             {t("forgotPassword.title")}
                         </button>
@@ -193,12 +193,13 @@ const RegisterView = ({ username, setUsernameLocal, password, setPasswordLocal, 
 interface RecoverViewProps {
     recoverEmail: string
     setRecoverEmail: (v: string) => void
+    error: string
     handleRecoverPassword: (e: React.FormEvent) => void
-    setMode: (mode: AccountMenuMode) => void
+    backToLogin: () => void
     close: () => void
 }
 
-const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, setMode, close }: RecoverViewProps) => {
+const RecoverView = ({ recoverEmail, setRecoverEmail, error, handleRecoverPassword, backToLogin, close }: RecoverViewProps) => {
     const { t } = useTranslation()
     const containerRef = useRef<HTMLDivElement>(null)
     // Move the screen-reader cursor into the view, but only after the slide-in
@@ -211,6 +212,7 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
     return <div ref={containerRef} tabIndex={-1} className="p-3.5 outline-none">
         <h2 className="text-2xl text-white">{t("forgotPassword.title")}</h2>
         <form onSubmit={handleRecoverPassword}>
+            <Alert message={error} />
             <div className="text-white">
                 <label className="w-full text-sm">
                     {t("forgotPassword.prompt")}
@@ -233,7 +235,7 @@ const RecoverView = ({ recoverEmail, setRecoverEmail, handleRecoverPassword, set
                 left={<button
                     type="button"
                     className="text-sm text-amber hover:text-amber-300 font-bold"
-                    onClick={() => setMode("login")}
+                    onClick={backToLogin}
                 >
                     ← {t("accountMenu.backToLogin")}
                 </button>}
@@ -329,16 +331,23 @@ export const AccountMenu = ({
         setMode("login")
     }
 
+    const goToRecover = () => {
+        setError("")
+        setMode("recover")
+    }
+
     const handleRecoverPassword = async (e: React.FormEvent) => {
         e.preventDefault()
-        post("/users/resetpwd", { email: recoverEmail }).then(() => {
+        setError("")
+        try {
+            await post("/users/resetpwd", { email: recoverEmail })
             esconsole("Forgot Password succeeded", "info")
             userNotification.show(t("messages:forgotpassword.success"), "success", 3.5)
             close()
-        }).catch(() => {
+        } catch {
             esconsole("Forgot Password failed", "info")
-            userNotification.show(t("messages:forgotpassword.fail"), "failure1", 3.5)
-        })
+            setError(t("messages:forgotpassword.fail"))
+        }
     }
 
     // Tween the modal's height smoothly when swapping between views of different heights.
@@ -379,8 +388,8 @@ export const AccountMenu = ({
                                 error={error}
                                 loggingIn={loggingIn}
                                 handleLogin={handleLogin}
-                                setMode={setMode}
                                 goToRegister={goToRegister}
+                                goToRecover={goToRecover}
                                 close={close}
                             />
                         </div>
@@ -408,8 +417,9 @@ export const AccountMenu = ({
                             <RecoverView
                                 recoverEmail={recoverEmail}
                                 setRecoverEmail={setRecoverEmail}
+                                error={error}
                                 handleRecoverPassword={handleRecoverPassword}
-                                setMode={setMode}
+                                backToLogin={backToLogin}
                                 close={close}
                             />
                         </div>
