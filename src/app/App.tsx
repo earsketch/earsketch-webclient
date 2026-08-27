@@ -945,8 +945,7 @@ export const App = () => {
 
         const handleChangeFont = (e: KeyboardEvent) => {
             if (!e.ctrlKey || !e.shiftKey || !e.altKey) return
-            if (e.key === "+") { e.preventDefault(); stepFont(1) }
-            else if (e.key === "_") { e.preventDefault(); stepFont(-1) }
+            if (e.key === "+") { e.preventDefault(); stepFont(1) } else if (e.key === "_") { e.preventDefault(); stepFont(-1) }
         }
 
         window.addEventListener("keydown", handleChangeFont)
