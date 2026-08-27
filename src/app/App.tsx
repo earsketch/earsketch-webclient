@@ -931,6 +931,28 @@ export const App = () => {
         return () => window.removeEventListener("keydown", handleFocusNav)
     }, [])
 
+    useEffect(() => {
+        const SIZE_OPTIONS = [10, 12, 14, 18, 24, 36, 40]
+
+        const stepFont = (direction: 1 | -1) => {
+            const fontSize = appState.selectFontSize(store.getState())
+            const fontIndex = SIZE_OPTIONS.indexOf(fontSize)
+            const nextIndex = fontIndex + direction
+            if (nextIndex >= 0 && nextIndex < SIZE_OPTIONS.length) {
+                store.dispatch(appState.setFontSize(SIZE_OPTIONS[nextIndex]))
+            }
+        }
+
+        const handleChangeFont = (e: KeyboardEvent) => {
+            if (!e.ctrlKey || !e.shiftKey || !e.altKey) return
+            if (e.key === "+") { e.preventDefault(); stepFont(1) }
+            else if (e.key === "_") { e.preventDefault(); stepFont(-1) }
+        }
+
+        window.addEventListener("keydown", handleChangeFont)
+        return () => window.removeEventListener("keydown", handleChangeFont)
+    }, [])
+
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
         if (loginInProgressRef.current) {
             await loginInProgressRef.current
