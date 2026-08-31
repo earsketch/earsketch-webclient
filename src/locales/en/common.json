@@ -999,8 +999,8 @@
         "description": "A list of slice start positions evenly spaced by note duration."
       },
       "example": {
-        "python": "# Slice by eighth notes\nslices = slicesPerMeasure(8)\nmakeBeatSlice(HIPHOP_DUSTYGROOVE_006, 1, 1, \"01261264\", slices)",
-        "javascript": "// Slice by eighth notes\nvar slices = slicesPerMeasure(8);\nmakeBeatSlice(HIPHOP_DUSTYGROOVE_006, 1, 1, \"01261264\", slices);"
+        "python": "# Slice by sixteenth notes\nslices = slicesPerMeasure(16)\nmakeBeatSlice(CIARA_MELANIN_DRUMBEAT_1, 1, 1, \"0123012378C8CCCC\", slices)",
+        "javascript": "// Slice by sixteenth notes\nvar slices = slicesPerMeasure(16);\nmakeBeatSlice(CIARA_MELANIN_DRUMBEAT_1, 1, 1, \"0123012378C8CCCC\", slices);"
       }
     },
 
