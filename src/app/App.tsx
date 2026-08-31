@@ -4,7 +4,7 @@ import { Fragment, useEffect, useRef, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
-import { AccountCreator } from "./AccountCreator"
+import { AccountMenu } from "./AccountMenu"
 import { AdminWindow } from "./AdminWindow"
 import * as appState from "../app/appState"
 import * as audioLibrary from "./audiolibrary"
@@ -16,7 +16,6 @@ import * as caiThunks from "../cai/caiThunks"
 import { Script, SoundEntity } from "common"
 import * as curriculum from "../browser/curriculumState"
 import { ErrorForm } from "./ErrorForm"
-import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
@@ -362,10 +361,6 @@ function loadExtension() {
     openModal(ExtensionLoader)
 }
 
-function forgotPass() {
-    openModal(ForgotPassword)
-}
-
 const KeyboardShortcuts = () => {
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
@@ -539,22 +534,18 @@ const MiscActionMenu = () => {
     </Menu>
 }
 
+// Thrown by `login` on any failure whose message is meant to be shown to the user directly
+// (as opposed to an unexpected error, which gets wrapped with a generic message).
+class LoginError extends Error {}
+
 type LoginState = "logged-out" | "logging-in" | "logged-in"
 
 const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPassword, login, logout }: {
     loginState: LoginState, isAdmin: boolean, username: string, password: string,
     setUsername: (u: string) => void, setPassword: (p: string) => void,
-    login: (i: { username: string, password: string }) => void, logout: () => void,
+    login: (i: { username: string, password: string }) => Promise<void>, logout: () => void,
 }) => {
     const { t } = useTranslation()
-
-    const createAccount = async () => {
-        const result = await openModal(AccountCreator)
-        if (result) {
-            setUsername(result.username)
-            login(result)
-        }
-    }
 
     const editProfile = async () => {
         const newEmail = await openModal(ProfileEditor, { username, email })
@@ -564,34 +555,57 @@ const LoginMenu = ({ loginState, isAdmin, username, password, setUsername, setPa
     }
 
     const loggedIn = loginState === "logged-in"
-    const loggingIn = loginState === "logging-in"
 
-    return <>
-        {!loggedIn &&
-        <form className="flex items-center" onSubmit={e => { e.preventDefault(); login({ username, password }) }}>
-            <input disabled={loggingIn} type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input disabled={loggingIn} type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button disabled={loggingIn} type="submit" className="disabled:bg-gray-400 whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">
-                GO <i className="icon icon-arrow-right" />
+    const openAccountMenu = () => {
+        openModal(AccountMenu, {
+            username,
+            password,
+            onLogin: (u, p) => login({ username: u, password: p }),
+            setUsername,
+            setPassword,
+        })
+    }
+
+    if (loggedIn) {
+        return (
+            <Menu as="div" className="relative inline-block text-left mx-3">
+                <Menu.Button className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md ring-1 ring-gray-900/5 ring-inset hover:bg-gray-300">
+                    {username}<i className="icon icon-arrow-down2 pl-1.5 pr-0.5 text-xs"></i>
+                </Menu.Button>
+                <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    {[{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
+                        .map(({ name, action }) =>
+                            <Menu.Item key={name}>
+                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action} type="button">{name}</button>}
+                            </Menu.Item>)}
+                </Menu.Items>
+            </Menu>
+        )
+    }
+
+    if (loginState === "logging-in") {
+        return (
+            <button
+                className="mx-3 whitespace-nowrap py-1 px-2 rounded-md border border-amber text-amber disabled:opacity-75 disabled:cursor-not-allowed inline-flex items-center justify-center"
+                disabled
+                title={t("loading")}
+                aria-label={t("loading")}
+            >
+                <i className="es-spinner es-spinner-amber animate-spin"></i>
             </button>
-        </form>}
-        <Menu as="div" className="relative inline-block text-left mx-3">
-            <Menu.Button className="text-gray-400">
-                {loggedIn
-                    ? <div className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md" role="button">{username}<span className="caret" /></div>
-                    : <div className="whitespace-nowrap py-1 px-2 text-xs bg-white text-black hover:text-black hover:bg-gray-200" role="button" style={{ marginLeft: "6px", height: "23px" }} title={t("createResetAccount")} aria-label={t("createResetAccount")}>{t("createResetAccount")}</div>}
-            </Menu.Button>
-            <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                {(loggedIn
-                    ? [{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
-                    : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
-                    .map(({ name, action }) =>
-                        <Menu.Item key={name}>
-                            {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{name}</button>}
-                        </Menu.Item>)}
-            </Menu.Items>
-        </Menu>
-    </>
+        )
+    }
+
+    return (
+        <button
+            className="mx-3 whitespace-nowrap py-1 px-2 rounded-md border border-amber text-amber  hover:text-black hover:bg-amber"
+            onClick={openAccountMenu}
+            title={t("accountMenu.login")}
+            aria-label={t("accountMenu.login")}
+        >
+            {t("accountMenu.login")}
+        </button>
+    )
 }
 
 function setup() {
@@ -712,7 +726,10 @@ export const App = () => {
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
     const [isAdmin, setIsAdmin] = useState(false)
-    const [loginState, setLoginState] = useState<LoginState>("logged-out")
+    // Start in "logging-in" so the nav-bar login button shows a spinner from the very
+    // first paint, rather than briefly showing the enabled Login button before we've had
+    // a chance to check for saved credentials/token and attempt an auto-login.
+    const [loginState, setLoginState] = useState<LoginState>("logging-in")
     /** When a login is in progress, callers (e.g. Strict Mode’s second useEffect) await
      * this promise instead of returning early. */
     const loginInProgressRef = useRef<Promise<void> | null>(null)
@@ -772,7 +789,14 @@ export const App = () => {
             } else {
                 const token = user.selectToken(store.getState())
                 if (token !== null) {
-                    await login({ token })
+                    try {
+                        await login({ token })
+                    } catch (error) {
+                        userNotification.show((error as Error).message, "failure1", 3.5)
+                    }
+                } else {
+                    // No saved credentials or token to try — we're definitively logged out.
+                    setLoginState("logged-out")
                 }
             }
 
@@ -952,9 +976,8 @@ export const App = () => {
                     try {
                         token = await request.getBasicAuth("/users/token", loginInfo.username, loginInfo.password)
                     } catch (error) {
-                        userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
                         esconsole(error, ["main", "login"])
-                        return
+                        throw new LoginError(i18n.t("messages:general.loginfailure"))
                     }
                 }
 
@@ -962,8 +985,7 @@ export const App = () => {
                 try {
                     userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
                 } catch {
-                    userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
-                    return
+                    throw new LoginError("Your credentials have expired. Please login again with your username and password.")
                 }
                 const username = userInfo.username
 
@@ -988,7 +1010,10 @@ export const App = () => {
                 activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
                 succeeded = true
             } catch (err) {
-                userNotification.show("Login failed due to network error.", "failure1", 3.5)
+                if (err instanceof LoginError) {
+                    throw err
+                }
+                throw new LoginError("Login failed due to network error.")
             } finally {
                 if (!succeeded) {
                     setLoginState("logged-out")
