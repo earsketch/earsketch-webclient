@@ -933,14 +933,12 @@ export const App = () => {
     }, [])
 
     useEffect(() => {
-        const SIZE_OPTIONS = [10, 12, 14, 18, 24, 36, 40]
-
         const stepFont = (direction: 1 | -1) => {
             const fontSize = appState.selectFontSize(store.getState())
-            const fontIndex = SIZE_OPTIONS.indexOf(fontSize)
+            const fontIndex = FONT_SIZES.indexOf(fontSize)
             const nextIndex = fontIndex + direction
-            if (nextIndex >= 0 && nextIndex < SIZE_OPTIONS.length) {
-                store.dispatch(appState.setFontSize(SIZE_OPTIONS[nextIndex]))
+            if (nextIndex >= 0 && nextIndex < FONT_SIZES.length) {
+                store.dispatch(appState.setFontSize(FONT_SIZES[nextIndex]))
             }
         }
 
