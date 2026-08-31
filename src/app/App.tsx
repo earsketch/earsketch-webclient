@@ -379,6 +379,7 @@ const KeyboardShortcuts = () => {
             : keys
 
     const shortcuts: Record<string, { keys: string[] | React.ReactNode; group: string }> = {
+        zoomText: { keys: <><kbd>{modifier}</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>+</kbd>/<kbd>-</kbd></>, group: "general" },
         run: { keys: [modifier, "Enter"], group: "editor" },
         save: { keys: [modifier, "S"], group: "editor" },
         undo: { keys: [modifier, "Z"], group: "editor" },
