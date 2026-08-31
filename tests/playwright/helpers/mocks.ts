@@ -159,7 +159,7 @@ export async function setupBackend(page: Page, opts: MockOptions = {}): Promise<
     }
 
     if (opts.userAudio !== undefined) {
-        await page.route(`https://${API_HOST}/EarSketchWS/audio/user?**`, (route) => {
+        await page.route(`https://${API_HOST}/EarSketchWS/audio/user`, (route) => {
             counter.bump("audio_user")
             return fulfillJson(route, opts.userAudio)
         })

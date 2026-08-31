@@ -97,7 +97,7 @@ async function uploadFile(username: string | null, file: Blob, name: string, ext
                     // Clear the cache so it gets reloaded.
                     audioLibrary.clearCache()
                     store.dispatch(sounds.resetUserSounds())
-                    store.dispatch(getUserSounds(username!))
+                    store.dispatch(getUserSounds())
                     resolve()
                 } else {
                     reject(i18n.t("messages:uploadcontroller.commerror"))
@@ -339,7 +339,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             // Clear the cache so it gets reloaded.
             audioLibrary.clearCache()
             store.dispatch(sounds.resetUserSounds())
-            store.dispatch(getUserSounds(username))
+            store.dispatch(getUserSounds())
             close()
         } catch (error: any) {
             setError(error.message)
