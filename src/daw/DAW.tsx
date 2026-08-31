@@ -257,7 +257,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
             {/* Loop */}
             <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.loopProject")} type="submit" className={"dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={() => { toggleLoop(); addUIClick("loop " + (!loop.on ? "on" : "off")) }}>
+                <button aria-label={t("daw.tooltip.loopProject")} role="switch" aria-checked={loop.on} type="submit" className={"dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={() => { toggleLoop(); addUIClick("loop " + (!loop.on ? "on" : "off")) }}>
                     <span className="icon icon-loop"></span>
                 </button>
             </span>
