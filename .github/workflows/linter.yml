@@ -84,7 +84,7 @@ jobs:
           VALIDATE_JAVASCRIPT_PRETTIER: false
           VALIDATE_TYPESCRIPT_PRETTIER: false
           VALIDATE_JSX_PRETTIER: false
-          FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*|.*tests/vitest/scripts/.*.results.js|.*tests/playwright/fixtures/.*|.*node_modules/.*|tests/vitest/fixtures/.*)
+          FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*|.*tests/vitest/scripts/.*.results.js|.*tests/playwright/fixtures/.*|.*node_modules/.*|tests/vitest/fixtures/.*|.*public/embeddings/.*\.json)
 
       - name: Run ESLint
         run: npm run lint:report

@@ -5,7 +5,6 @@ import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
 import classNames from "classnames"
 import store from "../reducers"
 import { recommend } from "../app/recommender"
-
 import { addUIClick } from "../cai/dialogue/student"
 import * as sounds from "./soundsState"
 import * as soundsThunks from "./soundsThunks"
@@ -48,8 +47,14 @@ const SoundSearchBar = () => {
     const { t } = useTranslation()
     const searchText = useSelector(sounds.selectSearchText)
     const count = useSelector(sounds.selectFilteredRegularNames).length
-    const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(sounds.setSearchText(event.target.value))
-    const dispatchReset = () => dispatch(sounds.setSearchText(""))
+    const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => {
+        dispatch(sounds.setSearchText(event.target.value))
+        sounds.scheduleSemanticSearch(event.target.value) // no-op unless the "Semantic Search" toggle is on
+    }
+    const dispatchReset = () => {
+        dispatch(sounds.setSearchText(""))
+        sounds.scheduleSemanticSearch("") // clears any stale semantic search results immediately
+    }
     const liveMessage = t("soundsFound", { count })
     const props = { id: "soundSearchBar", aria: t("ariaDescriptors:sounds.searchBar"), liveMessage, firstResultSelector: "#panel-0 h5", searchText, dispatchSearch, dispatchReset }
 
@@ -1078,11 +1083,17 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
     const searchText = useSelector(sounds.selectSearchText)
-    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
+    const semanticSearchEnabled = useSelector(sounds.selectSemanticSearchEnabled)
+    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText || semanticSearchEnabled
     const clearClassnames = classNames({
         "scale:text-sm flex items-center rounded pl-1 pr-1.5 border whitespace-nowrap": true,
         "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
         "text-gray-200 border-gray-200": !clearButtonEnabled,
+    })
+    const semanticSearchClassnames = classNames({
+        "scale:text-sm flex items-center rounded pl-1 pr-1.5 border whitespace-nowrap": true,
+        "text-green-800 border-green-800 bg-green-50": semanticSearchEnabled,
+        "text-gray-200 border-gray-200": !semanticSearchEnabled,
     })
     const scrollToTopRef = useRef<HTMLDivElement>(null)
 
@@ -1118,6 +1129,15 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                     aria-label={t("ariaDescriptors:sounds.clearFilter")}
                 >
                     <span className="icon icon-cross3 scale:text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
+                </button>
+                <button
+                    className={semanticSearchClassnames}
+                    onClick={() => sounds.toggleSemanticSearchEnabled()}
+                    aria-pressed={semanticSearchEnabled}
+                    title={semanticSearchEnabled ? t("ariaDescriptors:sounds.semanticSearchToggleOn") : t("ariaDescriptors:sounds.semanticSearchToggleOff")}
+                    aria-label={semanticSearchEnabled ? t("ariaDescriptors:sounds.semanticSearchToggleOn") : t("ariaDescriptors:sounds.semanticSearchToggleOff")}
+                >
+                    {t("soundBrowser.button.semanticSearch")}
                 </button>
                 <NumberOfSounds/>
             </div>
@@ -1171,6 +1191,8 @@ const DefaultSoundCollection = () => {
     const getStandardSounds = useSelector(sounds.selectAllRegularEntities)
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
+    const isSemanticSearchActive = useSelector(sounds.selectIsSemanticSearchActive)
+    const semanticSearchTopResults = useSelector(sounds.selectSemanticSearchTopResultNames)
     const filtered = numFiltered !== numSounds
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
@@ -1186,6 +1208,15 @@ const DefaultSoundCollection = () => {
         folders = [recommendationsTitle, ...folders]
         foldersWithRecs = { ...namesByFolders, [recommendationsTitle]: recommendationSounds.slice(0, 5) }
     }
+
+    // insert a "semantic search results" folder at the top, showing the top CLAP-ranked
+    // matches directly (unexpanded — no folder/instrument siblings), like Recommendations
+    if (isSemanticSearchActive && semanticSearchTopResults.length > 0) {
+        const semanticSearchTitle = t("soundBrowser.title.semanticSearchResults").toLocaleUpperCase()
+        folders = [semanticSearchTitle, ...folders]
+        foldersWithRecs = { ...foldersWithRecs, [semanticSearchTitle]: semanticSearchTopResults }
+    }
+
     const props = { title, folders, namesByFolders: foldersWithRecs, currentFilterTab, setCurrentFilterTab }
     return <WindowedSoundCollection {...props} />
 }
