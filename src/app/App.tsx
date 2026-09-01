@@ -368,12 +368,22 @@ const KeyboardShortcuts = () => {
 
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
 
-    const renderKeys = (keys: string[] | React.ReactNode) =>
-        Array.isArray(keys)
-            ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
-            : keys
+    type KeyToken = string | { word: string } | { sep: string }
 
-    const shortcuts: Record<string, { keys: string[] | React.ReactNode; group: string }> = {
+    const renderKeys = (keys: KeyToken[]) =>
+        keys.map((token, i) => {
+            if (typeof token === "object" && "word" in token) {
+                return <span key={i}> {t(`shortcuts.${token.word}`)} </span>
+            }
+            if (typeof token === "object" && "sep" in token) {
+                return <span key={i}>{token.sep}</span>
+            }
+            const prev = keys[i - 1]
+            const joiner = typeof prev === "string" ? " + " : ""
+            return <span key={i}>{joiner}<kbd>{localize(token)}</kbd></span>
+        })
+
+    const shortcuts: Record<string, { keys: KeyToken[]; group: string }> = {
         run: { keys: [modifier, "Enter"], group: "editor" },
         save: { keys: [modifier, "S"], group: "editor" },
         undo: { keys: [modifier, "Z"], group: "editor" },
@@ -381,10 +391,10 @@ const KeyboardShortcuts = () => {
         comment: { keys: [modifier, "/"], group: "editor" },
         findReplace: { keys: [modifier, "G"], group: "editor" },
         goToLine: { keys: [modifier, "Alt", "G"], group: "editor" },
-        escapeEditor: { keys: <><kbd>{localize("Esc")}</kbd> then <kbd>{localize("Tab")}</kbd></>, group: "editor" },
+        escapeEditor: { keys: ["Esc", { word: "then" }, "Tab"], group: "editor" },
         playPause: { keys: ["Ctrl", "Space"], group: "daw" },
         jumpToCodeDaw: { keys: ["Ctrl", "I"], group: "daw" },
-        zoomHorizontal: { keys: <><kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd></>, group: "daw" },
+        zoomHorizontal: { keys: [modifier, "Wheel", { word: "or" }, "+", { sep: "/" }, "-"], group: "daw" },
         zoomVertical: { keys: [modifier, "Shift", "Wheel"], group: "daw" },
         commandPalette: { keys: [modifier, "Shift", "P"], group: "navigation" },
         jumpBackInFocus: { keys: ["Ctrl", "Alt", "["], group: "navigation" },
@@ -398,7 +408,7 @@ const KeyboardShortcuts = () => {
         jumpToUtility: { keys: ["Ctrl", "Shift", "7"], group: "navigation" },
         jumpToSoundPreview: { keys: ["Ctrl", "Shift", "8"], group: "navigation" },
         jumpToConsole: { keys: ["Ctrl", "Shift", "9"], group: "navigation" },
-        closeContentManager: { keys: <><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd></>, group: "layout" },
+        closeContentManager: { keys: ["Ctrl", "Alt", "Shift", "1", { sep: "/" }, "2", { sep: "/" }, "3"], group: "layout" },
         closeCurriculum: { keys: ["Ctrl", "Alt", "Shift", "6"], group: "layout" },
     }
 

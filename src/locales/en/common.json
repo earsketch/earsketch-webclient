@@ -380,6 +380,8 @@
     "shortcuts.group.layout": "Layout",
     "shortcuts.action": "Action",
     "shortcuts.keys": "Keys",
+    "shortcuts.then": "then",
+    "shortcuts.or": "or",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
