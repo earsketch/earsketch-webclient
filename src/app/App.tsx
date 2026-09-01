@@ -971,7 +971,7 @@ export const App = () => {
     }, [])
 
     useEffect(() => {
-        const closePanel = (panelId: string, toggleId: string, setOpen: (open: boolean) => void, code: string, paneName: string) => {
+        const togglePanel = (panelId: string, toggleId: string, setOpen: (open: boolean) => void, code: string, paneName: string) => {
             const pane = document.getElementById(panelId)
             const focusWasInPane = pane?.contains(document.activeElement)
             const isOpen = panelId === "sidebar-container"
@@ -980,7 +980,7 @@ export const App = () => {
 
             if (isOpen) {
                 setOpen(false)
-                consoleStatus(i18n.t("console:PaneClosed", { paneName }))
+                consoleStatus(i18n.t("console:paneClosed", { paneName }))
 
                 if (focusWasInPane) {
                     window.requestAnimationFrame(() => {
@@ -990,23 +990,29 @@ export const App = () => {
 
                 uiLogger.shortcut(`Ctrl+Alt+Shift+${code}`, panelId)
                 reporter.keyboardShortcut(`Ctrl+Alt+Shift+${code}`)
+            } else {
+                setOpen(true)
+                consoleStatus(i18n.t("console:paneOpened", { paneName }))
+
+                uiLogger.shortcut(`Ctrl+Alt+Shift+${code}`, panelId)
+                reporter.keyboardShortcut(`Ctrl+Alt+Shift+${code}`)
             }
         }
 
-        const handleClosePanel = (e: KeyboardEvent) => {
+        const handleTogglePanel = (e: KeyboardEvent) => {
             if (!e.ctrlKey || !e.altKey || !e.shiftKey || e.metaKey) return
 
             if (["Digit1", "Digit2", "Digit3"].includes(e.code)) {
                 e.preventDefault()
-                closePanel("sidebar-container", "westPaneToggle", () => store.dispatch(layout.setWest({ open: false })), e.code, i18n.t("contentManager.title"))
+                togglePanel("sidebar-container", "westPaneToggle", (open) => store.dispatch(layout.setWest({ open })), e.code, i18n.t("contentManager.title"))
             } else if (e.code === "Digit6") {
                 e.preventDefault()
-                closePanel("curriculum-container", "eastPaneToggle", () => store.dispatch(layout.setEast({ open: false })), e.code, i18n.t("curriculum.title"))
+                togglePanel("curriculum-container", "eastPaneToggle", (open) => store.dispatch(layout.setEast({ open })), e.code, i18n.t("curriculum.title"))
             }
         }
 
-        window.addEventListener("keydown", handleClosePanel)
-        return () => window.removeEventListener("keydown", handleClosePanel)
+        window.addEventListener("keydown", handleTogglePanel)
+        return () => window.removeEventListener("keydown", handleTogglePanel)
     }, [])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {

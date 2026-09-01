@@ -1474,6 +1474,7 @@
       "NetworkError": "Please try running the code again. If the issue persists, check your internet connection or contact network administrator.",
       "ServerError": "Please try running the code again. If the issue persists, please report the issue using 'Report Error' in the information menu."
     },
-    "PaneClosed": "{{ paneName }} pane closed."
+    "paneClosed": "{{ paneName }} pane closed.",
+    "paneOpened": "{{ paneName }} pane opened."
   }
 }
