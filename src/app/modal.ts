@@ -1,5 +1,7 @@
 import * as appState from "./appState"
 import store from "../reducers"
+import { selectModal, setModal } from "./appState"
+import * as bubble from "../bubble/bubbleState"
 
 // There is a little type magic here to accomplish three things:
 // 1. Make the compiler check that `props` really matches the props expected by `modal`.
@@ -26,4 +28,17 @@ export function openModal<T extends appState.Modal>(modal: T, props?: Omit<Param
         }
         store.dispatch(appState.setModal({ Modal: wrappedModal, resolve }))
     })
+}
+
+export function closeModal() {
+    const modal = selectModal(store.getState())
+    if (modal) {
+        modal.resolve(undefined)
+        store.dispatch(setModal(null))
+    }
+}
+
+export function closeOverlays() {
+    closeModal()
+    store.dispatch(bubble.suspend())
 }
