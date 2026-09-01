@@ -36,6 +36,7 @@ import * as scripts from "../browser/scriptsState"
 import { status as consoleStatus } from "./console"
 import * as uiLogger from "../app/uiLogger"
 import reporter from "../app/reporter"
+import { getCodeInsertion } from "./editorInsertion"
 
 Object.assign(window, { Sk, ace }) // for droplet
 
@@ -488,6 +489,29 @@ export function pasteCode(code: string) {
         view.dispatch({ changes: { from, to, insert: code }, selection: { anchor: from + code.length } })
         view.focus()
     }
+}
+
+export function insertCodeAtLine(code: string, lineNumber: number) {
+    if (!view) {
+        return { error: "Editor is not ready" }
+    }
+    if (view.state.readOnly) {
+        return { error: "Editor is read-only" }
+    }
+
+    const doc = view.state.doc
+    const insertion = getCodeInsertion(doc, code, lineNumber)
+    if ("error" in insertion) return insertion
+    const { from, insert } = insertion
+
+    view.dispatch({
+        changes: { from, insert },
+        selection: { anchor: from + insert.length },
+        scrollIntoView: true,
+    })
+    updateBlocks?.()
+    view.focus()
+    return { success: true, lineNumber }
 }
 
 export function highlightError(err: any) {

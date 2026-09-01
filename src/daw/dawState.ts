@@ -1,4 +1,4 @@
-import { createSlice, createSelector } from "@reduxjs/toolkit"
+import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit"
 import * as d3 from "d3"
 
 import type { RootState } from "../reducers"
@@ -64,6 +64,7 @@ interface DAWState {
     metronome: boolean
     tempoMap: TempoMap
     playing: boolean
+    playbackStateChangeTimestamp: number
     pendingPosition: number | null
     soloMute: SoloMuteConfig
     bypass: { [key: number]: string[] }
@@ -89,6 +90,7 @@ const dawSlice = createSlice({
         metronome: false,
         tempoMap: new TempoMap(),
         playing: false,
+        playbackStateChangeTimestamp: Date.now(),
         pendingPosition: null, // null indicates no position pending.
         soloMute: {}, // Track index -> "mute" or "solo"
         bypass: {}, // Track index -> [bypassed effect keys]
@@ -129,8 +131,16 @@ const dawSlice = createSlice({
         setTempoMap(state, { payload }) {
             state.tempoMap = payload
         },
-        setPlaying(state, { payload }) {
-            state.playing = payload
+        setPlaying: {
+            reducer(state, { payload, meta }: PayloadAction<boolean, string, { timestamp: number }>) {
+                if (state.playing !== payload) {
+                    state.playing = payload
+                    state.playbackStateChangeTimestamp = meta.timestamp
+                }
+            },
+            prepare(playing: boolean) {
+                return { payload: playing, meta: { timestamp: Date.now() } }
+            },
         },
         setPendingPosition(state, { payload }) {
             state.pendingPosition = payload
@@ -179,6 +189,7 @@ export const selectShowEffects = (state: RootState) => state.daw.showEffects
 export const selectMetronome = (state: RootState) => state.daw.metronome
 export const selectTempoMap = (state: RootState) => state.daw.tempoMap
 export const selectPlaying = (state: RootState) => state.daw.playing
+export const selectPlaybackStateChangeTimestamp = (state: RootState) => state.daw.playbackStateChangeTimestamp
 export const selectPendingPosition = (state: RootState) => state.daw.pendingPosition
 export const selectSoloMute = (state: RootState) => state.daw.soloMute
 export const selectBypass = (state: RootState) => state.daw.bypass
