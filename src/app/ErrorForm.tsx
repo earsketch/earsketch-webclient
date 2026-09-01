@@ -4,27 +4,13 @@ import { useTranslation } from "react-i18next"
 import UAParser from "ua-parser-js"
 
 import * as app from "../app/appState"
+import * as request from "../request"
 import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import { REPORT_LOG } from "../esconsole"
 import * as userNotification from "../user/notification"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import store from "../reducers"
-
-async function postJSON(endpoint: string, data: any) {
-    const url = URL_DOMAIN + endpoint
-    const response = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-            Authorization: "Bearer " + user.selectToken(store.getState()),
-            "Content-Type": "application/json",
-        },
-    })
-    if (!response.ok) {
-        throw new Error(`error code: ${response.status}`)
-    }
-}
 
 export const ErrorForm = ({ email: storedEmail, close }: { email: string, close: () => void }) => {
     const { t } = useTranslation()
@@ -35,7 +21,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
     const [description, setDescription] = useState("")
 
     const submit = () => {
-        let body = ["@xfreeman", "@heerman", "@manodrum"].join(" ") + "\r\n"
+        let body = ""
         if (name || email) {
             body += "\r\n**Reported by:** " + (name ? name + " " : "") + (email ? `[${email}]` : "") + "\r\n"
             body += username ? "\r\n**Logged in username:** " + username + "\r\n" : ""
@@ -92,7 +78,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
             body = body.substring(0, maxLength - truncateWarning.length) + truncateWarning
         }
 
-        postJSON("/thirdparty/reportissue", { title: "User reported bug", labels: ["report"], body })
+        request.post("/thirdparty/reportissue", { reportBody: body })
             .then(() => userNotification.show("Thank you for your submission! Your error has been reported.", "success"))
             .catch(() => userNotification.show("Error submitting report.", "failure1"))
 
