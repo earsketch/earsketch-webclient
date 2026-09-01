@@ -408,8 +408,8 @@ const KeyboardShortcuts = () => {
         jumpToUtility: { keys: ["Ctrl", "Shift", "7"], group: "navigation" },
         jumpToSoundPreview: { keys: ["Ctrl", "Shift", "8"], group: "navigation" },
         jumpToConsole: { keys: ["Ctrl", "Shift", "9"], group: "navigation" },
-        closeContentManager: { keys: ["Ctrl", "Alt", "Shift", "1", { sep: "/" }, "2", { sep: "/" }, "3"], group: "layout" },
-        closeCurriculum: { keys: ["Ctrl", "Alt", "Shift", "6"], group: "layout" },
+        toggleContentManager: { keys: ["Ctrl", "Alt", "Shift", "1", { sep: "/" }, "2", { sep: "/" }, "3"], group: "layout" },
+        toggleCurriculum: { keys: ["Ctrl", "Alt", "Shift", "6"], group: "layout" },
     }
 
     return <Popover>
