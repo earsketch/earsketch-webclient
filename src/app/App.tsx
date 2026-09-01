@@ -406,7 +406,7 @@ const KeyboardShortcuts = () => {
         <Popover.Button id="utilityPanelAnchor" className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-1 -translate-x-1/2 w-max">
+        <Popover.Panel className="absolute z-50 mt-1 -translate-x-1/2 w-max">
             <div tabIndex={0} className="bg-gray-100 shadow-lg max-h-[70vh] overflow-y-auto p-2">
                 <table>
                     <thead className="sr-only">
