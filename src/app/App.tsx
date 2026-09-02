@@ -384,6 +384,7 @@ const KeyboardShortcuts = () => {
         })
 
     const shortcuts: Record<string, { keys: KeyToken[]; group: string }> = {
+        zoomText: { keys: <><kbd>{modifier}</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>+</kbd>/<kbd>-</kbd></>, group: "general" },
         run: { keys: [modifier, "Enter"], group: "editor" },
         save: { keys: [modifier, "S"], group: "editor" },
         undo: { keys: [modifier, "Z"], group: "editor" },
@@ -968,6 +969,25 @@ export const App = () => {
         }
         window.addEventListener("keydown", handleFocusNav)
         return () => window.removeEventListener("keydown", handleFocusNav)
+    }, [])
+
+    useEffect(() => {
+        const stepFont = (direction: 1 | -1) => {
+            const fontSize = appState.selectFontSize(store.getState())
+            const fontIndex = FONT_SIZES.indexOf(fontSize)
+            const nextIndex = fontIndex + direction
+            if (nextIndex >= 0 && nextIndex < FONT_SIZES.length) {
+                store.dispatch(appState.setFontSize(FONT_SIZES[nextIndex]))
+            }
+        }
+
+        const handleChangeFont = (e: KeyboardEvent) => {
+            if (!e.ctrlKey || !e.shiftKey || !e.altKey || !e.metaKey) return
+            if (e.code === "Equal") { e.preventDefault(); stepFont(1) } else if (e.key === "Minus") { e.preventDefault(); stepFont(-1) }
+        }
+
+        window.addEventListener("keydown", handleChangeFont)
+        return () => window.removeEventListener("keydown", handleChangeFont)
     }, [])
 
     useEffect(() => {
