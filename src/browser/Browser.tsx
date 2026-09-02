@@ -28,9 +28,13 @@ export const TitleBar = () => {
                 <h2>{t("contentManager.title").toLocaleUpperCase()}</h2>
             </div>
             <button
+                id="westPaneToggle"
                 className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                 onClick={() => {
                     dispatch(layout.setWest({ open: false }))
+                    window.requestAnimationFrame(() => {
+                        document.getElementById("westPaneToggle")?.focus()
+                    })
                 }}
                 aria-label={t("ariaDescriptors:contentManager.close")}
                 title={t("ariaDescriptors:contentManager.close")}
