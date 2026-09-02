@@ -368,15 +368,15 @@ const KeyboardShortcuts = () => {
 
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
 
-    type KeyToken = string | { word: string } | { sep: string }
+    type KeyToken = string | { word: string } | { separator: string }
 
     const renderKeys = (keys: KeyToken[]) =>
         keys.map((token, i) => {
             if (typeof token === "object" && "word" in token) {
                 return <span key={i}> {t(`shortcuts.${token.word}`)} </span>
             }
-            if (typeof token === "object" && "sep" in token) {
-                return <span key={i}>{token.sep}</span>
+            if (typeof token === "object" && "separator" in token) {
+                return <span key={i}>{token.separator}</span>
             }
             const prev = keys[i - 1]
             const joiner = typeof prev === "string" ? " + " : ""
@@ -394,7 +394,7 @@ const KeyboardShortcuts = () => {
         escapeEditor: { keys: ["Esc", { word: "then" }, "Tab"], group: "editor" },
         playPause: { keys: ["Ctrl", "Space"], group: "daw" },
         jumpToCodeDaw: { keys: ["Ctrl", "I"], group: "daw" },
-        zoomHorizontal: { keys: [modifier, "Wheel", { word: "or" }, "+", { sep: "/" }, "-"], group: "daw" },
+        zoomHorizontal: { keys: [modifier, "Wheel", { word: "or" }, "+", { separator: "/" }, "-"], group: "daw" },
         zoomVertical: { keys: [modifier, "Shift", "Wheel"], group: "daw" },
         commandPalette: { keys: [modifier, "Shift", "P"], group: "navigation" },
         jumpBackInFocus: { keys: ["Ctrl", "Alt", "["], group: "navigation" },
@@ -408,7 +408,7 @@ const KeyboardShortcuts = () => {
         jumpToUtility: { keys: ["Ctrl", "Shift", "7"], group: "navigation" },
         jumpToSoundPreview: { keys: ["Ctrl", "Shift", "8"], group: "navigation" },
         jumpToConsole: { keys: ["Ctrl", "Shift", "9"], group: "navigation" },
-        toggleContentManager: { keys: ["Ctrl", "Alt", "Shift", "1", { sep: "/" }, "2", { sep: "/" }, "3"], group: "layout" },
+        toggleContentManager: { keys: ["Ctrl", "Alt", "Shift", "1", { separator: "/" }, "2", { separator: "/" }, "3"], group: "layout" },
         toggleCurriculum: { keys: ["Ctrl", "Alt", "Shift", "6"], group: "layout" },
     }
 
