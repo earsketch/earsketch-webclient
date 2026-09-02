@@ -368,12 +368,22 @@ const KeyboardShortcuts = () => {
 
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
 
-    const renderKeys = (keys: string[] | React.ReactNode) =>
-        Array.isArray(keys)
-            ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
-            : keys
+    type KeyToken = string | { word: string } | { separator: string }
 
-    const shortcuts: Record<string, { keys: string[] | React.ReactNode; group: string }> = {
+    const renderKeys = (keys: KeyToken[]) =>
+        keys.map((token, i) => {
+            if (typeof token === "object" && "word" in token) {
+                return <span key={i}> {t(`shortcuts.${token.word}`)} </span>
+            }
+            if (typeof token === "object" && "separator" in token) {
+                return <span key={i}>{token.separator}</span>
+            }
+            const prev = keys[i - 1]
+            const joiner = typeof prev === "string" ? " + " : ""
+            return <span key={i}>{joiner}<kbd>{localize(token)}</kbd></span>
+        })
+
+    const shortcuts: Record<string, { keys: KeyToken[]; group: string }> = {
         zoomText: { keys: <><kbd>{modifier}</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>+</kbd>/<kbd>-</kbd></>, group: "general" },
         run: { keys: [modifier, "Enter"], group: "editor" },
         save: { keys: [modifier, "S"], group: "editor" },
@@ -382,10 +392,10 @@ const KeyboardShortcuts = () => {
         comment: { keys: [modifier, "/"], group: "editor" },
         findReplace: { keys: [modifier, "G"], group: "editor" },
         goToLine: { keys: [modifier, "Alt", "G"], group: "editor" },
-        escapeEditor: { keys: <><kbd>{localize("Esc")}</kbd> then <kbd>{localize("Tab")}</kbd></>, group: "editor" },
+        escapeEditor: { keys: ["Esc", { word: "then" }, "Tab"], group: "editor" },
         playPause: { keys: ["Ctrl", "Space"], group: "daw" },
         jumpToCodeDaw: { keys: ["Ctrl", "I"], group: "daw" },
-        zoomHorizontal: { keys: <><kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd></>, group: "daw" },
+        zoomHorizontal: { keys: [modifier, "Wheel", { word: "or" }, "+", { separator: "/" }, "-"], group: "daw" },
         zoomVertical: { keys: [modifier, "Shift", "Wheel"], group: "daw" },
         commandPalette: { keys: [modifier, "Shift", "P"], group: "navigation" },
         jumpBackInFocus: { keys: ["Ctrl", "Alt", "["], group: "navigation" },
@@ -399,13 +409,15 @@ const KeyboardShortcuts = () => {
         jumpToUtility: { keys: ["Ctrl", "Shift", "7"], group: "navigation" },
         jumpToSoundPreview: { keys: ["Ctrl", "Shift", "8"], group: "navigation" },
         jumpToConsole: { keys: ["Ctrl", "Shift", "9"], group: "navigation" },
+        toggleContentManager: { keys: ["Ctrl", "Alt", "Shift", "1", { separator: "/" }, "2", { separator: "/" }, "3"], group: "layout" },
+        toggleCurriculum: { keys: ["Ctrl", "Alt", "Shift", "6"], group: "layout" },
     }
 
     return <Popover>
         <Popover.Button id="utilityPanelAnchor" className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-1 -translate-x-1/2 w-max">
+        <Popover.Panel className="absolute z-50 mt-1 -translate-x-1/2 w-max">
             <div tabIndex={0} className="bg-gray-100 shadow-lg max-h-[70vh] overflow-y-auto p-2">
                 <table>
                     <thead className="sr-only">
@@ -976,6 +988,51 @@ export const App = () => {
 
         window.addEventListener("keydown", handleChangeFont)
         return () => window.removeEventListener("keydown", handleChangeFont)
+    }, [])
+
+    useEffect(() => {
+        const togglePanel = (panelId: string, toggleId: string, setOpen: (open: boolean) => void, code: string, paneName: string) => {
+            const pane = document.getElementById(panelId)
+            const focusWasInPane = pane?.contains(document.activeElement)
+            const isOpen = panelId === "sidebar-container"
+                ? store.getState().layout.west.open
+                : store.getState().layout.east.open
+
+            if (isOpen) {
+                setOpen(false)
+                consoleStatus(i18n.t("console:paneClosed", { paneName }))
+
+                if (focusWasInPane) {
+                    window.requestAnimationFrame(() => {
+                        document.getElementById(toggleId)?.focus()
+                    })
+                }
+
+                uiLogger.shortcut(`Ctrl+Alt+Shift+${code}`, panelId)
+                reporter.keyboardShortcut(`Ctrl+Alt+Shift+${code}`)
+            } else {
+                setOpen(true)
+                consoleStatus(i18n.t("console:paneOpened", { paneName }))
+
+                uiLogger.shortcut(`Ctrl+Alt+Shift+${code}`, panelId)
+                reporter.keyboardShortcut(`Ctrl+Alt+Shift+${code}`)
+            }
+        }
+
+        const handleTogglePanel = (e: KeyboardEvent) => {
+            if (!e.ctrlKey || !e.altKey || !e.shiftKey || e.metaKey) return
+
+            if (["Digit1", "Digit2", "Digit3"].includes(e.code)) {
+                e.preventDefault()
+                togglePanel("sidebar-container", "westPaneToggle", (open) => store.dispatch(layout.setWest({ open })), e.code, i18n.t("contentManager.title"))
+            } else if (e.code === "Digit6") {
+                e.preventDefault()
+                togglePanel("curriculum-container", "eastPaneToggle", (open) => store.dispatch(layout.setEast({ open })), e.code, i18n.t("curriculum.title"))
+            }
+        }
+
+        window.addEventListener("keydown", handleTogglePanel)
+        return () => window.removeEventListener("keydown", handleTogglePanel)
     }, [])
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
