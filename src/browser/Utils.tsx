@@ -210,9 +210,20 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
 
     return (
         <button
+            id={position === "west" ? "westPaneToggle" : "eastPaneToggle"}
             className={`${embedMode ? "hidden" : "flex"} flex-col h-full cursor-pointer items-center`}
             onClick={() => {
-                position === "west" ? dispatch(layout.setWest({ open: true })) : dispatch(layout.setEast({ open: true }))
+                if (position === "west") {
+                    dispatch(layout.setWest({ open: true }))
+                    window.requestAnimationFrame(() => {
+                        document.getElementById("westPaneToggle")?.focus()
+                    })
+                } else {
+                    dispatch(layout.setEast({ open: true }))
+                    window.requestAnimationFrame(() => {
+                        document.getElementById("eastPaneToggle")?.focus()
+                    })
+                }
             }}
             aria-label={t("ariaDescriptors:general.openPanel", { panelName: title })}
             title={t("ariaDescriptors:general.openPanel", { panelName: title })}
