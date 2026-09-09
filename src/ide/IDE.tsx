@@ -11,7 +11,7 @@ import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as caiThunks from "../cai/caiThunks"
 import { Chat } from "../cai/Chat"
-import { Script } from "common"
+import { Language, Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { callbacks as dawCallbacks, DAW, setDAWData } from "../daw/DAW"
@@ -20,6 +20,7 @@ import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { ExtensionHost } from "../extensions/ExtensionHost"
+import * as extensions from "../extensions/extensionState"
 import { setReady } from "../bubble/bubbleState"
 import { dismiss } from "../bubble/bubbleThunks"
 import { callbacks as bubbleCallbacks } from "../bubble/Bubble"
@@ -234,6 +235,31 @@ export async function openShare(shareid: string) {
     }
 }
 
+// Open source code in a read-only tab, which the user can then bring into
+// their own account with the editor's "import to edit" button. Shared by the
+// curriculum's copy buttons and by extensions.
+// The name is sanitized here rather than at the call sites, because extensions
+// are third-party code and may pass anything.
+function openReadOnlyScript(sourceCode: string, name: string, language: Language) {
+    // We allow the english alphabet and accented latin characters.
+    // See https://stackoverflow.com/a/26900132
+    const scriptName = name.replace(/[^\wÀ-ÖØ-öø-ÿ_]/g, "") || "script"
+    const ext = language === "python" ? ".py" : ".js"
+
+    // Create a fake script object to load into a tab.
+    const fakeScript = {
+        name: scriptName + ext,
+        source_code: sourceCode,
+        shareid: scriptsState.selectNextLocalScriptID(store.getState()),
+        readonly: true,
+    }
+
+    store.dispatch(scriptsState.addReadOnlyScript(fakeScript))
+    editor.focus()
+    store.dispatch(setActiveTabAndEditor(fakeScript.shareid))
+    return fakeScript.name
+}
+
 // For curriculum pages.
 function importExample(sourceCode: string) {
     // Curriculum examples may provide a script name by creating a comment on the first line...
@@ -249,34 +275,17 @@ function importExample(sourceCode: string) {
 
     // isolate the script name from the description
     const result = /^(?:\/\/|#) (.*?) ?:/.exec(firstLine)
+    const scriptName = result?.[1] ? result[1] : "curriculum"
 
-    // remove unsupported characters
-    let scriptName
-    if (result && result[1]) {
-        // we allow the english alphabet and accented latin characters
-        // see https://stackoverflow.com/a/26900132
-        scriptName = result[1].replace(/[^\wÀ-ÖØ-öø-ÿ_]/g, "")
-    } else {
-        scriptName = "curriculum"
-    }
-
-    const ideTargetLanguage = store.getState().app.scriptLanguage
-    const ext = ideTargetLanguage === "python" ? ".py" : ".js"
-
-    // Create a fake script object to load into a tab.
-    const fakeScript = {
-        name: scriptName + ext,
-        source_code: sourceCode,
-        shareid: scriptsState.selectNextLocalScriptID(store.getState()),
-        readonly: true,
-    }
-
-    store.dispatch(scriptsState.addReadOnlyScript(fakeScript))
-    editor.focus()
-    store.dispatch(setActiveTabAndEditor(fakeScript.shareid))
+    openReadOnlyScript(sourceCode, scriptName, store.getState().app.scriptLanguage)
 }
 
 curriculum.callbacks.import = importExample
+
+// For extensions. Returns the name of the tab that was opened, so the
+// extension can tell the user where its script went.
+extensions.callbacks.openReadOnlyScript = (sourceCode, name, language) =>
+    openReadOnlyScript(sourceCode, name, language)
 
 // Run script in the editor and propagate the DAW data it generates.
 async function runScript() {

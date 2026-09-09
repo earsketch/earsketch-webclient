@@ -2,7 +2,16 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 
+import type { Language } from "common"
 import type { RootState } from "../reducers"
+
+// Assigned by the IDE, which owns the editor and the tab bar. Same pattern as
+// `curriculumState.callbacks`, and for the same reason: the extension host
+// cannot import the IDE without a cycle.
+export const callbacks = {
+    /** Opens source code in a read-only tab. Returns the tab's script name. */
+    openReadOnlyScript: (_source: string, _name: string, _language: Language) => "",
+}
 
 export interface ExtensionState {
     url: string
