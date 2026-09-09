@@ -364,6 +364,7 @@ function loadExtension() {
 const KeyboardShortcuts = () => {
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
+    const alt = isMac ? "Option" : "Alt"
     const { t } = useTranslation()
 
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
@@ -384,22 +385,21 @@ const KeyboardShortcuts = () => {
         })
 
     const shortcuts: Record<string, { keys: KeyToken[]; group: string }> = {
-        zoomText: { keys: <><kbd>{modifier}</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>+</kbd>/<kbd>-</kbd></>, group: "general" },
         run: { keys: [modifier, "Enter"], group: "editor" },
         save: { keys: [modifier, "S"], group: "editor" },
         undo: { keys: [modifier, "Z"], group: "editor" },
         redo: { keys: [modifier, "Shift", "Z"], group: "editor" },
         comment: { keys: [modifier, "/"], group: "editor" },
         findReplace: { keys: [modifier, "G"], group: "editor" },
-        goToLine: { keys: [modifier, "Alt", "G"], group: "editor" },
+        goToLine: { keys: [modifier, alt, "G"], group: "editor" },
         escapeEditor: { keys: ["Esc", { word: "then" }, "Tab"], group: "editor" },
         playPause: { keys: ["Ctrl", "Space"], group: "daw" },
         jumpToCodeDaw: { keys: ["Ctrl", "I"], group: "daw" },
         zoomHorizontal: { keys: [modifier, "Wheel", { word: "or" }, "+", { separator: "/" }, "-"], group: "daw" },
         zoomVertical: { keys: [modifier, "Shift", "Wheel"], group: "daw" },
         commandPalette: { keys: [modifier, "Shift", "P"], group: "navigation" },
-        jumpBackInFocus: { keys: ["Ctrl", "Alt", "["], group: "navigation" },
-        jumpForwardInFocus: { keys: ["Ctrl", "Alt", "]"], group: "navigation" },
+        jumpBackInFocus: { keys: ["Ctrl", alt, "["], group: "navigation" },
+        jumpForwardInFocus: { keys: ["Ctrl", alt, "]"], group: "navigation" },
         jumpToSounds: { keys: ["Ctrl", "Shift", "1"], group: "navigation" },
         jumpToScripts: { keys: ["Ctrl", "Shift", "2"], group: "navigation" },
         jumpToApi: { keys: ["Ctrl", "Shift", "3"], group: "navigation" },
@@ -409,8 +409,9 @@ const KeyboardShortcuts = () => {
         jumpToUtility: { keys: ["Ctrl", "Shift", "7"], group: "navigation" },
         jumpToSoundPreview: { keys: ["Ctrl", "Shift", "8"], group: "navigation" },
         jumpToConsole: { keys: ["Ctrl", "Shift", "9"], group: "navigation" },
-        toggleContentManager: { keys: ["Ctrl", "Alt", "Shift", "1", { separator: "/" }, "2", { separator: "/" }, "3"], group: "layout" },
-        toggleCurriculum: { keys: ["Ctrl", "Alt", "Shift", "6"], group: "layout" },
+        zoomText: { keys: [modifier, alt, "Shift", "+", { separator: "/" }, "-"], group: "layout" },
+        toggleContentManager: { keys: ["Ctrl", alt, "Shift", "1", { separator: "/" }, "2", { separator: "/" }, "3"], group: "layout" },
+        toggleCurriculum: { keys: ["Ctrl", alt, "Shift", "6"], group: "layout" },
     }
 
     return <Popover>
