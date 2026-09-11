@@ -747,7 +747,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             {activeScript?.readonly && !embedMode &&
             <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
                 <div className="btn-action btn-floating">
-                    <i className="icon icon-import"></i><span className="text-blue-800">{t("importToEdit").toLocaleUpperCase()}</span>
+                    <i className="icon icon-import"></i><span className="text-blue-800 dark:text-white">{t("importToEdit").toLocaleUpperCase()}</span>
                 </div>
             </div>}
         </div>

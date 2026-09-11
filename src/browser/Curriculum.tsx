@@ -223,8 +223,14 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
             </div>
             <div>
                 <button
+                    id="eastPaneToggle"
                     className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
-                    onClick={() => dispatch(layout.setEast({ open: false }))}
+                    onClick={() => {
+                        dispatch(layout.setEast({ open: false }))
+                        window.requestAnimationFrame(() => {
+                            document.getElementById("eastPaneToggle")?.focus()
+                        })
+                    }}
                     title={closeButtonTitle}
                     aria-label={closeButtonTitle}
                 >

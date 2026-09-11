@@ -16,9 +16,12 @@ export async function skipTour(page: Page) {
 }
 
 export async function login(page: Page, username = TEST_USER) {
+    await page.locator("button[title='Login']").click()
+    await waitForHeadlessDialog(page)
     await page.locator("input[name='username']").fill(username)
     await page.locator("input[name='password']").fill("not_a_real_password")
-    await page.locator("button[title='Login']").click()
+    const dialog = page.getByRole("dialog")
+    await dialog.locator("button[title='Login']").click()
     await expect(page.locator("button[title='Login']")).toHaveCount(0, { timeout: 15000 })
 }
 
