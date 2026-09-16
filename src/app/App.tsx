@@ -736,6 +736,7 @@ export const App = () => {
     const caiHighlight = useSelector(caiState.selectHighlight)
     const switchedToCurriculum = useSelector(caiState.selectSwitchedToCurriculum)
     const switchedToCai = useSelector(caiState.selectSwitchedToCai)
+    const isMac = ESUtils.whichOS() === "MacOS"
 
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
@@ -983,7 +984,8 @@ export const App = () => {
         }
 
         const handleChangeFont = (e: KeyboardEvent) => {
-            if (!e.ctrlKey || !e.shiftKey || !e.altKey) return
+            const primaryKey = isMac ? e.metaKey : e.ctrlKey
+            if (!primaryKey || !e.shiftKey || !e.altKey) return
             if (e.code === "Equal") { e.preventDefault(); stepFont(1) } else if (e.code === "Minus") { e.preventDefault(); stepFont(-1) }
         }
 
