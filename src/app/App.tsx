@@ -983,7 +983,7 @@ export const App = () => {
         }
 
         const handleChangeFont = (e: KeyboardEvent) => {
-            if (!e.ctrlKey || !e.shiftKey || !(e.altKey || e.metaKey)) return
+            if (!e.ctrlKey || !e.shiftKey || !e.altKey) return
             if (e.code === "Equal") { e.preventDefault(); stepFont(1) } else if (e.code === "Minus") { e.preventDefault(); stepFont(-1) }
         }
 
