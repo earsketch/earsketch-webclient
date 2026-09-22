@@ -35,7 +35,6 @@ export interface SoundEntity {
     folder: string
     artist: string
     year: string
-    public: number // TODO: Currently: 0 or 1. Soon: 0, 1, or 2 (corresponding to `SoundType` enum).
     genre: string
     instrument: string
     keySignature?: string
@@ -57,7 +56,7 @@ export interface Clip {
     tempo?: number
     loop: boolean
     scale: number
-    sourceLine: number
+    sourceLines: number[]
 }
 
 export type TransformedClip = SlicedClip | StretchedClip
@@ -79,7 +78,7 @@ interface AutomationPoint {
     measure: number
     value: number
     shape: "square" | "linear"
-    sourceLine: number
+    sourceLines: number[]
 }
 
 export type Effect = { [key: string]: Envelope }

@@ -6,7 +6,7 @@ test.describe("script browser", () => {
     test.beforeEach(async ({ page }) => {
         await setupBackend(page, {
             standardAudio: [],
-            standardAudioMeta: { folder: "STUB", name: "STUB", path: "stub", public: 1 },
+            standardAudioMeta: { folder: "STUB", name: "STUB", path: "stub", type: 1 },
             interceptAudioSample: true,
             interceptCurriculum: true,
         })

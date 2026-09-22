@@ -146,7 +146,7 @@ export function addRandomRecInput(recInput: string[] = []) {
     return recInput
 }
 
-async function findAvailableSounds(genreLimit: string[] = [], instrumentLimit: string[] = [], keyLimit: (number | undefined)[] = [], artistLimit: string[] = []): Promise<string[]> {
+async function findAvailableSounds(genreLimit: string[] = [], instrumentLimit: string[] = [], keyLimit: (number | string | undefined)[] = [], artistLimit: string[] = []): Promise<string[]> {
     const sounds = []
     for (const key in soundDict) {
         if (genreLimit.length === 0 || genreLimit.includes(soundDict[key].genre)) {
@@ -164,7 +164,7 @@ async function findAvailableSounds(genreLimit: string[] = [], instrumentLimit: s
 
 export async function recommend(inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
-    keyOverride?: (number | undefined)[], artistLimit: string[] = []) {
+    keyOverride?: (number | string | undefined)[], artistLimit: string[] = [], loopUntilBest?: true) {
     let filteredRecs: string[] = []
     // add key info for all generated recommendations using original input sample lists.
     const useKeyOverride = keyOverride || [estimateKeySignature(inputSamples)]
@@ -190,14 +190,18 @@ export async function recommend(inputSamples: string[], coUsage: number = 1, sim
         }
         filteredRecs = Object.keys(recs).filter(r => !previousRecommendations.includes(r)).sort((a, b) => recs[a] - recs[b]).slice(0, bestLimit)
 
-        if (genreLimit.length > 0) {
-            genreLimit.pop()
-        } else if (instrumentLimit.length > 0) {
-            instrumentLimit.pop()
-        } else if (keyOverride && keyOverride.length > 0) {
-            keyOverride.pop()
-        } else if (artistLimit.length > 0) {
-            artistLimit.pop()
+        if (loopUntilBest && filteredRecs.length < bestLimit) {
+            if (genreLimit.length > 0) {
+                genreLimit.pop()
+            } else if (instrumentLimit.length > 0) {
+                instrumentLimit.pop()
+            } else if (keyOverride && keyOverride.length > 0) {
+                keyOverride.pop()
+            } else if (artistLimit.length > 0) {
+                artistLimit.pop()
+            } else {
+                return filteredRecs
+            }
         } else {
             return filteredRecs
         }
@@ -205,7 +209,7 @@ export async function recommend(inputSamples: string[], coUsage: number = 1, sim
     return filteredRecs
 }
 
-async function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, keyOverride?: (number|undefined)[]) {
+async function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, keyOverride?: (number|string|undefined)[]) {
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)

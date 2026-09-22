@@ -18,6 +18,7 @@ dist/
 # Binaries (non-text)
 *.zip
 *.wav
+!tests/playwright/fixtures/*.wav
 *.reapeaks
 
 # OS generated files

@@ -11,13 +11,13 @@
                             "measure": 1,
                             "value": 120,
                             "shape": "square",
-                            "sourceLine": 1
+                            "sourceLines": [1]
                         },
                         {
                             "measure": 1,
                             "value": 88,
                             "shape": "square",
-                            "sourceLine": 7
+                            "sourceLines": [7]
                         }
                     ]
                 }
@@ -1140,7 +1140,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 10,
+                    "sourceLines": [10],
                     "tempo": 120,
                     "sourceAudio": {},
                     "audio": {},
@@ -1155,7 +1155,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 10,
+                    "sourceLines": [10],
                     "tempo": 120,
                     "sourceAudio": {},
                     "audio": {},
@@ -1175,7 +1175,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 11,
+                    "sourceLines": [11],
                     "tempo": 120,
                     "sourceAudio": {},
                     "audio": {},
@@ -1190,7 +1190,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 11,
+                    "sourceLines": [11],
                     "tempo": 120,
                     "sourceAudio": {},
                     "audio": {},
@@ -1204,13 +1204,13 @@
                             "measure": 1,
                             "value": -20,
                             "shape": "linear",
-                            "sourceLine": 23
+                            "sourceLines": [23]
                         },
                         {
                             "measure": 5,
                             "value": 6,
                             "shape": "square",
-                            "sourceLine": 23
+                            "sourceLines": [23]
                         }
                     ]
                 }
@@ -1227,7 +1227,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 31,
+                    "sourceLines": [31],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1241,7 +1241,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 31,
+                    "sourceLines": [31],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1255,7 +1255,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 31,
+                    "sourceLines": [31],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1269,7 +1269,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 31,
+                    "sourceLines": [31],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1283,7 +1283,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 31,
+                    "sourceLines": [31],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1297,7 +1297,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 31,
+                    "sourceLines": [31],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1311,7 +1311,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 31,
+                    "sourceLines": [31],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1325,7 +1325,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 31,
+                    "sourceLines": [31],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1339,7 +1339,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 31,
+                    "sourceLines": [31],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1353,7 +1353,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 33,
+                    "sourceLines": [33],
                     "tempo": 91,
                     "sourceAudio": {},
                     "audio": {},
@@ -1368,7 +1368,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 33,
+                    "sourceLines": [33],
                     "tempo": 91,
                     "sourceAudio": {},
                     "audio": {},
@@ -1383,7 +1383,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 33,
+                    "sourceLines": [33],
                     "tempo": 91,
                     "sourceAudio": {},
                     "audio": {},
@@ -1398,7 +1398,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 33,
+                    "sourceLines": [33],
                     "tempo": 91,
                     "sourceAudio": {},
                     "audio": {},
@@ -1413,7 +1413,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 33,
+                    "sourceLines": [33],
                     "tempo": 91,
                     "sourceAudio": {},
                     "audio": {},
@@ -1428,7 +1428,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0.0625,
-                    "sourceLine": 33,
+                    "sourceLines": [33],
                     "tempo": 91,
                     "sourceAudio": {},
                     "audio": {},
@@ -1448,7 +1448,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 12,
+                    "sourceLines": [12],
                     "tempo": 96,
                     "sourceAudio": {},
                     "audio": {},
@@ -1463,7 +1463,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 12,
+                    "sourceLines": [12],
                     "tempo": 96,
                     "sourceAudio": {},
                     "audio": {},
@@ -1483,7 +1483,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 13,
+                    "sourceLines": [13],
                     "tempo": 105,
                     "sourceAudio": {},
                     "audio": {},
@@ -1503,7 +1503,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 14,
+                    "sourceLines": [14],
                     "tempo": 100,
                     "sourceAudio": {},
                     "audio": {},
@@ -1523,7 +1523,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 15,
+                    "sourceLines": [15],
                     "tempo": 120,
                     "sourceAudio": {},
                     "audio": {},
@@ -1538,7 +1538,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 15,
+                    "sourceLines": [15],
                     "tempo": 120,
                     "sourceAudio": {},
                     "audio": {},
@@ -1553,7 +1553,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 15,
+                    "sourceLines": [15],
                     "tempo": 120,
                     "sourceAudio": {},
                     "audio": {},
@@ -1568,7 +1568,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 15,
+                    "sourceLines": [15],
                     "tempo": 120,
                     "sourceAudio": {},
                     "audio": {},
@@ -1583,7 +1583,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 15,
+                    "sourceLines": [15],
                     "tempo": 120,
                     "sourceAudio": {},
                     "audio": {},
@@ -1603,7 +1603,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 16,
+                    "sourceLines": [16],
                     "tempo": 96,
                     "sourceAudio": {},
                     "audio": {},
@@ -1618,7 +1618,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 16,
+                    "sourceLines": [16],
                     "tempo": 96,
                     "sourceAudio": {},
                     "audio": {},
@@ -1633,7 +1633,7 @@
                     "scale": false,
                     "loop": true,
                     "silence": 0,
-                    "sourceLine": 16,
+                    "sourceLines": [16],
                     "tempo": 96,
                     "sourceAudio": {},
                     "audio": {},
@@ -1647,13 +1647,13 @@
                             "measure": 1,
                             "value": -20,
                             "shape": "linear",
-                            "sourceLine": 24
+                            "sourceLines": [24]
                         },
                         {
                             "measure": 5,
                             "value": 6,
                             "shape": "square",
-                            "sourceLine": 24
+                            "sourceLines": [24]
                         }
                     ]
                 }
@@ -1670,7 +1670,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 34,
+                    "sourceLines": [34],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1684,7 +1684,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 34,
+                    "sourceLines": [34],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1698,7 +1698,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 34,
+                    "sourceLines": [34],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1712,7 +1712,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 34,
+                    "sourceLines": [34],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1726,7 +1726,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 34,
+                    "sourceLines": [34],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1740,7 +1740,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 34,
+                    "sourceLines": [34],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1754,7 +1754,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 34,
+                    "sourceLines": [34],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1768,7 +1768,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 34,
+                    "sourceLines": [34],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false
@@ -1782,7 +1782,7 @@
                     "scale": false,
                     "loop": false,
                     "silence": 0,
-                    "sourceLine": 34,
+                    "sourceLines": [34],
                     "sourceAudio": {},
                     "audio": {},
                     "loopChild": false

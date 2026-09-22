@@ -13,6 +13,7 @@ import * as user from "../user/userState"
 import { get, postAuth } from "../request"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import store from "../reducers"
+import * as uiLogger from "./uiLogger"
 
 function shareWithPeople(shareid: string, users: string[]) {
     for (const recipient of users) {
@@ -120,15 +121,16 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     const [copied, setCopied] = useState(false)
 
     const handleClick = () => {
-        textElement.current?.select()
-        document.execCommand("copy")
+        const shareUrl = textElement.current?.value ?? ""
+        window.navigator.clipboard.writeText(shareUrl)
+        uiLogger.event("copy", "script-share", { content: shareUrl })
         setCopied(true)
         window.setTimeout(() => setCopied(false), 1000)
     }
 
     return <>
         <button aria-label={t("scriptShare.copyClipboard")} ref={setReferenceElement} onClick={e => { e.preventDefault(); handleClick() }} className="text-blue-400 hover:text-blue-600 text-2xl p-2" title={t("scriptShare.copyClipboard")}>
-            <i className="icon icon-paste4"></i>
+            <i className="icon icon-copy"></i>
         </button>
         <Transition
             show={copied}

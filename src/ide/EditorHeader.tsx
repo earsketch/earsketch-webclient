@@ -79,35 +79,32 @@ const ToggleButton = React.forwardRef(({ hovered, labelKey, state, setState, ...
     </button>
 })
 
-const SettingsMenu = () => {
-    const { t } = useTranslation()
+export interface EditorSetting {
+    id: string
+    nameKey: string
+    state: boolean
+    setState: (state: boolean) => void
+    divider?: boolean
+}
+
+export const useEditorSettings = (): EditorSetting[] => {
+    const dispatch = useDispatch()
     const blocksMode = useSelector(ide.selectBlocksMode)
     const autocomplete = useSelector(ide.selectAutocomplete)
     const playArrows = useSelector(ide.selectPlayArrows)
     const showBeatStringAnnotations = useSelector(ide.selectShowBeatStringAnnotation)
-    const dispatch = useDispatch()
 
-    const actions = [
-        { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) }, divider: true },
-        { nameKey: "editor.autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
-        {
-            nameKey: "editor.showBeatStringAnnotations",
-            state: showBeatStringAnnotations,
-            setState(state: boolean) {
-                dispatch(ide.setShowBeatStringAnnotation(state))
-            },
-        },
-        {
-            nameKey: "editor.playArrows",
-            state: playArrows,
-            setState(state: boolean) {
-                dispatch(ide.setPlayArrows(state))
-                if (state === false) {
-                    editor.setDAWPlayingLines([])
-                }
-            },
-        },
+    return [
+        { id: "blocks-mode", nameKey: "editor.blocksMode", state: blocksMode, setState(state) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) }, divider: true },
+        { id: "autocomplete", nameKey: "editor.autocomplete", state: autocomplete, setState(state) { dispatch(ide.setAutocomplete(state)) } },
+        { id: "beat-string-annotations", nameKey: "editor.showBeatStringAnnotations", state: showBeatStringAnnotations, setState(state) { dispatch(ide.setShowBeatStringAnnotation(state)) } },
+        { id: "play-arrows", nameKey: "editor.playArrows", state: playArrows, setState(state) { dispatch(ide.setPlayArrows(state)); if (!state) editor.setDAWPlayingLines([]) } },
     ]
+}
+
+const SettingsMenu = () => {
+    const { t } = useTranslation()
+    const actions = useEditorSettings()
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
         <Menu.Button className="hover:text-gray-700 text-xl" title={t("ariaDescriptors:editor.settings")} aria-label={t("ariaDescriptors:editor.settings")}>

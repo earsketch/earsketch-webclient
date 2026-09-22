@@ -1,4 +1,4 @@
-import { useState, useEffect, LegacyRef, Ref } from "react"
+import { useState, useEffect, useRef, LegacyRef, Ref } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { usePopper } from "react-popper"
 import { Dialog } from "@headlessui/react"
@@ -149,6 +149,7 @@ export const Bubble = () => {
     const active = useSelector(bubble.selectActive)
     const currentPage = useSelector(bubble.selectCurrentPage)
     const { t } = useTranslation()
+    const headingRef = useRef<HTMLHeadingElement>(null)
 
     const [referenceElement, setReferenceElement] = useState<Element|null>(null)
     const [popperElement, setPopperElement] = useState(null)
@@ -235,6 +236,7 @@ export const Bubble = () => {
         const elem = document.querySelector(ref as string)
         if (ref && elem) setReferenceElement(elem)
         update?.()
+        headingRef.current?.focus()
     }, [currentPage])
 
     // Prevent panel from being too tall on the code editor page
@@ -269,10 +271,10 @@ export const Bubble = () => {
                     </ul>
                 </div>
                 {[0, 9].includes(currentPage) && <DismissButton />}
-                <h2 className="text-lg font-black mb-4">
+                <h2 ref={headingRef} tabIndex={0} className="text-lg font-black mb-4">
                     {t(pages[currentPage].headerKey)}
                 </h2>
-                <div className="text-sm">
+                <div tabIndex={0} className="text-sm">
                     {parse(t(pages[currentPage].bodyKey))}
                 </div>
                 <MessageFooter />

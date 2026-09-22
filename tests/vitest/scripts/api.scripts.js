@@ -106,13 +106,13 @@ export const API_SCRIPTS = {
     "importFile.py": "from earsketch import * \n" +
         "init() \n" +
         "setTempo(120) \n" +
-        'fileData = importFile("https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt")\n' +
+        'fileData = importFile("http://example.com/test.txt")\n' +
         "print fileData\n" +
         "finish() \n",
 
     "importFile.js": "init();\n" +
         "setTempo(120);\n" +
-        'var fileData = importFile("https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt")\n' +
+        'var fileData = importFile("http://example.com/test.txt")\n' +
         "println(fileData);\n" +
         "finish();\n",
 

@@ -307,14 +307,14 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
 
         const data = await request.get("/audio/freesound/search", { query })
         const results = data.results
-            .filter((result: any) => result.analysis?.rhythm?.bpm)
+            .filter((result: any) => result.bpm)
             .map((result: any) => ({
                 previewURL: result.previews["preview-lq-mp3"],
                 iframe: `https://freesound.org/embed/sound/iframe/${result.id}/simple/small/`,
                 downloadURL: result.previews["preview-hq-mp3"],
                 creator: result.username,
                 name: result.name,
-                bpm: Math.round(result.analysis.rhythm.bpm),
+                bpm: Math.round(result.bpm),
             }))
         setResults(results)
     }

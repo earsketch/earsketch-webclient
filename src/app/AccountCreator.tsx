@@ -49,6 +49,7 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
                             required maxLength={25}
                             pattern="[a-zA-Z_][0-9a-zA-Z_]*"
                             title={t("messages:createaccount.usernameconstraint")}
+                            autoFocus
                         />
                     </label>
                 </div>

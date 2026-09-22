@@ -107,26 +107,21 @@ export async function multiTrack(script: Script) {
 
 // Print the source code.
 export function print(script: Script) {
-    let content = script.source_code
-    const lines = content.split(/\n/)
-    const numlines = lines.length
-    esconsole(numlines, "debug")
+    const lines = script.source_code.split(/\n/)
+    const printContent = lines.map((line, lineNum) => {
+        return `${(lineNum + 1).toString().padStart(3, " ")}| ${line}`
+    }).join("\n")
+
     const pri = (document.getElementById("ifmcontentstoprint") as HTMLIFrameElement).contentWindow!
-    pri.document.open()
-    pri.document.writeln('<pre style="-moz-tab-size:2; -o-tab-size:2; tab-size:2;">')
-    for (let lineNum = 0; lineNum < numlines; lineNum++) {
-        content = lines[lineNum]
-        esconsole(content, "debug")
-        let lineNumStr = (lineNum + 1).toString()
-        if (lineNumStr.length === 1) {
-            lineNumStr = "  " + lineNumStr
-        } else if (lineNumStr.length === 2) {
-            lineNumStr = " " + lineNumStr
-        }
-        pri.document.writeln(lineNumStr + "| " + content)
+    const pre = pri.document.createElement("pre")
+    pre.style.cssText = "-moz-tab-size: 2; -o-tab-size: 2; tab-size: 2;"
+    // Using `textContent` with untrusted text prevents malicious html injection
+    pre.textContent = printContent
+
+    if (pri.document.head) {
+        pri.document.head.replaceChildren()
     }
-    pri.document.writeln("</pre>")
-    pri.document.close()
+    pri.document.body.replaceChildren(pre)
     pri.focus()
     pri.print()
 }

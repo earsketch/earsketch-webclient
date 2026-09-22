@@ -10,8 +10,8 @@ const TEST_SOUND_META: AudioMeta = {
     instrument: "SYNTH",
     name: "DUBSTEP_BASS_WOBBLE_002",
     path: "standard-library/filename/placeholder/here.wav",
-    public: 1,
     tempo: 140,
+    type: 1,
     year: 2012,
 }
 

@@ -24,12 +24,14 @@ const appSlice = createSlice({
         embedMode,
         hideDAW,
         hideEditor,
+        eastContent: "curriculum" as "curriculum" | "extension",
         doNotDisturb: false,
         embeddedScriptName: null as string | null,
         embeddedScriptUsername: null as string | null,
         embeddedShareID: null as string | null,
         modal: null as { Modal: Modal, resolve: (_: any) => void } | null,
         confetti: false,
+        showSoundPreviewWidget: false,
     },
     reducers: {
         setScriptLanguage(state, { payload }) {
@@ -53,6 +55,9 @@ const appSlice = createSlice({
         setHideEditor(state, { payload }) {
             state.hideEditor = payload
         },
+        setEastContent(state, { payload }) {
+            state.eastContent = payload
+        },
         setDoNotDisturb(state, { payload }) {
             state.doNotDisturb = payload
         },
@@ -74,6 +79,9 @@ const appSlice = createSlice({
         setConfetti(state, { payload }) {
             state.confetti = payload
         },
+        setShowSoundPreviewWidget(state, { payload }: { payload: boolean }) {
+            state.showSoundPreviewWidget = payload
+        },
     },
 })
 
@@ -91,6 +99,7 @@ export const {
     setEmbedMode,
     setHideDAW,
     setHideEditor,
+    setEastContent,
     setDoNotDisturb,
     setEmbeddedScriptUsername,
     setEmbeddedScriptName,
@@ -98,6 +107,7 @@ export const {
     setLocaleCode,
     setModal,
     setConfetti,
+    setShowSoundPreviewWidget,
 } = appSlice.actions
 
 export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage
@@ -113,6 +123,7 @@ export const selectScaledFontSize = (state: RootState) => {
 export const selectEmbedMode = (state: RootState) => state.app.embedMode
 export const selectHideDAW = (state: RootState) => state.app.hideDAW
 export const selectHideEditor = (state: RootState) => state.app.hideEditor
+export const selectEastContent = (state: RootState) => state.app.eastContent
 export const selectDoNotDisturb = (state: RootState) => state.app.doNotDisturb
 export const selectEmbeddedScriptUsername = (state: RootState) => state.app.embeddedScriptUsername
 export const selectEmbeddedScriptName = (state: RootState) => state.app.embeddedScriptName
@@ -120,6 +131,7 @@ export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedSha
 export const selectLocaleCode = (state: RootState) => state.app.locale
 export const selectModal = (state: RootState) => state.app.modal
 export const selectConfetti = (state: RootState) => state.app.confetti
+export const selectShowSoundPreviewWidget = (state: RootState) => state.app.showSoundPreviewWidget
 
 export const selectLocale = createSelector(
     [selectLocaleCode],

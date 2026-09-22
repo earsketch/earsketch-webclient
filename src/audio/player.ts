@@ -24,6 +24,11 @@ let loop = {
     end: 0,
 }
 
+// Tracks whether the active playback is a clip-scoped preview (started by Ctrl+Space while a
+// DAW clip is focused), as opposed to whole-arrangement playback. Lets the DAW know whether
+// losing focus on that clip should stop playback, or leave unrelated playback alone.
+let previewing = false
+
 let dawData: DAWData | null = null
 
 let upcomingProjectGraph: ProjectGraph | null = null
@@ -55,10 +60,10 @@ function clearAllTimers() {
     window.clearTimeout(timers.playEnd)
 }
 
-export function play(startMes: number, delay = 0) {
+export function play(startMes: number, delay = 0, maxEndMes: number = 0) {
     const minStartMes = (loop.on && loop.selection) ? loop.start : 1
-    const endMes = (loop.on && loop.selection) ? loop.end : dawData!.length + 1
-    if (startMes < minStartMes || (loop.on && startMes >= endMes)) {
+    const endMes = maxEndMes || ((loop.on && loop.selection) ? loop.end : dawData!.length + 1)
+    if (startMes < minStartMes || (loop.on && startMes >= endMes) || (maxEndMes && startMes >= maxEndMes)) {
         startMes = minStartMes
     }
     const tempoMap = new TempoMap(dawData!)
@@ -202,7 +207,19 @@ export function getPosition() {
     return playbackData.playheadPos
 }
 
-const getProjectTracks = () => [...projectGraph?.tracks.entries() ?? [], ...upcomingProjectGraph?.tracks.entries() ?? []]
+export const getProjectTracks = () => [...projectGraph?.tracks.entries() ?? [], ...upcomingProjectGraph?.tracks.entries() ?? []]
+
+export function startPreview() {
+    previewing = true
+}
+
+export function isPreviewing() {
+    return previewing
+}
+
+export function clearPreview() {
+    previewing = false
+}
 
 export function setMutedTracks(muted: number[]) {
     mutedTracks = muted

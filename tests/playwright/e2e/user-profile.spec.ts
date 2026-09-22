@@ -26,9 +26,9 @@ test("logs in and changes user email and password", async ({ page }) => {
     await page.locator("button", { hasText: TEST_USER }).click()
     await page.locator("button", { hasText: "Edit Profile" }).click()
 
-    await page.locator("input[placeholder='Email Address (Optional)']").fill(changedEmail)
-    await page.locator("input[placeholder='Verify your current password']").fill(originalPassword)
-    await page.locator("input[placeholder='New password (Optional)']").fill(changedPassword)
-    await page.locator("input[placeholder='Confirm new password']").fill(changedPassword)
+    await page.locator("input[name='email']").fill(changedEmail)
+    await page.locator("input[name='password']").fill(originalPassword)
+    await page.locator("input[name='newPassword']").fill(changedPassword)
+    await page.locator("input[name='confirmPassword']").fill(changedPassword)
     await page.locator("input[value='UPDATE']").click()
 })

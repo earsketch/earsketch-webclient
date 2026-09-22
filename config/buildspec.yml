@@ -6,6 +6,7 @@ env:
     ES_VERSION_LIST: /earsketch-webclient/version_number
     ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_uri
     ES_BASE_URL: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_url
+    ES_UI_LOGGER_URL: /earsketch-webclient/BuildConfig/$ES_API_TARGET_ENVIRONMENT/ui-logger-url
   secrets-manager:
     GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token

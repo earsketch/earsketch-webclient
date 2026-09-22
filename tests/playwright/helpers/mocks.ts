@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export const API_HOST = "api-dev.ersktch.gatech.edu"
+export const API_HOST = "api-dev-gw.ersktch.gatech.edu"
 export const CLOUDFRONT_HOST = "earsketch-test.ersktch.gatech.edu"
 export const TEST_USER = "tester"
 
@@ -17,8 +17,8 @@ export interface AudioMeta {
     instrument?: string
     name: string
     path: string
-    public: 0 | 1
     tempo?: number
+    type: 0 | 1 | 2
     year?: number
 }
 
@@ -78,8 +78,8 @@ const standardLibraryDefault = (sounds: AudioMeta[] = []): AudioMeta[] => sounds
     folder: "EARSKETCH",
     name: `METRONOME0${i}`,
     path: `standard-library/EarSketch/METRONOME0${i}.flac`,
-    public: 0 as const,
     tempo: -1,
+    type: 2 as const,
 })))
 
 function fulfillJson(route: Route, body: unknown, status = 200) {
@@ -99,6 +99,7 @@ export class RouteCounter {
     bump(key: string) {
         this.map.set(key, (this.map.get(key) ?? 0) + 1)
     }
+
     count(key: string) {
         return this.map.get(key) ?? 0
     }
@@ -110,7 +111,7 @@ export async function setupBackend(page: Page, opts: MockOptions = {}): Promise<
 
     // Standard audio library — always set if anything is mocked
     const standardAudio = standardLibraryDefault(opts.standardAudio ?? [])
-    await page.route(`https://${CLOUDFRONT_HOST}/backend-static/audio-standard_2.json`, (route) => {
+    await page.route(`https://${CLOUDFRONT_HOST}/backend-static/audio-standard_4.json`, (route) => {
         counter.bump("audio_standard")
         return fulfillJson(route, standardAudio)
     })
@@ -126,15 +127,18 @@ export async function setupBackend(page: Page, opts: MockOptions = {}): Promise<
         })
     }
 
-    // Audio sample (.wav) — return the clink fixture
+    // Audio sample (.wav) — return the clink fixture, or countdown.wav for DUBSTEP_BASS_WOBBLE_002
     if (opts.interceptAudioSample) {
-        const audio = readFixture("clink.wav")
+        const clinkAudio = readFixture("clink.wav")
+        const countdownAudio = readFixture("countdown.wav")
         await page.route(`https://${CLOUDFRONT_HOST}/backend-static/standard-library/**`, (route) => {
             counter.bump("audio_sample")
+            const url = route.request().url()
+            const body = url.includes("DUBSTEP_BASS_WOBBLE_002") ? countdownAudio : clinkAudio
             return route.fulfill({
                 status: 200,
                 contentType: "application/octet-stream",
-                body: audio,
+                body,
             })
         })
     }
