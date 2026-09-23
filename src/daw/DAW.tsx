@@ -264,14 +264,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
             {/* Autoscroll */}
             <span className="daw-transport-button rotate-90">
-                <button aria-label={t("daw.tooltip.autoScroll")} type="submit" className={"dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.autoScroll")} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
+                <button aria-label={t("daw.tooltip.autoScroll")} role="switch" aria-checked={autoScroll} className={"dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.autoScroll")} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
                     <span className="icon icon-move-up"></span>
                 </button>
             </span>
 
             {/* Metronome */}
             <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.toggleMetronome")} id="dawMetronomeButton" className={"dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={() => { toggleMetronome(); addUIClick("metronome " + (!metronome ? "on" : "off")) }}>
+                <button aria-label={t("daw.tooltip.toggleMetronome")} id="dawMetronomeButton" role="switch" aria-checked={metronome} className={"dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={() => { toggleMetronome(); addUIClick("metronome " + (!metronome ? "on" : "off")) }}>
                     <span className="icon icon-meter3"></span>
                 </button>
             </span>
@@ -279,7 +279,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             {/* Volume Control */}
             <span className="daw-transport-button" id="volume-control">
                 <span onClick={() => mute(!volumeMuted)}>
-                    <button aria-label={t("daw.tooltip.toggleVolume")} id="muteButton" className="dark:text-white hover:opacity-70" style={{ width: "40px" }} title={t("daw.tooltip.toggleVolume")} data-toggle="tooltip" data-placement="bottom">
+                    <button aria-label={t("daw.tooltip.toggleVolume")} id="muteButton" role="switch" aria-checked={volumeMuted} className="dark:text-white hover:opacity-70" style={{ width: "40px" }} title={t("daw.tooltip.toggleVolume")} data-toggle="tooltip" data-placement="bottom">
                         <span className={"icon icon-volume-" + (volumeMuted ? "mute" : "high")}></span>
                     </button>
                 </span>
