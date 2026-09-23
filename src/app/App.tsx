@@ -115,6 +115,9 @@ export function navigateTo(entry: PanelEntry) {
         window.requestAnimationFrame(() => {
             const el = document.querySelector(entry.elementSelector) as HTMLElement | null
             el?.focus()
+            if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+                el.select()
+            }
         })
     }
 }
