@@ -984,7 +984,7 @@ export const App = () => {
                 consoleStatus(i18n.t(fontMessageKey, { size }))
                 store.dispatch(appState.setFontSize(size))
             } else {
-                playEarcon(SINE_BUMP, 0.3)
+                playEarcon(SINE_BUMP, 0.5)
             }
         }
 
