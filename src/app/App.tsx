@@ -979,7 +979,12 @@ export const App = () => {
             const fontIndex = FONT_SIZES.indexOf(fontSize)
             const nextIndex = fontIndex + direction
             if (nextIndex >= 0 && nextIndex < FONT_SIZES.length) {
-                store.dispatch(appState.setFontSize(FONT_SIZES[nextIndex]))
+                const size = FONT_SIZES[nextIndex]
+                const fontMessageKey = direction === 1 ? "shortcuts.fontSizeIncreased" : "shortcuts.fontSizeDecreased"
+                consoleStatus(i18n.t(fontMessageKey, { size }))
+                store.dispatch(appState.setFontSize(size))
+            } else {
+                playEarcon(SINE_BUMP, 0.3)
             }
         }
 
