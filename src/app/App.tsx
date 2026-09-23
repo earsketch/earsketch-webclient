@@ -364,6 +364,7 @@ function loadExtension() {
 const KeyboardShortcuts = () => {
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
+    const alt = isMac ? "Option" : "Alt"
     const { t } = useTranslation()
 
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
@@ -390,15 +391,15 @@ const KeyboardShortcuts = () => {
         redo: { keys: [modifier, "Shift", "Z"], group: "editor" },
         comment: { keys: [modifier, "/"], group: "editor" },
         findReplace: { keys: [modifier, "G"], group: "editor" },
-        goToLine: { keys: [modifier, "Alt", "G"], group: "editor" },
+        goToLine: { keys: [modifier, alt, "G"], group: "editor" },
         escapeEditor: { keys: ["Esc", { word: "then" }, "Tab"], group: "editor" },
         playPause: { keys: ["Ctrl", "Space"], group: "daw" },
         jumpToCodeDaw: { keys: ["Ctrl", "I"], group: "daw" },
         zoomHorizontal: { keys: [modifier, "Wheel", { word: "or" }, "+", { separator: "/" }, "-"], group: "daw" },
         zoomVertical: { keys: [modifier, "Shift", "Wheel"], group: "daw" },
         commandPalette: { keys: [modifier, "Shift", "P"], group: "navigation" },
-        jumpBackInFocus: { keys: ["Ctrl", "Alt", "["], group: "navigation" },
-        jumpForwardInFocus: { keys: ["Ctrl", "Alt", "]"], group: "navigation" },
+        jumpBackInFocus: { keys: ["Ctrl", alt, "["], group: "navigation" },
+        jumpForwardInFocus: { keys: ["Ctrl", alt, "]"], group: "navigation" },
         jumpToSounds: { keys: ["Ctrl", "Shift", "1"], group: "navigation" },
         jumpToScripts: { keys: ["Ctrl", "Shift", "2"], group: "navigation" },
         jumpToApi: { keys: ["Ctrl", "Shift", "3"], group: "navigation" },
@@ -408,8 +409,9 @@ const KeyboardShortcuts = () => {
         jumpToUtility: { keys: ["Ctrl", "Shift", "7"], group: "navigation" },
         jumpToSoundPreview: { keys: ["Ctrl", "Shift", "8"], group: "navigation" },
         jumpToConsole: { keys: ["Ctrl", "Shift", "9"], group: "navigation" },
-        toggleContentManager: { keys: ["Ctrl", "Alt", "Shift", "1", { separator: "/" }, "2", { separator: "/" }, "3"], group: "layout" },
-        toggleCurriculum: { keys: ["Ctrl", "Alt", "Shift", "6"], group: "layout" },
+        zoomText: { keys: [modifier, alt, "Shift", "+", { separator: "/" }, "-"], group: "layout" },
+        toggleContentManager: { keys: ["Ctrl", alt, "Shift", "1", { separator: "/" }, "2", { separator: "/" }, "3"], group: "layout" },
+        toggleCurriculum: { keys: ["Ctrl", alt, "Shift", "6"], group: "layout" },
     }
 
     return <Popover>
@@ -734,6 +736,7 @@ export const App = () => {
     const caiHighlight = useSelector(caiState.selectHighlight)
     const switchedToCurriculum = useSelector(caiState.selectSwitchedToCurriculum)
     const switchedToCai = useSelector(caiState.selectSwitchedToCai)
+    const isMac = ESUtils.whichOS() === "MacOS"
 
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
@@ -968,6 +971,31 @@ export const App = () => {
         }
         window.addEventListener("keydown", handleFocusNav)
         return () => window.removeEventListener("keydown", handleFocusNav)
+    }, [])
+
+    useEffect(() => {
+        const stepFont = (direction: 1 | -1) => {
+            const fontSize = appState.selectFontSize(store.getState())
+            const fontIndex = FONT_SIZES.indexOf(fontSize)
+            const nextIndex = fontIndex + direction
+            if (nextIndex >= 0 && nextIndex < FONT_SIZES.length) {
+                const size = FONT_SIZES[nextIndex]
+                const fontMessageKey = direction === 1 ? "shortcuts.fontSizeIncreased" : "shortcuts.fontSizeDecreased"
+                consoleStatus(i18n.t(fontMessageKey, { size }))
+                store.dispatch(appState.setFontSize(size))
+            } else {
+                playEarcon(SINE_BUMP, 0.5)
+            }
+        }
+
+        const handleChangeFont = (e: KeyboardEvent) => {
+            const primaryKey = isMac ? e.metaKey : e.ctrlKey
+            if (!primaryKey || !e.shiftKey || !e.altKey) return
+            if (e.code === "Equal") { e.preventDefault(); stepFont(1) } else if (e.code === "Minus") { e.preventDefault(); stepFont(-1) }
+        }
+
+        window.addEventListener("keydown", handleChangeFont)
+        return () => window.removeEventListener("keydown", handleChangeFont)
     }, [])
 
     useEffect(() => {
