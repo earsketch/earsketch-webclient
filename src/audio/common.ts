@@ -58,6 +58,7 @@ function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, te
         // case: clip is in the future
         const untilClipStart = clipStartTime - startTime
         source.start(waStartTime + untilClipStart, 0, clipDuration)
+        // TODO: demo of midi note out here
     }
 
     source.connect(trackGain)
