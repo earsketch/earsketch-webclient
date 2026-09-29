@@ -58,11 +58,35 @@ function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, te
         // case: clip is in the future
         const untilClipStart = clipStartTime - startTime
         source.start(waStartTime + untilClipStart, 0, clipDuration)
-        // TODO: demo of midi note out here
+    }
+
+    // Demo midi out
+    if (clip.track !== 0 && context instanceof AudioContext) {
+        const clipStartOffset = Math.max(0, startTime - clipStartTime)
+        const scheduledStart = waStartTime + Math.max(0, clipStartTime - startTime)
+        const tsNoteOn = window.performance.now() + (scheduledStart - context.currentTime) * 1000
+        const dur = (clipDuration - clipStartOffset) * 1000
+        playMidiNote(48, 100, tsNoteOn, dur)
     }
 
     source.connect(trackGain)
     return source
+}
+
+function playMidiNote(num: number, vel: number, tsNoteOn: number, dur: number) {
+    const midiInterface = "IAC"
+    const midiCh = 0
+    const gate = 0.6
+    const tsNoteOff = tsNoteOn + gate * dur
+
+    window.navigator.requestMIDIAccess().then((midiAccess) => {
+        for (const midiOutputPort of midiAccess.outputs.values()) {
+            if (!midiOutputPort.name?.includes(midiInterface)) continue
+            midiOutputPort.send([0x90 | midiCh, num, vel], tsNoteOn)
+            midiOutputPort.send([0x80 | midiCh, num, 1], tsNoteOff)
+            console.log("Send MIDI n:", num, ", vel:", vel, ", dur:", dur, "at", tsNoteOn)
+        }
+    })
 }
 
 export function playTrack(
