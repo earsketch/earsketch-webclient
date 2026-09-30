@@ -228,7 +228,7 @@ const PillButton = ({ script, fn, aria, icon, children }: { script: Script, fn: 
         aria-label={descriptor}
         title={descriptor}
     >
-        <i className={icon} />
+        <i className={icon} aria-hidden />
         {children}
     </button>
 }
