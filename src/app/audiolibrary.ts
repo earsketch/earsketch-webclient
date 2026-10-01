@@ -150,9 +150,9 @@ async function _getStandardSounds() {
     }
 }
 
-export async function getUserSounds(username: string) {
+export async function getUserSounds() {
     // The /audio/user depricated query parameter `username` is maintained, for now, until the backend is updated.
-    const sounds: SoundEntity[] = await getAuth("/audio/user", { username })
+    const sounds: SoundEntity[] = await getAuth("/audio/user")
     // Populate cache with user sound metadata so that we don't fetch it again later via `getMetadata()`.
     for (const sound of sounds) {
         fixMetadata(sound)
