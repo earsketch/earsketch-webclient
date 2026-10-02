@@ -75,10 +75,9 @@ function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, te
 
 function playMidiNote(num: number, vel: number, tsNoteOn: number, dur: number) {
     const midiInterface = "Launchpad Mini MK3 LPMiniMK3 MIDI In"
-    const midiCh = 9
+    const midiCh = 8
     const gate = 0.95
     const tsNoteOff = tsNoteOn + (dur * gate)
-    // const tsNoteOff = tsNoteOn + 250
 
     const smiley = [38, 39, 41, 42, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 61, 62, 63, 66, 67, 68, 69, 73, 74, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 93, 94, 96, 97]
 
