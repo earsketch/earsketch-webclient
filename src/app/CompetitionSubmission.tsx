@@ -23,7 +23,7 @@ export const CompetitionSubmission = ({ name, shareID, close }: { name: string, 
                     </ul>
                 </div>
                 <div className="text-center m-auto">
-                    <a href={"https://www.rocketjudge.com/register/PV0NL6hn#scriptid=".concat(shareID)} target="_blank" rel="noreferrer">
+                    <a href={"https://gatech.co1.qualtrics.com/jfe/preview/previewId/ab6f7acc-b007-472f-a148-d3ec5ac0336d/SV_5mtWGCTD14SJ9OK?Q_CHL=preview&Q_SurveyVersionID=current&EarSketchShareID=".concat(shareID)} target="_blank" rel="noreferrer">
                         <button style={{ minWidth: "270px", fontSize: "26px", color: "black", background: "#d3d25a" }}>Click Here to Submit</button>
                     </a>
                 </div>
