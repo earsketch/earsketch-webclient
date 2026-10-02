@@ -61,12 +61,12 @@ function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, te
     }
 
     // Demo midi out
-    if (clip.track !== 0 && context instanceof AudioContext) {
+    if (clip.track === 1 && context instanceof AudioContext) {
         const clipStartOffset = Math.max(0, startTime - clipStartTime)
         const scheduledStart = waStartTime + Math.max(0, clipStartTime - startTime)
         const tsNoteOn = window.performance.now() + (scheduledStart - context.currentTime) * 1000
         const dur = (clipDuration - clipStartOffset) * 1000
-        playMidiNote(48, 100, tsNoteOn, dur)
+        playMidiNote(48, 13, tsNoteOn, dur)
     }
 
     source.connect(trackGain)
@@ -74,16 +74,22 @@ function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, te
 }
 
 function playMidiNote(num: number, vel: number, tsNoteOn: number, dur: number) {
-    const midiInterface = "IAC"
-    const midiCh = 0
-    const gate = 0.6
-    const tsNoteOff = tsNoteOn + gate * dur
+    const midiInterface = "Launchpad Mini MK3 LPMiniMK3 MIDI In"
+    const midiCh = 9
+    const gate = 0.95
+    const tsNoteOff = tsNoteOn + (dur * gate)
+    // const tsNoteOff = tsNoteOn + 250
+
+    const smiley = [38, 39, 41, 42, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 61, 62, 63, 66, 67, 68, 69, 73, 74, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 93, 94, 96, 97]
 
     window.navigator.requestMIDIAccess().then((midiAccess) => {
         for (const midiOutputPort of midiAccess.outputs.values()) {
             if (!midiOutputPort.name?.includes(midiInterface)) continue
-            midiOutputPort.send([0x90 | midiCh, num, vel], tsNoteOn)
-            midiOutputPort.send([0x80 | midiCh, num, 1], tsNoteOff)
+            // for (let i = 36; i <= 99; i++) {
+            for (const i of smiley) {
+                midiOutputPort.send([0x90 | midiCh, i, vel], tsNoteOn)
+                midiOutputPort.send([0x80 | midiCh, i, 1], tsNoteOff)
+            }
             console.log("Send MIDI n:", num, ", vel:", vel, ", dur:", dur, "at", tsNoteOn)
         }
     })
