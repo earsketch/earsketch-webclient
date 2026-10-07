@@ -26,7 +26,6 @@ import * as audioLibrary from "../app/audiolibrary"
 import { TFunction } from "i18next"
 import * as userConsole from "../ide/console"
 
-
 const TABBABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 // Focus the next (or previous, if reverse=true) tabbable element in the document
