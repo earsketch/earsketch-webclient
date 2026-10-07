@@ -17,6 +17,8 @@
     "soundBrowser.button.showOnlyStarsDescriptive": "Show only favorites",
     "soundBrowser.button.backToTop": "Back To Top",
     "soundBrowser.noResultsToPreview": "No sound results to preview.",
+    "soundBrowser.filtersActive": "Filters active",
+    "soundBrowser.noFiltersActive": "No filters active",
     "filter": "Filter",
     "startQuickTour": "Start Quick Tour",
     "switchThemeLight": "Switch to dark color theme",
