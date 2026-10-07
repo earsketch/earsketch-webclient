@@ -1082,7 +1082,7 @@ export const App = () => {
 
                 store.dispatch(user.login({ username, token }))
 
-                store.dispatch(soundsThunks.getUserSounds(username))
+                store.dispatch(soundsThunks.getUserSounds())
                 store.dispatch(soundsThunks.getFavorites(token))
 
                 // Always override with the returned username in case the letter cases mismatch.

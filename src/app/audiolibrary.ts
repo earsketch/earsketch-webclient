@@ -125,7 +125,7 @@ export function getStandardSounds() {
 async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
-        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard_4.json"
+        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard_5.json"
         const response = await fetch(url)
         if (!response.ok) {
             throw Object.assign(new Error(`Failed to fetch standard sounds (code ${response.status}).`), { code: response.status })
@@ -150,9 +150,9 @@ async function _getStandardSounds() {
     }
 }
 
-export async function getUserSounds(username: string) {
+export async function getUserSounds() {
     // The /audio/user depricated query parameter `username` is maintained, for now, until the backend is updated.
-    const sounds: SoundEntity[] = await getAuth("/audio/user", { username })
+    const sounds: SoundEntity[] = await getAuth("/audio/user")
     // Populate cache with user sound metadata so that we don't fetch it again later via `getMetadata()`.
     for (const sound of sounds) {
         fixMetadata(sound)
