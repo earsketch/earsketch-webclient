@@ -1166,8 +1166,8 @@
         "description": "A list of slice start positions evenly spaced by note duration."
       },
       "example": {
-        "python": "# Slice by sixteenth notes\nslices = slicesPerMeasure(16)\nmakeBeatSlice(CIARA_MELANIN_DRUMBEAT_1, 1, 1, \"0123012378C8CCCC\", slices)",
-        "javascript": "// Slice by sixteenth notes\nvar slices = slicesPerMeasure(16);\nmakeBeatSlice(CIARA_MELANIN_DRUMBEAT_1, 1, 1, \"0123012378C8CCCC\", slices);"
+        "python": "sound = HIPHOP_HIHAT_ROLL_001\nbeat = \"1-8++-55\"\nmakeBeatSlice(sound, 1, 1, beat, slicesPerMeasure(8), 8)\n\nsound = HIPHOP_VOCALHIT_004\nbeat = \"0+++----55+5+BAB\"\nmakeBeatSlice(sound, 2, 1, beat, slicesPerMeasure(16), 16)",
+        "javascript": "var sound = HIPHOP_HIHAT_ROLL_001;\nvar beat = \"1-8++-55\";\nmakeBeatSlice(sound, 1, 1, beat, slicesPerMeasure(8), 8);\n\nvar sound = HIPHOP_VOCALHIT_004;\nvar beat = \"0+++----55+5+BAB\";\nmakeBeatSlice(sound, 2, 1, beat, slicesPerMeasure(16), 16);"
       }
     },
 
