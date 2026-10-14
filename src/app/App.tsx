@@ -772,6 +772,12 @@ export const App = () => {
         dispatch(curriculum.fetchLocale({ }))
     }
 
+    const localeCode = useSelector(appState.selectLocaleCode)
+
+    useEffect(() => {
+        document.documentElement.lang = localeCode
+    }, [localeCode])
+
     // Command Palette keyboard shortcut
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
