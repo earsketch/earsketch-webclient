@@ -7,6 +7,7 @@ import * as layout from "../ide/layoutState"
 import type { RootState, ThunkAPI, AppDispatch } from "../reducers"
 import { BrowserTabType } from "./BrowserTab"
 import { highlight } from "../ide/highlight"
+import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 
 const CURRICULUM_DIR = "../curriculum"
 
@@ -428,6 +429,16 @@ export const getChNumberForDisplay = (toc: TOCItem[], unitIdx: number|string, ch
         return unit.chapters && unit.chapters[chIdx].displayChNum
     }
 }
+
+// Language of the curriculum content being shown, taken from the page URL (e.g. "/en/v2/welcome.html" -> "en").
+// This can differ from the UI locale: e.g. iu and oj have translated UI, but their curriculum pages are English.
+export const selectContentLang = createSelector(
+    [selectCurrentLocation, selectContent],
+    (location) => {
+        const lang = getURLForLocation(location)?.split("/")[1]
+        return lang && lang in AVAILABLE_LOCALES ? lang : undefined
+    }
+)
 
 export const selectPageTitle = createSelector(
     [selectCurrentLocation, selectContent, selectTableOfContents],
