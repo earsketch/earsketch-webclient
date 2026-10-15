@@ -853,6 +853,8 @@ export const App = () => {
             changeLanguage(chooseDetectedLanguage(language))
         } else if (Object.keys(AVAILABLE_LOCALES).includes(currentLocale)) {
             i18n.changeLanguage(currentLocale)
+            // Fall back to English if we don't have translations for the locale.
+            document.documentElement.lang = i18n.hasResourceBundle(currentLocale, "common") ? currentLocale : ENGLISH_LOCALE.localeCode
         } else {
             changeLanguage(ENGLISH_LOCALE.localeCode)
         }
