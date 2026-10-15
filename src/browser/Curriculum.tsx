@@ -3,6 +3,7 @@ import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "..
 import { Hilitor } from "../../lib/hilitor"
 
 import * as appState from "../app/appState"
+import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 import * as uiLogger from "../app/uiLogger"
 import { Collapsed, SearchBar } from "./Utils"
 import * as curriculum from "./curriculumState"
@@ -286,6 +287,8 @@ const CurriculumPane = () => {
     const paneIsOpen = useSelector(layout.isEastOpen)
     const content = useSelector(curriculum.selectContent)
     const contentLang = useSelector(curriculum.selectContentLang)
+    // Direction follows the content's language, which can differ from the UI locale (e.g. English content under an rtl UI).
+    const contentDirection = (contentLang && AVAILABLE_LOCALES[contentLang].direction) || currentLocale.direction
     const curriculumBody = useRef<HTMLElement>(null)
     const focusPending = useSelector(curriculum.selectFocusPending)
 
@@ -350,12 +353,12 @@ const CurriculumPane = () => {
 
     return (
         <div dir={currentLocale.direction} style={{ fontSize: `${scaledFontSize}px` }}
-            className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
+            className="font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white">
             {paneIsOpen
                 ? (
                     <>
                         <CurriculumHeader />
-                        <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
+                        <div id="curriculum" dir={contentDirection} className={`${theme === "light" ? "curriculum-light" : "dark"} ${contentDirection === "rtl" ? "curriculum-rtl" : ""}`} style={{ fontSize }}>
                             {content
                                 ? <article ref={curriculumBody} id="curriculum-body" lang={contentLang} aria-label={t("curriculum.title")} className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
                                 : <div className="flex flex-col items-center">
