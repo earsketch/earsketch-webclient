@@ -430,13 +430,13 @@ export const getChNumberForDisplay = (toc: TOCItem[], unitIdx: number|string, ch
     }
 }
 
-// Language of the curriculum content being shown, taken from the page URL (e.g. "/en/v2/welcome.html" -> "en").
+// Locale of the curriculum content being shown, taken from the page URL (e.g. "/en/v2/welcome.html" -> English).
 // This can differ from the UI locale: e.g. iu and oj have translated UI, but their curriculum pages are English.
-export const selectContentLang = createSelector(
+export const selectCurriculumLocale = createSelector(
     [selectCurrentLocation, selectContent],
     (location) => {
-        const lang = getURLForLocation(location)?.split("/")[1]
-        return lang && lang in AVAILABLE_LOCALES ? lang : undefined
+        const code = getURLForLocation(location)?.split("/")[1]
+        return code ? AVAILABLE_LOCALES[code] : undefined
     }
 )
 

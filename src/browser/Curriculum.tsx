@@ -3,7 +3,6 @@ import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "..
 import { Hilitor } from "../../lib/hilitor"
 
 import * as appState from "../app/appState"
-import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 import * as uiLogger from "../app/uiLogger"
 import { Collapsed, SearchBar } from "./Utils"
 import * as curriculum from "./curriculumState"
@@ -286,9 +285,9 @@ const CurriculumPane = () => {
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
     const content = useSelector(curriculum.selectContent)
-    const contentLang = useSelector(curriculum.selectContentLang)
-    // Direction follows the content's language, which can differ from the UI locale (e.g. English content under an rtl UI).
-    const contentDirection = (contentLang && AVAILABLE_LOCALES[contentLang].direction) || currentLocale.direction
+    const curriculumLocale = useSelector(curriculum.selectCurriculumLocale)
+    // Direction follows the curriculum's locale, which can differ from the UI locale (e.g. English content under an rtl UI).
+    const curriculumDirection = (curriculumLocale ?? currentLocale).direction
     const curriculumBody = useRef<HTMLElement>(null)
     const focusPending = useSelector(curriculum.selectFocusPending)
 
@@ -358,9 +357,9 @@ const CurriculumPane = () => {
                 ? (
                     <>
                         <CurriculumHeader />
-                        <div id="curriculum" dir={contentDirection} className={`${theme === "light" ? "curriculum-light" : "dark"} ${contentDirection === "rtl" ? "curriculum-rtl" : ""}`} style={{ fontSize }}>
+                        <div id="curriculum" dir={curriculumDirection} className={`${theme === "light" ? "curriculum-light" : "dark"} ${curriculumDirection === "rtl" ? "curriculum-rtl" : ""}`} style={{ fontSize }}>
                             {content
-                                ? <article ref={curriculumBody} id="curriculum-body" lang={contentLang} aria-label={t("curriculum.title")} className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
+                                ? <article ref={curriculumBody} id="curriculum-body" lang={curriculumLocale?.localeCode} aria-label={t("curriculum.title")} className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
                                 : <div className="flex flex-col items-center">
                                     <div className="text-2xl text-center py-8">Loading curriculum...</div>
                                     <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />
