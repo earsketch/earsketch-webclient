@@ -23,6 +23,8 @@ import * as uiLogger from "../app/uiLogger"
 import reporter from "../app/reporter"
 import { Waveform } from "../app/Recorder"
 import * as audioLibrary from "../app/audiolibrary"
+import { TFunction } from "i18next"
+import * as userConsole from "../ide/console"
 
 const TABBABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
@@ -1190,10 +1192,51 @@ const DefaultSoundCollection = () => {
     return <WindowedSoundCollection {...props} />
 }
 
+function buildFilterAnnouncement(filters: sounds.Filters, t: TFunction) {
+    const categories: Array<keyof sounds.Filters> = ["artists", "genres", "instruments", "keys"]
+
+    const parts = categories
+        .filter(cat => filters[cat].length > 0)
+        .map(cat => `${t(`soundBrowser.filterDropdown.${cat}`)}: ${filters[cat].join(", ")}`)
+
+    return parts.length
+        ? `${t("soundBrowser.filtersActive")}: ${parts.join(". ")}`
+        : t("soundBrowser.noFiltersActive")
+}
+
+export const SoundFilterAnnouncer = ({ children }: { children: React.ReactNode }) => {
+    const { t } = useTranslation()
+    const filters = useSelector(sounds.selectFilters)
+
+    const announceFilters = () => {
+        userConsole.log(buildFilterAnnouncement(filters, t))
+        uiLogger.shortcut("Ctrl+Shift+F", "sound-browser")
+        reporter.keyboardShortcut("sound-browser: announce-filters")
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const tag = (e.target as HTMLElement)?.tagName
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return
+
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "f") {
+            e.preventDefault()
+            announceFilters()
+        }
+    }
+
+    return (
+        <div className="contents" onKeyDown={handleKeyDown}>
+            {children}
+        </div>
+    )
+}
+
 export const SoundBrowser = () => {
     return (
         <div className="grow min-h-0 flex flex-col justify-start" role="tabpanel">
-            <DefaultSoundCollection />
+            <SoundFilterAnnouncer>
+                <DefaultSoundCollection />
+            </SoundFilterAnnouncer>
         </div>
     )
 }
