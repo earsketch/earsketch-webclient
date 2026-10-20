@@ -1112,6 +1112,11 @@ export const App = () => {
             await loginInProgressRef.current
             return
         }
+        if (user.selectLoggedIn(store.getState())) {
+            // E.g. Fast Refresh re-running the startup effect. Logging in again would re-run postLogin() (#1006).
+            esconsole("Already logged in, ignoring login", ["DEBUG", "MAIN"])
+            return
+        }
         const loginID = nextLoginDebugID()
         logLoginDebug("login started", {
             loginID,
