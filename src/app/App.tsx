@@ -34,6 +34,7 @@ import * as soundsState from "../browser/soundsState"
 import * as soundsThunks from "../browser/soundsThunks"
 import { SoundUploader } from "./SoundUploader"
 import store, { persistor } from "../reducers"
+import { logLoginDebug, logPersistedLoginScripts, nextLoginDebugID, summarizeLoginScripts } from "./loginDebug"
 import * as tabs from "../ide/tabState"
 import * as tabThunks from "../ide/tabThunks"
 import * as user from "../user/userState"
@@ -192,7 +193,7 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
 }
 
 // Login, setup, restore scripts, return shared scripts.
-async function postLogin(username: string) {
+async function postLogin(username: string, loginID: number) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
     uiLogger.init()
@@ -215,9 +216,28 @@ async function postLogin(username: string) {
     const saved = scriptsState.selectRegularScripts(state)
     const openTabs = tabs.selectOpenTabs(state)
 
+    if (import.meta.env.DEV) {
+        logLoginDebug("migration snapshot", { loginID, ...summarizeLoginScripts(saved) })
+        logPersistedLoginScripts()
+    }
+
     // Fetch the user's scripts now that they're logged in.
     // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
     await refreshScriptBrowser()
+
+    if (import.meta.env.DEV) {
+        logLoginDebug("server scripts fetched", {
+            loginID,
+            ...summarizeLoginScripts(scriptsState.selectRegularScripts(store.getState())),
+        })
+        // Opt in from DevTools to widen the window for a reload or Fast Refresh.
+        const delayMs = Number(window.localStorage.getItem("debug:delayAfterScriptFetch"))
+        if (Number.isFinite(delayMs) && delayMs > 0) {
+            logLoginDebug("delay after fetch started", { loginID, delayMs })
+            await new Promise(resolve => window.setTimeout(resolve, delayMs))
+            logLoginDebug("delay after fetch ended", { loginID })
+        }
+    }
 
     const promises = []
     for (const script of Object.values(saved)) {
@@ -225,6 +245,12 @@ async function postLogin(username: string) {
             // Don't migrate scripts the user deleted while logged out.
             continue
         }
+        logLoginDebug("migrating script", {
+            loginID,
+            shareid: script.shareid,
+            name: script.name,
+            local: script.shareid.startsWith("local/"),
+        })
         let promise
         if (script.original_id !== undefined) {
             promise = scriptsThunks.importSharedScript(script.original_id)
@@ -237,7 +263,18 @@ async function postLogin(username: string) {
             })).unwrap()
         }
         const reopen = openTabs.includes(script.shareid)
-        promise = promise.then(script => ({ script, reopen }))
+        promise = promise.then(savedScript => {
+            logLoginDebug("migration saved", { loginID, shareid: savedScript.shareid, name: savedScript.name })
+            if (import.meta.env.DEV && !script.shareid.startsWith("local/") && savedScript.name !== script.name) {
+                console.error("[login-debug] Dups triggered!!!", {
+                    loginID,
+                    page: window.performance.timeOrigin,
+                    original: { shareid: script.shareid, name: script.name },
+                    duplicate: { shareid: savedScript.shareid, name: savedScript.name },
+                })
+            }
+            return { script: savedScript, reopen }
+        })
         promises.push(promise)
     }
 
@@ -751,6 +788,8 @@ export const App = () => {
     /** When a login is in progress, callers (e.g. Strict Mode’s second useEffect) await
      * this promise instead of returning early. */
     const loginInProgressRef = useRef<Promise<void> | null>(null)
+    const debugInstanceRef = useRef<number | null>(null)
+    if (debugInstanceRef.current === null) debugInstanceRef.current = nextLoginDebugID()
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
@@ -788,7 +827,13 @@ export const App = () => {
     }, [])
 
     useEffect(() => {
-        (async () => {
+        logLoginDebug("startup effect entered", {
+            instanceID: debugInstanceRef.current,
+            bootstrapped: persistor.getState().bootstrapped,
+            loggedIn: user.selectLoggedIn(store.getState()),
+            hasToken: user.selectToken(store.getState()) !== null,
+        })
+        ;(async () => {
             document.getElementById("loading-screen")!.style.display = "none"
 
             // Attempt to load userdata from a previous session.
@@ -834,6 +879,7 @@ export const App = () => {
                 }
             }
         })()
+        return () => logLoginDebug("startup effect cleanup", { instanceID: debugInstanceRef.current })
     }, [])
 
     useEffect(() => {
@@ -1050,9 +1096,17 @@ export const App = () => {
 
     const login = async (loginInfo: { username: string, password: string, token?: undefined } | { token: string }) => {
         if (loginInProgressRef.current) {
+            logLoginDebug("login joined existing promise", { instanceID: debugInstanceRef.current })
             await loginInProgressRef.current
             return
         }
+        const loginID = nextLoginDebugID()
+        logLoginDebug("login started", {
+            loginID,
+            instanceID: debugInstanceRef.current,
+            loggedIn: user.selectLoggedIn(store.getState()),
+            method: loginInfo.token !== undefined ? "token" : "credentials",
+        })
         setLoginState("logging-in")
         esconsole("Logging in", ["DEBUG", "MAIN"])
 
@@ -1083,6 +1137,7 @@ export const App = () => {
                 const username = userInfo.username
 
                 store.dispatch(user.login({ username, token }))
+                logLoginDebug("authentication applied", { loginID })
 
                 store.dispatch(soundsThunks.getUserSounds())
                 store.dispatch(soundsThunks.getFavorites(token))
@@ -1094,7 +1149,7 @@ export const App = () => {
                 userNotification.user.isAdmin = userInfo.isAdmin
 
                 // Retrieve the user scripts.
-                await postLogin(username)
+                await postLogin(username, loginID)
                 esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
                 setLoginState("logged-in")
@@ -1108,6 +1163,7 @@ export const App = () => {
                 }
                 throw new LoginError("Login failed due to network error.")
             } finally {
+                logLoginDebug("login finished", { loginID, succeeded })
                 if (!succeeded) {
                     setLoginState("logged-out")
                 }

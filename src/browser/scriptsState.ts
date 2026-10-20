@@ -6,6 +6,7 @@ import { Script } from "common"
 import { selectUserName, selectLoggedIn } from "../user/userState"
 import store, { RootState } from "../reducers"
 import * as ESUtils from "../esutils"
+import { logLoginDebug, summarizeLoginScripts } from "../app/loginDebug"
 
 export interface Scripts {
     [scriptID: string]: Script
@@ -154,13 +155,25 @@ const scriptsSlice = createSlice({
 
 const LocalScriptTransform = createTransform(
     // Transform state on its way to being persisted.
-    (inboundState: ScriptsState) => {
-        if (selectLoggedIn(store.getState())) {
+    (inboundState: Scripts) => {
+        const loggedIn = selectLoggedIn(store.getState())
+        if (import.meta.env.DEV) {
+            logLoginDebug("scripts persistence transform", {
+                loggedIn,
+                output: summarizeLoginScripts(loggedIn ? {} : inboundState),
+            })
+        }
+        if (loggedIn) {
             return {}
         }
         return inboundState
     },
-    null,
+    (outboundState: Scripts) => {
+        if (import.meta.env.DEV) {
+            logLoginDebug("scripts rehydration input", summarizeLoginScripts(outboundState))
+        }
+        return outboundState
+    },
     { whitelist: ["regularScripts"] }
 )
 
