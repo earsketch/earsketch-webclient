@@ -1,13 +1,13 @@
+import type { Middleware } from "redux"
 import type { Script } from "common"
 
-// Temporary diagnostics for #1006. Keep IDs across HMR, but not page reloads.
+// Temporary diagnostics for #1006; remove before deployment. Keep IDs across HMR, but not page reloads.
 const debugWindow = window as Window & { __ES_LOGIN_DEBUG_V2?: { sequence: number, nextID: number } }
 const debug = debugWindow.__ES_LOGIN_DEBUG_V2 ??= { sequence: 0, nextID: 0 }
 
 export const nextLoginDebugID = () => ++debug.nextID
 
 export function logLoginDebug(event: string, details: object = {}) {
-    if (!import.meta.env.DEV) return
     console.log("[login-debug]", {
         page: window.performance.timeOrigin,
         sequence: ++debug.sequence,
@@ -35,7 +35,6 @@ export function summarizeLoginScripts(scripts: Record<string, Script>) {
 }
 
 export function logPersistedLoginScripts() {
-    if (!import.meta.env.DEV) return
     try {
         const raw = window.localStorage.getItem("persist:scripts")
         const persisted = raw ? JSON.parse(raw) : {}
@@ -47,4 +46,25 @@ export function logPersistedLoginScripts() {
     } catch {
         logLoginDebug("could not parse persisted scripts")
     }
+}
+
+// Catch the dispatch that leaves server scripts in regularScripts while logged out, synchronously so the stack
+// trace points at the culprit. (The persistence transform runs later and only sees the end state.)
+export const loginDebugMiddleware: Middleware = api => next => action => {
+    const before = api.getState()
+    const result = next(action)
+    const after = api.getState()
+    const scripts: Record<string, Script> = after.scripts.regularScripts
+    const changed = scripts !== before.scripts.regularScripts || after.user.loggedIn !== before.user.loggedIn
+    if (changed && !after.user.loggedIn) {
+        const serverIDs = Object.keys(scripts).filter(id => !id.startsWith("local/"))
+        if (serverIDs.length > 0) {
+            console.error("[login-debug] Server scripts in regularScripts while logged out", {
+                action: (action as { type?: string }).type,
+                ...summarizeLoginScripts(scripts),
+            })
+            console.trace("[login-debug] dispatch stack")
+        }
+    }
+    return result
 }

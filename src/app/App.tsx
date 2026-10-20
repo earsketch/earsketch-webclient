@@ -192,6 +192,9 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
     }
 }
 
+// Temporary diagnostics for #1006: "my_script_2.py" -> "my_script.py", matching selectNextScriptName's suffixes.
+const stripDedupSuffix = (name: string) => ESUtils.parseName(name).replace(/_\d+$/, "") + ESUtils.parseExt(name)
+
 // Login, setup, restore scripts, return shared scripts.
 async function postLogin(username: string, loginID: number) {
     esconsole("Using username: " + username, ["debug", "user"])
@@ -216,27 +219,25 @@ async function postLogin(username: string, loginID: number) {
     const saved = scriptsState.selectRegularScripts(state)
     const openTabs = tabs.selectOpenTabs(state)
 
-    if (import.meta.env.DEV) {
-        logLoginDebug("migration snapshot", { loginID, ...summarizeLoginScripts(saved) })
-        logPersistedLoginScripts()
-    }
+    logLoginDebug("migration snapshot", { loginID, ...summarizeLoginScripts(saved) })
+    logPersistedLoginScripts()
 
     // Fetch the user's scripts now that they're logged in.
     // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
     await refreshScriptBrowser()
 
-    if (import.meta.env.DEV) {
-        logLoginDebug("server scripts fetched", {
-            loginID,
-            ...summarizeLoginScripts(scriptsState.selectRegularScripts(store.getState())),
-        })
-        // Opt in from DevTools to widen the window for a reload or Fast Refresh.
-        const delayMs = Number(window.localStorage.getItem("debug:delayAfterScriptFetch"))
-        if (Number.isFinite(delayMs) && delayMs > 0) {
-            logLoginDebug("delay after fetch started", { loginID, delayMs })
-            await new Promise(resolve => window.setTimeout(resolve, delayMs))
-            logLoginDebug("delay after fetch ended", { loginID })
-        }
+    const fetchedServerScripts = Object.values(scriptsState.selectRegularScripts(store.getState()))
+    logLoginDebug("server scripts fetched", {
+        loginID,
+        ...summarizeLoginScripts(scriptsState.selectRegularScripts(store.getState())),
+    })
+    // Opt in from DevTools to widen the window for a reload or Fast Refresh.
+    const delayMs = Number(window.localStorage.getItem("debug:delayAfterScriptFetch"))
+    if (Number.isFinite(delayMs) && delayMs > 0) {
+        console.warn(`[login-debug] Delaying login ${delayMs}ms because localStorage "debug:delayAfterScriptFetch" is set. Remove it to disable.`)
+        logLoginDebug("delay after fetch started", { loginID, delayMs })
+        await new Promise(resolve => window.setTimeout(resolve, delayMs))
+        logLoginDebug("delay after fetch ended", { loginID })
     }
 
     const promises = []
@@ -251,6 +252,18 @@ async function postLogin(username: string, loginID: number) {
             name: script.name,
             local: script.shareid.startsWith("local/"),
         })
+        // Catch re-migration regardless of cause (e.g. a reload re-migrating local scripts that were already saved):
+        // the server already has a script with identical source and the same de-duplicated name (my_script.py, my_script_1.py, ...).
+        const sameContent = fetchedServerScripts.filter(serverScript =>
+            serverScript.source_code === script.source_code && stripDedupSuffix(serverScript.name) === stripDedupSuffix(script.name))
+        if (sameContent.length > 0) {
+            console.error("[login-debug] Migrating a script whose content already exists on the server", {
+                loginID,
+                page: window.performance.timeOrigin,
+                migrating: { shareid: script.shareid, name: script.name, local: script.shareid.startsWith("local/") },
+                existing: sameContent.map(serverScript => ({ shareid: serverScript.shareid, name: serverScript.name })),
+            })
+        }
         let promise
         if (script.original_id !== undefined) {
             promise = scriptsThunks.importSharedScript(script.original_id)
@@ -265,10 +278,12 @@ async function postLogin(username: string, loginID: number) {
         const reopen = openTabs.includes(script.shareid)
         promise = promise.then(savedScript => {
             logLoginDebug("migration saved", { loginID, shareid: savedScript.shareid, name: savedScript.name })
-            if (import.meta.env.DEV && !script.shareid.startsWith("local/") && savedScript.name !== script.name) {
+            // Migrating any server script creates a server copy, whether or not its name changed.
+            if (!script.shareid.startsWith("local/")) {
                 console.error("[login-debug] Dups triggered!!!", {
                     loginID,
                     page: window.performance.timeOrigin,
+                    renamed: savedScript.name !== script.name,
                     original: { shareid: script.shareid, name: script.name },
                     duplicate: { shareid: savedScript.shareid, name: savedScript.name },
                 })

@@ -153,25 +153,32 @@ const scriptsSlice = createSlice({
     },
 })
 
+// Temporary diagnostics for #1006: only log persistence when login state changes or server scripts are present.
+let lastPersistLoggedIn: boolean | undefined
+
 const LocalScriptTransform = createTransform(
     // Transform state on its way to being persisted.
     (inboundState: Scripts) => {
         const loggedIn = selectLoggedIn(store.getState())
-        if (import.meta.env.DEV) {
+        const input = summarizeLoginScripts(inboundState)
+        if (loggedIn !== lastPersistLoggedIn || input.server > 0) {
             logLoginDebug("scripts persistence transform", {
                 loggedIn,
-                output: summarizeLoginScripts(loggedIn ? {} : inboundState),
+                persisted: loggedIn ? "nothing" : "input",
+                input,
             })
+            if (!loggedIn && input.server > 0) {
+                console.error("[login-debug] Server scripts are being persisted while logged out", input)
+            }
         }
+        lastPersistLoggedIn = loggedIn
         if (loggedIn) {
             return {}
         }
         return inboundState
     },
     (outboundState: Scripts) => {
-        if (import.meta.env.DEV) {
-            logLoginDebug("scripts rehydration input", summarizeLoginScripts(outboundState))
-        }
+        logLoginDebug("scripts rehydration input", summarizeLoginScripts(outboundState))
         return outboundState
     },
     { whitelist: ["regularScripts"] }
