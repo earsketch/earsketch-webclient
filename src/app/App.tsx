@@ -34,7 +34,7 @@ import * as soundsState from "../browser/soundsState"
 import * as soundsThunks from "../browser/soundsThunks"
 import { SoundUploader } from "./SoundUploader"
 import store, { persistor } from "../reducers"
-import { logLoginDebug, logPersistedLoginScripts, nextLoginDebugID, summarizeLoginScripts } from "./loginDebug"
+import { debugDelay, logLoginDebug, logPersistedLoginScripts, nextLoginDebugID, summarizeLoginScripts } from "./loginDebug"
 import * as tabs from "../ide/tabState"
 import * as tabThunks from "../ide/tabThunks"
 import * as user from "../user/userState"
@@ -222,6 +222,9 @@ async function postLogin(username: string, loginID: number) {
     logLoginDebug("migration snapshot", { loginID, ...summarizeLoginScripts(saved) })
     logPersistedLoginScripts()
 
+    // Opt in from DevTools to simulate a stuck /scripts/owned fetch (IDE visible, scripts still loading).
+    await debugDelay("debug:delayBeforeScriptFetch", loginID)
+
     // Fetch the user's scripts now that they're logged in.
     // (We need to do this now in case there are name conflicts when migrating anonymous scripts below.)
     await refreshScriptBrowser()
@@ -232,13 +235,7 @@ async function postLogin(username: string, loginID: number) {
         ...summarizeLoginScripts(scriptsState.selectRegularScripts(store.getState())),
     })
     // Opt in from DevTools to widen the window for a reload or Fast Refresh.
-    const delayMs = Number(window.localStorage.getItem("debug:delayAfterScriptFetch"))
-    if (Number.isFinite(delayMs) && delayMs > 0) {
-        console.warn(`[login-debug] Delaying login ${delayMs}ms because localStorage "debug:delayAfterScriptFetch" is set. Remove it to disable.`)
-        logLoginDebug("delay after fetch started", { loginID, delayMs })
-        await new Promise(resolve => window.setTimeout(resolve, delayMs))
-        logLoginDebug("delay after fetch ended", { loginID })
-    }
+    await debugDelay("debug:delayAfterScriptFetch", loginID)
 
     const promises = []
     for (const script of Object.values(saved)) {

@@ -17,6 +17,16 @@ export function logLoginDebug(event: string, details: object = {}) {
     })
 }
 
+// Wait for the number of milliseconds in localStorage[key], if set.
+export async function debugDelay(key: string, loginID: number) {
+    const delayMs = Number(window.localStorage.getItem(key))
+    if (!Number.isFinite(delayMs) || delayMs <= 0) return
+    console.warn(`[login-debug] Delaying login ${delayMs}ms because localStorage "${key}" is set. Remove it to disable.`)
+    logLoginDebug("delay started", { loginID, key, delayMs })
+    await new Promise(resolve => window.setTimeout(resolve, delayMs))
+    logLoginDebug("delay ended", { loginID, key })
+}
+
 export function summarizeLoginScripts(scripts: Record<string, Script>) {
     const entries = Object.entries(scripts).map(([id, script]) => ({
         id,

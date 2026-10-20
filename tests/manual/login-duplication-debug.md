@@ -15,13 +15,42 @@ server copies. No code intentionally poisons local storage or forces a reload.
    ```
 3. Log in with an account that already owns scripts. Optionally create an
    anonymous script before logging in to exercise local migration too.
-4. When `delay after fetch started` appears, try a browser reload. Separately,
+4. When `delay started` (key `debug:delayAfterScriptFetch`) appears, try a browser reload. Separately,
    try editing and saving `src/app/App.tsx` during that window. This is a candidate
    file, not a confirmed reproduction; capture Vite's HMR/invalidation messages.
 5. Also try a source edit after `login finished`. The promise lock only covers
    an in-progress login.
 6. Record the exact file/edit, event sequence, and `/scripts/save` request names.
    Retain the same setup to compare after each fix.
+
+## Reload during a stuck script fetch
+
+Simulates the production report: with many scripts, the IDE is visible but the
+script list is still loading; after a reload, scripts load quickly and
+de-duplicated copies appear in the script browser. Single tab.
+
+1. Enable **Preserve log** for Console and Network. Log in with the test account
+   and wait for `login finished`, so the session starts in its normal state.
+   Perform any steps suspected of leading up to the report before continuing.
+2. Run:
+   ```js
+   localStorage.setItem("debug:delayBeforeScriptFetch", "30000")
+   ```
+3. Reload. When `delay started` (key `debug:delayBeforeScriptFetch`) appears,
+   remove the key so the next load fetches immediately, then reload again
+   while the delay is still running:
+   ```js
+   localStorage.removeItem("debug:delayBeforeScriptFetch")
+   ```
+4. Compare the stuck page and the page after the reload (different `page`):
+   - `scripts rehydration input` and `persisted scripts at migration snapshot`:
+     `server > 0` on the stuck page means storage was contaminated before it
+     loaded (the middleware should also report `persist/REHYDRATE`).
+   - `server: 0` on the stuck page but `server > 0` after the reload means the
+     stuck page wrote server scripts to storage. Check the middleware's stack
+     trace and the "persisted while logged out" error.
+   - `Dups triggered!!!` and suffixed `/scripts/save` requests confirm the
+     reproduction.
 
 ## Multi-tab scenarios
 
@@ -50,6 +79,7 @@ Disable the delay afterward:
 
 ```js
 localStorage.removeItem("debug:delayAfterScriptFetch")
+localStorage.removeItem("debug:delayBeforeScriptFetch")
 ```
 
 ## Interpreting the events
