@@ -43,7 +43,6 @@ export const LocaleSelector = ({ handleSelection }: { handleSelection: Function 
     const currentLocale = useSelector(appState.selectLocaleCode)
     const { t } = useTranslation()
 
-    // test did not trigger dup bug
     return (
         <div className="">
             <Menu as="div" className="relative inline-block text-left">

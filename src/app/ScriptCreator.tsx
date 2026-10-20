@@ -51,7 +51,7 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
         }
     }
 
-    // WOW triggers dups every time you edit on fast refresh!
+    // TODO: Why does editing this line while logged in to `npm run dev` locally cause all script to duplicate on the server?
     return <>
         <ModalHeader>{t("scriptCreator.title")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); confirm() }}>

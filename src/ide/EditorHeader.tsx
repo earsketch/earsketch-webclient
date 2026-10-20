@@ -171,7 +171,6 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
             "bg-red-700": running,
         })
 
-    // test - YES REPRODUCES! if you edit twice quickly with fast refresh
     return (
         <div
             className={`
