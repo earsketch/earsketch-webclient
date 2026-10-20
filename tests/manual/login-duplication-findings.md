@@ -1,5 +1,27 @@
 # Login script duplication (#1006): findings
 
+## Overview
+
+**In one line:** a failed login leaves the app half logged in, so the next login
+re-saves all of the user's server scripts as copies.
+
+`login()` and `postLogin()` assume they start from a logged-out state and never
+check. `postLogin()` treats everything in `regularScripts` as "scripts created
+while logged out" and saves each with `overwrite: false`. If server scripts are
+already in memory, every one gets a `_1` copy. Two paths lead there:
+
+| | Failed login (production) | Fast Refresh (dev only) |
+|---|---|---|
+| Starting state | `user.login` dispatched and server scripts fetched, then `getSharedScripts()` throws | Login finished; fully logged in |
+| What the UI shows | "Logged out" (only React state is reset; Redux is still logged in) | Logged in |
+| What calls `login()` again | The user, from the login form | React re-runs `App`'s startup effect, which calls `login({ token })` |
+| Why nothing stops it | `login()` never checks whether Redux is logged in | Same; `loginInProgressRef` only blocks a login still in progress |
+| Repro | Block `/scripts/shared`, log in (fails), unblock, log in again | While logged in, edit and save `src/app/ScriptCreator.tsx` |
+
+**Fixes:** log out properly when login fails (closes the production path),
+return early from `login()` when already logged in (closes both), and migrate
+only `local/` scripts (makes the migration harmless however it is reached).
+
 ## Symptom
 
 After logging in, every one of a user's scripts is re-saved on the server under
