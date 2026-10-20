@@ -239,8 +239,8 @@ async function postLogin(username: string, loginID: number) {
 
     const promises = []
     for (const script of Object.values(saved)) {
-        if (script.soft_delete) {
-            // Don't migrate scripts the user deleted while logged out.
+        if (script.soft_delete || !script.shareid.startsWith("local/")) {
+            // Don't migrate scripts the user deleted while logged out, or scripts that already came from the server.
             continue
         }
         logLoginDebug("migrating script", {
