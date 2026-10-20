@@ -1124,6 +1124,7 @@ export const App = () => {
 
         const loginPromise = (async () => {
             let succeeded = false
+            let authenticated = false
             try {
                 scriptsThunks.saveAll()
 
@@ -1149,6 +1150,7 @@ export const App = () => {
                 const username = userInfo.username
 
                 store.dispatch(user.login({ username, token }))
+                authenticated = true
                 logLoginDebug("authentication applied", { loginID })
 
                 store.dispatch(soundsThunks.getUserSounds())
@@ -1170,6 +1172,17 @@ export const App = () => {
                 activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
                 succeeded = true
             } catch (err) {
+                if (authenticated) {
+                    // Undo the partial login so Redux matches the logged-out UI.
+                    // Otherwise the next login would migrate the user's server scripts as if they were local (#1006).
+                    store.dispatch(tabThunks.resetTabs())
+                    store.dispatch(tabs.resetModifiedScripts())
+                    store.dispatch(scriptsState.resetRegularScripts())
+                    store.dispatch(scriptsState.resetSharedScripts())
+                    store.dispatch(user.logout())
+                    store.dispatch(soundsState.resetUserSounds())
+                    store.dispatch(soundsState.resetFavorites())
+                }
                 if (err instanceof LoginError) {
                     throw err
                 }
