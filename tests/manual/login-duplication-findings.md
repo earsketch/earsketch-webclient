@@ -52,7 +52,30 @@ partway through `postLogin()`, and then log in again.
 Fast Refresh re-runs `App`'s startup effect. That effect calls
 `login({ token })` while already logged in, and `loginInProgressRef` only guards
 a login that is still in progress. The result is the same migration of all
-server scripts. This reproduces 100% in dev, but cannot happen in production.
+server scripts. It cannot happen in production.
+
+**Reproduction (confirmed, every time):** in `npm run dev`, log in and wait for
+`login finished` with `succeeded: true`. Add a comment inside the
+`ScriptCreator` component (`src/app/ScriptCreator.tsx`, above `return <>`) and
+save. Every script is re-saved with a `_1` suffix.
+
+Likely mechanism (inferred from the import graph, not traced):
+`ScriptCreator.tsx` also exports `validateScriptName`, so it cannot Fast Refresh
+on its own and the update spreads to its importers. `Rename.tsx` (components
+only) accepts it and schedules a React refresh. `IDE.tsx` (also exports
+non-components) passes it on to `App.tsx`, which re-executes and registers a new
+`App`. The scheduled refresh then re-runs `App`'s effects.
+
+Other edits tried:
+
+| File edited | Result |
+|---|---|
+| `App.tsx`, inside `App`'s JSX | no duplicates |
+| `src/browser/API.tsx` (components only) | no duplicates |
+| `src/esutils.ts` | no duplicates |
+| `src/top/LocaleSelector.tsx` (imported only by `App.tsx`) | no duplicates |
+| `src/ide/EditorHeader.tsx` | duplicates when edited twice quickly |
+| `src/app/CommandPalette.tsx` (imports and is imported by `App.tsx`) | possibly once, unconfirmed |
 
 ## Ruled out or not observed
 

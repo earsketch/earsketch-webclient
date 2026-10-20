@@ -51,6 +51,7 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
         }
     }
 
+    // WOW triggers dups every time you edit on fast refresh!
     return <>
         <ModalHeader>{t("scriptCreator.title")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); confirm() }}>

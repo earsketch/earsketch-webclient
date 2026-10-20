@@ -710,6 +710,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
     }, [])
 
     // ── Render ─────────────────────────────────────────────────────────────
+    // maybe triggered dups once?
     return (
         <Dialog as="div" className="relative z-50" open={isOpen} onClose={onClose} unmount={false}>
             <Transition appear show={isOpen} as={Fragment}>
