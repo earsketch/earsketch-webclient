@@ -153,33 +153,33 @@ const scriptsSlice = createSlice({
     },
 })
 
+// Only scripts created while logged out belong in local storage. Server scripts must never be persisted, or they
+// would be migrated as new scripts on the next login (#1006). Filter on rehydration too, in case storage is stale.
+const selectLocalScripts = (scripts: Scripts) => Object.fromEntries(
+    Object.entries(scripts).filter(([id, script]) => id.startsWith("local/") && script.shareid.startsWith("local/"))
+)
+
 // Temporary diagnostics for #1006: only log persistence when login state changes or server scripts are present.
 let lastPersistLoggedIn: boolean | undefined
 
 const LocalScriptTransform = createTransform(
-    // Transform state on its way to being persisted.
+    // Transform regularScripts on its way to being persisted.
     (inboundState: Scripts) => {
         const loggedIn = selectLoggedIn(store.getState())
         const input = summarizeLoginScripts(inboundState)
         if (loggedIn !== lastPersistLoggedIn || input.server > 0) {
-            logLoginDebug("scripts persistence transform", {
-                loggedIn,
-                persisted: loggedIn ? "nothing" : "input",
-                input,
-            })
+            logLoginDebug("scripts persistence transform", { loggedIn, input })
             if (!loggedIn && input.server > 0) {
-                console.error("[login-debug] Server scripts are being persisted while logged out", input)
+                console.error("[login-debug] Server scripts reached persistence while logged out (dropped by filter)", input)
             }
         }
         lastPersistLoggedIn = loggedIn
-        if (loggedIn) {
-            return {}
-        }
-        return inboundState
+        return selectLocalScripts(inboundState)
     },
+    // Transform regularScripts as it is rehydrated from persisted state.
     (outboundState: Scripts) => {
         logLoginDebug("scripts rehydration input", summarizeLoginScripts(outboundState))
-        return outboundState
+        return selectLocalScripts(outboundState)
     },
     { whitelist: ["regularScripts"] }
 )
