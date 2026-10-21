@@ -6,6 +6,7 @@ import { Script } from "common"
 import { selectUserName, selectLoggedIn } from "../user/userState"
 import store, { RootState } from "../reducers"
 import * as ESUtils from "../esutils"
+import { logLoginDebug, summarizeLoginScripts } from "../app/loginDebug"
 
 export interface Scripts {
     [scriptID: string]: Script
@@ -152,15 +153,34 @@ const scriptsSlice = createSlice({
     },
 })
 
+// Only scripts created while logged out belong in local storage. Server scripts must never be persisted, or they
+// would be migrated as new scripts on the next login (#1006). Filter on rehydration too, in case storage is stale.
+const selectLocalScripts = (scripts: Scripts) => Object.fromEntries(
+    Object.entries(scripts).filter(([id, script]) => id.startsWith("local/") && script.shareid.startsWith("local/"))
+)
+
+// Temporary diagnostics for #1006: only log persistence when login state changes or server scripts are present.
+let lastPersistLoggedIn: boolean | undefined
+
 const LocalScriptTransform = createTransform(
-    // Transform state on its way to being persisted.
-    (inboundState: ScriptsState) => {
-        if (selectLoggedIn(store.getState())) {
-            return {}
+    // Transform regularScripts on its way to being persisted.
+    (inboundState: Scripts) => {
+        const loggedIn = selectLoggedIn(store.getState())
+        const input = summarizeLoginScripts(inboundState)
+        if (loggedIn !== lastPersistLoggedIn || input.server > 0) {
+            logLoginDebug("scripts persistence transform", { loggedIn, input })
+            if (!loggedIn && input.server > 0) {
+                console.error("[login-debug] Server scripts reached persistence while logged out (dropped by filter)", input)
+            }
         }
-        return inboundState
+        lastPersistLoggedIn = loggedIn
+        return selectLocalScripts(inboundState)
     },
-    null,
+    // Transform regularScripts as it is rehydrated from persisted state.
+    (outboundState: Scripts) => {
+        logLoginDebug("scripts rehydration input", summarizeLoginScripts(outboundState))
+        return selectLocalScripts(outboundState)
+    },
     { whitelist: ["regularScripts"] }
 )
 

@@ -19,6 +19,7 @@ import recommender from "./browser/recommenderState"
 import cai from "./cai/caiState"
 import extension from "./extensions/extensionState"
 import focusHistory from "./app/focusHistoryState"
+import { loginDebugMiddleware } from "./app/loginDebug"
 
 const rootReducer = combineReducers({
     app,
@@ -52,7 +53,7 @@ const store = configureStore({
             // See: https://redux-toolkit.js.org/api/getDefaultMiddleware#included-default-middleware
             immutableCheck: false,
             serializableCheck: false,
-        })
+        }).concat(loginDebugMiddleware) // Temporary diagnostics for #1006.
     },
 })
 
