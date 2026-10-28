@@ -212,7 +212,9 @@ async function postLogin(username: string, migratedIDs: Set<string>) {
 
     // Migrate scripts created or imported while logged out to the user's account.
     const state = store.getState()
-    const saved = scriptsState.selectRegularScripts(state)
+    // A failed login or Fast Refresh can leave server scripts here. Re-saving them
+    // with overwrite: false would duplicate them, so snapshot only local candidates.
+    const localScripts = Object.values(scriptsState.selectRegularScripts(state)).filter(script => scriptsState.isLocalScriptID(script.shareid))
     const openTabs = tabs.selectOpenTabs(state)
 
     // Fetch the user's scripts now that they're logged in.
@@ -220,7 +222,7 @@ async function postLogin(username: string, migratedIDs: Set<string>) {
     await refreshScriptBrowser()
 
     const promises = []
-    for (const script of Object.values(saved)) {
+    for (const script of localScripts) {
         if (script.soft_delete) {
             // Don't migrate scripts the user deleted while logged out.
             continue
@@ -1111,7 +1113,7 @@ export const App = () => {
                 }
                 const username = userInfo.username
 
-                localScripts = ESUtils.fromEntries(Object.entries(scriptsState.selectRegularScripts(store.getState())).filter(([id]) => id.startsWith("local/")))
+                localScripts = ESUtils.fromEntries(Object.entries(scriptsState.selectRegularScripts(store.getState())).filter(([id]) => scriptsState.isLocalScriptID(id)))
 
                 store.dispatch(user.login({ username, token }))
                 authenticated = true
