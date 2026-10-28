@@ -12,7 +12,7 @@ let SITE_BASE_URI
 let baseURL
 let buildType
 let UI_LOGGER_URL
-const port = process.env.port ? +process.env.port : 8888
+const port = process.env.port ? +process.env.port : 8889
 if (process.env.NODE_ENV === "production") {
     apiHost = process.env.ES_API_HOST ?? "builderror"
     URL_WEBSOCKET = apiHost.replace("http", "ws") + "/EarSketchWS"
