@@ -248,12 +248,18 @@ async function postLogin(username: string, migratedIDs: Set<string>) {
     if (promises.length > 0) {
         store.dispatch(tabThunks.resetTabs())
 
-        const results = await Promise.all(promises)
+        // Wait for every migration to settle before failing, so `migratedIDs` is complete if the login is undone,
+        // and no save is still in flight to add its script back afterwards.
+        const results = await Promise.allSettled(promises)
+        const rejected = results.find((result): result is PromiseRejectedResult => result.status === "rejected")
+        if (rejected) {
+            throw rejected.reason
+        }
         // Re-open scripts that were opened before login (which now have new IDs).
         // TODO: Ideally, we would preserve the order of the open tabs.
-        for (const { script, reopen } of results) {
-            if (reopen) {
-                store.dispatch(tabThunks.setActiveTabAndEditor(script.shareid))
+        for (const result of results) {
+            if (result.status === "fulfilled" && result.value.reopen) {
+                store.dispatch(tabThunks.setActiveTabAndEditor(result.value.script.shareid))
             }
         }
     }
