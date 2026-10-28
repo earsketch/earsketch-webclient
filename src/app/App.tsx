@@ -192,7 +192,7 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
 }
 
 // Login, setup, restore scripts, return shared scripts.
-async function postLogin(username: string) {
+async function postLogin(username: string, migratedIDs: Set<string>) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
     uiLogger.init()
@@ -237,7 +237,11 @@ async function postLogin(username: string) {
             })).unwrap()
         }
         const reopen = openTabs.includes(script.shareid)
-        promise = promise.then(script => ({ script, reopen }))
+        promise = promise.then(migrated => {
+            // Record each migration as it happens, so the caller knows about it even if a later step throws.
+            migratedIDs.add(script.shareid)
+            return { script: migrated, reopen }
+        })
         promises.push(promise)
     }
 
@@ -275,6 +279,20 @@ async function postLogin(username: string) {
     } catch (error) {
         esconsole("Error loading notifications on login: " + error, ["error", "user"])
     }
+}
+
+// Undo the authenticated portion of this login using its pre-login snapshot and
+// settled migration results. Restoring already-migrated scripts would copy them on retry.
+function rollBackFailedLogin(localScripts: scriptsState.Scripts, migratedIDs: ReadonlySet<string>) {
+    store.dispatch(tabThunks.resetTabs())
+    store.dispatch(tabs.resetModifiedScripts())
+    store.dispatch(scriptsState.resetSharedScripts())
+    store.dispatch(user.logout())
+    store.dispatch(soundsState.resetUserSounds())
+    store.dispatch(soundsState.resetFavorites())
+
+    const unmigrated = ESUtils.fromEntries(Object.entries(localScripts).filter(([id]) => !migratedIDs.has(id)))
+    store.dispatch(scriptsState.setRegularScripts(unmigrated))
 }
 
 async function refreshScriptBrowser() {
@@ -1058,6 +1076,11 @@ export const App = () => {
 
         const loginPromise = (async () => {
             let authenticated = false
+            // Scripts created while logged out, so they can be restored if login fails before they are migrated.
+            let localScripts: scriptsState.Scripts = {}
+            // IDs of logged-out scripts that postLogin() has saved to the user's account.
+            // postLogin() fills it in as they are saved, rather than returning it, so it's still accurate if postLogin() throws.
+            const migratedIDs = new Set<string>()
             try {
                 scriptsThunks.saveAll()
 
@@ -1082,6 +1105,8 @@ export const App = () => {
                 }
                 const username = userInfo.username
 
+                localScripts = ESUtils.fromEntries(Object.entries(scriptsState.selectRegularScripts(store.getState())).filter(([id]) => id.startsWith("local/")))
+
                 store.dispatch(user.login({ username, token }))
                 authenticated = true
 
@@ -1095,7 +1120,7 @@ export const App = () => {
                 userNotification.user.isAdmin = userInfo.isAdmin
 
                 // Retrieve the user scripts.
-                await postLogin(username)
+                await postLogin(username, migratedIDs)
                 esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
                 setLoginState("logged-in")
@@ -1105,15 +1130,7 @@ export const App = () => {
             } catch (err) {
                 setLoginState("logged-out")
                 if (authenticated) {
-                    // Undo the partial login so Redux matches the logged-out UI.
-                    // Otherwise the next login would migrate the user's server scripts as if they were local (#1006).
-                    store.dispatch(tabThunks.resetTabs())
-                    store.dispatch(tabs.resetModifiedScripts())
-                    store.dispatch(scriptsState.resetRegularScripts())
-                    store.dispatch(scriptsState.resetSharedScripts())
-                    store.dispatch(user.logout())
-                    store.dispatch(soundsState.resetUserSounds())
-                    store.dispatch(soundsState.resetFavorites())
+                    rollBackFailedLogin(localScripts, migratedIDs)
                 }
                 if (err instanceof LoginError) {
                     throw err
