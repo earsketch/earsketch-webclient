@@ -1057,7 +1057,7 @@ export const App = () => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
 
         const loginPromise = (async () => {
-            let succeeded = false
+            let authenticated = false
             try {
                 scriptsThunks.saveAll()
 
@@ -1083,6 +1083,7 @@ export const App = () => {
                 const username = userInfo.username
 
                 store.dispatch(user.login({ username, token }))
+                authenticated = true
 
                 store.dispatch(soundsThunks.getUserSounds())
                 store.dispatch(soundsThunks.getFavorites(token))
@@ -1101,16 +1102,23 @@ export const App = () => {
                 userNotification.show(i18n.t("messages:general.loginsuccess"), "normal", 0.5)
                 const activeTabID = tabs.selectActiveTabID(store.getState())
                 activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
-                succeeded = true
             } catch (err) {
+                setLoginState("logged-out")
+                if (authenticated) {
+                    // Undo the partial login so Redux matches the logged-out UI.
+                    // Otherwise the next login would migrate the user's server scripts as if they were local (#1006).
+                    store.dispatch(tabThunks.resetTabs())
+                    store.dispatch(tabs.resetModifiedScripts())
+                    store.dispatch(scriptsState.resetRegularScripts())
+                    store.dispatch(scriptsState.resetSharedScripts())
+                    store.dispatch(user.logout())
+                    store.dispatch(soundsState.resetUserSounds())
+                    store.dispatch(soundsState.resetFavorites())
+                }
                 if (err instanceof LoginError) {
                     throw err
                 }
                 throw new LoginError("Login failed due to network error.")
-            } finally {
-                if (!succeeded) {
-                    setLoginState("logged-out")
-                }
             }
         })()
 
