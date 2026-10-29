@@ -201,9 +201,6 @@ async function postLogin(username: string) {
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
     userNotification.callbacks.getSharedScripts = () => store.dispatch(scriptsThunks.getSharedScripts())
 
-    // used for managing websocket notifications locally
-    userNotification.user.loginTime = Date.now()
-
     esconsole("List of scripts in Load script list successfully updated.", ["debug", "user"])
 
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
@@ -1091,7 +1088,6 @@ export const App = () => {
                 setUsername(username)
                 setIsAdmin(userInfo.isAdmin)
                 email = userInfo.email
-                userNotification.user.isAdmin = userInfo.isAdmin
 
                 // Retrieve the user scripts.
                 await postLogin(username)
