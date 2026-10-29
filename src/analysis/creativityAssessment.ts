@@ -1,5 +1,4 @@
-// Automated Creativity Assessment for CAI (Co-creative Artificial Intelligence) Project.
-import { Script } from "common"
+// Automated creativity assessment for Code Analyzer reports.
 import { mean } from "lodash"
 import { Report } from "."
 import { audiokeysPromise } from "../app/recommender"
@@ -7,15 +6,6 @@ import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { getTimestampData } from "../data/recommendationData"
 import { Results } from "./complexityCalculator"
 import { combinations, entropy, hammingDistance, normalize } from "./utils"
-
-export interface CaiHistoryNode {
-    created: string,
-    username: string,
-    project: string,
-    history: string,
-    sourceCode: string | null,
-    ui: "CAI" | "standard" | "NLU" | "Wizard"
-}
 
 export interface Assessment {
     fluency: {
@@ -35,7 +25,6 @@ export interface Assessment {
         rhythmicComplexity: number
         beatComplexity: number
     }
-    effort: { timeOnTask: number }
 }
 
 interface AudioFeatures{
@@ -62,7 +51,6 @@ function emptyAssessment(): Assessment {
             rhythmicComplexity: 0,
             beatComplexity: 0,
         },
-        effort: { timeOnTask: 0 },
     }
 }
 
@@ -101,7 +89,7 @@ function rhythmicAnalysis(soundData: AudioFeatures[]) {
     return { complexity: avgDistance, entropy: avgEntropy }
 }
 
-export async function assess(complexity: Results, analysisReport: Report, timeOnTaskPercentage: number | undefined): Promise<Assessment> {
+export async function assess(complexity: Results, analysisReport: Report): Promise<Assessment> {
     const assessment = emptyAssessment()
 
     const uniqueSounds: string [] = []
@@ -216,64 +204,5 @@ export async function assess(complexity: Results, analysisReport: Report, timeOn
         beatComplexity: avgEntropy || 0,
     }
 
-    // Effort = z-time on task
-    assessment.effort.timeOnTask = timeOnTaskPercentage || 0
-
     return assessment
-}
-
-export function timeOnTask(scriptHistory: Script [], caiHistory: CaiHistoryNode []) {
-    const onTask: number[][] = []
-
-    for (let idx = 0; idx < scriptHistory.length; idx++) {
-        // Group data points into a historical window between two script versions.
-        let historyWindow: CaiHistoryNode[]
-        const script = scriptHistory[idx]
-        onTask.push([])
-
-        if (idx === 0) {
-            historyWindow = caiHistory.filter((node) => {
-                return node.created.slice(0, 21) < String(script.modified).slice(0, 21)
-            })
-        } else {
-            const prevScript = scriptHistory[idx - 1]
-
-            historyWindow = caiHistory.filter((node) => {
-                return node.created.slice(0, 21) < String(script.modified).slice(0, 21) && node.created.slice(0, 21) > String(prevScript.modified).slice(0, 21)
-            })
-        }
-
-        if (!historyWindow.length) {
-            onTask[idx] = [0]
-            continue
-        }
-
-        // Fill 5-second time windows with user actions (0 if no activity, 1 if activity).
-        const startTime = Date.parse(historyWindow[0].created)
-        const endTime = Date.parse(historyWindow[historyWindow.length - 1].created)
-        const times: number[] = []
-        for (let time = startTime; time < endTime; time += 5000) {
-            times.push(time)
-        }
-
-        onTask[idx] = Array(times.length).fill(0)
-
-        let i = startTime
-        let j = 0
-
-        while (i < endTime && j < (times.length - 1)) {
-            if (times[j] < i) {
-                if (times[j + 1] > i) {
-                    onTask[idx][j] = 1
-                }
-                j = j + 1
-            } else if (i < times[j + 1]) {
-                i = i + 5000
-            }
-        }
-
-        onTask[idx][times.length] = 1 // End of time window: save/run
-    }
-
-    return onTask.map((window) => mean(window))
 }
