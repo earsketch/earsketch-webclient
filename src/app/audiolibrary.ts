@@ -56,10 +56,9 @@ export async function getSound(name: string): Promise<Sound> {
 
 async function getSoundBuffer(sound: SoundEntity) {
     const name = sound.name
-    // const url = result.public === 1
-    //     ? STATIC_AUDIO_URL_DOMAIN + "/" + result.path
-    //     : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
-    const url = URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
+    const url = sound.type === SoundType.User
+        ? URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
+        : STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
 
     let response: Response
     try {
@@ -126,8 +125,7 @@ export function getStandardSounds() {
 async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
-        // const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard_5.json"
-        const url = URL_DOMAIN + "/audio/standard"
+        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard_5.json"
         const response = await fetch(url)
         if (!response.ok) {
             throw Object.assign(new Error(`Failed to fetch standard sounds (code ${response.status}).`), { code: response.status })
