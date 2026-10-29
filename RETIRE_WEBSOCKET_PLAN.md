@@ -74,3 +74,32 @@ Each step is a separate commit, so it's easy to review and revert.
 - **Low overall.** The module is already unreferenced, so runtime behavior shouldn't change.
 - The Playwright stub may have been hiding a socket that some third-party script opens. If an e2e spec fails after step 5, check the browser for unexpected `WebSocket` connections before restoring the stub.
 - Custom deployment builds that set or read `URL_WEBSOCKET` externally would break. A search of this repo found no such usage; confirm with whoever maintains the deploy pipeline.
+
+## Results (2026-10-29)
+
+Steps 1–6 are done:
+
+| Step | Commit |
+| --- | --- |
+| 1. Delete dead module and mock | `2eec2b8f` Remove unused websocket module and its mock |
+| 2. Remove `URL_WEBSOCKET` | `239822c2` Remove URL_WEBSOCKET build constant |
+| 3. Remove socket-only notification state | `23790fd5` Remove websocket-only notification state and broadcast handler |
+| 4. Stale comments | `d069abd6` Update stale websocket comments |
+| 5. Playwright stub | `05957fe9` Remove Playwright WebSocket stub |
+| 6. Final sweep | No changes needed |
+
+Verification:
+- `npm test`: 80/80 pass after each step.
+- `tsc -p tsconfig.app.json` and eslint: clean apart from the existing `STATIC_AUDIO_URL_DOMAIN` unused-variable error, which comes from the local-dev commit "Use localhost backend". The existing `getComputedStyle` lint error in `daw.spec.ts` is also unrelated.
+- `vite build` (production mode): succeeds, and the output contains no `URL_WEBSOCKET` or socket URL.
+- In the browser on :8889 against the local API: login (new user and restored session), the user menu (no Admin Window for a non-admin), the notifications panel, and the sound library all work. The only WebSocket the page opens is Vite's dev-server HMR socket (`ws://localhost:8889/?token=…`). No socket goes to the API.
+- `git grep -niE "websocket|URL_WEBSOCKET|new WebSocket"` (excluding vendored files and this plan) returns nothing.
+
+Not verified:
+- **Admin Window as an admin user.** The local test user isn't an admin. The removed `userNotification.user.isAdmin` was never read, so behavior shouldn't change.
+- **Full e2e suite.** The suite needs the app on :8888 with `main`'s API host, because its mocks intercept `https://api-dev-gw.ersktch.gatech.edu` and the CloudFront audio host. One run on a temporary :8888 server (with this branch's `audiolibrary.ts` local-backend change still in place) had 51 passed and 18 failed. Every failure was either in a spec that never used the removed stub (command-palette, editor, user-login) or in sound loading, which the local-backend `audiolibrary.ts` change breaks under the mocks. The non-sound specs that used the stub all passed: daw, source-highlight, user-profile, and the sound-browser block at line 82. Re-run `npm run test:e2e` on a clean branch before merging.
+
+Before opening the PR:
+- Drop the local-dev commits "Use 8889 for local dev", "Use localhost backend", and "Ignore playwright files". Keep the last one only if the team wants `.playwright-mcp/` ignored.
+- Re-run `npm run test:e2e` against `npm run dev` on :8888.
+- Step 7: delete this file and move this summary into the PR description.
