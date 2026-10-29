@@ -260,10 +260,8 @@ async function postLogin(username: string) {
 
     // load scripts in shared browser
     await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
-    // Wait to receive websocket notifications until *after* we have the list of existing shared scripts.
+    // Load notifications on login, *after* we have the list of existing shared scripts.
     // This prevents us from re-adding shared scripts when we get a bunch of unread share notifications.
-
-    // Load notifications on login
     try {
         const notifications = await request.getAuth("/users/notifications")
         if (notifications && Array.isArray(notifications)) {
@@ -1339,7 +1337,6 @@ export const ModalContainer = () => {
     </Transition>
 }
 
-// websocket gets closed before onunload in FF
 window.onbeforeunload = () => {
     if (user.selectLoggedIn(store.getState())) {
         // Show page-close warning if saving.
