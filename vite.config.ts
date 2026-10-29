@@ -11,7 +11,7 @@ let SITE_BASE_URI
 let baseURL
 let buildType
 let UI_LOGGER_URL
-const port = process.env.port ? +process.env.port : 8889
+const port = process.env.port ? +process.env.port : 8888
 if (process.env.NODE_ENV === "production") {
     apiHost = process.env.ES_API_HOST ?? "builderror"
     SITE_BASE_URI = process.env.ES_BASE_URI ?? "https://earsketch.gatech.edu/earsketch2"
@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "production") {
     buildType = process.env.ES_BUILD_TYPE ?? "production"
     UI_LOGGER_URL = process.env.ES_UI_LOGGER_URL ?? "builderror"
 } else {
-    apiHost = "http://localhost:8080"
+    apiHost = "https://api-dev-gw.ersktch.gatech.edu"
     const clientPath = process.env.path ? "/" + process.env.path : ""
     SITE_BASE_URI = `http://localhost:${port}${clientPath}`
     baseURL = process.env.ES_BASE_URL ?? "/"
