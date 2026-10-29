@@ -1,4 +1,4 @@
-// Analysis module for CAI (Co-creative Artificial Intelligence) Project.
+// Code and music analysis for Code Analyzer reports.
 import { DAWData, Language } from "common"
 import { soundDict } from "../app/recommender"
 import { TempoMap } from "../app/tempo"
