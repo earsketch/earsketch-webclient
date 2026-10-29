@@ -6,7 +6,6 @@ import { CallObj, Results, VariableObj, getApiCalls } from "../complexityCalcula
 import { analyzeJavascript } from "../complexityCalculator/js"
 import { analyzePython } from "../complexityCalculator/py"
 import { state } from "../complexityCalculator/state"
-import { studentModel } from "../dialogue/student"
 
 export interface Report {
     OVERVIEW: { measures: number, "length (seconds)": number, [key: string]: string | number }
@@ -61,11 +60,7 @@ export function analyzeCode(language: Language, sourceCode: string) {
 
 // Report the music analysis of a script.
 export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
-    const musicAnalysis = Object.assign({}, createReport(trackListing, apiCalls, variables))
-    if (ES_WEB_SHOW_CAI) {
-        studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
-    }
-    return musicAnalysis
+    return Object.assign({}, createReport(trackListing, apiCalls, variables))
 }
 
 // Report the code complexity and music analysis of a script.
