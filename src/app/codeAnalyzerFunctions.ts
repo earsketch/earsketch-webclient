@@ -48,7 +48,7 @@ export interface ReportOptions {
     CREATIVITY: boolean
 }
 
-const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
+export const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
     const headers = [useContestID ? "contestID" : "username", "script_name", "shareid", "version", "modified", "error"]
     const rows: string[] = []
     const colMap: { [key: string]: { [key: string]: number } } = {}
