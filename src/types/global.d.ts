@@ -28,8 +28,6 @@ declare module "@lib/jsdifflib/difflib"
 
 declare const Recorder: any
 
-declare module "@webscopeio/react-textarea-autocomplete"
-
 declare module "file-loader!*" {
     const value: any
     export default value
