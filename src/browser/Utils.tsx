@@ -5,8 +5,6 @@ import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Disclosure, Disc
 
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
-import * as caiState from "../cai/caiState"
-import * as student from "../cai/dialogue/student"
 import { TFunction } from "i18next"
 import { useAppSelector } from "../hooks"
 import * as scripts from "./scriptsState"
@@ -17,20 +15,18 @@ interface SearchBarProps {
     searchText: string
     aria?: string
     id?: string
-    highlight?: boolean
     liveMessage?: string
     firstResultSelector?: string
     dispatchSearch: ChangeEventHandler<HTMLInputElement>
     dispatchReset: MouseEventHandler<HTMLElement>
 }
-export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria, highlight, liveMessage, firstResultSelector }: SearchBarProps) => {
-    const dispatch = useDispatch()
+export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria, liveMessage, firstResultSelector }: SearchBarProps) => {
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
     return (
         <form
-            className={`p-1.5 pb-1 ${(highlight ? "border-yellow-500 border-4" : "")}`}
+            className="p-1.5 pb-1"
             onSubmit={e => {
                 e.preventDefault()
                 const firstEl = firstResultSelector
@@ -53,8 +49,6 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, aria,
                     placeholder={t("search")}
                     value={searchText}
                     onChange={e => { dispatchSearch(e) }}
-                    onKeyDown={(e) => { student.addUIClick(id + ": " + e.key) }}
-                    onFocus={() => { if (highlight) { dispatch(caiState.setHighlight({ zone: null })) } }}
                 />
                 {searchText.length !== 0 &&
                     (
