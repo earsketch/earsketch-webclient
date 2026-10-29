@@ -192,7 +192,7 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
 }
 
 // Login, setup, restore scripts, return shared scripts.
-async function postLogin(username: string) {
+async function postLogin(username: string, migratedIDs: Set<string>) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
     uiLogger.init()
@@ -212,7 +212,9 @@ async function postLogin(username: string) {
 
     // Migrate scripts created or imported while logged out to the user's account.
     const state = store.getState()
-    const saved = scriptsState.selectRegularScripts(state)
+    // A failed login or Fast Refresh can leave server scripts here. Re-saving them
+    // with overwrite: false would duplicate them, so snapshot only local candidates.
+    const localScripts = Object.values(scriptsState.selectRegularScripts(state)).filter(script => scriptsState.isLocalScriptID(script.shareid))
     const openTabs = tabs.selectOpenTabs(state)
 
     // Fetch the user's scripts now that they're logged in.
@@ -220,7 +222,7 @@ async function postLogin(username: string) {
     await refreshScriptBrowser()
 
     const promises = []
-    for (const script of Object.values(saved)) {
+    for (const script of localScripts) {
         if (script.soft_delete) {
             // Don't migrate scripts the user deleted while logged out.
             continue
@@ -237,19 +239,29 @@ async function postLogin(username: string) {
             })).unwrap()
         }
         const reopen = openTabs.includes(script.shareid)
-        promise = promise.then(script => ({ script, reopen }))
+        promise = promise.then(migrated => {
+            // Record each migration as it happens, so the caller knows about it even if a later step throws.
+            migratedIDs.add(script.shareid)
+            return { script: migrated, reopen }
+        })
         promises.push(promise)
     }
 
     if (promises.length > 0) {
         store.dispatch(tabThunks.resetTabs())
 
-        const results = await Promise.all(promises)
+        // Wait for every migration to settle before failing, so `migratedIDs` is complete if the login is undone,
+        // and no save is still in flight to add its script back afterwards.
+        const results = await Promise.allSettled(promises)
+        const rejected = results.find((result): result is PromiseRejectedResult => result.status === "rejected")
+        if (rejected) {
+            throw rejected.reason
+        }
         // Re-open scripts that were opened before login (which now have new IDs).
         // TODO: Ideally, we would preserve the order of the open tabs.
-        for (const { script, reopen } of results) {
-            if (reopen) {
-                store.dispatch(tabThunks.setActiveTabAndEditor(script.shareid))
+        for (const result of results) {
+            if (result.status === "fulfilled" && result.value.reopen) {
+                store.dispatch(tabThunks.setActiveTabAndEditor(result.value.script.shareid))
             }
         }
     }
@@ -275,6 +287,20 @@ async function postLogin(username: string) {
     } catch (error) {
         esconsole("Error loading notifications on login: " + error, ["error", "user"])
     }
+}
+
+// Undo the authenticated portion of this login using its pre-login snapshot and
+// settled migration results. Restoring already-migrated scripts would copy them on retry.
+function rollBackFailedLogin(localScripts: scriptsState.Scripts, migratedIDs: ReadonlySet<string>) {
+    store.dispatch(tabThunks.resetTabs())
+    store.dispatch(tabs.resetModifiedScripts())
+    store.dispatch(scriptsState.resetSharedScripts())
+    store.dispatch(user.logout())
+    store.dispatch(soundsState.resetUserSounds())
+    store.dispatch(soundsState.resetFavorites())
+
+    const unmigrated = ESUtils.fromEntries(Object.entries(localScripts).filter(([id]) => !migratedIDs.has(id)))
+    store.dispatch(scriptsState.setRegularScripts(unmigrated))
 }
 
 async function refreshScriptBrowser() {
@@ -1057,7 +1083,12 @@ export const App = () => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
 
         const loginPromise = (async () => {
-            let succeeded = false
+            let authenticated = false
+            // Scripts created while logged out, so they can be restored if login fails before they are migrated.
+            let localScripts: scriptsState.Scripts = {}
+            // IDs of logged-out scripts that postLogin() has saved to the user's account.
+            // postLogin() fills it in as they are saved, rather than returning it, so it's still accurate if postLogin() throws.
+            const migratedIDs = new Set<string>()
             try {
                 scriptsThunks.saveAll()
 
@@ -1082,7 +1113,10 @@ export const App = () => {
                 }
                 const username = userInfo.username
 
+                localScripts = ESUtils.fromEntries(Object.entries(scriptsState.selectRegularScripts(store.getState())).filter(([id]) => scriptsState.isLocalScriptID(id)))
+
                 store.dispatch(user.login({ username, token }))
+                authenticated = true
 
                 store.dispatch(soundsThunks.getUserSounds())
                 store.dispatch(soundsThunks.getFavorites(token))
@@ -1094,23 +1128,22 @@ export const App = () => {
                 userNotification.user.isAdmin = userInfo.isAdmin
 
                 // Retrieve the user scripts.
-                await postLogin(username)
+                await postLogin(username, migratedIDs)
                 esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
                 setLoginState("logged-in")
                 userNotification.show(i18n.t("messages:general.loginsuccess"), "normal", 0.5)
                 const activeTabID = tabs.selectActiveTabID(store.getState())
                 activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
-                succeeded = true
             } catch (err) {
+                setLoginState("logged-out")
+                if (authenticated) {
+                    rollBackFailedLogin(localScripts, migratedIDs)
+                }
                 if (err instanceof LoginError) {
                     throw err
                 }
                 throw new LoginError("Login failed due to network error.")
-            } finally {
-                if (!succeeded) {
-                    setLoginState("logged-out")
-                }
             }
         })()
 
