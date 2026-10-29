@@ -11,8 +11,6 @@ import * as audioLibrary from "./audiolibrary"
 import { Bubble } from "../bubble/Bubble"
 import * as bubble from "../bubble/bubbleState"
 import { ConfettiLauncher } from "./Confetti"
-import * as caiState from "../cai/caiState"
-import * as caiThunks from "../cai/caiThunks"
 import { Script, SoundEntity } from "common"
 import * as curriculum from "../browser/curriculumState"
 import { ErrorForm } from "./ErrorForm"
@@ -205,10 +203,6 @@ async function postLogin(username: string) {
     userNotification.user.loginTime = Date.now()
 
     esconsole("List of scripts in Load script list successfully updated.", ["debug", "user"])
-
-    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
-        store.dispatch(caiState.resetState())
-    }
 
     // Migrate scripts created or imported while logged out to the user's account.
     const state = store.getState()
@@ -643,11 +637,6 @@ function setup() {
     } else {
         loadLocalScripts()
     }
-
-    // If in CAI study mode, switch to active CAI view.
-    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
-        store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
-    }
 }
 
 // TODO: Move to userState.
@@ -735,10 +724,6 @@ function navigateToRecord(record: FocusRecord) {
 export const App = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
-    const showCai = useSelector(layout.selectEastKind) === "CAI"
-    const caiHighlight = useSelector(caiState.selectHighlight)
-    const switchedToCurriculum = useSelector(caiState.selectSwitchedToCurriculum)
-    const switchedToCai = useSelector(caiState.selectSwitchedToCai)
     const isMac = ESUtils.whichOS() === "MacOS"
 
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
@@ -828,8 +813,8 @@ export const App = () => {
                         store.dispatch(tabThunks.closeAndSwitchTab(scriptID))
                     }
                 }
-                // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !ES_WEB_SHOW_CAI && !ES_WEB_SHOW_CHAT) {
+                // Show bubble tutorial when not opening a share link.
+                if (Object.keys(allScripts).length === 0 && !sharedScriptID) {
                     store.dispatch(bubble.resume())
                 }
             }
@@ -1138,9 +1123,6 @@ export const App = () => {
         }
 
         window.localStorage.clear()
-        if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
-            store.dispatch(caiState.resetState())
-        }
         userNotification.clearHistory()
         reporter.logout()
         uiLogger.destroy()
@@ -1182,25 +1164,6 @@ export const App = () => {
         // User data
         email = ""
         setIsAdmin(false)
-    }
-
-    const toggleCaiWindow = () => {
-        if (!showCai) {
-            dispatch(layout.setEast({ open: true, kind: "CAI" }))
-            dispatch(caiState.setHasSwitchedToCai(true))
-            dispatch(caiThunks.closeCurriculum())
-            if (caiHighlight.zone === "curriculumButton") {
-                dispatch(caiThunks.highlight({ zone: null }))
-            }
-            dispatch(caiThunks.autoScrollCai())
-        } else {
-            dispatch(layout.setEast({ kind: "CURRICULUM" }))
-            dispatch(caiState.setHasSwitchedToCurriculum(true))
-            dispatch(caiThunks.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
-            if (caiHighlight.zone === "curriculumButton") {
-                dispatch(caiThunks.highlight({ zone: "curriculumSearchBar" }))
-            }
-        }
     }
 
     useEffect(() => {
@@ -1255,17 +1218,6 @@ export const App = () => {
 
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
-                    {/* CAI-window toggle */}
-                    {(ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) &&
-                        <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }}
-                            onClick={toggleCaiWindow} title="CAI">
-                            <i
-                                id="caiButton"
-                                className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
-                            >
-                            </i>
-                        </button>}
-
                     <LocaleSelector handleSelection={changeLanguage}/>
                     <KeyboardShortcuts />
                     <FontSizeMenu />

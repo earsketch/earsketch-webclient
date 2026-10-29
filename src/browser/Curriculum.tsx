@@ -12,8 +12,6 @@ import * as userNotification from "../user/notification"
 import { OLD_CURRICULUM_LOCATIONS } from "../data/old_curriculum"
 import { useHeightLimiter } from "../Utils"
 import { useTranslation } from "react-i18next"
-import * as cai from "../cai/caiState"
-import * as caiThunks from "../cai/caiThunks"
 import { Language } from "common"
 import { selectExtensionIcon32, selectExtensionName, selectExtensionUrl } from "../extensions/extensionState"
 
@@ -174,8 +172,7 @@ const CurriculumSearchBar = () => {
     const searchText = useSelector(curriculum.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(curriculum.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(curriculum.setSearchText(""))
-    const highlight = useSelector(cai.selectHighlight).zone === "curriculumSearchBar"
-    return <SearchBar {... { searchText, dispatchSearch, dispatchReset, id: "curriculumSearchBar", aria: t("ariaDescriptors:curriculum.searchBar"), highlight }} />
+    return <SearchBar {... { searchText, dispatchSearch, dispatchReset, id: "curriculumSearchBar", aria: t("ariaDescriptors:curriculum.searchBar") }} />
 }
 
 const CurriculumSearchResults = () => {
@@ -201,20 +198,11 @@ export const TitleBar = ({ isCurriculumPane }: { isCurriculumPane: boolean }) =>
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
     const location = useSelector(curriculum.selectCurrentLocation)
-    const pageTitle = useSelector(curriculum.selectPageTitle)
     const extensionIcon32 = useSelector(selectExtensionIcon32)
     const extensionName = useSelector(selectExtensionName)
     const extensionUrl = useSelector(selectExtensionUrl)
     const paneTitle = isCurriculumPane ? t("curriculum.title") : t("extension")
     const closeButtonTitle = isCurriculumPane ? t("curriculum.close") : t("extension.close")
-
-    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
-        useEffect(() => {
-            if (!pageTitle?.includes("Loading")) {
-                dispatch(caiThunks.curriculumPage([location, pageTitle]))
-            }
-        }, [location, pageTitle])
-    }
 
     return (
         <div className="flex items-center p-2 text-base bg-white text-black dark:bg-gray-900 dark:text-white">

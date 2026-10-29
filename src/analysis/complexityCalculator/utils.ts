@@ -1,65 +1,8 @@
-// A library of helper functions for the CAI Code Complexity Calculator
+// A library of helper functions for the Code Complexity Calculator
 import { AnyNode, StructuralNode, VariableAssignment, VariableObj } from "."
 import { selectAllNames } from "../../browser/soundsState"
 import store from "../../reducers"
 import { builtInNames, builtInReturns, state } from "./state"
-
-// Trims comments and leading/trailing whitespace from lines of Python and JS code.
-export function trimCommentsAndWhitespace(stringToTrim: string) {
-    let returnString = stringToTrim
-    // strip out any trailing comments
-    // python uses #
-    if (!state.isJavascript && returnString.includes("#")) {
-        let singleQuotes = 0
-        let doubleQuotes = 0
-        let commentIndex = -1
-        for (let s = 0; s < returnString.length; s++) {
-            // we use the number of single and double quotes (odd versus even) to determine whether any # or // is actually part of a string and NOT a comment.
-            if (returnString[s] === "'") {
-                singleQuotes++
-            }
-            if (returnString[s] === '"') {
-                doubleQuotes++
-            }
-            if (returnString[s] === "#") {
-                // we have a #. assuming this is NOT in a string (ie both singleQuotes and doubleQuotes are EVEN NUMBERS this is the index we chop from. save it and break
-                if (doubleQuotes % 2 === 0 && singleQuotes % 2 === 0) {
-                    commentIndex = s
-                    break
-                }
-            }
-        }
-        if (commentIndex !== -1) {
-            returnString = returnString.substring(0, commentIndex)
-        }
-    }
-    // Javascript uses //
-    if (state.isJavascript && returnString.includes("//")) {
-        let singleQuotes = 0
-        let doubleQuotes = 0
-        let commentIndex = -1
-        for (let s = 0; s < returnString.length; s++) {
-            if (returnString[s] === "'") {
-                singleQuotes++
-            }
-            if (returnString[s] === '"') {
-                doubleQuotes++
-            }
-            if (returnString[s] === "/" && s < returnString.length - 1 && returnString[s + 1] === "/") {
-                // we have a double slash. assuming this is NOT in a string (ie both singleQuotes and doubleQuotes are EVEN NUMBERS this is the index we chop from. save it and break
-                if (doubleQuotes % 2 === 0 && singleQuotes % 2 === 0) {
-                    commentIndex = s
-                    break
-                }
-            }
-        }
-        if (commentIndex !== -1) {
-            returnString = returnString.substring(0, commentIndex)
-        }
-    }
-    returnString = returnString.trim() // then any leading/trailing spaces
-    return returnString
-}
 
 // Gets the last line in a multiline block of code.
 export function getLastLine(functionNode: AnyNode): number {
@@ -82,12 +25,6 @@ function areTwoNodesSameNode(node1: AnyNode, node2: AnyNode) {
         return true
     }
     return false
-}
-
-export function numberOfLeadingSpaces(stringToCheck: string) {
-    let number
-    for (number = 0; number < stringToCheck.length && stringToCheck[number] === " "; number++);
-    return number
 }
 
 // generates an object representing the depth level and parent object of a structural node

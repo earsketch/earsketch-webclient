@@ -12,9 +12,6 @@ declare const ES_WEB_SHOW_COMPETITION_SUBMIT: boolean
 declare const ES_WEB_SHOW_COMPETITION_BANNER: boolean
 declare const ES_WEB_SHOW_FEATURED_SOUNDS: boolean
 declare const ES_WEB_FEATURED_ARTISTS: string[]
-declare const ES_WEB_SHOW_CAI: boolean
-declare const ES_WEB_UPLOAD_CAI_HISTORY: boolean
-declare const ES_WEB_SHOW_CHAT: boolean
 declare const UI_LOGGER_URL: string
 
 declare const Kali: any
@@ -27,8 +24,6 @@ declare module "@lib/jsdifflib/diffview"
 declare module "@lib/jsdifflib/difflib"
 
 declare const Recorder: any
-
-declare module "@webscopeio/react-textarea-autocomplete"
 
 declare module "file-loader!*" {
     const value: any
