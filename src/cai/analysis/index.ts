@@ -63,13 +63,6 @@ export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], varia
     return Object.assign({}, createReport(trackListing, apiCalls, variables))
 }
 
-// Report the code complexity and music analysis of a script.
-export function analyzeCodeAndMusic(language: Language, sourceCode: string, trackListing: DAWData) {
-    const codeComplexity = analyzeCode(language, sourceCode)
-    const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
-    return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
-}
-
 // Convert compiler output to analysis object.
 function createReport(output: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
     const report: Report = Object.create(null)
