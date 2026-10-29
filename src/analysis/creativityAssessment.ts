@@ -2,10 +2,10 @@
 import { Script } from "common"
 import { mean } from "lodash"
 import { Report } from "."
-import { audiokeysPromise } from "../../app/recommender"
-import NUMBERS_AUDIOKEYS from "../../data/numbers_audiokeys"
-import { getTimestampData } from "../../data/recommendationData"
-import { Results } from "../complexityCalculator"
+import { audiokeysPromise } from "../app/recommender"
+import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
+import { getTimestampData } from "../data/recommendationData"
+import { Results } from "./complexityCalculator"
 import { combinations, entropy, hammingDistance, normalize } from "./utils"
 
 export interface CaiHistoryNode {

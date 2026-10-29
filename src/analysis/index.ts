@@ -1,11 +1,11 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 import { DAWData, Language } from "common"
-import { soundDict } from "../../app/recommender"
-import { TempoMap } from "../../app/tempo"
-import { CallObj, Results, VariableObj, getApiCalls } from "../complexityCalculator"
-import { analyzeJavascript } from "../complexityCalculator/js"
-import { analyzePython } from "../complexityCalculator/py"
-import { state } from "../complexityCalculator/state"
+import { soundDict } from "../app/recommender"
+import { TempoMap } from "../app/tempo"
+import { CallObj, Results, VariableObj, getApiCalls } from "./complexityCalculator"
+import { analyzeJavascript } from "./complexityCalculator/js"
+import { analyzePython } from "./complexityCalculator/py"
+import { state } from "./complexityCalculator/state"
 
 export interface Report {
     OVERVIEW: { measures: number, "length (seconds)": number, [key: string]: string | number }
