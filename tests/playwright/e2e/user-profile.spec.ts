@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test"
 import { setupBackend, TEST_USER } from "../helpers/mocks"
-import { skipTour, login, visitWithStubWebSocket } from "../helpers/actions"
+import { skipTour, login } from "../helpers/actions"
 
 test("logs in and changes user email and password", async ({ page }) => {
     const changedEmail = "tester.alternate@example.com"
@@ -17,7 +17,7 @@ test("logs in and changes user email and password", async ({ page }) => {
         interceptModifyPassword: { password: originalPassword },
     })
 
-    await visitWithStubWebSocket(page, "/")
+    await page.goto("/")
     await skipTour(page)
     await login(page)
 

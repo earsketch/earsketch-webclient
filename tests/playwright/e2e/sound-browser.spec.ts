@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test"
 import * as path from "node:path"
 import { fileURLToPath } from "node:url"
 import { setupBackend, TEST_USER, type AudioMeta } from "../helpers/mocks"
-import { skipTour, login, visitWithStubWebSocket } from "../helpers/actions"
+import { skipTour, login } from "../helpers/actions"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -79,7 +79,7 @@ test.describe("add a sound", () => {
             interceptAudioUpload: true,
         })
 
-        await visitWithStubWebSocket(page, "/")
+        await page.goto("/")
         await skipTour(page)
         await login(page, username)
 
@@ -123,7 +123,7 @@ test.describe("edit sound uploads", () => {
             scriptsOwned: [],
             scriptsShared: [],
         })
-        await visitWithStubWebSocket(page, "/")
+        await page.goto("/")
         await skipTour(page)
         await login(page, username)
 
