@@ -68,7 +68,20 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             "hover:bg-gray-300": active,
         })
 
-    return <div
+    const openContextMenu = (tabEl: HTMLElement) => {
+        // dispatch on the trigger (the inner span), since Radix listens there, not on the tab
+        const trigger = tabEl.querySelector<HTMLElement>("[data-state]")
+        if (!trigger) return
+        const rect = tabEl.getBoundingClientRect()
+        trigger.dispatchEvent(new MouseEvent("contextmenu", {
+            bubbles: true,
+            cancelable: true,
+            clientX: rect.left + 8,
+            clientY: rect.bottom,
+        }))
+}
+
+    return <button
         className={tabDivClass}
         id={`${scriptID}-tab`}
         role="tab"
@@ -83,6 +96,14 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             }
         }}
         onKeyDown={(event) => {
+            if (event.target !== event.currentTarget) return
+
+            if ((event.ctrlKey && (event.key === "Enter")) ||
+                event.key === "ContextMenu"){
+                openContextMenu(event.currentTarget)
+                event.preventDefault()
+                return
+            }
             if (event.key === "Delete" || event.key === "Backspace") {
                 dispatch(tabThunks.closeAndSwitchTab(scriptID))
                 event.preventDefault()
@@ -118,7 +139,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
                 <i className="icon-cross2 cursor-pointer"/>
             </div>
         </div>
-    </div>
+    </button>
 }
 
 const CloseAllTab = ({ closeAll }: { closeAll: () => void }) => {
