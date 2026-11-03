@@ -70,6 +70,7 @@ export default ({ mode }: { mode: string }) => {
                         name: "unit",
                         environment: "jsdom",
                         include: ["tests/vitest/src/**/*.spec.{js,ts,jsx,tsx}"],
+                        setupFiles: ["./tests/vitest/src/setup.js"],
                     },
                 },
                 {
