@@ -10,6 +10,8 @@ import { AdminWindow } from "../../../../src/app/AdminWindow" // called by our t
 import { Dialog } from "@headlessui/react"
 
 // tell vitest to use our mocks in place of these modules, located in __mocks__/
+vi.mock("i18next")
+vi.mock("react-i18next")
 vi.mock("../../../../src/request")
 vi.mock("../../../../src/app/websocket")
 vi.mock("../../../../src/app/audiolibrary")
