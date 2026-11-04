@@ -388,15 +388,18 @@ export const selectNextScriptName = createSelector(
     }
 )
 
+// Local IDs cannot conflict with server share IDs, which never contain a slash.
+const LOCAL_SCRIPT_ID_PREFIX = "local/"
+
+export const isLocalScriptID = (shareid: string) => shareid.startsWith(LOCAL_SCRIPT_ID_PREFIX)
+
 /**
  * Find the max local script ID and add one to guarantee a new, unique ID.
- * Note that local script IDs are prefixed with "local/" to prevent conflict with server share IDs (which consist of A-Z, a-z, 0-9, -, _, and =).
  */
 export const selectNextLocalScriptID = createSelector(
     [selectAllScripts],
     (scripts) => {
-        const PREFIX = "local/"
-        const maxID = Math.max(...Object.keys(scripts).filter(s => s.startsWith(PREFIX)).map(s => parseInt(s.slice(PREFIX.length))))
-        return `local/${maxID === -Infinity ? 0 : maxID + 1}`
+        const maxID = Math.max(...Object.keys(scripts).filter(isLocalScriptID).map(s => parseInt(s.slice(LOCAL_SCRIPT_ID_PREFIX.length))))
+        return `${LOCAL_SCRIPT_ID_PREFIX}${maxID === -Infinity ? 0 : maxID + 1}`
     }
 )
