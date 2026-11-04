@@ -13,6 +13,7 @@ import * as request from "../../../../src/request"
 import * as soundsThunks from "../../../../src/browser/soundsThunks"
 import * as scriptsState from "../../../../src/browser/scriptsState"
 window.ResizeObserver = ResizeObserver // jsdom has no ResizeObserver
+globalThis.IS_REACT_ACT_ENVIRONMENT = true // vitest globals are off, so testing-library cannot set this itself; act() warns without it
 
 // mocked modules
 vi.mock("i18next")

@@ -285,6 +285,9 @@ const CurriculumPane = () => {
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
     const content = useSelector(curriculum.selectContent)
+    const curriculumLocale = useSelector(curriculum.selectCurriculumLocale)
+    // Direction follows the curriculum's locale, which can differ from the UI locale (e.g. English content under an rtl UI).
+    const curriculumDirection = (curriculumLocale ?? currentLocale).direction
     const curriculumBody = useRef<HTMLElement>(null)
     const focusPending = useSelector(curriculum.selectFocusPending)
 
@@ -349,14 +352,14 @@ const CurriculumPane = () => {
 
     return (
         <div dir={currentLocale.direction} style={{ fontSize: `${scaledFontSize}px` }}
-            className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
+            className="font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white">
             {paneIsOpen
                 ? (
                     <>
                         <CurriculumHeader />
-                        <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
+                        <div id="curriculum" dir={curriculumDirection} className={`${theme === "light" ? "curriculum-light" : "dark"} ${curriculumDirection === "rtl" ? "curriculum-rtl" : ""}`} style={{ fontSize }}>
                             {content
-                                ? <article ref={curriculumBody} id="curriculum-body" aria-label={t("curriculum.title")} className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
+                                ? <article ref={curriculumBody} id="curriculum-body" lang={curriculumLocale?.localeCode} aria-label={t("curriculum.title")} className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
                                 : <div className="flex flex-col items-center">
                                     <div className="text-2xl text-center py-8">Loading curriculum...</div>
                                     <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />

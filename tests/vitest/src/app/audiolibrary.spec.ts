@@ -24,7 +24,7 @@ it("defaults an undefined sound type to hidden without replacing an explicit typ
     } as SoundEntity
     vi.mocked(getAuth).mockResolvedValue([withoutType, publicSound])
 
-    const sounds = await getUserSounds("tester")
+    const sounds = await getUserSounds()
 
     expect(sounds[0].type).toBe(SoundType.Hidden)
     expect(sounds[0].tempo).toBeUndefined()

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next"
+
 import teachersLogo from "./teachers_logo.png"
 
 /** Show the active banner */
@@ -6,21 +8,29 @@ export const HeaderBanner = () => {
     return <EarSketchTeachersCompetitionBanner />
 }
 
-/** A banner for competitions run by our team */
-export const EarSketchTeachersCompetitionBanner = () => {
+const COMPETITION_URL = "https://teachers.earsketch.org/2026-synthesize-your-inspirations"
+
+const CompetitionBannerLink = ({ children }: { children: React.ReactNode }) => {
+    const { t } = useTranslation()
     return (<div className="hidden w-full lg:flex justify-evenly">
-        <a href="https://www.teachers.earsketch.org/compete"
-            aria-label="Link to the competition website"
+        <a href={COMPETITION_URL}
+            aria-label={`${t("banner.competition.title")}: ${t("banner.competition.kicker")}`}
             target="_blank"
-            className="text-black uppercase dark:text-white text-center"
-            style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
+            className="flex items-center text-center uppercase whitespace-nowrap"
             rel="noreferrer">
-            <div className="flex flex-col items-center">
-                <img style={{ height: "20px" }} src={teachersLogo} id="comp-logo" alt="Link to the competition site"/>
-                <div>Remix Competition</div>
-            </div>
+            <img style={{ height: "24px" }} className="hidden xl:block mr-3" src={teachersLogo} id="comp-logo" alt=""/>
+            <div className="flex flex-col items-center">{children}</div>
         </a>
     </div>)
+}
+
+/** Competition banner: small event label above the competition name */
+export const EarSketchTeachersCompetitionBanner = () => {
+    const { t } = useTranslation()
+    return (<CompetitionBannerLink>
+        <div className="text-amber text-xs tracking-widest leading-[18px]">{t("banner.competition.kicker")}</div>
+        <div className="text-white text-lg font-medium tracking-wide leading-[22px]">{t("banner.competition.title")}</div>
+    </CompetitionBannerLink>)
 }
 
 /** A banner linking to info about the EarSketch Summit */
