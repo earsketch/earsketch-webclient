@@ -43,5 +43,6 @@ tests/vitest/reports/
 tests/playwright/test-results/
 tests/playwright/reports/
 playwright-report/
+.playwright-mcp/
 eslint_report.json
 stats.html

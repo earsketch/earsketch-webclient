@@ -13,7 +13,6 @@ import { Dialog } from "@headlessui/react"
 vi.mock("i18next")
 vi.mock("react-i18next")
 vi.mock("../../../../src/request")
-vi.mock("../../../../src/app/websocket")
 vi.mock("../../../../src/app/audiolibrary")
 vi.mock("../../../../src/data/recommendationData")
 

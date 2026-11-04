@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test"
 import { API_HOST, setupBackend, TEST_USER, type Script } from "../helpers/mocks"
-import { createScript, login, skipTour, visitWithStubWebSocket, waitForHeadlessDialog } from "../helpers/actions"
+import { createScript, login, skipTour, waitForHeadlessDialog } from "../helpers/actions"
 
 // Regression tests for #1006: logging in must only migrate scripts created while logged out,
 // and a failed login must not leave the user's server scripts behind to be copied by the next login.
@@ -72,7 +72,7 @@ async function expectMyScripts(page: Page, count: number) {
 test("does not copy server scripts when logging in after a failed login", async ({ page }) => {
     await setupBackend(page, { ...backend, additionalRoutes: [failFirst("scripts/shared")] })
     const saves = recordSaves(page)
-    await visitWithStubWebSocket(page, "/")
+    await page.goto("/")
     await skipTour(page)
 
     await failLogin(page)
@@ -87,7 +87,7 @@ test("does not copy server scripts when logging in after a failed login", async 
 test("migrates scripts created while logged out exactly once", async ({ page }) => {
     await setupBackend(page, backend)
     const saves = recordSaves(page)
-    await visitWithStubWebSocket(page, "/")
+    await page.goto("/")
     await skipTour(page)
     await createScript(page, "local_script")
 
@@ -99,7 +99,7 @@ test("migrates scripts created while logged out exactly once", async ({ page }) 
 test("keeps scripts created while logged out when migrating them fails", async ({ page }) => {
     await setupBackend(page, { ...backend, additionalRoutes: [failFirst("scripts/save")] })
     const saves = recordSaves(page)
-    await visitWithStubWebSocket(page, "/")
+    await page.goto("/")
     await skipTour(page)
     await createScript(page, "local_script")
 
@@ -143,7 +143,7 @@ test("waits for a mixed migration batch and retries only the unsaved script", as
         }],
     })
     const saves = recordSaves(page)
-    await visitWithStubWebSocket(page, "/")
+    await page.goto("/")
     await skipTour(page)
     await createScript(page, "retry_script")
     await createScript(page, "saved_script")
