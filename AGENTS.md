@@ -63,7 +63,6 @@ EarSketch is a web-based music programming IDE. Users write Python or JavaScript
 - `daw` — DAW panel state (`dawState.ts`)
 - `curriculum` — curriculum panel state (`curriculumState.ts`)
 - `recommender` — sound recommender state (`recommenderState.ts`)
-- `cai` — Co-Creative AI assistant state (`caiState.ts`)
 
 Only `layout` is persisted via redux-persist.
 
@@ -85,7 +84,7 @@ The JS API adapter is `src/api/earsketch.js.ts`; the Python adapter is `src/api/
 The IDE uses `react-split` for resizable panels:
 - **West**: Browser (scripts, sounds, API reference, curriculum tabs)
 - **Center**: Code editor (`src/ide/Editor.tsx` using CodeMirror 6; or Droplet for blocks mode)
-- **East**: Curriculum or CAI panel
+- **East**: Curriculum panel (or an extension)
 - **Bottom**: DAW (`src/daw/DAW.tsx`)
 
 ### API Requests
@@ -95,8 +94,6 @@ The IDE uses `react-split` for resizable panels:
 ### Build-Time Feature Flags
 
 These are injected via Vite `define` and declared in `src/types/global.d.ts`. They are set via `.env` files prefixed with `ES_WEB_`:
-- `ES_WEB_SHOW_CAI` — enable CAI assistant panel
-- `ES_WEB_SHOW_CHAT` — enable human-human chat
 - `ES_WEB_SHOW_LOCALE_SWITCHER` — show language selector
 - `ES_WEB_SHOW_COMPETITION_BANNER` / `ES_WEB_SHOW_COMPETITION_SUBMIT`
 - `ES_WEB_SHOW_FEATURED_SOUNDS` / `ES_WEB_FEATURED_ARTISTS`
@@ -106,9 +103,9 @@ These are injected via Vite `define` and declared in `src/types/global.d.ts`. Th
 
 All user-facing text must use `i18next`. In React components, use the `useTranslation` hook and the `t()` function. Keys live in `src/locales/en/common.json` and other locale folders. Placeholders use `{{variableName}}` syntax. See `INTERNATIONALIZATION.md` for full details.
 
-### CAI (Co-Creative AI)
+### Code Analyzer
 
-`src/cai/` contains an experimental AI assistant for research studies. It analyzes user scripts for complexity/creativity, generates dialogue, and handles error help. Controlled by `ES_WEB_SHOW_CAI`. See `src/cai/README.md`.
+`/codeAnalyzer` (`src/app/CodeAnalyzer.tsx`, `src/app/codeAnalyzerFunctions.ts`) runs batches of scripts and reports on their code and music. The analysis lives in `src/analysis/`: `complexityCalculator/` walks the Python/JavaScript AST for code features, `index.ts` analyzes the resulting `DAWData`, and `creativityAssessment.ts` scores the result. `tests/vitest/scripts/codeAnalyzer.spec.js` snapshots its reports and CSV output.
 
 ### Testing
 

@@ -16,7 +16,6 @@ import api from "./browser/apiState"
 import daw from "./daw/dawState"
 import curriculum from "./browser/curriculumState"
 import recommender from "./browser/recommenderState"
-import cai from "./cai/caiState"
 import extension from "./extensions/extensionState"
 import focusHistory from "./app/focusHistoryState"
 
@@ -33,7 +32,6 @@ const rootReducer = combineReducers({
     daw,
     curriculum,
     recommender,
-    cai,
     extension,
     focusHistory,
 })

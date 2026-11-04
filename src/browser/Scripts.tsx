@@ -14,8 +14,6 @@ import * as user from "../user/userState"
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { ScriptDropdownMenu } from "./ScriptsMenus"
 import { useTranslation } from "react-i18next"
-import * as cai from "../cai/caiState"
-import * as caiThunks from "../cai/caiThunks"
 import { Popover, PopoverButton, PopoverPanel, Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
@@ -292,7 +290,6 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
     const modified = useSelector(tabs.selectModifiedScripts).includes(script.shareid)
     const tabIndicator = (open || active) ? (active ? (modified ? "border-red-600" : "border-green-400") : (modified ? "border-red-400" : "border-green-300") + " opacity-80") : "opacity-0"
     const loggedIn = useSelector(user.selectLoggedIn)
-    const highlight = useSelector(cai.selectHighlight).id === script.shareid
     const { t } = useTranslation()
 
     // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
@@ -302,9 +299,6 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
     const openScript = () => {
         if (type === "regular" || type === "shared") {
             dispatch(setActiveTabAndEditor(script.shareid))
-        }
-        if (highlight) {
-            dispatch(caiThunks.highlight({ zone: null }))
         }
     }
     return (

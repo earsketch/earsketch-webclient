@@ -6,7 +6,6 @@ import classNames from "classnames"
 import store from "../reducers"
 import { recommend } from "../app/recommender"
 
-import { addUIClick } from "../cai/dialogue/student"
 import * as sounds from "./soundsState"
 import * as soundsThunks from "./soundsThunks"
 import * as appState from "../app/appState"
@@ -63,7 +62,6 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
     const handleToggle = () => {
         if (selected) dispatch(sounds.removeFilterItem({ category, value }))
         else dispatch(sounds.addFilterItem({ category, value }))
-        addUIClick("filter: " + label + (selected ? " off" : " on"))
     }
 
     const classnames = classNames({
@@ -529,7 +527,6 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                         className="scale:text-xs pr-1.5"
                         onClick={() => {
                             dispatch(soundsThunks.togglePreview({ name, kind: "sound" }))
-                            addUIClick("sound preview - " + name + (previewState !== "play" ? " stop" : " play"))
                             if (previewState === "play") uiLogger.event("preview", "sound-browser", { sound: name })
                         }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
@@ -559,7 +556,7 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
                         (
                             <button
                                 className="scale:text-xs px-1.5 text-sky-700 dark:text-blue-400"
-                                onClick={() => { editor.pasteCode(name); addUIClick("sound copy - " + name) }}
+                                onClick={() => { editor.pasteCode(name) }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                                 aria-label={t("ariaDescriptors:sounds.paste", { name })}
                             >
@@ -1024,7 +1021,6 @@ const SoundPreview = () => {
                             onClick={() => {
                                 if (!currentName) return
                                 editor.pasteCode(currentName)
-                                addUIClick("sound copy - " + currentName)
                                 uiLogger.event("paste", "audition-panel", { content: currentName })
                             }}
                             title={t("soundBrowser.clip.tooltip.paste")}

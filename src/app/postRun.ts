@@ -8,7 +8,6 @@ import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
 import { timestretchBuffer } from "./timestretch"
 import * as userConsole from "../ide/console"
-import { setCurrentOverlap } from "../cai/dialogue"
 
 // After running code, go through each clip, load the audio file and
 // replace looped ones with multiple clips. Why? Because we don't know
@@ -315,7 +314,6 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
 // we don't know the length of clips until then.
 export function checkOverlap(result: DAWData) {
     const margin = 0.001
-    const overlaps: [string, string, number][] = []
 
     for (const [trackIndex, { clips }] of result.tracks.entries()) {
         clips.sort((a, b) => a.measure - b.measure)
@@ -329,19 +327,12 @@ export function checkOverlap(result: DAWData) {
                     userConsole.warn(`Removing ${other.filekey} (line ${other.sourceLines[0]})` +
                                      ` due to overlap at track ${trackIndex}, measure ${other.measure}` +
                                      ` with ${clip.filekey} (line ${clip.sourceLines[0]})`)
-                    if (ES_WEB_SHOW_CAI) {
-                        overlaps.push([clip.filekey, other.filekey, trackIndex])
-                    }
                     clips.splice(j, 1)
                 } else {
                     j++
                 }
             }
         }
-    }
-
-    if (ES_WEB_SHOW_CAI) {
-        setCurrentOverlap(overlaps)
     }
 }
 

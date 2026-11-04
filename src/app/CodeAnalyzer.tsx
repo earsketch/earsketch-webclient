@@ -120,7 +120,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                     setResults(results)
                     setProcessing(null)
                 } else {
-                    const result = await runScriptHistory(script, useHistory, true)
+                    const result = await runScriptHistory(script, useHistory)
                     for (const r of result) {
                         r.contestID = id
                         results = [...results, r]
