@@ -1103,8 +1103,8 @@
         }
       },
       "example": {
-        "python": "# Slice by default sixteenth notes\nsound = HIPHOP_DUSTYGROOVE_006\nmakeBeatSlice(sound, 1, 1, \"0122252289A2CCEC\")",
-        "javascript": "// Slice by default sixteenth notes\nvar sound = HIPHOP_DUSTYGROOVE_006;\nmakeBeatSlice(sound, 1, 1, \"0122252289A2CCEC\");"
+        "python": "# Slice by sixteenth notes\nsound = HIPHOP_DUSTYGROOVE_006\nbeat = \"2222-2-2--2-4444\"\nmakeBeatSlice(sound, 1, 1, beat)",
+        "javascript": "// Slice by sixteenth notes\nvar sound = HIPHOP_DUSTYGROOVE_006;\nvar beat = \"2222-2-2--2-4444\";\nmakeBeatSlice(sound, 1, 1, beat);"
       }
     },
 
@@ -1152,7 +1152,7 @@
           "description": "A list/array of starting locations within the sound. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound that can be referenced in the beat string by \"0\" and \"1\" respectively."
         },
         "stepsPerMeasure": {
-          "description": "A number that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
+          "description": "A number that specifies the length of time for a single character in your beat string. For example, 8 results in one eighth note. If omitted, the default value of 16 results in one sixteenth note."
         }
       },
       "example": {
