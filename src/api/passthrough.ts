@@ -297,6 +297,7 @@ export function slicesPerMeasure(_result: DAWData, n: number) {
 
     checkArgCount("slicesPerMeasure", args, 1, 1)
     checkType("n", "number", n)
+    checkRange("n", n, { min: 1 / 1024, max: 256 })
 
     return Array.from({ length: 16 }, (_, x) => 1 + x / n)
 }

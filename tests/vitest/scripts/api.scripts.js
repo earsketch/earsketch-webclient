@@ -195,6 +195,54 @@ export const API_SCRIPTS = {
         "makeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, [1, 1.0625, 1.125, 1.1875]);\n" +
         "finish();\n",
 
+    "makeBeatSliceDefault.py": "from earsketch import * \n" +
+        "init() \n" +
+        "setTempo(120) \n" +
+        'beatString1 = "0123"\n' +
+        "makeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1)\n" +
+        "finish() \n",
+
+    "makeBeatSliceDefault.js": "init();\n" +
+        "setTempo(120);\n" +
+        'var beatString1 = "0123";\n' +
+        "makeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1);\n" +
+        "finish();\n",
+
+    "slicesPerMeasure.py": "from earsketch import * \n" +
+        "init() \n" +
+        "setTempo(120) \n" +
+        'beatString1 = "0123"\n' +
+        "makeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, slicesPerMeasure(8), 8)\n" +
+        "finish() \n",
+
+    "slicesPerMeasure.js": "init();\n" +
+        "setTempo(120);\n" +
+        'var beatString1 = "0123";\n' +
+        "makeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, slicesPerMeasure(8), 8);\n" +
+        "finish();\n",
+
+    // Python 2 (Skulpt) uses integer division, so fractions need a float: 1.0/1024, not 1/1024
+    "slicesPerMeasureFractions.py": `from earsketch import *
+print(slicesPerMeasure(0.5))
+print(slicesPerMeasure(1.5))
+print(slicesPerMeasure(1.0/1024))
+print(slicesPerMeasure(256))`,
+
+    "slicesPerMeasureFractions.js": `println(slicesPerMeasure(0.5));
+println(slicesPerMeasure(1.5));
+println(slicesPerMeasure(1/1024));
+println(slicesPerMeasure(256));`,
+
+    "slicesPerMeasureZero.py": `from earsketch import *
+slicesPerMeasure(0)`,
+
+    "slicesPerMeasureZero.js": "slicesPerMeasure(0);",
+
+    "slicesPerMeasureTooLarge.py": `from earsketch import *
+slicesPerMeasure(257)`,
+
+    "slicesPerMeasureTooLarge.js": "slicesPerMeasure(257);",
+
     "createAudioSlice.py": "from earsketch import *\n" +
         "init()\n" +
         "setTempo(120)\n" +
