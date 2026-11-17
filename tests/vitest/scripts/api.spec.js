@@ -91,11 +91,11 @@ describe("API function tests", () => {
     testPythonAndJavaScript("slicesPerMeasureFractions", [
         [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31],
         Array.from({ length: 16 }, (_, x) => 1 + x / 1.5),
-        Array.from({ length: 16 }, (_, x) => 1 + x * 1024),
-        Array.from({ length: 16 }, (_, x) => 1 + x / 256),
+        Array.from({ length: 16 }, (_, x) => 1 + x / 12),
+        Array.from({ length: 16 }, (_, x) => 1 + x / 1000),
     ], false)
-    testPythonAndJavaScriptError("slicesPerMeasureZero", "n exceeds the allowed range")
-    testPythonAndJavaScriptError("slicesPerMeasureTooLarge", "n exceeds the allowed range")
+    testPythonAndJavaScriptError("slicesPerMeasureZero", "n must be greater than 0")
+    testPythonAndJavaScriptError("slicesPerMeasureNegative", "n must be greater than 0")
     testPythonAndJavaScript("rhythmEffects")
     testPython("fitMediaReturnsNone", ["None"], false) // #2839
     testPython("selectRandomFileReturnsNone", ["None"], false) // #2823

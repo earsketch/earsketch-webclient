@@ -221,27 +221,27 @@ export const API_SCRIPTS = {
         "makeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, slicesPerMeasure(8), 8);\n" +
         "finish();\n",
 
-    // Python 2 (Skulpt) uses integer division, so fractions need a float: 1.0/1024, not 1/1024
+    // Python 2 (Skulpt) uses integer division, so fractions need a float: 1.0/3, not 1/3
     "slicesPerMeasureFractions.py": `from earsketch import *
 print(slicesPerMeasure(0.5))
 print(slicesPerMeasure(1.5))
-print(slicesPerMeasure(1.0/1024))
-print(slicesPerMeasure(256))`,
+print(slicesPerMeasure(12))
+print(slicesPerMeasure(1000))`,
 
     "slicesPerMeasureFractions.js": `println(slicesPerMeasure(0.5));
 println(slicesPerMeasure(1.5));
-println(slicesPerMeasure(1/1024));
-println(slicesPerMeasure(256));`,
+println(slicesPerMeasure(12));
+println(slicesPerMeasure(1000));`,
 
     "slicesPerMeasureZero.py": `from earsketch import *
 slicesPerMeasure(0)`,
 
     "slicesPerMeasureZero.js": "slicesPerMeasure(0);",
 
-    "slicesPerMeasureTooLarge.py": `from earsketch import *
-slicesPerMeasure(257)`,
+    "slicesPerMeasureNegative.py": `from earsketch import *
+slicesPerMeasure(-1)`,
 
-    "slicesPerMeasureTooLarge.js": "slicesPerMeasure(257);",
+    "slicesPerMeasureNegative.js": "slicesPerMeasure(-1);",
 
     "createAudioSlice.py": "from earsketch import *\n" +
         "init()\n" +
