@@ -243,10 +243,7 @@ const rawDoc: { [key: string]: Item[] } = {
             start: "float",
             beat: "string",
             sliceStarts: "listArray",
-            stepsPerMeasure: {
-                type: "floatOptional",
-                default: "16",
-            },
+            stepsPerMeasure: "float",
         },
     }],
     print: [{
