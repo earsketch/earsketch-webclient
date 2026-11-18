@@ -24,15 +24,31 @@ describe("API function tests", () => {
         })
     }
 
-    function testPythonAndJavaScript(name, logs = []) {
-        testPython(name, logs)
+    function testPythonAndJavaScript(name, logs = [], checkResult = true) {
+        testPython(name, logs, checkResult)
 
         it(`should compile ${name} correctly in JavaScript`, async () => {
             const result = await runner.run("javascript", API_SCRIPTS[`${name}.js`])
-            expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.js`])
+            if (checkResult) {
+                expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.js`])
+            }
             const str = obj => typeof obj === "string" ? obj : JSON.stringify(obj)
             expect(ide.selectLogs(store.getState())).toEqual(logs.map(text => ({ level: "info", text: str(text) })))
         })
+    }
+
+    function testPythonAndJavaScriptError(name, message) {
+        for (const [language, ext] of [["python", "py"], ["javascript", "js"]]) {
+            it(`should raise an error for ${name} in ${language}`, async () => {
+                let error
+                try {
+                    await runner.run(language, API_SCRIPTS[`${name}.${ext}`])
+                } catch (e) {
+                    error = e
+                }
+                expect(String(error)).toContain(message)
+            })
+        }
     }
 
     // TODO: figure out why this number is different in the browser
@@ -70,6 +86,16 @@ describe("API function tests", () => {
     testPythonAndJavaScript("insertMediaSectionTimeStretchMiddle")
     // TODO: makeBeat
     testPythonAndJavaScript("makeBeatSlice")
+    testPythonAndJavaScript("makeBeatSliceDefault")
+    testPythonAndJavaScript("slicesPerMeasure")
+    testPythonAndJavaScript("slicesPerMeasureFractions", [
+        [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31],
+        Array.from({ length: 16 }, (_, x) => 1 + x / 1.5),
+        Array.from({ length: 16 }, (_, x) => 1 + x / 12),
+        Array.from({ length: 16 }, (_, x) => 1 + x / 1000),
+    ], false)
+    testPythonAndJavaScriptError("slicesPerMeasureZero", "n must be greater than 0")
+    testPythonAndJavaScriptError("slicesPerMeasureNegative", "n must be greater than 0")
     testPythonAndJavaScript("rhythmEffects")
     testPython("fitMediaReturnsNone", ["None"], false) // #2839
     testPython("selectRandomFileReturnsNone", ["None"], false) // #2823

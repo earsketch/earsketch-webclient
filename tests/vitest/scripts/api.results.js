@@ -564,6 +564,58 @@ export const API_RESULTS = {
             },
         ],
     },
+    makeBeatSliceDefault: {
+        tempo: 120,
+        length: 0.25,
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
+                },
+            },
+            {
+                clips: [
+                    { filekey: "HIPHOP_TRAPHOP_BEAT_002", measure: 1, start: 1, end: 1.0625 },
+                    { filekey: "HIPHOP_TRAPHOP_BEAT_002", measure: 1.0625, start: 1.0625, end: 1.125 },
+                    { filekey: "HIPHOP_TRAPHOP_BEAT_002", measure: 1.125, start: 1.125, end: 1.1875 },
+                    { filekey: "HIPHOP_TRAPHOP_BEAT_002", measure: 1.1875, start: 1.1875, end: 1.25 },
+                ],
+                effects: {},
+            },
+        ],
+    },
+    slicesPerMeasure: {
+        tempo: 120,
+        length: 0.5,
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
+                },
+            },
+            {
+                clips: [
+                    { filekey: "HIPHOP_TRAPHOP_BEAT_002", measure: 1, start: 1, end: 1.125 },
+                    { filekey: "HIPHOP_TRAPHOP_BEAT_002", measure: 1.125, start: 1.125, end: 1.25 },
+                    { filekey: "HIPHOP_TRAPHOP_BEAT_002", measure: 1.25, start: 1.25, end: 1.375 },
+                    { filekey: "HIPHOP_TRAPHOP_BEAT_002", measure: 1.375, start: 1.375, end: 1.5 },
+                ],
+                effects: {},
+            },
+        ],
+    },
     rhythmEffects: {
         init: true,
         finish: false,
