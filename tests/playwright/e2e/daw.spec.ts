@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test"
 import { setupBackend, TEST_USER, type AudioMeta } from "../helpers/mocks"
-import { skipTour, login, visitWithStubWebSocket } from "../helpers/actions"
+import { skipTour, login } from "../helpers/actions"
 
 const TEST_SOUND_META: AudioMeta = {
     artist: "RICHARD DEVINE",
@@ -39,7 +39,7 @@ async function setupSoundsAndScript(page: Page, script: string) {
         interceptScriptSave: true,
     })
 
-    await visitWithStubWebSocket(page, "/")
+    await page.goto("/")
     await skipTour(page)
     await login(page)
 

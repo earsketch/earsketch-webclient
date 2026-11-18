@@ -2,8 +2,6 @@ import store from "../reducers"
 import * as request from "../request"
 import { Notification, pushNotification, selectNotifications, setNotifications } from "./userState"
 
-export const user = { isAdmin: false, loginTime: Date.now() }
-
 export const callbacks = {
     show: (() => {}) as (text: string, type?: string, duration?: number) => void,
     popup: (() => {}) as (text: string, type?: string, duration?: number) => void,
@@ -95,14 +93,6 @@ export function loadHistory(notifications: Notification[]) {
 
 export function clearHistory() {
     store.dispatch(setNotifications([]))
-}
-
-// TODO: should receive notification collection here as well
-export function handleBroadcast(data: Notification) {
-    show("From EarSketch team: " + data.message.text, "broadcast")
-    data.time = Date.now()
-    data.pinned = true
-    store.dispatch(pushNotification(data))
 }
 
 export async function markAsRead(item: Notification) {

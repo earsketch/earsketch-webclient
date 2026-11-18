@@ -3,7 +3,6 @@
 // Also, they should be moved to more appropriate locations in .ts files as part of the JS->TS migration.
 
 declare const URL_DOMAIN: string
-declare const URL_WEBSOCKET: string
 declare const SITE_BASE_URI: string
 declare const BUILD_NUM: string
 
