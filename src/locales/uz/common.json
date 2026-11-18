@@ -883,8 +883,8 @@
         }
       },
       "example": {
-        "python": "# O'n oltidan bir nota qismli kesish va qayta tuzish\nsound = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(sound, 1, 1, \"4--04-0-30-10+30\", slices)",
-        "javascript": "// # O'n oltidan bir nota qismli kesish va qayta tuzish\nvar sound = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(sound, 1, 1, \"4--04-0-30-10+30\", slices);"
+        "python": "# Maxsus pozitsiyalarda kesish va qayta tuzish\nsound = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(sound, 1, 1, \"4--04-0-30-10+30\", slices)",
+        "javascript": "// Maxsus pozitsiyalarda kesish va qayta tuzish\nvar sound = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(sound, 1, 1, \"4--04-0-30-10+30\", slices);"
       }
     },
     "makeBeatSlice3": {

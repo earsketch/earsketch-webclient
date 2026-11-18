@@ -883,8 +883,8 @@
         }
       },
       "example": {
-        "python": "# Slicen und neu ordnen durch sechzehntel Noten\nsound = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(sound, 1, 1, \"4--04-0-30-10+30\", slices)",
-        "javascript": "// Slicen und neu ordnen durch sechzehntel Noten\nvar sound = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(sound, 1, 1, \"4--04-0-30-10+30\", slices);"
+        "python": "# Slicen und neu ordnen an eigenen Positionen\nsound = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(sound, 1, 1, \"4--04-0-30-10+30\", slices)",
+        "javascript": "// Slicen und neu ordnen an eigenen Positionen\nvar sound = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(sound, 1, 1, \"4--04-0-30-10+30\", slices);"
       }
     },
     "makeBeatSlice3": {
