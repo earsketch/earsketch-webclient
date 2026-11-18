@@ -843,16 +843,16 @@
       }
     },
     "makeBeatSlice1": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound. By default, the sound is sliced into sixteenth notes.",
+      "description": "Diese Funktion erstellt ein rhythmisches Muster, indem sie einen String angibt, der die Startposition in einer Sounddatei bezeichnet. Im Gegensatz zur Funktion makeBeat, die die Sounds immer von Anfang an abspielt, kannst du mit makeBeatSlice Rhythmen erstellen, die viele verschiedene Slices aus der gleichen Sounddatei kombinieren.",
       "parameters": {
         "sound": {
-          "description": "A single sound. Typically this is a constant from the sound browser"
+          "description": "Einzelne Sounddatei. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         },
         "track": {
-          "description": "Track to place pattern onto"
+          "description": "Track, auf dem das Muster platziert werden soll."
         },
         "start": {
-          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+          "description": "Position, an der die Sounddatei beginnt (Beispiel: 1 startet am Anfang von Takt 1)."
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" play the corresponding sixteenth-note slice of the sound for a sixteenth note (\"0\" is the first slice, \"1\" is the second, and so on). \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."

@@ -843,16 +843,16 @@
       }
     },
     "makeBeatSlice1": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound. By default, the sound is sliced into sixteenth notes.",
+      "description": "Tovush faylidagi boshlang'ich pozitsiyasini ko'rsatadigan belgilar satrini belgilash orqali ritmik andoza yaratadi. Tovushlarni doim boshidan ijro etadigan makeBeat-dan farqli o'laroq, makeBeatSlice sizga ayni tovush faylidan ko'plab turli tovush bo'laklarini birlashtirgan ritmlarni yaratishga imkon beradi.",
       "parameters": {
         "sound": {
-          "description": "A single sound. Typically this is a constant from the sound browser"
+          "description": "Yagona ovoz. Odatda bu ovoz brauzerining konstantasi."
         },
         "track": {
-          "description": "Track to place pattern onto"
+          "description": "Nanunani joylashtirish uchun trek"
         },
         "start": {
-          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+          "description": "Andozaning trek ichida boshlash joylashuvi (masalan, 1 raqamli 1-o'lchovning boshida ijro etishini bildiradi)."
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" play the corresponding sixteenth-note slice of the sound for a sixteenth note (\"0\" is the first slice, \"1\" is the second, and so on). \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
