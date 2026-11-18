@@ -883,8 +883,8 @@
         }
       },
       "example": {
-        "python": "# Slicen und neu ordnen durch sechzehntel Noten\ns = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices)",
-        "javascript": "// Slicen und neu ordnen durch sechzehntel Noten\nvar s = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices);"
+        "python": "# Slicen und neu ordnen durch sechzehntel Noten\nsound = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(sound, 1, 1, \"4--04-0-30-10+30\", slices)",
+        "javascript": "// Slicen und neu ordnen durch sechzehntel Noten\nvar sound = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(sound, 1, 1, \"4--04-0-30-10+30\", slices);"
       }
     },
     "makeBeatSlice3": {
@@ -910,8 +910,8 @@
         }
       },
       "example": {
-        "python": "# Slicen und neu ordnen durch Achtelnoten\nsound = HIPHOP_TRAPHOP_BEAT_002\neighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"01261264\"\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8)",
-        "javascript": "// Slicen und neu ordnen durch Achtelnoten\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
+        "python": "# Slicen und neu ordnen durch Achtelnoten\nsound = HIPHOP_TRAPHOP_BEAT_002\neighths = slicesPerMeasure(8)\nbeat = \"01261264\"\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8)",
+        "javascript": "// Slicen und neu ordnen durch Achtelnoten\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = slicesPerMeasure(8);\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
       }
     },
     "slicesPerMeasure": {
