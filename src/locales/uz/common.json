@@ -843,7 +843,7 @@
       }
     },
     "makeBeatSlice1": {
-      "description": "Tovush faylidagi boshlang'ich pozitsiyasini ko'rsatadigan belgilar satrini belgilash orqali ritmik andoza yaratadi. Tovushlarni doim boshidan ijro etadigan makeBeat-dan farqli o'laroq, makeBeatSlice sizga ayni tovush faylidan ko'plab turli tovush bo'laklarini birlashtirgan ritmlarni yaratishga imkon beradi.",
+      "description": "Tovush faylidagi boshlang'ich pozitsiyasini ko'rsatadigan belgilar satrini belgilash orqali ritmik andoza yaratadi. Tovushlarni doim boshidan ijro etadigan makeBeat-dan farqli o'laroq, makeBeatSlice sizga ayni tovush faylidan ko'plab turli tovush bo'laklarini birlashtirgan ritmlarni yaratishga imkon beradi. Odatiy holda tovush o'n oltidan bir notalarga kesiladi.",
       "parameters": {
         "sound": {
           "description": "Yagona ovoz. Odatda bu ovoz brauzerining konstantasi."
