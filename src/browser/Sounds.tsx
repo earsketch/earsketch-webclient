@@ -1197,7 +1197,11 @@ function buildFilterAnnouncement(filters: sounds.Filters, t: TFunction) {
 
     const parts = categories
         .filter(cat => filters[cat].length > 0)
-        .map(cat => `${t(`soundBrowser.filterDropdown.${cat}`)}: ${filters[cat].join(", ")}`)
+        .map(cat => t("soundBrowser.filterCategorySelected", {
+            num: filters[cat].length,
+            category: t(`soundBrowser.filterDropdown.${cat}`),
+            values: filters[cat].join(", "),
+        }))
 
     return parts.length
         ? `${t("soundBrowser.filtersActive")}: ${parts.join(". ")}`

@@ -18,6 +18,7 @@
     "soundBrowser.button.backToTop": "Back To Top",
     "soundBrowser.noResultsToPreview": "No sound results to preview.",
     "soundBrowser.filtersActive": "Filters active",
+    "soundBrowser.filterCategorySelected": "{{num}} {{category}} selected: {{values}}",
     "soundBrowser.noFiltersActive": "No filters active",
     "filter": "Filter",
     "startQuickTour": "Start Quick Tour",
