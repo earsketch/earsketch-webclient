@@ -9,8 +9,6 @@ import { selectScriptLanguage } from "../app/appState"
 import { SearchBar, analyzeJavaScriptCode, analyzePythonCode } from "./Utils"
 import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
-import * as cai from "../cai/caiState"
-import { addUIClick } from "../cai/dialogue/student"
 import { highlight } from "../ide/highlight"
 import { Language } from "common"
 
@@ -69,7 +67,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
             <div className="flex justify-between mb-2">
                 <span
                     className="font-bold cursor-pointer truncate" title={returnText}
-                    onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
+                    onClick={() => { obj.details = !obj.details; forceUpdate() }}
                     data-api-entry={name}
                     tabIndex={-1}
                 >
@@ -78,13 +76,13 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                 <div className="flex">
                     <button
                         className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 scale:text-xs rounded-full scale:px-2.5 border border-gray-600 ${tabsOpen ? "" : "hidden"}`}
-                        onClick={() => { paste(name, obj); addUIClick("api copy - " + name) }}
+                        onClick={() => { paste(name, obj) }}
                         title={t("api:pasteToCodeEditor", { name })}
                         aria-label={t("api:pasteToCodeEditor", { name })}>
                         <i className="icon icon-paste2" />
                     </button>
                     <button className="hover:bg-gray-200 active:bg-gray-300 h-full scale:text-sm rounded-full pl-1.5 border border-gray-600 whitespace-nowrap"
-                        onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
+                        onClick={() => { obj.details = !obj.details; forceUpdate() }}
                         title={obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}
                         aria-label={`${obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}`}>
                         <div className="inline-block scale:w-10">{obj.details ? t("api:close") : t("api:open")}</div>
@@ -181,9 +179,8 @@ const APISearchBar = () => {
     const count = useSelector(api.selectFilteredEntries).length
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(api.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(api.setSearchText(""))
-    const caiHighlight = useSelector(cai.selectHighlight)
     const liveMessage = t("searchResults", { count })
-    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", aria: t("ariaDescriptors:api.searchBar"), liveMessage, firstResultSelector: "#panel-2 button", highlight: caiHighlight.zone === "apiSearchBar" }
+    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", aria: t("ariaDescriptors:api.searchBar"), liveMessage, firstResultSelector: "#panel-2 button" }
 
     return <SearchBar {...props} />
 }

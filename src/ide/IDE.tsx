@@ -8,9 +8,6 @@ import Split from "react-split"
 import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
-import { CAI } from "../cai/CAI"
-import * as caiThunks from "../cai/caiThunks"
-import { Chat } from "../cai/Chat"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
@@ -324,10 +321,6 @@ async function runScript() {
         reporter.compile(language, false, errType, duration)
 
         saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
-
-        if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
-            store.dispatch(caiThunks.compileError(error))
-        }
         return
     }
 
@@ -353,13 +346,6 @@ async function runScript() {
         // Update previousDAWData for next comparison and track current scriptID
         previousDAWData = cloneDAWDataForComparison(result)
         lastScriptID = scriptID
-    }
-
-    // asynchronously report the script complexity
-    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
-        window.setTimeout(() => {
-            store.dispatch(caiThunks.compileCai([result, language, code]))
-        })
     }
 
     const { bubble } = state
@@ -389,8 +375,6 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
 
     const bubbleActive = useSelector(bubble.selectActive)
     const bubblePage = useSelector(bubble.selectCurrentPage)
-
-    const showCai = useSelector(layout.selectEastKind) === "CAI" && (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT)
 
     const logs = useSelector(ide.selectLogs)
     const consoleContainer = useRef<HTMLDivElement>(null)
@@ -549,16 +533,8 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                 </Split>
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {(showCai || ES_WEB_UPLOAD_CAI_HISTORY) &&
-                        (<div className={(!showCai && ES_WEB_UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
-                            {(ES_WEB_SHOW_CHAT
-                                ? <Chat />
-                                : <CAI />)}
-                        </div>)}
-                    <div className={showCai ? "h-full hidden" : "h-full"}>
-                        <div className={eastContent !== "curriculum" ? "hidden" : "h-full"}><Curriculum /></div>
-                        <div className={eastContent === "curriculum" ? "hidden" : "h-full"}><ExtensionHost /></div>
-                    </div>
+                    <div className={eastContent !== "curriculum" ? "hidden" : "h-full"}><Curriculum /></div>
+                    <div className={eastContent === "curriculum" ? "hidden" : "h-full"}><ExtensionHost /></div>
                 </div>
             </Split>
         </div>

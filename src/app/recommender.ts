@@ -111,7 +111,7 @@ export function fillDict(sounds: SoundEntity []) {
         }
     }
 
-    // Update list of audio samples for audio recommendation input/CAI output.
+    // Update list of audio samples for audio recommendation input.
     AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS).filter((key) => {
         return soundDict[key] !== null
     })

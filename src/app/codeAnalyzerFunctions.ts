@@ -1,11 +1,9 @@
 import type { DAWData, Script } from "common"
 import { getScriptHistory } from "../browser/scriptsThunks"
-import { MeasureView, SoundProfile, analyzeCode, analyzeMusic } from "../cai/analysis"
-import { Assessment, CaiHistoryNode, assess, timeOnTask } from "../cai/analysis/creativityAssessment"
-import { DepthBreadth, FunctionCounts } from "../cai/complexityCalculator"
-import esconsole from "../esconsole"
+import { MeasureView, SoundProfile, analyzeCode, analyzeMusic } from "../analysis"
+import { Assessment, assess } from "../analysis/creativityAssessment"
+import { DepthBreadth, FunctionCounts } from "../analysis/complexityCalculator"
 import { parseLanguage } from "../esutils"
-import { getAuth } from "../request"
 import { compile } from "./Autograder"
 import * as exporter from "./exporter"
 import * as reader from "./reader"
@@ -48,7 +46,7 @@ export interface ReportOptions {
     CREATIVITY: boolean
 }
 
-const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
+export const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
     const headers = [useContestID ? "contestID" : "username", "script_name", "shareid", "version", "modified", "error"]
     const rows: string[] = []
     const colMap: { [key: string]: { [key: string]: number } } = {}
@@ -105,7 +103,7 @@ export const download = (results: Result[], useContestID: boolean, options: Repo
 }
 
 // Run a single script and add the result to the results list.
-export const runScript = async (script: Script, version?: number, timeOnTaskPercentage?: number): Promise<Result> => {
+export const runScript = async (script: Script, version?: number): Promise<Result> => {
     const codeComplexity: AnalyzerReport = {}
     let compilerOutput: DAWData
 
@@ -128,7 +126,7 @@ export const runScript = async (script: Script, version?: number, timeOnTaskPerc
     }
     const analyzerReport = analyzeMusic(compilerOutput)
 
-    const creativityAssessment = await assess(complexityOutput, analyzerReport, timeOnTaskPercentage)
+    const creativityAssessment = await assess(complexityOutput, analyzerReport)
 
     const reports: Reports = {
         OVERVIEW: analyzerReport.OVERVIEW,
@@ -153,10 +151,8 @@ export const runScript = async (script: Script, version?: number, timeOnTaskPerc
     return result
 }
 
-export const runScriptHistory = async (script: Script, useHistory?: boolean, useCaiHistory?: boolean) => {
+export const runScriptHistory = async (script: Script, useHistory?: boolean) => {
     let scriptHistory: Script[] = []
-    let caiHistory: CaiHistoryNode[] = []
-    let timeOnTaskPercentages: number[] = []
 
     if (useHistory) {
         try {
@@ -167,23 +163,9 @@ export const runScriptHistory = async (script: Script, useHistory?: boolean, use
         }
     }
 
-    if (useCaiHistory) {
-        try {
-            // Retrieve script history.
-            caiHistory = await getCaiHistory(script.username, script.name)
-            console.log("cai history", caiHistory)
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
     if (!scriptHistory.length) {
         // No history: run current version of script.
         return [await runScript(script)]
-    }
-
-    if (useHistory && useCaiHistory) {
-        timeOnTaskPercentages = timeOnTask(scriptHistory, caiHistory)
     }
 
     const results: Result[] = []
@@ -192,15 +174,8 @@ export const runScriptHistory = async (script: Script, useHistory?: boolean, use
         version.name = script.name
         version.username = script.username
         version.shareid = script.shareid
-        results.push(await runScript(version, idx, timeOnTaskPercentages[idx]))
+        results.push(await runScript(version, idx))
     }
 
     return results
-}
-
-// Fetch a script's history. Resolves to a list of historical scripts.
-async function getCaiHistory(username: string, project: string) {
-    esconsole("Getting cai history: " + username, ["debug", "user"])
-    const history = await getAuth("/studies/caihistory", { username, project })
-    return history
 }

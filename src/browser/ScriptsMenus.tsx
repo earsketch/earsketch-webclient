@@ -7,8 +7,6 @@ import { Script, ScriptType } from "common"
 import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
-import * as cai from "../cai/caiState"
-import * as caiThunks from "../cai/caiThunks"
 import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importScript, saveScript } from "./scriptsThunks"
@@ -25,7 +23,6 @@ interface ScriptMenuItem {
     icon: string;
     visible: boolean;
     disabled?: boolean;
-    highlighted?: boolean;
 }
 
 export const ScriptDropdownMenu = ({ script, scriptType, menuType, className, children }: { script: Script, scriptType: ScriptType, menuType: "buttonmenu" | "contextmenu", className?: string, children?: React.ReactNode }) => {
@@ -35,9 +32,6 @@ export const ScriptDropdownMenu = ({ script, scriptType, menuType, className, ch
 
     const loggedIn = useSelector(user.selectLoggedIn)
     const openTabs = useSelector(tabs.selectOpenTabs)
-
-    const caiHighlight = useSelector(cai.selectHighlight)
-    const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
 
     const scriptMenuItems: ScriptMenuItem[] = [{
         name: t("thing.open"),
@@ -100,13 +94,9 @@ export const ScriptDropdownMenu = ({ script, scriptType, menuType, className, ch
         aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),
         onClick: () => {
             script && openScriptHistory(script, !script.isShared)
-            if (highlight) {
-                caiThunks.highlight({ zone: null })
-            }
         },
         icon: "icon-history",
         disabled: !loggedIn || scriptType === "readonly",
-        highlighted: highlight,
         visible: true,
     }, {
         name: t("script.codeIndicator"),
@@ -154,14 +144,12 @@ export const ScriptDropdownMenu = ({ script, scriptType, menuType, className, ch
 
 const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptMenuItems: ScriptMenuItem[] }) => {
     const { t } = useTranslation()
-    const caiHighlight = useSelector(cai.selectHighlight)
-    const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
     const scaledFontSize = useSelector(appState.selectScaledFontSize)
 
     return <Menu>
         <MenuButton
             onClick={(event) => { event.stopPropagation() }}
-            className={`flex justify-left truncate ${highlight ? "border-yellow-500 border-4" : ""}`}
+            className="flex justify-left truncate"
             title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
         >
@@ -187,13 +175,12 @@ const ScriptMenuButton = ({ script, scriptMenuItems }: { script: Script, scriptM
                 )}
 
             </MenuItem>
-            {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true, highlighted }) => visible && <MenuItem key={name} disabled={disabled}>
+            {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true }) => visible && <MenuItem key={name} disabled={disabled}>
                 {({ active }) => (
                     <button
                         className={"flex items-center justify-start py-1.5 space-x-2 scale:text-sm text-black dark:text-white w-full " +
                                   (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
-                                  (disabled ? "cursor-not-allowed" : "cursor-pointer") + " " +
-                                  (highlighted ? "border-yellow-500 border-4" : "")}
+                                  (disabled ? "cursor-not-allowed" : "cursor-pointer")}
                         onClick={onClick}
                         aria-label={aria}
                         title={aria}
@@ -224,11 +211,10 @@ const ScriptContextMenu = ({ script, className, children, scriptMenuItems }: { s
                             </div>
                         </div>
                     </ContextMenu.Item>
-                    {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible, highlighted }) => {
+                    {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible }) => {
                         const menuItemsClasses = classNames("focus:outline-none data-[highlighted]:bg-blue-200 dark:data-[highlighted]:bg-blue-500 bg-white dark:bg-black flex items-center justify-start py-1.5 space-x-2 scale:text-sm text-black dark:text-white w-full", {
                             "cursor-not-allowed": disabled,
                             "cursor-pointer": !disabled,
-                            "border-yellow-500 border-4": highlighted,
                         })
                         return visible && <ContextMenu.Item
                             key={name}

@@ -6,7 +6,6 @@ import * as ESUtils from "../esutils"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import type { ThunkAPI } from "../reducers"
-import { addTabSwitch } from "../cai/dialogue/student"
 import reporter from "../app/reporter"
 import { selectActiveTabID, selectOpenTabs, selectModifiedScripts, openAndActivateTab, closeTab as pureCloseTab, removeModifiedScript, resetModifiedScripts, resetTabs as pureResetTabs } from "./tabState"
 import { createSession, getSession, deleteSession, deleteAllSessions, setActiveSession, setReadOnly } from "./Editor"
@@ -58,7 +57,6 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
             reporter.openScript()
         }
         dispatch(openAndActivateTab(scriptID))
-        addTabSwitch(script.name)
     }
 )
 
@@ -76,9 +74,6 @@ export const closeAndSwitchTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(resetTabs())
         } else if (activeTabID !== scriptID) {
             dispatch(closeTab(scriptID))
-            if (activeTabID !== null) {
-                addTabSwitch(scripts.selectAllScripts(getState())[activeTabID].name)
-            }
         } else if (openTabs.length > 1 && closedTabIndex === openTabs.length - 1) {
             const nextActiveTabID = openTabs[openTabs.length - 2]
             dispatch(setActiveTabAndEditor(nextActiveTabID))
