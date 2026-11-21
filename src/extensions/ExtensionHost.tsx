@@ -135,7 +135,7 @@ export const ExtensionHost = () => {
             <div dir={currentLocale.direction} className={`h-full ${paneIsOpen ? "" : "hidden"}`}>
                 <TitleBar isCurriculumPane={false} />
                 <div className="w-full flex justify-between items-stretch select-none text-white bg-blue">
-                    <div className="flex items-center gap-2 p-2.5 text-amber">
+                    <div id="extensionTitleBar" tabIndex={-1} className="flex items-center gap-2 p-2.5 text-amber">
                         {extensionIcon32 && <img src={extensionIcon32} alt="" className="w-5 h-5 border border-gray-300 dark:border-gray-400 rounded" />}
                         <span>{extensionName.toLocaleUpperCase()}</span>
                     </div>
