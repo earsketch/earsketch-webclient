@@ -23,6 +23,8 @@ import * as uiLogger from "../app/uiLogger"
 import reporter from "../app/reporter"
 import { Waveform } from "../app/Recorder"
 import * as audioLibrary from "../app/audiolibrary"
+import { Transition } from "@headlessui/react"
+import { usePopper } from "react-popper"
 
 const TABBABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
@@ -470,6 +472,47 @@ const AddSound = () => {
 
 type ClipPreviewState = "play" | "loading" | "stop"
 
+const useCopyToClipboard = () => {
+    const [copied, setCopied] = useState(false)
+    const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null)
+    const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
+    const { styles, attributes } = usePopper(referenceElement, popperElement, {
+        placement: "top",
+        modifiers: [{ name: "offset", options: { offset: [0, 8] } }],
+    })
+
+    const copy = (text: string) => {
+        window.navigator.clipboard.writeText(text).then(() => {
+            setCopied(true)
+            console.log(`Copied ${text} sound constant to clipboard`)
+            window.setTimeout(() => setCopied(false), 1000)
+        })
+    }
+
+    const popover = (
+        <Transition
+            show={copied}
+            as="div"
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 scale-95 translate-y-1"
+            enterTo="opacity-100 scale-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 scale-100 translate-y-0"
+            leaveTo="opacity-0 scale-95 translate-y-1"
+            className="origin-bottom-left"
+            style={styles.popper}
+            {...attributes.popper}
+            ref={setPopperElement}
+        >
+            <div className="bg-white p-2 rounded-md shadow-md">
+                Copied!
+            </div>
+        </Transition>
+    )
+
+    return { copied, copy, setReferenceElement, popover }
+}
+
 interface ClipProps {
     clip: SoundEntity
     bgcolor: string
@@ -500,15 +543,28 @@ const Clip = React.memo(({ clip, bgcolor, borderColor, previewState, loggedIn, i
         </div>
     )
 
+    const { copied, copy, setReferenceElement, popover } = useCopyToClipboard()
+
     return (
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${borderColor}`}>
                 <div className="flex items-center min-w-0">
+                    {popover}
+                    <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+                        {copied ? `Copied ${name} to clipboard` : ""}
+                    </span>
                     <Tooltip.Provider delayDuration={600} disableHoverableContent>
                         <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                                <h5 className="scale:text-sm truncate pl-2 cursor-default" tabIndex={-1}>{name}</h5>
+                                <div
+                                    ref={setReferenceElement}
+                                    className="flex items-center min-w-0 cursor-pointer"
+                                    onClick={() => copy(name)}
+                                    aria-label={`Copy ${name} to clipboard`}
+                                >
+                                    <h5 className="scale:text-sm truncate pl-2 cursor-default" tabIndex={-1}>{name}</h5>
+                                </div>
                             </Tooltip.Trigger>
                             <Tooltip.Portal>
                                 <Tooltip.Content
